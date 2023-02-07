@@ -1,8 +1,6 @@
 # Dokkatoo
 
-Generates documentation from Kotlin code.
-
-Based on Kotlin Dokka.
+Dokkatoo generates documentation for Kotlin Gradle projects (based on Dokka).
 
 * Compatible with Gradle Build Cache
 * Compatible with Gradle Configuration Cache
