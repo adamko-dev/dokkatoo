@@ -1,0 +1,231 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "dev.adamko.dokkatoo",
+    "module": "dokkatoo",
+    "version": "0.0.1-SNAPSHOT",
+    "attributes": {
+      "org.gradle.status": "integration"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "7.6"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.environment": "standard-jvm",
+        "org.gradle.jvm.version": 11,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "files": [
+        {
+          "name": "dokkatoo-0.0.1-SNAPSHOT.jar",
+          "url": "dokkatoo-0.0.1-SNAPSHOT.jar",
+          "size": 276666,
+          "sha512": "78ac394b1962da2dba8c688002c419c3cf5368ff9fd8650d9c1d9dfe6b7cd1c640e0d6b479aceb6e7fc8064d6e2ef9a7acb2c3690cbc2d3665cd7c528752e496",
+          "sha256": "b1c866dd1d89d09055e3b5705674954df5b0e30182007330018679c90ad9e7c1",
+          "sha1": "d50088c46bf7ca844174b382cb028a2dd0e1b09c",
+          "md5": "34b67a8763b0ae1761a7eb92b9d7b058"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.environment": "standard-jvm",
+        "org.gradle.jvm.version": 11,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "org.jetbrains.dokka",
+          "module": "dokka-core",
+          "version": {
+            "requires": "1.7.20"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlinx",
+          "module": "kotlinx-serialization-json",
+          "version": {
+            "requires": "1.4.1"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "dokkatoo-0.0.1-SNAPSHOT.jar",
+          "url": "dokkatoo-0.0.1-SNAPSHOT.jar",
+          "size": 276666,
+          "sha512": "78ac394b1962da2dba8c688002c419c3cf5368ff9fd8650d9c1d9dfe6b7cd1c640e0d6b479aceb6e7fc8064d6e2ef9a7acb2c3690cbc2d3665cd7c528752e496",
+          "sha256": "b1c866dd1d89d09055e3b5705674954df5b0e30182007330018679c90ad9e7c1",
+          "sha1": "d50088c46bf7ca844174b382cb028a2dd0e1b09c",
+          "md5": "34b67a8763b0ae1761a7eb92b9d7b058"
+        }
+      ]
+    },
+    {
+      "name": "testFixturesApiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 11,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "dependencies": [
+        {
+          "group": "dev.adamko.dokkatoo",
+          "module": "dokkatoo",
+          "version": {
+            "requires": "0.0.1-SNAPSHOT"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib-jdk8",
+          "version": {
+            "requires": "1.7.10"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "dokkatoo-0.0.1-SNAPSHOT-test-fixtures.jar",
+          "url": "dokkatoo-0.0.1-SNAPSHOT-test-fixtures.jar",
+          "size": 22135,
+          "sha512": "c5096561507f90b3d0d78a3a7684ef3e433920a3dc2199bb1b669e86fca18fa1183f353c018de5d5cc7a2b2b8c989afd5521d0e1cf558acf04029352e1f319b8",
+          "sha256": "d84bff79a71716cf37f6ebc2c3ef22fe683cd028608c8e16d859397e9e7f5ab0",
+          "sha1": "d4c00ed309a4f5e1c5f874a608bad4f2fab686e7",
+          "md5": "a7160324b73e1882d6d11c643035bd29"
+        }
+      ],
+      "capabilities": [
+        {
+          "group": "dev.adamko.dokkatoo",
+          "name": "dokkatoo-base-plugin-test-fixtures",
+          "version": "0.0.1-SNAPSHOT"
+        }
+      ]
+    },
+    {
+      "name": "testFixturesRuntimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 11,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlinx",
+          "module": "kotlinx-serialization-json",
+          "version": {
+            "requires": "1.4.1"
+          }
+        },
+        {
+          "group": "com.fasterxml.jackson.module",
+          "module": "jackson-module-kotlin",
+          "version": {
+            "requires": "2.12.7"
+          }
+        },
+        {
+          "group": "dev.adamko.dokkatoo",
+          "module": "dokkatoo",
+          "version": {
+            "requires": "0.0.1-SNAPSHOT"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib-jdk8",
+          "version": {
+            "requires": "1.7.10"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "dokkatoo-0.0.1-SNAPSHOT-test-fixtures.jar",
+          "url": "dokkatoo-0.0.1-SNAPSHOT-test-fixtures.jar",
+          "size": 22135,
+          "sha512": "c5096561507f90b3d0d78a3a7684ef3e433920a3dc2199bb1b669e86fca18fa1183f353c018de5d5cc7a2b2b8c989afd5521d0e1cf558acf04029352e1f319b8",
+          "sha256": "d84bff79a71716cf37f6ebc2c3ef22fe683cd028608c8e16d859397e9e7f5ab0",
+          "sha1": "d4c00ed309a4f5e1c5f874a608bad4f2fab686e7",
+          "md5": "a7160324b73e1882d6d11c643035bd29"
+        }
+      ],
+      "capabilities": [
+        {
+          "group": "dev.adamko.dokkatoo",
+          "name": "dokkatoo-base-plugin-test-fixtures",
+          "version": "0.0.1-SNAPSHOT"
+        }
+      ]
+    },
+    {
+      "name": "sourcesElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "dokkatoo-0.0.1-SNAPSHOT-sources.jar",
+          "url": "dokkatoo-0.0.1-SNAPSHOT-sources.jar",
+          "size": 35910,
+          "sha512": "7bb0a8dd1a4281bdbab304077feaea7a0e61c610b794a6870f35b8f7673cfd5edc9c54d5e444f3a646a50bb246daac087c35fc0e18dbbff9fc152bc336986af3",
+          "sha256": "e6a3463bf5f7d9611a739af3b68ab6bbfba30b1676ead2a848ccdb278b8c36bc",
+          "sha1": "9735cc6ccec3fdd22a9ca51029ca6c4904677591",
+          "md5": "9a3e7619771a50c0f342940d37f7602e"
+        },
+        {
+          "name": "dokkatoo-0.0.1-SNAPSHOT-sources.jar",
+          "url": "dokkatoo-0.0.1-SNAPSHOT-sources.jar",
+          "size": 35910,
+          "sha512": "7bb0a8dd1a4281bdbab304077feaea7a0e61c610b794a6870f35b8f7673cfd5edc9c54d5e444f3a646a50bb246daac087c35fc0e18dbbff9fc152bc336986af3",
+          "sha256": "e6a3463bf5f7d9611a739af3b68ab6bbfba30b1676ead2a848ccdb278b8c36bc",
+          "sha1": "9735cc6ccec3fdd22a9ca51029ca6c4904677591",
+          "md5": "9a3e7619771a50c0f342940d37f7602e"
+        }
+      ]
+    },
+    {
+      "name": "javadocElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "javadoc",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "dokkatoo-0.0.1-SNAPSHOT-javadoc.jar",
+          "url": "dokkatoo-0.0.1-SNAPSHOT-javadoc.jar",
+          "size": 261,
+          "sha512": "747d2f00a7f5f379582e33e452f30f3a25732a510971d9ed5161355bf7ef0fc507fef30883960dbfc780d36b6e8215fba01086b4ee053358805686e2f2c1aa85",
+          "sha256": "69e1a62e5752ca3f43fb1607f161379bbe88b64af89c1a543c126160adf7cc53",
+          "sha1": "5b8f86fea035328fc9e8c660773037a3401ce25f",
+          "md5": "e7e9f45eb9d74540092920528bb0abf0"
+        }
+      ]
+    }
+  ]
+}
