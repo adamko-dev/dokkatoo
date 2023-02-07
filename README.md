@@ -7,6 +7,11 @@ Based on Kotlin Dokka.
 * Compatible with Gradle Build Cache
 * Compatible with Gradle Configuration Cache
 * Safe cross-project sharing and aggregation
+* Parallel execution
+
+## Status
+
+Experimental early release, lots of things are broken and undocumented.
 
 ## Usage
 
@@ -64,7 +69,7 @@ plugins {
 
 #### Dokkatoo Gradle Tasks
 
-Then any of the Dokkatoo tasks can be run to generate a documentation site in the
+Any Dokkatoo tasks can be run to generate a documentation site in the
 `build/dokkatoo` directory.
 
 ```shell
@@ -80,7 +85,8 @@ Then any of the Dokkatoo tasks can be run to generate a documentation site in th
 
 ### Combining subprojects
 
-Any subproject can aggregate multiple subprojects into one Dokka Publication.
+Any subproject can depend on other subprojects to aggregate them all into a single Dokka
+Publication.
 
 ```kts
 // ./build.gradle.kts
@@ -107,6 +113,7 @@ specific plugins are provided:
 // ./build.gradle.kts
 
 plugins {
+  // apply any one plugin to automatically configure a single format
   id("dev.adamko.dokkatoo-html")
   id("dev.adamko.dokkatoo-gfm")
   id("dev.adamko.dokkatoo-jekyll")
