@@ -1,17 +1,30 @@
 package dev.adamko.dokkatoo
 
 import dev.adamko.dokkatoo.tasks.DokkatooCreateConfigurationTask
+import io.kotest.matchers.shouldBe
 import kotlin.test.Test
 import org.gradle.api.Action
+import org.gradle.kotlin.dsl.apply
+import org.gradle.kotlin.dsl.hasPlugin
 import org.gradle.kotlin.dsl.withType
 import org.gradle.testfixtures.ProjectBuilder
 
 class DokkatooPluginTest {
 
   @Test
-  fun `expect plugin can be applied to project successfully`() {
+  fun `expect plugin id can be applied to project successfully`() {
     val project = ProjectBuilder.builder().build()
     project.plugins.apply("dev.adamko.dokkatoo")
+    project.plugins.hasPlugin("dev.adamko.dokkatoo") shouldBe true
+    project.plugins.hasPlugin(DokkatooPlugin::class) shouldBe true
+  }
+
+  @Test
+  fun `expect plugin class can be applied to project successfully`() {
+    val project = ProjectBuilder.builder().build()
+    project.plugins.apply(type = DokkatooPlugin::class)
+    project.plugins.hasPlugin("dev.adamko.dokkatoo") shouldBe true
+    project.plugins.hasPlugin(DokkatooPlugin::class) shouldBe true
   }
 
   @Test
