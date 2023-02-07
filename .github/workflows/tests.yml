@@ -26,13 +26,6 @@ jobs:
         os: [ macos-latest, ubuntu-latest, windows-latest ]
         task:
           - check --continue
-        include:
-          - os: macos-latest
-            task: macosX64Test
-          - os: ubuntu-latest
-            task: linuxX64Test
-          - os: windows-latest
-            task: mingwX64Test
       fail-fast: false
     uses: ./.github/workflows/gradle_task.yml
     with:
