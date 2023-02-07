@@ -5,43 +5,43 @@
   <version>0.0.1-SNAPSHOT</version>
   <versioning>
     <snapshot>
-      <timestamp>20230207.151633</timestamp>
+      <timestamp>20230207.151814</timestamp>
       <buildNumber>1</buildNumber>
     </snapshot>
-    <lastUpdated>20230207151633</lastUpdated>
+    <lastUpdated>20230207151814</lastUpdated>
     <snapshotVersions>
-      <snapshotVersion>
-        <extension>pom</extension>
-        <value>0.0.1-20230207.151633-1</value>
-        <updated>20230207151633</updated>
-      </snapshotVersion>
-      <snapshotVersion>
-        <extension>jar</extension>
-        <value>0.0.1-20230207.151633-1</value>
-        <updated>20230207151633</updated>
-      </snapshotVersion>
       <snapshotVersion>
         <classifier>javadoc</classifier>
         <extension>jar</extension>
-        <value>0.0.1-20230207.151633-1</value>
-        <updated>20230207151633</updated>
+        <value>0.0.1-20230207.151814-1</value>
+        <updated>20230207151814</updated>
       </snapshotVersion>
       <snapshotVersion>
-        <classifier>sources</classifier>
-        <extension>jar</extension>
-        <value>0.0.1-20230207.151633-1</value>
-        <updated>20230207151633</updated>
-      </snapshotVersion>
-      <snapshotVersion>
-        <extension>module</extension>
-        <value>0.0.1-20230207.151633-1</value>
-        <updated>20230207151633</updated>
+        <extension>pom</extension>
+        <value>0.0.1-20230207.151814-1</value>
+        <updated>20230207151814</updated>
       </snapshotVersion>
       <snapshotVersion>
         <classifier>test-fixtures</classifier>
         <extension>jar</extension>
-        <value>0.0.1-20230207.151633-1</value>
-        <updated>20230207151633</updated>
+        <value>0.0.1-20230207.151814-1</value>
+        <updated>20230207151814</updated>
+      </snapshotVersion>
+      <snapshotVersion>
+        <extension>module</extension>
+        <value>0.0.1-20230207.151814-1</value>
+        <updated>20230207151814</updated>
+      </snapshotVersion>
+      <snapshotVersion>
+        <extension>jar</extension>
+        <value>0.0.1-20230207.151814-1</value>
+        <updated>20230207151814</updated>
+      </snapshotVersion>
+      <snapshotVersion>
+        <classifier>sources</classifier>
+        <extension>jar</extension>
+        <value>0.0.1-20230207.151814-1</value>
+        <updated>20230207151814</updated>
       </snapshotVersion>
     </snapshotVersions>
   </versioning>
