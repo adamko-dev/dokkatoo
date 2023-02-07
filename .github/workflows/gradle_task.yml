@@ -1,0 +1,61 @@
+name: Gradle Task
+run-name: "Gradle Task ${{ inputs.gradle-task }} @ ${{ inputs.runs-on }}"
+
+# Reusable Workflow for running a Gradle task
+
+on:
+  workflow_dispatch:
+
+  workflow_call:
+    inputs:
+      gradle-task:
+        description: "The Gradle task to run, including any flags"
+        required: true
+        type: string
+      runs-on:
+        description: "OSes to run the task on"
+        required: true
+        type: string
+
+
+concurrency:
+  # note: the Workflow inputs are also included in the concurrency group
+  group: "${{ github.workflow }} ${{ join(inputs.*) }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}"
+  cancel-in-progress: true
+
+
+permissions:
+  contents: read
+
+
+jobs:
+
+  run-task:
+    runs-on: ${{ inputs.runs-on }}
+    name: "./gradlew ${{ inputs.gradle-task}} @ ${{ inputs.runs-on }}"
+    timeout-minutes: 60
+    steps:
+
+      ### Gradle task ###
+
+      - name: Checkout the repo
+        uses: actions/checkout@v3
+
+      - name: Setup JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 11
+
+      - uses: gradle/gradle-build-action@v2
+        with:
+          gradle-home-cache-cleanup: true
+          arguments: ${{ inputs.gradle-task }}
+
+      - name: Upload build reports
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-report-${{ runner.os }}${{ github.action }}
+          path: "**/build/reports/"
+          if-no-files-found: ignore
