@@ -3,6 +3,7 @@ package dev.adamko.dokkatoo.it
 import dev.adamko.dokkatoo.dokka.parameters.DokkaParametersKxs
 import dev.adamko.dokkatoo.utils.gradleKtsProjectIntegrationTest
 import dev.adamko.dokkatoo.utils.gradleProperties
+import dev.adamko.dokkatoo.utils.invariantNewlines
 import dev.adamko.dokkatoo.utils.parseJson
 import io.kotest.assertions.withClue
 import io.kotest.matchers.collections.shouldBeSameSizeAs
@@ -46,8 +47,8 @@ class BasicProjectIntegrationTest {
       )
       .build()
 
-    build.output shouldContain "BUILD SUCCESSFUL"
-    build.output shouldContain "Generation completed successfully"
+    build.output.invariantNewlines() shouldContain "BUILD SUCCESSFUL"
+    build.output.invariantNewlines() shouldContain "Generation completed successfully"
 
 
     val actualDokkaConfJson = basicProject
