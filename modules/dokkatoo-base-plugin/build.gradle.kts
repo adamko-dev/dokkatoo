@@ -11,8 +11,6 @@ plugins {
   `test-report-aggregation`
 
   buildsrc.conventions.`github-maven-publish`
-
-//    id("org.jetbrains.kotlinx.binary-compatibility-validator") version "0.12.1"
 }
 
 dependencies {
