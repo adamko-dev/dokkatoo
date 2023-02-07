@@ -9,6 +9,7 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.api.provider.Provider
+import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.withType
 
@@ -22,7 +23,9 @@ abstract class DokkatooFormatPlugin @Inject constructor(
 ) : Plugin<Project> {
 
   final override fun apply(target: Project) {
-    // TODO maybe auto apply DokkatooPlugin? Then these plugins can be used independently
+
+    // apply DokkatooPlugin (does nothing if already applied)
+    target.pluginManager.apply(DokkatooPlugin::class)
 
     target.plugins.withType<DokkatooPlugin>().configureEach {
       val dokkatooExtension = target.extensions.getByType(DokkatooExtension::class)
