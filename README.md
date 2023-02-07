@@ -56,7 +56,6 @@ Any subproject can aggregate multiple subprojects into one Dokka Publication.
 // ./build.gradle.kts
 
 plugins {
-  kotlin("jvm") version "1.8.0" apply false // required by Gradle
   id("dev.adamko.dokkatoo") version "0.0.1-SNAPSHOT"
 }
 
