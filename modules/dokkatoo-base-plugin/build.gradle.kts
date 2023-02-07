@@ -38,7 +38,7 @@ java {
 }
 
 gradlePlugin {
-  plugins.create("dokkatoo") {
+  plugins.register("dokkatoo") {
     id = "dev.adamko.dokkatoo"
     displayName = "Dokkatoo"
     description = "Generates documentation sites for Kotlin projects using Dokka"
@@ -47,7 +47,7 @@ gradlePlugin {
   }
 
   fun registerDokkaPlugin(format: String, className: String) {
-    plugins.create("dokkatoo${format.toLowerCase().capitalize()}") {
+    plugins.register("dokkatoo${format.toLowerCase().capitalize()}") {
       id = "dev.adamko.dokkatoo-${format.toLowerCase()}"
       displayName = "Dokkatoo $format"
       description = "Generates $format documentation sites for Kotlin projects using Dokka"
