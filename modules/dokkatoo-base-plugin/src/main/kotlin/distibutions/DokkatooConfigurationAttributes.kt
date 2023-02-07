@@ -41,10 +41,13 @@ abstract class DokkatooConfigurationAttributes @Inject constructor(
 
   companion object {
     val DOKKATOO_BASE_ATTRIBUTE =
-      Attribute.of("dev.adamko.dokkatoo.base", DokkatooBaseAttribute::class.java)
+      Attribute<DokkatooBaseAttribute>("dev.adamko.dokkatoo.base")
     val DOKKATOO_CATEGORY_ATTRIBUTE =
-      Attribute.of("dev.adamko.dokkatoo.category", DokkatooCategoryAttribute::class.java)
+      Attribute<DokkatooCategoryAttribute>("dev.adamko.dokkatoo.category")
     val DOKKA_FORMAT_ATTRIBUTE =
-      Attribute.of("dev.adamko.dokkatoo.format", DokkatooCategoryAttribute::class.java)
+      Attribute<DokkaFormatAttribute>("dev.adamko.dokkatoo.format")
+
+    private inline fun <reified T> Attribute(name: String): Attribute<T> =
+      Attribute.of(name, T::class.java)
   }
 }

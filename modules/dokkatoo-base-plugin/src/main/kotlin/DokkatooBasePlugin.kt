@@ -96,9 +96,8 @@ abstract class DokkatooBasePlugin @Inject constructor(
       cacheDirectory.convention(dokkatooExtension.dokkatooCacheDirectory)
     }
 
-//        target.tasks.withType<DokkaConfigurationTask>().configureEach {
-//        }
-
+    //target.tasks.withType<DokkaConfigurationTask>().configureEach {
+    //}
   }
 
 
@@ -359,9 +358,6 @@ abstract class DokkatooBasePlugin @Inject constructor(
         objects.named(TargetJvmEnvironment.STANDARD_JVM)
       )
       attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements.JAR))
-
-      // tell Gradle to only resolve Kotlin/JVM dependencies (might not need this)
-      //attribute(kotlinPlatformType, "jvm")
     }
 
     //<editor-fold desc="Dokka Configuration files">
@@ -512,7 +508,7 @@ abstract class DokkatooBasePlugin @Inject constructor(
       const val DOKKA_PLUGINS_CLASSPATH = "dokkatooPlugin"
 
       /**
-       * Dokka Plugins (excluding transitive dependencies, so this be used to create Dokka Generator Configuration
+       * Dokka Plugins (excluding transitive dependencies) will be used to create Dokka Generator Parameters
        *
        * Generally, this configuration should not be invoked manually. Instead, use [DOKKA_PLUGINS_CLASSPATH].
        */
