@@ -24,7 +24,8 @@ class GradleProjectTest(
   )
 
   val runner: GradleRunner = GradleRunner.create().withProjectDir(projectDir.toFile())
-  val testMavenRepoRelativePath: Path = projectDir.relativize(testMavenRepoDir)
+
+  val testMavenRepoRelativePath: String = projectDir.relativize(testMavenRepoDir).toFile().invariantSeparatorsPath
 
   fun createFile(filePath: String, contents: String): File =
     projectDir.resolve(filePath).toFile().apply {
