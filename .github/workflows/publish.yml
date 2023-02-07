@@ -1,0 +1,91 @@
+name: Publish Task
+run-name: "Publish Task ${{ inputs.gradle-task }} @ ${{ inputs.runs-on }}"
+
+# Reusable Workflow for publishing
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+
+concurrency:
+  group: "${{ github.workflow }}"
+  cancel-in-progress: false
+
+
+jobs:
+
+  create-m2-publication:
+    name: "publish @ ${{ inputs.runs-on }}"
+    runs-on: ubuntu-latest
+    environment:
+      name: artifacts
+      url: ${{ steps.deployment.outputs.page_url }}
+    env:
+      GITHUB_PUBLISH_DIR: ${{ runner.temp }}/m2
+    timeout-minutes: 60
+
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v3
+
+      - name: setup JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 11
+
+      - uses: gradle/gradle-build-action@v2
+        with:
+          gradle-home-cache-cleanup: true
+
+      - name: Run publish task
+        run: >-
+          ./gradlew publishAllPublicationsToGitHubPublishRepository --stacktrace --info
+
+      - name: upload build reports
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-report-${{ runner.os }}-${{ github.action }}
+          path: "**/build/reports/"
+          if-no-files-found: ignore
+
+      - name: upload local project publication
+        uses: actions/upload-artifact@v3
+        with:
+          name: m2-publication
+          path: ${{ env.GITHUB_PUBLISH_DIR }}
+
+
+  commit-artifacts:
+    name: "commit @ ${{ inputs.runs-on }}"
+    runs-on: ubuntu-latest
+    needs: create-m2-publication
+    environment:
+      name: artifacts
+      url: https://github.com/adamko-dev/dokkatoo/tree/artifacts/m2
+    env:
+      CI_COMMIT_MESSAGE: artifacts
+      CI_COMMIT_AUTHOR: ${{ github.workflow }}
+    steps:
+      - name: Checkout artifacts branch
+        uses: actions/checkout@v3
+        with:
+          ref: artifacts
+
+      - name: download local project publication
+        uses: actions/download-artifact@v3
+        with:
+          name: m2-publication
+          path: m2
+
+      - name: git push
+        run: |
+          git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
+          git config --global user.email "username@users.noreply.github.com"
+          git add .
+          git commit -a -m "${{ env.CI_COMMIT_MESSAGE }}"
+          git push
