@@ -13,6 +13,7 @@ import io.kotest.matchers.string.shouldContain
 import kotlinx.serialization.json.Json
 import org.jetbrains.dokka.DokkaConfiguration
 import org.jetbrains.dokka.DokkaConfigurationImpl
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class BasicProjectIntegrationTest {
@@ -28,6 +29,7 @@ class BasicProjectIntegrationTest {
   }
 
   @Test
+  @Disabled("this test uses a Dokka project that applies the Dokka plugin, so it needs to be updated")
   fun `test basic project`() {
     val build = basicProject.runner
       .withArguments(
