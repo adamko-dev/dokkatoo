@@ -1,3 +1,6 @@
+[![GitHub license](https://img.shields.io/github/license/adamko-dev/dokkatoo?style=for-the-badge)](https://github.com/adamko-dev/dokkatoo/blob/main/LICENSE)
+[![Maven metadata URL](https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Fraw.githubusercontent.com%2Fadamko-dev%2Fdokkatoo%2Fartifacts%2Fm2%2Fdev%2Fadamko%2Fdokkatoo%2Fdokkatoo%2Fmaven-metadata.xml&style=for-the-badge)](https://github.com/adamko-dev/dokkatoo/tree/artifacts#readme)
+
 # Dokkatoo
 
 Dokkatoo generates documentation for Kotlin Gradle projects (based on Dokka).
