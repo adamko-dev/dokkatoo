@@ -4,6 +4,7 @@ import dev.adamko.dokkatoo.utils.buildGradleKts
 import dev.adamko.dokkatoo.utils.gradleKtsProjectTest
 import io.kotest.assertions.withClue
 import io.kotest.matchers.string.shouldContain
+import java.io.File
 import org.junit.jupiter.api.Test
 
 class DokkatooPluginFunctionalTest {
@@ -68,7 +69,7 @@ class DokkatooPluginFunctionalTest {
                 |Artifacts
                 |    - build/dokka-config/$format/dokka_configuration.json (artifactType = json)
                 |
-            """.trimMargin()
+            """.trimMargin().replace("/", File.pathSeparator)
     }
 
     checkVariant("gfm")
