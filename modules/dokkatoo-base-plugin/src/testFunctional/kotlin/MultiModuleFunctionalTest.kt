@@ -1,6 +1,6 @@
 package dev.adamko.dokkatoo
 
-import dev.adamko.dokkatoo.dokka_configuration.DokkaParametersKxs
+import dev.adamko.dokkatoo.dokka.parameters.DokkaParametersKxs
 import dev.adamko.dokkatoo.utils.*
 import io.kotest.assertions.withClue
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder

@@ -1,9 +1,9 @@
 package dev.adamko.dokkatoo.tasks
 
 import dev.adamko.dokkatoo.DokkatooPlugin.Companion.jsonMapper
-import dev.adamko.dokkatoo.dokka_configuration.DokkaParametersKxs
-import dev.adamko.dokkatoo.dokka_configuration.DokkaPluginConfigurationGradleBuilder
-import dev.adamko.dokkatoo.dokka_configuration.DokkaSourceSetGradleBuilder
+import dev.adamko.dokkatoo.dokka.parameters.DokkaParametersKxs
+import dev.adamko.dokkatoo.dokka.parameters.DokkaPluginConfigurationGradleBuilder
+import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetGradleBuilder
 import javax.inject.Inject
 import kotlinx.serialization.encodeToString
 import org.gradle.api.DomainObjectSet
@@ -99,7 +99,7 @@ abstract class DokkatooCreateConfigurationTask @Inject constructor(
   @get:Input
   abstract val suppressInheritedMembers: Property<Boolean>
 
-  /** @see dev.adamko.dokkatoo.dokka_configuration.DokkaPublication.enabled */
+  /** @see dev.adamko.dokkatoo.dokka.parameters.DokkaPublication.enabled */
   @get:Input
 //    @get:Optional
   abstract val publicationEnabled: Property<Boolean>

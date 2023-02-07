@@ -1,4 +1,4 @@
-package dev.adamko.dokkatoo.dokka_configuration
+package dev.adamko.dokkatoo.dokka.parameters
 
 import java.io.File
 import java.io.Serializable

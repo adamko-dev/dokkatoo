@@ -1,7 +1,7 @@
 package dev.adamko.dokkatoo
 
-import dev.adamko.dokkatoo.dokka_configuration.DokkaPublication
-import dev.adamko.dokkatoo.dokka_configuration.DokkaSourceSetGradleBuilder
+import dev.adamko.dokkatoo.dokka.parameters.DokkaPublication
+import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetGradleBuilder
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property

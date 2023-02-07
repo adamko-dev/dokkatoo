@@ -1,4 +1,4 @@
-package dev.adamko.dokkatoo.formats
+package dev.adamko.dokkatoo.distibutions
 
 import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.artifacts.Configuration

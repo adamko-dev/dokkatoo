@@ -1,7 +1,7 @@
 package dev.adamko.dokkatoo.tasks
 
 import dev.adamko.dokkatoo.DokkatooPlugin.Companion.jsonMapper
-import dev.adamko.dokkatoo.dokka_configuration.DokkaParametersKxs
+import dev.adamko.dokkatoo.dokka.parameters.DokkaParametersKxs
 import javax.inject.Inject
 import kotlinx.serialization.encodeToString
 import org.gradle.api.file.ConfigurableFileCollection

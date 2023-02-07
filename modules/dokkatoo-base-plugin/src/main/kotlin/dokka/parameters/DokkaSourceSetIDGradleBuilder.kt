@@ -1,4 +1,4 @@
-package dev.adamko.dokkatoo.dokka_configuration
+package dev.adamko.dokkatoo.dokka.parameters
 
 import org.gradle.api.Named
 import org.gradle.api.tasks.Input

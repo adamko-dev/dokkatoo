@@ -1,6 +1,6 @@
 package dev.adamko.dokkatoo.it
 
-import dev.adamko.dokkatoo.dokka_configuration.DokkaParametersKxs
+import dev.adamko.dokkatoo.dokka.parameters.DokkaParametersKxs
 import dev.adamko.dokkatoo.utils.gradleKtsProjectIntegrationTest
 import dev.adamko.dokkatoo.utils.gradleProperties
 import dev.adamko.dokkatoo.utils.parseJson

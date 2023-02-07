@@ -2,7 +2,7 @@
 
 package org.jetbrains.dokka.gradle
 
-import dev.adamko.dokkatoo.dokka_configuration.DokkaSourceSetGradleBuilder
+import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetGradleBuilder
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 
 //@Deprecated("dokka2")
