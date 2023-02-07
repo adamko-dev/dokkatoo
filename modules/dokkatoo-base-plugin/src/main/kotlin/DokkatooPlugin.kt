@@ -2,7 +2,7 @@ package dev.adamko.dokkatoo
 
 import dev.adamko.dokkatoo.DokkatooPlugin.Companion.ConfigurationName.DOKKA_PLUGINS_CLASSPATH
 import dev.adamko.dokkatoo.adapters.DokkatooKotlinAdapter
-import dev.adamko.dokkatoo.distibutions.DokkatooPluginAttributes
+import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes
 import dev.adamko.dokkatoo.dokka_configuration.DokkaPluginConfigurationGradleBuilder
 import dev.adamko.dokkatoo.dokka_configuration.DokkaPublication
 import dev.adamko.dokkatoo.dokka_configuration.DokkaSourceSetGradleBuilder
@@ -57,12 +57,12 @@ abstract class DokkatooPlugin @Inject constructor(
 
     target.tasks.createDokkaLifecycleTasks()
 
-    val configurationAttributes = objects.newInstance<DokkatooPluginAttributes>()
+    val configurationAttributes = objects.newInstance<DokkatooConfigurationAttributes>()
 
     target.dependencies.attributesSchema {
-      attribute(DokkatooPluginAttributes.DOKKATOO_BASE_ATTRIBUTE)
-      attribute(DokkatooPluginAttributes.DOKKATOO_CATEGORY_ATTRIBUTE)
-      attribute(DokkatooPluginAttributes.DOKKA_FORMAT_ATTRIBUTE)
+      attribute(DokkatooConfigurationAttributes.DOKKATOO_BASE_ATTRIBUTE)
+      attribute(DokkatooConfigurationAttributes.DOKKATOO_CATEGORY_ATTRIBUTE)
+      attribute(DokkatooConfigurationAttributes.DOKKA_FORMAT_ATTRIBUTE)
     }
 
     val dokkaConsumerConfiguration = target.configurations.register(ConfigurationName.DOKKATOO) {
@@ -71,7 +71,7 @@ abstract class DokkatooPlugin @Inject constructor(
       isVisible = false
       attributes {
         attribute(
-          DokkatooPluginAttributes.DOKKATOO_BASE_ATTRIBUTE,
+          DokkatooConfigurationAttributes.DOKKATOO_BASE_ATTRIBUTE,
           configurationAttributes.dokkatooBaseUsage
         )
       }
@@ -115,7 +115,7 @@ abstract class DokkatooPlugin @Inject constructor(
     project: Project,
     dokkatooExtension: DokkatooExtension,
     dokkaConsumerConfiguration: NamedDomainObjectProvider<Configuration>,
-    configurationAttributes: DokkatooPluginAttributes,
+    configurationAttributes: DokkatooConfigurationAttributes,
   ) {
     dokkatooExtension.dokkatooPublications.all publication@{
 
@@ -351,14 +351,14 @@ abstract class DokkatooPlugin @Inject constructor(
   private fun DokkaPublication.createDokkaFormatConfigurations(
     dokkaConsumer: NamedDomainObjectProvider<Configuration>,
     objects: ObjectFactory,
-    attributes: DokkatooPluginAttributes,
+    attributes: DokkatooConfigurationAttributes,
     configurations: ConfigurationContainer,
   ): DokkatooFormatGradleConfigurations {
 
-    fun AttributeContainer.dokkaCategory(category: DokkatooPluginAttributes.DokkatooCategoryAttribute) {
-      attribute(DokkatooPluginAttributes.DOKKATOO_BASE_ATTRIBUTE, attributes.dokkatooBaseUsage)
-      attribute(DokkatooPluginAttributes.DOKKA_FORMAT_ATTRIBUTE, objects.named(formatName))
-      attribute(DokkatooPluginAttributes.DOKKATOO_CATEGORY_ATTRIBUTE, category)
+    fun AttributeContainer.dokkaCategory(category: DokkatooConfigurationAttributes.DokkatooCategoryAttribute) {
+      attribute(DokkatooConfigurationAttributes.DOKKATOO_BASE_ATTRIBUTE, attributes.dokkatooBaseUsage)
+      attribute(DokkatooConfigurationAttributes.DOKKA_FORMAT_ATTRIBUTE, objects.named(formatName))
+      attribute(DokkatooConfigurationAttributes.DOKKATOO_CATEGORY_ATTRIBUTE, category)
     }
 
     fun AttributeContainer.jvmJar() {

@@ -13,8 +13,7 @@ import org.gradle.kotlin.dsl.named
  *
  * These attributes are used to tag [Configuration]s, so files can be shared between subprojects.
  */
-abstract class DokkatooPluginAttributes @Inject constructor(
-  // TODO rename to DokkaConfigurationAttributes
+abstract class DokkatooConfigurationAttributes @Inject constructor(
   objects: ObjectFactory,
 ) {
 
