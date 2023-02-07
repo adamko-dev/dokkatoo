@@ -1,6 +1,6 @@
 package dev.adamko.dokkatoo.it
 
-import dev.adamko.dokkatoo.dokka_configuration.DokkaConfigurationKxs
+import dev.adamko.dokkatoo.dokka_configuration.DokkaParametersKxs
 import dev.adamko.dokkatoo.utils.gradleKtsProjectIntegrationTest
 import dev.adamko.dokkatoo.utils.gradleProperties
 import dev.adamko.dokkatoo.utils.parseJson
@@ -55,7 +55,7 @@ class BasicProjectIntegrationTest {
       .readText()
 
     val actualDokkaConf: DokkaConfiguration =
-      Json.decodeFromString(DokkaConfigurationKxs.serializer(), actualDokkaConfJson)
+      Json.decodeFromString(DokkaParametersKxs.serializer(), actualDokkaConfJson)
 
     actualDokkaConf.moduleName shouldBeEqualComparingTo expectedDokkaConf.moduleName
     if (expectedDokkaConf.moduleVersion == null) {

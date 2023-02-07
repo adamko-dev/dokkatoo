@@ -62,5 +62,5 @@ abstract class DokkaPublication @Inject constructor(
 
 
   @get:Nested
-  abstract val dokkaConfiguration: DokkaConfigurationGradleBuilder
+  abstract val dokkaConfiguration: DokkaParametersGradleBuilder
 }

@@ -26,9 +26,10 @@ import org.jetbrains.dokka.*
 
 
 @Serializable
-data class DokkaConfigurationKxs(
+data class DokkaParametersKxs(
   override val moduleName: String,
   override val moduleVersion: String? = null,
+  // TODO outputDir is overwritten in DokkatooGenerateTask so the task's output dir can be registered properly, so this property is not used and should be hidden
   override val outputDir: File,
   override val cacheRoot: File? = null,
   override val offlineMode: Boolean,

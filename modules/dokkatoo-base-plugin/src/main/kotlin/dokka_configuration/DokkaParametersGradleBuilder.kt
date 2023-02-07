@@ -8,7 +8,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
 
-abstract class DokkaConfigurationGradleBuilder :
+abstract class DokkaParametersGradleBuilder :
 //    DokkaConfigurationBuilder<DokkaConfigurationKxs>,
   Serializable {
 

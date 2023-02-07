@@ -7,7 +7,7 @@ import org.jetbrains.dokka.DokkaConfiguration
 import org.jetbrains.dokka.DokkaConfigurationBuilder
 
 abstract class DokkaPluginConfigurationGradleBuilder :
-  DokkaConfigurationBuilder<DokkaConfigurationKxs.PluginConfigurationKxs>,
+  DokkaConfigurationBuilder<DokkaParametersKxs.PluginConfigurationKxs>,
   Serializable {
 
   @get:Input
@@ -19,7 +19,7 @@ abstract class DokkaPluginConfigurationGradleBuilder :
   @get:Input
   abstract val values: Property<String>
 
-  override fun build() = DokkaConfigurationKxs.PluginConfigurationKxs(
+  override fun build() = DokkaParametersKxs.PluginConfigurationKxs(
     fqPluginName = fqPluginName.get(),
     serializationFormat = serializationFormat.get(),
     values = values.get(),

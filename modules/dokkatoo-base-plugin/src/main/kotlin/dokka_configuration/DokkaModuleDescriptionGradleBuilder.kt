@@ -12,7 +12,7 @@ import org.jetbrains.dokka.DokkaConfigurationBuilder
 
 abstract class DokkaModuleDescriptionGradleBuilder @Inject constructor(
   providers: ProviderFactory,
-) : DokkaConfigurationBuilder<DokkaConfigurationKxs.DokkaModuleDescriptionKxs>, Named {
+) : DokkaConfigurationBuilder<DokkaParametersKxs.DokkaModuleDescriptionKxs>, Named {
 
   @get:Input
   val moduleName: Provider<String> = providers.provider { name }
@@ -25,7 +25,7 @@ abstract class DokkaModuleDescriptionGradleBuilder @Inject constructor(
 
   @Internal
   override fun build() =
-    DokkaConfigurationKxs.DokkaModuleDescriptionKxs(
+    DokkaParametersKxs.DokkaModuleDescriptionKxs(
       moduleName = moduleName.get(),
       sourceOutputDirectory = sourceOutputDirectory.get().asFile,
       includes = includes.files,

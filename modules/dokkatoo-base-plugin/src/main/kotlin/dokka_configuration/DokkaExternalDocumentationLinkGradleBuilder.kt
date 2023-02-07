@@ -29,7 +29,7 @@ import org.jetbrains.dokka.DokkaConfigurationBuilder
  * ```
  */
 abstract class DokkaExternalDocumentationLinkGradleBuilder :
-  DokkaConfigurationBuilder<DokkaConfigurationKxs.ExternalDocumentationLinkKxs>,
+  DokkaConfigurationBuilder<DokkaParametersKxs.ExternalDocumentationLinkKxs>,
   Serializable {
 
   /**
@@ -64,7 +64,7 @@ abstract class DokkaExternalDocumentationLinkGradleBuilder :
   abstract val packageListUrl: Property<URL>
 
   override fun build() =
-    DokkaConfigurationKxs.ExternalDocumentationLinkKxs(
+    DokkaParametersKxs.ExternalDocumentationLinkKxs(
       url = url.get(),
       packageListUrl = packageListUrl.get(),
     )

@@ -28,7 +28,7 @@ import org.jetbrains.dokka.DokkaConfigurationBuilder
  * ```
  */
 abstract class DokkaPackageOptionsGradleBuilder :
-  DokkaConfigurationBuilder<DokkaConfigurationKxs.PackageOptionsKxs>,
+  DokkaConfigurationBuilder<DokkaParametersKxs.PackageOptionsKxs>,
   Serializable {
 
   /**
@@ -91,7 +91,7 @@ abstract class DokkaPackageOptionsGradleBuilder :
   abstract val includeNonPublic: Property<Boolean>
 
 
-  override fun build() = DokkaConfigurationKxs.PackageOptionsKxs(
+  override fun build() = DokkaParametersKxs.PackageOptionsKxs(
     matchingRegex = matchingRegex.get(),
     documentedVisibilities = documentedVisibilities.get(),
     reportUndocumented = reportUndocumented.get(),

@@ -47,12 +47,12 @@ abstract class DokkatooPlugin @Inject constructor(
 
     val dokkatooExtension = target.extensions.create<DokkatooExtension>(EXTENSION_NAME).apply {
       dokkaVersion.convention("1.7.20")
-      dokkaCacheDirectory.convention(null)
+      dokkatooCacheDirectory.convention(null)
       moduleNameDefault.convention(providers.provider { target.name })
       moduleVersionDefault.convention(providers.provider { target.version.toString() })
       sourceSetScopeDefault.convention(target.path)
-      dokkaPublicationDirectory.convention(layout.buildDirectory.dir("dokka"))
-      dokkaConfigurationsDirectory.convention(layout.buildDirectory.dir("dokka-config"))
+      dokkatooPublicationDirectory.convention(layout.buildDirectory.dir("dokka"))
+      dokkatooConfigurationsDirectory.convention(layout.buildDirectory.dir("dokka-config"))
     }
 
     target.tasks.createDokkaLifecycleTasks()
@@ -90,7 +90,7 @@ abstract class DokkatooPlugin @Inject constructor(
 
 
     target.tasks.withType<DokkatooGenerateTask>().configureEach {
-      cacheDirectory.convention(dokkatooExtension.dokkaCacheDirectory)
+      cacheDirectory.convention(dokkatooExtension.dokkatooCacheDirectory)
     }
 
 //        target.tasks.withType<DokkaConfigurationTask>().configureEach {
@@ -117,7 +117,7 @@ abstract class DokkatooPlugin @Inject constructor(
     dokkaConsumerConfiguration: NamedDomainObjectProvider<Configuration>,
     configurationAttributes: DokkatooPluginAttributes,
   ) {
-    dokkatooExtension.dokkaPublications.all publication@{
+    dokkatooExtension.dokkatooPublications.all publication@{
 
       // create Gradle Configurations
       val gradleConfigurations = createDokkaFormatConfigurations(
@@ -140,7 +140,7 @@ abstract class DokkatooPlugin @Inject constructor(
         description =
           "Creates Dokka Configuration for executing the Dokka Generator for the $formatName publication"
 
-        dokkaConfigurationJson.convention(dokkatooExtension.dokkaConfigurationsDirectory.file("$formatName/dokka_configuration.json"))
+        dokkaConfigurationJson.convention(dokkatooExtension.dokkatooConfigurationsDirectory.file("$formatName/dokka_configuration.json"))
 
         // depend on Dokka Configurations from other subprojects
         dokkaSubprojectConfigurations.from(
@@ -227,7 +227,7 @@ abstract class DokkatooPlugin @Inject constructor(
 
       project.tasks.register<DokkatooGenerateTask>(taskNames.generate) {
         description = "Executes the Dokka Generator, producing the $formatName publication"
-        outputDirectory.convention(dokkatooExtension.dokkaPublicationDirectory.dir(formatName))
+        outputDirectory.convention(dokkatooExtension.dokkatooPublicationDirectory.dir(formatName))
         dokkaConfigurationJson.convention(createConfigurationTask.flatMap { it.dokkaConfigurationJson })
         runtimeClasspath.from(gradleConfigurations.dokkaGeneratorClasspath)
       }
@@ -275,23 +275,23 @@ abstract class DokkatooPlugin @Inject constructor(
       }
     }
 
-    dokkatooExtension.dokkaSourceSets.configureEach {
+    dokkatooExtension.dokkatooSourceSets.configureEach {
       configureDefaults()
     }
-    dokkatooExtension.dokkaPublications.configureEach {
+    dokkatooExtension.dokkatooPublications.configureEach {
 
       enabled.convention(true)
 
       dokkaConfiguration.apply {
 
-        cacheRoot.convention(dokkatooExtension.dokkaCacheDirectory)
+        cacheRoot.convention(dokkatooExtension.dokkatooCacheDirectory)
         delayTemplateSubstitution.convention(false)
         failOnWarning.convention(false)
         finalizeCoroutines.convention(false)
         moduleName.convention(dokkatooExtension.moduleNameDefault)
         moduleVersion.convention(dokkatooExtension.moduleVersionDefault)
         offlineMode.convention(false)
-        outputDir.convention(dokkatooExtension.dokkaPublicationDirectory)
+        outputDir.convention(dokkatooExtension.dokkatooPublicationDirectory)
         suppressInheritedMembers.convention(false)
         suppressObviousFunctions.convention(true)
 
@@ -299,7 +299,7 @@ abstract class DokkatooPlugin @Inject constructor(
         dokkaSourceSets.addAllLater(
           objects.listProperty<DokkaSourceSetGradleBuilder>().apply {
             addAll(
-              providers.provider { dokkatooExtension.dokkaSourceSets }
+              providers.provider { dokkatooExtension.dokkatooSourceSets }
             )
           }
         )

@@ -26,7 +26,7 @@ import org.jetbrains.dokka.DokkaConfigurationBuilder
  * ```
  */
 abstract class DokkaSourceLinkGradleBuilder :
-  DokkaConfigurationBuilder<DokkaConfigurationKxs.SourceLinkDefinitionKxs>,
+  DokkaConfigurationBuilder<DokkaParametersKxs.SourceLinkDefinitionKxs>,
   Serializable {
 
   /**
@@ -87,8 +87,8 @@ abstract class DokkaSourceLinkGradleBuilder :
   @get:Input
   abstract val remoteLineSuffix: Property<String>
 
-  override fun build(): DokkaConfigurationKxs.SourceLinkDefinitionKxs {
-    return DokkaConfigurationKxs.SourceLinkDefinitionKxs(
+  override fun build(): DokkaParametersKxs.SourceLinkDefinitionKxs {
+    return DokkaParametersKxs.SourceLinkDefinitionKxs(
       localDirectory = localDirectory.get().canonicalPath,
       remoteUrl = remoteUrl.get(),
       remoteLineSuffix = remoteLineSuffix.orNull,

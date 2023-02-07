@@ -4,7 +4,7 @@ import dev.adamko.dokkatoo.DokkatooPlugin
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.CacheableTask
 
-/** Base Dokka task */
+/** Base Dokkatoo task */
 @CacheableTask
 abstract class DokkatooTask : DefaultTask() {
 

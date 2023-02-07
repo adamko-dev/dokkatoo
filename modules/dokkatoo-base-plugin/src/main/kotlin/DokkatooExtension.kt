@@ -15,14 +15,12 @@ abstract class DokkatooExtension {
   abstract val dokkaVersion: Property<String>
 
   /** Directory into which [DokkaPublication]s will be produced */
-  abstract val dokkaPublicationDirectory: DirectoryProperty
+  abstract val dokkatooPublicationDirectory: DirectoryProperty
 
-  abstract val dokkaConfigurationsDirectory: DirectoryProperty
+  abstract val dokkatooConfigurationsDirectory: DirectoryProperty
 
-  /** Default Dokka cache directory */
-  abstract val dokkaCacheDirectory: DirectoryProperty
-
-//    abstract val dokkaConfigurations: NamedDomainObjectContainer<DokkaConfigurationGradleBuilder>
+  /** Default Dokkatoo cache directory */
+  abstract val dokkatooCacheDirectory: DirectoryProperty
 
   abstract val moduleNameDefault: Property<String>
   abstract val moduleVersionDefault: Property<String>
@@ -41,12 +39,12 @@ abstract class DokkatooExtension {
    *
    * The type of site is determined by the Dokka Plugins. By default, an HTML site will be generated.
    */
-  abstract val dokkaPublications: NamedDomainObjectContainer<DokkaPublication>
+  abstract val dokkatooPublications: NamedDomainObjectContainer<DokkaPublication>
 
   /**
-   * Dokka Source Sets that describe source code in the local project (not subprojects)
+   * Dokkatoo Source Sets that describe source code in the local project (not other subprojects).
    *
-   * These source sets will be added to all [dokkaPublications].
+   * These source sets will be added to all [dokkatooPublications].
    */
-  abstract val dokkaSourceSets: NamedDomainObjectContainer<DokkaSourceSetGradleBuilder>
+  abstract val dokkatooSourceSets: NamedDomainObjectContainer<DokkaSourceSetGradleBuilder>
 }

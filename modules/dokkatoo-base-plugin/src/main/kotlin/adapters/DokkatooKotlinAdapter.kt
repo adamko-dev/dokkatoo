@@ -70,7 +70,7 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
 
         registerKotlinSourceSet(this@kss)
 
-        dokka.dokkaSourceSets.all dss@{
+        dokka.dokkatooSourceSets.all dss@{
           if (this@kss.name == this@dss.name) {
             logger.lifecycle("setting suppress convention for SourceSet $name")
             suppress.convention(!this@kss.isMainSourceSet())
@@ -172,7 +172,7 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
 
       logger.lifecycle("kotlin source set ${kotlinSourceSet.name} has source roots: ${extantKotlinSourceRoots.map { it.invariantSeparatorsPath }}")
 
-      dokka.dokkaSourceSets.register(kotlinSourceSet.name) {
+      dokka.dokkatooSourceSets.register(kotlinSourceSet.name) {
         this.suppress.set(!kotlinSourceSet.isMainSourceSet())
 
         this.sourceRoots.from(extantKotlinSourceRoots)

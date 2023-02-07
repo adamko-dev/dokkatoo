@@ -1,6 +1,6 @@
 package dev.adamko.dokkatoo
 
-import dev.adamko.dokkatoo.dokka_configuration.DokkaConfigurationKxs
+import dev.adamko.dokkatoo.dokka_configuration.DokkaParametersKxs
 import dev.adamko.dokkatoo.utils.*
 import io.kotest.assertions.withClue
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
@@ -249,7 +249,7 @@ class MultiModuleFunctionalTest {
     dokkaConfigurationFile.shouldBeAFile()
     @OptIn(ExperimentalSerializationApi::class)
     val dokkaConfiguration = kotlinx.serialization.json.Json.decodeFromStream(
-      DokkaConfigurationKxs.serializer(),
+      DokkaParametersKxs.serializer(),
       dokkaConfigurationFile.toFile().inputStream(),
     )
 

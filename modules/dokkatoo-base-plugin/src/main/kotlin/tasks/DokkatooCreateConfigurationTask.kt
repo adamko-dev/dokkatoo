@@ -1,7 +1,7 @@
 package dev.adamko.dokkatoo.tasks
 
 import dev.adamko.dokkatoo.DokkatooPlugin.Companion.jsonMapper
-import dev.adamko.dokkatoo.dokka_configuration.DokkaConfigurationKxs
+import dev.adamko.dokkatoo.dokka_configuration.DokkaParametersKxs
 import dev.adamko.dokkatoo.dokka_configuration.DokkaPluginConfigurationGradleBuilder
 import dev.adamko.dokkatoo.dokka_configuration.DokkaSourceSetGradleBuilder
 import javax.inject.Inject
@@ -120,7 +120,7 @@ abstract class DokkatooCreateConfigurationTask @Inject constructor(
   }
 
 
-  private fun buildDokkaConfiguration(): DokkaConfigurationKxs {
+  private fun buildDokkaConfiguration(): DokkaParametersKxs {
 
     val moduleName = moduleName.get()
     val moduleVersion = moduleVersion.orNull?.takeIf { it != "unspecified" }
@@ -146,7 +146,7 @@ abstract class DokkatooCreateConfigurationTask @Inject constructor(
 
 
     // construct the base configuration for THIS project
-    val baseDokkaConfiguration = DokkaConfigurationKxs(
+    val baseDokkaConfiguration = DokkaParametersKxs(
       cacheRoot = cacheRoot,
       delayTemplateSubstitution = delayTemplateSubstitution,
       failOnWarning = failOnWarning,
@@ -167,11 +167,11 @@ abstract class DokkatooCreateConfigurationTask @Inject constructor(
     // fetch any configurations from OTHER subprojects
     val subprojectConfigs = dokkaSubprojectConfigurations.files.map { file ->
       val fileContent = file.readText()
-      jsonMapper.decodeFromString(DokkaConfigurationKxs.serializer(), fileContent)
+      jsonMapper.decodeFromString(DokkaParametersKxs.serializer(), fileContent)
     }
 
     // now, combine them:
-    return subprojectConfigs.fold(baseDokkaConfiguration) { acc, it: DokkaConfigurationKxs ->
+    return subprojectConfigs.fold(baseDokkaConfiguration) { acc, it: DokkaParametersKxs ->
       acc.copy(
         sourceSets = acc.sourceSets + it.sourceSets,
         // TODO remove plugin classpath aggregation, plugin classpath should be shared via Gradle Configuration
@@ -181,11 +181,11 @@ abstract class DokkatooCreateConfigurationTask @Inject constructor(
     }
   }
 
-  private fun dokkaModuleDescriptors(): List<DokkaConfigurationKxs.DokkaModuleDescriptionKxs> =
+  private fun dokkaModuleDescriptors(): List<DokkaParametersKxs.DokkaModuleDescriptionKxs> =
     dokkaModuleDescriptorFiles.files.map { file ->
       val fileContent = file.readText()
       jsonMapper.decodeFromString(
-        DokkaConfigurationKxs.DokkaModuleDescriptionKxs.serializer(),
+        DokkaParametersKxs.DokkaModuleDescriptionKxs.serializer(),
         fileContent,
       )
     }

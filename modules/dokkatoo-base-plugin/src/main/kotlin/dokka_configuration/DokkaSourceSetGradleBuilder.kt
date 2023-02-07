@@ -39,7 +39,7 @@ import org.jetbrains.dokka.*
 abstract class DokkaSourceSetGradleBuilder(
   private val name: String
 ) :
-  DokkaConfigurationBuilder<DokkaConfigurationKxs.DokkaSourceSetKxs>,
+  DokkaConfigurationBuilder<DokkaParametersKxs.DokkaSourceSetKxs>,
   Named,
   Serializable {
 
@@ -448,8 +448,8 @@ abstract class DokkaSourceSetGradleBuilder(
     )
   }
 
-  override fun build(): DokkaConfigurationKxs.DokkaSourceSetKxs {
-    return DokkaConfigurationKxs.DokkaSourceSetKxs(
+  override fun build(): DokkaParametersKxs.DokkaSourceSetKxs {
+    return DokkaParametersKxs.DokkaSourceSetKxs(
       sourceSetID = sourceSetID.get(),
       displayName = displayName.get(),
       classpath = classpath.files.toList(),

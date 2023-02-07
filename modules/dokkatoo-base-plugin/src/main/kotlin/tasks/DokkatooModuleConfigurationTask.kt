@@ -1,7 +1,7 @@
 package dev.adamko.dokkatoo.tasks
 
 import dev.adamko.dokkatoo.DokkatooPlugin.Companion.jsonMapper
-import dev.adamko.dokkatoo.dokka_configuration.DokkaConfigurationKxs
+import dev.adamko.dokkatoo.dokka_configuration.DokkaParametersKxs
 import javax.inject.Inject
 import kotlinx.serialization.encodeToString
 import org.gradle.api.file.ConfigurableFileCollection
@@ -58,7 +58,7 @@ abstract class DokkatooModuleConfigurationTask @Inject constructor(
     val sourceOutputDirectory = layout.files(sourceOutputDirectory).singleFile
     val includes = includes.files
 
-    val moduleDesc = DokkaConfigurationKxs.DokkaModuleDescriptionKxs(
+    val moduleDesc = DokkaParametersKxs.DokkaModuleDescriptionKxs(
       moduleName = moduleName,
 //            moduleOutputDirectory = moduleOutputDirectory,
       sourceOutputDirectory = sourceOutputDirectory,

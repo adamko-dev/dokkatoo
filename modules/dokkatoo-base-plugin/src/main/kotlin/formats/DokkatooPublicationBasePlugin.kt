@@ -27,7 +27,7 @@ abstract class DokkatooPublicationBasePlugin @Inject constructor(
     target.plugins.withType<DokkatooPlugin>().configureEach {
       val dokkatooExtension = target.extensions.getByType(DokkatooExtension::class)
 
-      val publication = dokkatooExtension.dokkaPublications.create(formatName)
+      val publication = dokkatooExtension.dokkatooPublications.create(formatName)
 
       val context = PublicationPluginContext(target, dokkatooExtension, publication)
 

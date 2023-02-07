@@ -1,7 +1,7 @@
 package dev.adamko.dokkatoo.tasks
 
 import dev.adamko.dokkatoo.DokkatooPlugin.Companion.jsonMapper
-import dev.adamko.dokkatoo.dokka_configuration.DokkaConfigurationKxs
+import dev.adamko.dokkatoo.dokka_configuration.DokkaParametersKxs
 import dev.adamko.dokkatoo.workers.DokkaGeneratorWorker
 import javax.inject.Inject
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -48,7 +48,7 @@ abstract class DokkatooGenerateTask @Inject constructor(
     val dokkaConfigurationJsonFile = dokkaConfigurationJson.get().asFile
 
     val dokkaConfiguration = jsonMapper.decodeFromStream(
-      DokkaConfigurationKxs.serializer(),
+      DokkaParametersKxs.serializer(),
       dokkaConfigurationJsonFile.inputStream(),
     ).copy(
       outputDir = outputDirectory.get().asFile,
