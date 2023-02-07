@@ -5,43 +5,43 @@
   <version>0.0.1-SNAPSHOT</version>
   <versioning>
     <snapshot>
-      <timestamp>20230207.135058</timestamp>
+      <timestamp>20230207.135546</timestamp>
       <buildNumber>1</buildNumber>
     </snapshot>
-    <lastUpdated>20230207135058</lastUpdated>
+    <lastUpdated>20230207135546</lastUpdated>
     <snapshotVersions>
+      <snapshotVersion>
+        <classifier>sources</classifier>
+        <extension>jar</extension>
+        <value>0.0.1-20230207.135546-1</value>
+        <updated>20230207135546</updated>
+      </snapshotVersion>
+      <snapshotVersion>
+        <extension>jar</extension>
+        <value>0.0.1-20230207.135546-1</value>
+        <updated>20230207135546</updated>
+      </snapshotVersion>
       <snapshotVersion>
         <classifier>javadoc</classifier>
         <extension>jar</extension>
-        <value>0.0.1-20230207.135058-1</value>
-        <updated>20230207135058</updated>
+        <value>0.0.1-20230207.135546-1</value>
+        <updated>20230207135546</updated>
       </snapshotVersion>
       <snapshotVersion>
-        <extension>pom</extension>
-        <value>0.0.1-20230207.135058-1</value>
-        <updated>20230207135058</updated>
+        <extension>module</extension>
+        <value>0.0.1-20230207.135546-1</value>
+        <updated>20230207135546</updated>
       </snapshotVersion>
       <snapshotVersion>
         <classifier>test-fixtures</classifier>
         <extension>jar</extension>
-        <value>0.0.1-20230207.135058-1</value>
-        <updated>20230207135058</updated>
+        <value>0.0.1-20230207.135546-1</value>
+        <updated>20230207135546</updated>
       </snapshotVersion>
       <snapshotVersion>
-        <extension>module</extension>
-        <value>0.0.1-20230207.135058-1</value>
-        <updated>20230207135058</updated>
-      </snapshotVersion>
-      <snapshotVersion>
-        <classifier>sources</classifier>
-        <extension>jar</extension>
-        <value>0.0.1-20230207.135058-1</value>
-        <updated>20230207135058</updated>
-      </snapshotVersion>
-      <snapshotVersion>
-        <extension>jar</extension>
-        <value>0.0.1-20230207.135058-1</value>
-        <updated>20230207135058</updated>
+        <extension>pom</extension>
+        <value>0.0.1-20230207.135546-1</value>
+        <updated>20230207135546</updated>
       </snapshotVersion>
     </snapshotVersions>
   </versioning>
