@@ -1,7 +1,5 @@
 name: Publish Task
-run-name: "Publish Task ${{ inputs.gradle-task }} @ ${{ inputs.runs-on }}"
 
-# Reusable Workflow for publishing
 
 on:
   workflow_dispatch:
