@@ -69,7 +69,7 @@ class DokkatooPluginFunctionalTest {
                 |Artifacts
                 |    - build/dokka-config/$format/dokka_configuration.json (artifactType = json)
                 |
-            """.trimMargin().replace("/", File.pathSeparator)
+            """.trimMargin().replace('/', File.separatorChar)
     }
 
     checkVariant("gfm")
