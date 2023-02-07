@@ -2,17 +2,15 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  buildsrc.conventions.base
-  `kotlin-dsl`
+  buildsrc.conventions.`kotlin-gradle-plugin`
 
-  id("com.gradle.plugin-publish") version "1.0.0"
   kotlin("plugin.serialization") version embeddedKotlinVersion
   `java-test-fixtures`
 
   `jvm-test-suite`
   `test-report-aggregation`
 
-  idea
+  buildsrc.conventions.`github-maven-publish`
 
 //    id("org.jetbrains.kotlinx.binary-compatibility-validator") version "0.12.1"
 }
@@ -50,12 +48,12 @@ gradlePlugin {
     isAutomatedPublishing = true
   }
 
-  fun registerDokkaPlugin(format: String, cls: String) {
+  fun registerDokkaPlugin(format: String, className: String) {
     plugins.create("dokkatoo${format.toLowerCase().capitalize()}") {
       id = "dev.adamko.dokkatoo-${format.toLowerCase()}"
       displayName = "Dokkatoo $format"
       description = "Generates $format documentation sites for Kotlin projects using Dokka"
-      implementationClass = "dev.adamko.dokkatoo.formats.$cls"
+      implementationClass = "dev.adamko.dokkatoo.formats.$className"
       isAutomatedPublishing = true
     }
   }
@@ -82,9 +80,6 @@ pluginBundle {
   )
 }
 
-tasks.validatePlugins {
-  enableStricterValidation.set(true)
-}
 
 tasks.withType<KotlinCompile>().configureEach {
   kotlinOptions {
@@ -222,8 +217,4 @@ tasks.withType<Test>().configureEach {
     showCauses = true
     showStackTraces = true
   }
-}
-
-tasks.validatePlugins {
-  enableStricterValidation.set(true)
 }
