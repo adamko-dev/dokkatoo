@@ -1,5 +1,6 @@
 package dev.adamko.dokkatoo.distibutions
 
+import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import javax.inject.Inject
 import org.gradle.api.Named
 import org.gradle.api.artifacts.Configuration
@@ -13,6 +14,7 @@ import org.gradle.kotlin.dsl.named
  *
  * These attributes are used to tag [Configuration]s, so files can be shared between subprojects.
  */
+@DokkatooInternalApi
 abstract class DokkatooConfigurationAttributes @Inject constructor(
   objects: ObjectFactory,
 ) {

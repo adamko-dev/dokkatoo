@@ -6,6 +6,7 @@
 
 package dev.adamko.dokkatoo.dokka.parameters
 
+import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import java.io.File
 import java.net.URL
 import java.nio.file.Paths
@@ -26,6 +27,7 @@ import org.jetbrains.dokka.*
 
 
 @Serializable
+@DokkatooInternalApi
 data class DokkaParametersKxs(
   override val moduleName: String,
   override val moduleVersion: String? = null,

@@ -1,5 +1,6 @@
 package dev.adamko.dokkatoo.workers
 
+import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import dev.adamko.dokkatoo.internal.LoggerAdapter
 import kotlin.time.ExperimentalTime
 import kotlin.time.nanoseconds
@@ -14,6 +15,7 @@ import org.jetbrains.dokka.DokkaGenerator
  *
  * The worker requires [DokkaGenerator] is present on the classpath.
  */
+@DokkatooInternalApi
 abstract class DokkaGeneratorWorker : WorkAction<DokkaGeneratorWorker.Parameters> {
 
   private val logger = LoggerAdapter(DokkaGeneratorWorker::class)

@@ -1,5 +1,6 @@
 package dev.adamko.dokkatoo.distibutions
 
+import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.artifacts.Configuration
 
@@ -7,6 +8,7 @@ import org.gradle.api.artifacts.Configuration
  * The Dokka-specific Gradle [Configuration]s used to produce and consume files from external sources
  * (example: Maven Central), or between subprojects.
  */
+@DokkatooInternalApi
 internal data class DokkatooFormatGradleConfigurations(
 
 //    /** Fetch all Dokka files from all configurations in other subprojects */

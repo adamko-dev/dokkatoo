@@ -3,6 +3,7 @@ package dev.adamko.dokkatoo.adapters
 import com.android.build.gradle.api.ApplicationVariant
 import com.android.build.gradle.api.LibraryVariant
 import dev.adamko.dokkatoo.DokkatooExtension
+import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import dev.adamko.dokkatoo.internal.not
 import dev.adamko.dokkatoo.tasks.DokkatooCreateConfigurationTask
 import java.io.File
@@ -29,6 +30,7 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinJvmAndroidCompilation
 /**
  * The [DokkatooKotlinAdapter] plugin will automatically register Kotlin source sets as Dokka source sets.
  */
+@DokkatooInternalApi
 abstract class DokkatooKotlinAdapter @Inject constructor(
   private val providers: ProviderFactory,
 ) : Plugin<Project> {

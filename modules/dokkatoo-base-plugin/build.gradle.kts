@@ -82,7 +82,8 @@ pluginBundle {
 tasks.withType<KotlinCompile>().configureEach {
   kotlinOptions {
     this.freeCompilerArgs += listOf(
-      "-opt-in=kotlin.RequiresOptIn"
+      "-opt-in=kotlin.RequiresOptIn",
+      "-opt-in=dev.adamko.dokkatoo.internal.DokkatooInternalApi",
     )
   }
 }

@@ -1,4 +1,4 @@
-package dev.adamko.dokkatoo.dokka.parameters
+package dev.adamko.dokkatoo.dokka
 
 import dev.adamko.dokkatoo.DokkatooPlugin.Companion.ConfigurationName.DOKKATOO_CONFIGURATIONS
 import dev.adamko.dokkatoo.DokkatooPlugin.Companion.ConfigurationName.DOKKATOO_CONFIGURATION_ELEMENTS
@@ -8,6 +8,7 @@ import dev.adamko.dokkatoo.DokkatooPlugin.Companion.ConfigurationName.DOKKA_PLUG
 import dev.adamko.dokkatoo.DokkatooPlugin.Companion.TaskName.CREATE_CONFIGURATION
 import dev.adamko.dokkatoo.DokkatooPlugin.Companion.TaskName.CREATE_MODULE_CONFIGURATION
 import dev.adamko.dokkatoo.DokkatooPlugin.Companion.TaskName.GENERATE
+import dev.adamko.dokkatoo.dokka.parameters.DokkaParametersGradleBuilder
 import java.io.Serializable
 import javax.inject.Inject
 import org.gradle.api.Named

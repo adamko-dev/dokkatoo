@@ -8,6 +8,9 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
 
+/**
+ * These parameters that will be used to execute the Dokka Generator.
+ */
 abstract class DokkaParametersGradleBuilder :
 //    DokkaConfigurationBuilder<DokkaConfigurationKxs>,
   Serializable {

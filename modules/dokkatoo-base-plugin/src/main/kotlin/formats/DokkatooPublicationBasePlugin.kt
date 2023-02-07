@@ -2,7 +2,7 @@ package dev.adamko.dokkatoo.formats
 
 import dev.adamko.dokkatoo.DokkatooExtension
 import dev.adamko.dokkatoo.DokkatooPlugin
-import dev.adamko.dokkatoo.dokka.parameters.DokkaPublication
+import dev.adamko.dokkatoo.dokka.DokkaPublication
 import javax.inject.Inject
 import org.gradle.api.Plugin
 import org.gradle.api.Project

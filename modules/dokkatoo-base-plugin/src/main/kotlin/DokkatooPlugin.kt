@@ -4,8 +4,8 @@ import dev.adamko.dokkatoo.DokkatooPlugin.Companion.ConfigurationName.DOKKA_PLUG
 import dev.adamko.dokkatoo.adapters.DokkatooKotlinAdapter
 import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes
 import dev.adamko.dokkatoo.distibutions.DokkatooFormatGradleConfigurations
+import dev.adamko.dokkatoo.dokka.DokkaPublication
 import dev.adamko.dokkatoo.dokka.parameters.DokkaPluginConfigurationGradleBuilder
-import dev.adamko.dokkatoo.dokka.parameters.DokkaPublication
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetGradleBuilder
 import dev.adamko.dokkatoo.formats.*
 import dev.adamko.dokkatoo.internal.asConsumer
@@ -357,7 +357,10 @@ abstract class DokkatooPlugin @Inject constructor(
   ): DokkatooFormatGradleConfigurations {
 
     fun AttributeContainer.dokkaCategory(category: DokkatooConfigurationAttributes.DokkatooCategoryAttribute) {
-      attribute(DokkatooConfigurationAttributes.DOKKATOO_BASE_ATTRIBUTE, attributes.dokkatooBaseUsage)
+      attribute(
+        DokkatooConfigurationAttributes.DOKKATOO_BASE_ATTRIBUTE,
+        attributes.dokkatooBaseUsage
+      )
       attribute(DokkatooConfigurationAttributes.DOKKA_FORMAT_ATTRIBUTE, objects.named(formatName))
       attribute(DokkatooConfigurationAttributes.DOKKATOO_CATEGORY_ATTRIBUTE, category)
     }
