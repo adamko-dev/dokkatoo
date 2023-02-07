@@ -59,3 +59,11 @@ jobs:
           name: build-report-${{ runner.os }}${{ github.action }}
           path: "**/build/reports/"
           if-no-files-found: ignore
+
+      - name: Publish Test Reports
+        uses: mikepenz/action-junit-report@v3
+        if: always()
+        with:
+          report_paths: |
+            **/build/test-results/test/TEST-*.xml
+          require_tests: false
