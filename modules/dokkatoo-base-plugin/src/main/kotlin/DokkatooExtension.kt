@@ -7,7 +7,7 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
 
 /**
- * Configure the behaviour of the [DokkatooPlugin].
+ * Configure the behaviour of the [DokkatooBasePlugin].
  */
 abstract class DokkatooExtension {
 

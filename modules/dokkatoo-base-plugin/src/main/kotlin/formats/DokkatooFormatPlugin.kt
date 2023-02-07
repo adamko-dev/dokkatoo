@@ -1,7 +1,7 @@
 package dev.adamko.dokkatoo.formats
 
+import dev.adamko.dokkatoo.DokkatooBasePlugin
 import dev.adamko.dokkatoo.DokkatooExtension
-import dev.adamko.dokkatoo.DokkatooPlugin
 import dev.adamko.dokkatoo.dokka.DokkaPublication
 import javax.inject.Inject
 import org.gradle.api.Plugin
@@ -16,7 +16,7 @@ import org.gradle.kotlin.dsl.withType
 /**
  * Base Gradle Plugin for setting up a Dokka Publication for a specific format.
  *
- * [DokkatooPlugin] must be applied for this plugin, or any implementation, to have an effect.
+ * [DokkatooBasePlugin] must be applied for this plugin (or any subclass) to have an effect.
  */
 abstract class DokkatooFormatPlugin @Inject constructor(
   val formatName: String,
@@ -24,10 +24,10 @@ abstract class DokkatooFormatPlugin @Inject constructor(
 
   final override fun apply(target: Project) {
 
-    // apply DokkatooPlugin (does nothing if already applied)
-    target.pluginManager.apply(DokkatooPlugin::class)
+    // apply DokkatooBasePlugin (does nothing if already applied)
+    target.pluginManager.apply(DokkatooBasePlugin::class)
 
-    target.plugins.withType<DokkatooPlugin>().configureEach {
+    target.plugins.withType<DokkatooBasePlugin>().configureEach {
       val dokkatooExtension = target.extensions.getByType(DokkatooExtension::class)
 
       val publication = dokkatooExtension.dokkatooPublications.create(formatName)

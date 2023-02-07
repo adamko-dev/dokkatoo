@@ -1,6 +1,6 @@
 package dev.adamko.dokkatoo.tasks
 
-import dev.adamko.dokkatoo.DokkatooPlugin.Companion.jsonMapper
+import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.jsonMapper
 import dev.adamko.dokkatoo.dokka.parameters.DokkaParametersKxs
 import dev.adamko.dokkatoo.workers.DokkaGeneratorWorker
 import javax.inject.Inject
