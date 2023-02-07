@@ -10,17 +10,32 @@ Based on Kotlin Dokka.
 
 ## Usage
 
+Dokkatoo is published to a GitHub branch which must be defined as a repository.
+
+```kts
+// settings.gradle.kts
+
+pluginManagement {
+  repositories {
+    gradlePluginPortal()
+    mavenCentral()
+    maven("https://raw.githubusercontent.com/adamko-dev/dokkatoo/artifacts/m2/")
+  }
+}
+```
+
+The plugin can be then be applied to any Gradle project.
+
 ```kts
 // build.gradle.kts
 
 plugins {
   id("dev.adamko.dokkatoo") version "0.0.1-SNAPSHOT"
 }
-
-dokkatoo {
-  // ...
-}
 ```
+
+Then any of the Dokkatoo tasks can be run to generate a documentation site in the
+`build/dokkatoo` directory.
 
 ```shell
 # generate all sites
