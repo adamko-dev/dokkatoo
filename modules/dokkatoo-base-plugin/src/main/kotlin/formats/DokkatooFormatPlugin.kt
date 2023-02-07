@@ -17,7 +17,7 @@ import org.gradle.kotlin.dsl.withType
  *
  * [DokkatooPlugin] must be applied for this plugin, or any implementation, to have an effect.
  */
-abstract class DokkatooPublicationBasePlugin @Inject constructor(
+abstract class DokkatooFormatPlugin @Inject constructor(
   val formatName: String,
 ) : Plugin<Project> {
 

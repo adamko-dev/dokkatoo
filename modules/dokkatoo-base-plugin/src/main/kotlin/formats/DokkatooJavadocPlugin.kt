@@ -2,12 +2,10 @@ package dev.adamko.dokkatoo.formats
 
 import org.gradle.kotlin.dsl.dependencies
 
-abstract class DokkatooJekyllPublicationPlugin : DokkatooPublicationBasePlugin(
-  formatName = "jekyll"
-) {
+abstract class DokkatooJavadocPlugin : DokkatooFormatPlugin(formatName = "javadoc") {
   override fun PublicationPluginContext.configure() {
     project.dependencies {
-      dokkaPlugin(dokka("jekyll-plugin"))
+      dokkaPlugin(dokka("javadoc-plugin"))
     }
   }
 }

@@ -103,10 +103,10 @@ abstract class DokkatooPlugin @Inject constructor(
       apply(type = DokkatooKotlinAdapter::class)
 
       // auto-apply the custom format plugins
-      apply(type = DokkatooGfmPublicationPlugin::class)
-      apply(type = DokkatooHtmlPublicationPlugin::class)
-      apply(type = DokkatooJavadocPublicationPlugin::class)
-      apply(type = DokkatooJekyllPublicationPlugin::class)
+      apply(type = DokkatooGfmPlugin::class)
+      apply(type = DokkatooHtmlPlugin::class)
+      apply(type = DokkatooJavadocPlugin::class)
+      apply(type = DokkatooJekyllPlugin::class)
     }
   }
 

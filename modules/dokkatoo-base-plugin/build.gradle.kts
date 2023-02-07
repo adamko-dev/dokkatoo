@@ -55,10 +55,10 @@ gradlePlugin {
       isAutomatedPublishing = true
     }
   }
-  registerDokkaPlugin("gfm", "DokkatooGfmPublicationPlugin")
-  registerDokkaPlugin("html", "DokkatooHtmlPublicationPlugin")
-  registerDokkaPlugin("javadoc", "DokkatooJavadocPublicationPlugin")
-  registerDokkaPlugin("jekyll", "DokkatooJekyllPublicationPlugin")
+  registerDokkaPlugin("gfm", "DokkatooGfmPlugin")
+  registerDokkaPlugin("html", "DokkatooHtmlPlugin")
+  registerDokkaPlugin("javadoc", "DokkatooJavadocPlugin")
+  registerDokkaPlugin("jekyll", "DokkatooJekyllPlugin")
 }
 
 pluginBundle {
