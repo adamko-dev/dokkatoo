@@ -96,6 +96,10 @@ publishing {
       name = "Test"
     }
   }
+  publications.matching { it.name == "pluginMaven" }.withType<MavenPublication>().configureEach {
+    // rename the base plugin to be simpler than the default `dokkatoo-base-plugin`
+    artifactId = "dokkatoo"
+  }
   publications.withType<MavenPublication>().configureEach {
     // prevent warning message...
     // Maven publication 'pluginMaven' pom metadata warnings (silence with 'suppressPomMetadataWarningsFor(variant)'):
