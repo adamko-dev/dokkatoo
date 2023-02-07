@@ -86,7 +86,7 @@ abstract class DokkatooFormatPlugin @Inject constructor(
         version.map { v -> create("$this:$v") }
 
       with(dokkatooExtension.versions) {
-        dokkaPlugin("org.jetbrains:markdown" version jetbrainsMarkdown)
+        dokkaPlugin("org.jetbrains:markdown-jvm" version jetbrainsMarkdown)
 
         dokkaPlugin(dokka("kotlin-analysis-intellij"))
         dokkaPlugin(dokka("dokka-base"))
