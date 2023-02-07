@@ -1,13 +1,13 @@
 package dev.adamko.dokkatoo.dokka
 
-import dev.adamko.dokkatoo.DokkatooPlugin.Companion.ConfigurationName.DOKKATOO_CONFIGURATIONS
-import dev.adamko.dokkatoo.DokkatooPlugin.Companion.ConfigurationName.DOKKATOO_CONFIGURATION_ELEMENTS
-import dev.adamko.dokkatoo.DokkatooPlugin.Companion.ConfigurationName.DOKKA_GENERATOR_CLASSPATH
-import dev.adamko.dokkatoo.DokkatooPlugin.Companion.ConfigurationName.DOKKA_PLUGINS_CLASSPATH
-import dev.adamko.dokkatoo.DokkatooPlugin.Companion.ConfigurationName.DOKKA_PLUGINS_INTRANSITIVE_CLASSPATH
-import dev.adamko.dokkatoo.DokkatooPlugin.Companion.TaskName.CREATE_CONFIGURATION
-import dev.adamko.dokkatoo.DokkatooPlugin.Companion.TaskName.CREATE_MODULE_CONFIGURATION
-import dev.adamko.dokkatoo.DokkatooPlugin.Companion.TaskName.GENERATE
+import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKATOO_CONFIGURATIONS
+import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKATOO_CONFIGURATION_ELEMENTS
+import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKA_GENERATOR_CLASSPATH
+import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKA_PLUGINS_CLASSPATH
+import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKA_PLUGINS_INTRANSITIVE_CLASSPATH
+import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.TaskName.CREATE_CONFIGURATION
+import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.TaskName.CREATE_MODULE_CONFIGURATION
+import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.TaskName.GENERATE
 import dev.adamko.dokkatoo.dokka.parameters.DokkaParametersGradleBuilder
 import java.io.Serializable
 import javax.inject.Inject
