@@ -1,6 +1,5 @@
 package dev.adamko.dokkatoo
 
-import dev.adamko.dokkatoo.adapters.DokkatooKotlinAdapter
 import dev.adamko.dokkatoo.formats.DokkatooGfmPlugin
 import dev.adamko.dokkatoo.formats.DokkatooHtmlPlugin
 import dev.adamko.dokkatoo.formats.DokkatooJavadocPlugin
@@ -8,7 +7,6 @@ import dev.adamko.dokkatoo.formats.DokkatooJekyllPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
-
 
 /**
  * Dokkatoo Gradle Plugin.
@@ -20,9 +18,6 @@ abstract class DokkatooPlugin : Plugin<Project> {
   override fun apply(target: Project) {
     with(target.pluginManager) {
       apply(type = DokkatooBasePlugin::class)
-
-      // apply the plugin that will autoconfigure Dokkatoo to use the sources of a Kotlin project
-      apply(type = DokkatooKotlinAdapter::class)
 
       // auto-apply the custom format plugins
       apply(type = DokkatooGfmPlugin::class)

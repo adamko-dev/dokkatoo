@@ -20,13 +20,10 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ConfigurationContainer
-import org.gradle.api.artifacts.Dependency
-import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.api.attributes.*
 import org.gradle.api.attributes.java.TargetJvmEnvironment
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.kotlin.dsl.*
@@ -46,13 +43,19 @@ abstract class DokkatooBasePlugin @Inject constructor(
   override fun apply(target: Project) {
 
     val dokkatooExtension = target.extensions.create<DokkatooExtension>(EXTENSION_NAME).apply {
-      dokkaVersion.convention("1.7.20")
       dokkatooCacheDirectory.convention(null)
       moduleNameDefault.convention(providers.provider { target.name })
       moduleVersionDefault.convention(providers.provider { target.version.toString() })
       sourceSetScopeDefault.convention(target.path)
       dokkatooPublicationDirectory.convention(layout.buildDirectory.dir("dokka"))
       dokkatooConfigurationsDirectory.convention(layout.buildDirectory.dir("dokka-config"))
+
+      this.extensions.create<DokkatooExtension.Versions>("versions").apply {
+        jetbrainsDokka.convention("1.7.20")
+        jetbrainsMarkdown.convention("0.3.1")
+        freemarker.convention("2.3.31")
+        kotlinxHtml.convention("0.8.0")
+      }
     }
 
     target.tasks.createDokkaLifecycleTasks()
@@ -114,12 +117,6 @@ abstract class DokkatooBasePlugin @Inject constructor(
         objects,
         configurationAttributes,
         project.configurations,
-      )
-
-      // add default Configuration dependencies
-      project.dependencies.addDokkaDependencies(
-        dokkatooExtension,
-        gradleConfigurations,
       )
 
       // create tasks
@@ -464,41 +461,6 @@ abstract class DokkatooBasePlugin @Inject constructor(
     )
   }
 
-
-  private fun DependencyHandler.addDokkaDependencies(
-    dokkatooExtension: DokkatooExtension,
-    formatConfigurations: DokkatooFormatGradleConfigurations,
-  ) {
-
-    //<editor-fold desc="DependencyHandler utils">
-    fun DependencyHandler.dokkaPlugin(dependency: Provider<Dependency>) =
-      addProvider(formatConfigurations.dokkaPluginsClasspath.name, dependency)
-
-    fun DependencyHandler.dokkaPlugin(dependency: String) =
-      add(formatConfigurations.dokkaPluginsClasspath.name, dependency)
-
-    fun DependencyHandler.dokkaGenerator(dependency: Provider<Dependency>) =
-      addProvider(formatConfigurations.dokkaGeneratorClasspath.name, dependency)
-
-    fun DependencyHandler.dokkaGenerator(dependency: String) =
-      add(formatConfigurations.dokkaGeneratorClasspath.name, dependency)
-    //</editor-fold>
-
-    fun dokka(module: String) =
-      dokkatooExtension.dokkaVersion.map { version -> create("org.jetbrains.dokka:$module:$version") }
-
-    dokkaPlugin("org.jetbrains:markdown-jvm:0.3.1")
-    dokkaPlugin(dokka("kotlin-analysis-intellij"))
-    dokkaPlugin(dokka("dokka-base"))
-    dokkaPlugin(dokka("templating-plugin"))
-    dokkaPlugin(dokka("dokka-analysis"))
-    dokkaPlugin(dokka("kotlin-analysis-compiler"))
-
-    dokkaPlugin("org.jetbrains.kotlinx:kotlinx-html-jvm:0.8.0")
-    dokkaPlugin("org.freemarker:freemarker:2.3.31")
-
-    dokkaGenerator(dokka("dokka-core"))
-  }
 
   private fun TaskContainer.createDokkaLifecycleTasks() {
     register(TaskName.GENERATE, DokkatooTask::class) {
