@@ -2,6 +2,9 @@ package dev.adamko.dokkatoo
 
 import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKA_PLUGINS_CLASSPATH
 import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes
+import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes.Companion.DOKKATOO_BASE_ATTRIBUTE
+import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes.Companion.DOKKATOO_CATEGORY_ATTRIBUTE
+import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes.Companion.DOKKA_FORMAT_ATTRIBUTE
 import dev.adamko.dokkatoo.distibutions.DokkatooFormatGradleConfigurations
 import dev.adamko.dokkatoo.dokka.DokkaPublication
 import dev.adamko.dokkatoo.dokka.parameters.DokkaPluginConfigurationGradleBuilder
@@ -21,7 +24,16 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.attributes.*
-import org.gradle.api.attributes.java.TargetJvmEnvironment
+import org.gradle.api.attributes.Bundling.BUNDLING_ATTRIBUTE
+import org.gradle.api.attributes.Bundling.EXTERNAL
+import org.gradle.api.attributes.Category.CATEGORY_ATTRIBUTE
+import org.gradle.api.attributes.Category.LIBRARY
+import org.gradle.api.attributes.LibraryElements.JAR
+import org.gradle.api.attributes.LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE
+import org.gradle.api.attributes.Usage.JAVA_RUNTIME
+import org.gradle.api.attributes.Usage.USAGE_ATTRIBUTE
+import org.gradle.api.attributes.java.TargetJvmEnvironment.STANDARD_JVM
+import org.gradle.api.attributes.java.TargetJvmEnvironment.TARGET_JVM_ENVIRONMENT_ATTRIBUTE
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ProviderFactory
@@ -42,30 +54,16 @@ abstract class DokkatooBasePlugin @Inject constructor(
 
   override fun apply(target: Project) {
 
-    val dokkatooExtension = target.extensions.create<DokkatooExtension>(EXTENSION_NAME).apply {
-      dokkatooCacheDirectory.convention(null)
-      moduleNameDefault.convention(providers.provider { target.name })
-      moduleVersionDefault.convention(providers.provider { target.version.toString() })
-      sourceSetScopeDefault.convention(target.path)
-      dokkatooPublicationDirectory.convention(layout.buildDirectory.dir("dokka"))
-      dokkatooConfigurationsDirectory.convention(layout.buildDirectory.dir("dokka-config"))
-
-      this.extensions.create<DokkatooExtension.Versions>("versions").apply {
-        jetbrainsDokka.convention("1.7.20")
-        jetbrainsMarkdown.convention("0.3.1")
-        freemarker.convention("2.3.31")
-        kotlinxHtml.convention("0.8.0")
-      }
-    }
+    val dokkatooExtension = createExtension(target)
 
     target.tasks.createDokkaLifecycleTasks()
 
     val configurationAttributes = objects.newInstance<DokkatooConfigurationAttributes>()
 
     target.dependencies.attributesSchema {
-      attribute(DokkatooConfigurationAttributes.DOKKATOO_BASE_ATTRIBUTE)
-      attribute(DokkatooConfigurationAttributes.DOKKATOO_CATEGORY_ATTRIBUTE)
-      attribute(DokkatooConfigurationAttributes.DOKKA_FORMAT_ATTRIBUTE)
+      attribute(DOKKATOO_BASE_ATTRIBUTE)
+      attribute(DOKKATOO_CATEGORY_ATTRIBUTE)
+      attribute(DOKKA_FORMAT_ATTRIBUTE)
     }
 
     val dokkaConsumerConfiguration = target.configurations.register(ConfigurationName.DOKKATOO) {
@@ -74,7 +72,7 @@ abstract class DokkatooBasePlugin @Inject constructor(
       isVisible = false
       attributes {
         attribute(
-          DokkatooConfigurationAttributes.DOKKATOO_BASE_ATTRIBUTE,
+          DOKKATOO_BASE_ATTRIBUTE,
           configurationAttributes.dokkatooBaseUsage
         )
       }
@@ -98,6 +96,25 @@ abstract class DokkatooBasePlugin @Inject constructor(
 
     //target.tasks.withType<DokkaConfigurationTask>().configureEach {
     //}
+  }
+
+
+  private fun createExtension(project: Project): DokkatooExtension {
+    return project.extensions.create<DokkatooExtension>(EXTENSION_NAME).apply {
+      dokkatooCacheDirectory.convention(null)
+      moduleNameDefault.convention(providers.provider { project.name })
+      moduleVersionDefault.convention(providers.provider { project.version.toString() })
+      sourceSetScopeDefault.convention(project.path)
+      dokkatooPublicationDirectory.convention(layout.buildDirectory.dir("dokka"))
+      dokkatooConfigurationsDirectory.convention(layout.buildDirectory.dir("dokka-config"))
+
+      this.extensions.create<DokkatooExtension.Versions>("versions").apply {
+        jetbrainsDokka.convention("1.7.20")
+        jetbrainsMarkdown.convention("0.3.1")
+        freemarker.convention("2.3.31")
+        kotlinxHtml.convention("0.8.0")
+      }
+    }
   }
 
 
@@ -341,23 +358,17 @@ abstract class DokkatooBasePlugin @Inject constructor(
   ): DokkatooFormatGradleConfigurations {
 
     fun AttributeContainer.dokkaCategory(category: DokkatooConfigurationAttributes.DokkatooCategoryAttribute) {
-      attribute(
-        DokkatooConfigurationAttributes.DOKKATOO_BASE_ATTRIBUTE,
-        attributes.dokkatooBaseUsage
-      )
-      attribute(DokkatooConfigurationAttributes.DOKKA_FORMAT_ATTRIBUTE, objects.named(formatName))
-      attribute(DokkatooConfigurationAttributes.DOKKATOO_CATEGORY_ATTRIBUTE, category)
+      attribute(DOKKATOO_BASE_ATTRIBUTE, attributes.dokkatooBaseUsage)
+      attribute(DOKKA_FORMAT_ATTRIBUTE, objects.named(formatName))
+      attribute(DOKKATOO_CATEGORY_ATTRIBUTE, category)
     }
 
     fun AttributeContainer.jvmJar() {
-      attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_RUNTIME))
-      attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category.LIBRARY))
-      attribute(Bundling.BUNDLING_ATTRIBUTE, objects.named(Bundling.EXTERNAL))
-      attribute(
-        TargetJvmEnvironment.TARGET_JVM_ENVIRONMENT_ATTRIBUTE,
-        objects.named(TargetJvmEnvironment.STANDARD_JVM)
-      )
-      attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements.JAR))
+      attribute(USAGE_ATTRIBUTE, objects.named(JAVA_RUNTIME))
+      attribute(CATEGORY_ATTRIBUTE, objects.named(LIBRARY))
+      attribute(BUNDLING_ATTRIBUTE, objects.named(EXTERNAL))
+      attribute(TARGET_JVM_ENVIRONMENT_ATTRIBUTE, objects.named(STANDARD_JVM))
+      attribute(LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(JAR))
     }
 
     //<editor-fold desc="Dokka Configuration files">
@@ -478,8 +489,8 @@ abstract class DokkatooBasePlugin @Inject constructor(
      * Names of the Gradle [Configuration]s used by the [Dokkatoo Plugin][DokkatooBasePlugin].
      *
      * Beware the confusing terminology:
-     * - [Gradle Configurations][org.gradle.api.artifacts.Configuration] are used to share files between subprojects. Each has a name.
-     * - [Dokka Configurations][org.jetbrains.dokka.DokkaConfiguration] are used to create JSON settings for the Dokka Generator
+     * - [Gradle Configurations][org.gradle.api.artifacts.Configuration] - share files between subprojects. Each has a name.
+     * - [DokkaConfiguration][org.jetbrains.dokka.DokkaConfiguration] - parameters for executing the Dokka Generator
      */
     object ConfigurationName {
 

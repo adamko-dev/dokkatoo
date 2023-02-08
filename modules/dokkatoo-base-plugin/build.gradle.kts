@@ -100,16 +100,6 @@ publishing {
     // rename the base plugin to be simpler than the default `dokkatoo-base-plugin`
     artifactId = "dokkatoo"
   }
-  publications.withType<MavenPublication>().configureEach {
-    // prevent warning message...
-    // Maven publication 'pluginMaven' pom metadata warnings (silence with 'suppressPomMetadataWarningsFor(variant)'):
-    // - Variant testFixturesApiElements:
-    // - Declares capability org.jetbrains.dokka:dokka-gradle-plugin-2-test-fixtures:2.0.0 which cannot be mapped to Maven
-    // - Variant testFixturesRuntimeElements:
-    // - Declares capability org.jetbrains.dokka:dokka-gradle-plugin-2-test-fixtures:2.0.0 which cannot be mapped to Maven
-    suppressPomMetadataWarningsFor("testFixturesApiElements")
-    suppressPomMetadataWarningsFor("testFixturesRuntimeElements")
-  }
 }
 
 
@@ -221,3 +211,10 @@ tasks.withType<Test>().configureEach {
     showStackTraces = true
   }
 }
+
+
+// don't publish test fixtures (which causes warnings when publishing)
+// https://docs.gradle.org/current/userguide/java_testing.html#publishing_test_fixtures
+val javaComponent = components["java"] as AdhocComponentWithVariants
+javaComponent.withVariantsFromConfiguration(configurations["testFixturesApiElements"]) { skip() }
+javaComponent.withVariantsFromConfiguration(configurations["testFixturesRuntimeElements"]) { skip() }
