@@ -19,6 +19,7 @@ import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.dokka.Platform
+import org.jetbrains.kotlin.gradle.dsl.KotlinCommonOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinSingleTargetExtension
@@ -85,10 +86,9 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
       project.tasks.withType<DokkatooCreateConfigurationTask>().configureEach {
         dokkaSourceSets.configureEach {
           suppress.convention(
-            todoSourceSetName
-              .flatMap {
-                kotlinExtension.sourceSets.named(it).flatMap { kss -> !kss.isMainSourceSet() }
-              }
+            todoSourceSetName.flatMap {
+              kotlinExtension.sourceSets.named(it).flatMap { kss -> !kss.isMainSourceSet() }
+            }
           )
         }
       }
@@ -103,20 +103,14 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
   ) {
     private val logger = Logging.getLogger(this::class.java)
 
-    /** Determine if a source set is 'main', and not test sources */
-    fun KotlinSourceSet.isMainSourceSet(): Provider<Boolean> = providers.provider {
+
+    private fun KotlinSourceSet.allCompilations(): List<KotlinCompilation<KotlinCommonOptions>> {
       val currentSourceSet = this
 
-      val allCompilations = when (kotlinExtension) {
-        is KotlinMultiplatformExtension   -> {
-          kotlinExtension.targets
-            .flatMap { target -> target.compilations }
+      return when (kotlinExtension) {
+        is KotlinMultiplatformExtension   -> kotlinExtension.targets.flatMap { target -> target.compilations }
 
-        }
-
-        is KotlinSingleTargetExtension<*> -> {
-          kotlinExtension.target.compilations
-        }
+        is KotlinSingleTargetExtension<*> -> kotlinExtension.target.compilations
 
         else                              -> emptyList()
       }.filter { compilation ->
@@ -124,6 +118,10 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
             || currentSourceSet in compilation.kotlinSourceSets
             || currentSourceSet in compilation.allKotlinSourceSets
       }
+    }
+
+    /** Determine if a source set is 'main', and not test sources */
+    fun KotlinSourceSet.isMainSourceSet(): Provider<Boolean> = providers.provider {
 
       fun KotlinCompilation<*>.isMainCompilation(): Boolean {
         return try {
@@ -140,6 +138,8 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
         }
       }
 
+      val allCompilations = allCompilations()
+
       logger.lifecycle("KotlinSourceSet $name. empty: ${allCompilations.isEmpty()}. main compilations: ${allCompilations.count { it.isMainCompilation() }}")
 
       allCompilations.isEmpty() || allCompilations.any { compilation -> compilation.isMainCompilation() }
@@ -151,8 +151,7 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
         is KotlinMultiplatformExtension   ->
           kotlinExtension.targets
             .map { it.platformType }
-            .singleOrNull()
-            ?: KotlinPlatformType.common
+            .singleOrNull() ?: KotlinPlatformType.common
 
         is KotlinSingleTargetExtension<*> ->
           kotlinExtension.target.platformType
@@ -179,24 +178,40 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
 
         this.sourceRoots.from(extantKotlinSourceRoots)
 
-        // need to check for resolution, because testImplementation can't be resolved....
-        // > Resolving dependency configuration 'testImplementation' is not allowed as it is defined as 'canBeResolved=false'.
-        // >    Instead, a resolvable ('canBeResolved=true') dependency configuration that extends 'testImplementation' should be resolved.
-        // As a workaround, just manually check if the configuration can be resolved.
-        // If resolution is necessary, maybe make a special, one-off, resolvable configuration?
-        this.classpath.from(
-          projectConfigurations
-            .named(kotlinSourceSet.implementationConfigurationName)
-            .map { elements ->
-              when {
-                elements.isCanBeResolved ->
-                  elements.incoming.artifactView { lenient(true) }.files
+        iterator {
+          yield(kotlinSourceSet.implementationConfigurationName)
+          yield(kotlinSourceSet.runtimeOnlyConfigurationName)
+          yield(kotlinSourceSet.apiConfigurationName)
+          yield(kotlinSourceSet.compileOnlyConfigurationName)
+          yieldAll(kotlinSourceSet.relatedConfigurationNames)
+        }.forEach { kotlinSourceSetConfigurationName ->
 
-                else                     ->
-                  emptySet<File>()
+          classpath.from(
+            projectConfigurations
+              .named(kotlinSourceSetConfigurationName)
+              .map { conf ->
+                when {
+                  // need to check for resolution, because testImplementation can't be resolved....
+                  // > Resolving dependency configuration 'testImplementation' is not allowed as it is defined as 'canBeResolved=false'.
+                  // As a workaround, just manually check if the configuration can be resolved.
+                  conf.isCanBeResolved -> conf.incoming
+                    .artifactView { lenient(true) }
+                    .artifacts
+                    .map { it.file }
+
+                  else                 -> emptySet<File>()
+                }
               }
+          )
+
+          classpath.from(providers.provider {
+            projectConfigurations.matching { conf ->
+              conf.isCanBeResolved && conf.extendsFrom.any { it.name == kotlinSourceSetConfigurationName }
+            }.flatMap { conf ->
+              conf.incoming.artifactView { lenient(true) }.artifacts.map { it.file }
             }
-        )
+          })
+        }
 
         this.analysisPlatform.set(dokkaAnalysisPlatform)
 
