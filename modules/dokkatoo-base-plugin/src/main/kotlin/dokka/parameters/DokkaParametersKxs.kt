@@ -19,6 +19,7 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import org.gradle.api.Named
+import org.gradle.api.logging.Logging
 import org.jetbrains.dokka.*
 
 
@@ -155,7 +156,7 @@ data class DokkaParametersKxs(
       val relativePathToOutputDirectory =
         sourceOutputDirectory.relativeToOrSelf(rootOutputDirectory)
 
-      println("relativePathToOutputDirectory: $relativePathToOutputDirectory")
+      logger.info("relativePathToOutputDirectory: $relativePathToOutputDirectory")
 
       return DokkaModuleDescriptionImpl(
         name = name,
@@ -163,6 +164,10 @@ data class DokkaParametersKxs(
         sourceOutputDirectory = sourceOutputDirectory,
         includes = includes,
       )
+    }
+
+    companion object {
+      private val logger = Logging.getLogger(DokkaModuleDescriptionKxs::class.java)
     }
   }
 
