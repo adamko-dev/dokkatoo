@@ -13,9 +13,11 @@ import org.gradle.api.tasks.PathSensitivity.RELATIVE
 
 /**
  * Produces a Dokka Configuration that describes a single module of a multimodule Dokka configuration.
+ *
+ * @see dev.adamko.dokkatoo.dokka.parameters.DokkaParametersKxs.DokkaModuleDescriptionKxs
  */
 @CacheableTask
-abstract class DokkatooModuleConfigurationTask @Inject constructor(
+abstract class DokkatooPrepareModuleDescriptorTask @Inject constructor(
   private val layout: ProjectLayout,
 ) : DokkatooTask() {
 
@@ -49,7 +51,7 @@ abstract class DokkatooModuleConfigurationTask @Inject constructor(
   abstract val includes: ConfigurableFileCollection
 
   @get:OutputFile
-  abstract val dokkaModuleConfigurationJson: RegularFileProperty
+  abstract val dokkaModuleDescriptorJson: RegularFileProperty
 
   @TaskAction
   fun generateModuleConfiguration() {
@@ -69,6 +71,6 @@ abstract class DokkatooModuleConfigurationTask @Inject constructor(
 
     logger.info("encodedModuleDesc: $encodedModuleDesc")
 
-    dokkaModuleConfigurationJson.get().asFile.writeText(encodedModuleDesc)
+    dokkaModuleDescriptorJson.get().asFile.writeText(encodedModuleDesc)
   }
 }

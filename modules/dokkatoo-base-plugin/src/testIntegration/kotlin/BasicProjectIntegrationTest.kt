@@ -53,7 +53,7 @@ class BasicProjectIntegrationTest {
 
     val actualDokkaConfJson = basicProject
       .projectDir
-      .resolve("build/dokka-config/html/dokka_configuration.json")
+      .resolve("build/dokka-config/html/dokka_parameters.json")
       .toFile()
       .readText()
 

@@ -9,16 +9,17 @@ import kotlinx.serialization.json.decodeFromStream
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.Property
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.*
-import org.gradle.api.tasks.PathSensitivity.NAME_ONLY
+import org.gradle.api.tasks.PathSensitivity.RELATIVE
 import org.gradle.kotlin.dsl.submit
 import org.gradle.workers.WorkerExecutor
 
 /**
  * Executes the Dokka Generator, and produces documentation.
  *
- * The type of documentation generated is determined by the supplied Dokka Plugins in [pluginClasspath].
+ * The type of documentation generated is determined by the supplied Dokka Plugins in [dokkaConfigurationJson].
  */
 @CacheableTask
 abstract class DokkatooGenerateTask @Inject constructor(
@@ -27,7 +28,7 @@ abstract class DokkatooGenerateTask @Inject constructor(
 ) : DokkatooTask() {
 
   @get:InputFile
-  @get:PathSensitive(NAME_ONLY)
+  @get:PathSensitive(RELATIVE)
   abstract val dokkaConfigurationJson: RegularFileProperty
 
   @get:Classpath
@@ -42,16 +43,40 @@ abstract class DokkatooGenerateTask @Inject constructor(
   @get:OutputDirectory
   abstract val outputDirectory: DirectoryProperty
 
+  /**
+   * Generating a Dokka Module? Set this to `true`.
+   *
+   * Generating a Dokka Publication? `false`.
+   */
+  @get:Input
+  abstract val generationType: Property<GenerationType>
+
+  @get:InputFiles
+  @get:Optional
+  @get:PathSensitive(RELATIVE)
+  abstract val dokkaModuleSourceDirectories: ConfigurableFileCollection
+
+  enum class GenerationType {
+    MODULE,
+    PUBLICATION,
+  }
+
   @TaskAction
   @OptIn(ExperimentalSerializationApi::class) // jsonMapper.decodeFromStream
   fun generateDocumentation() {
     val dokkaConfigurationJsonFile = dokkaConfigurationJson.get().asFile
+    val generationType =
+      generationType.orNull ?: error("GenerationType is required, but no value was provided")
 
     val dokkaConfiguration = jsonMapper.decodeFromStream(
       DokkaParametersKxs.serializer(),
       dokkaConfigurationJsonFile.inputStream(),
     ).copy(
       outputDir = outputDirectory.get().asFile,
+      delayTemplateSubstitution = when (generationType) {
+        GenerationType.MODULE      -> true
+        GenerationType.PUBLICATION -> false
+      },
     )
 
     logger.info("dokkaConfiguration: $dokkaConfiguration")

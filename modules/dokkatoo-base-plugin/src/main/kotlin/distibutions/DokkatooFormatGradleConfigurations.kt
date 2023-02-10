@@ -15,10 +15,20 @@ internal data class DokkatooFormatGradleConfigurations(
 //    val dokkaConsumer: NamedDomainObjectProvider<Configuration>,
 
 
-  /** Fetch Dokka Configuration files from other subprojects */
-  val dokkaConfigurationsConsumer: NamedDomainObjectProvider<Configuration>,
-  /** Provide Dokka Configurations files to other subprojects */
-  val dokkaConfigurationsElements: NamedDomainObjectProvider<Configuration>,
+  /** Fetch Dokka Parameter files from other subprojects */
+  val dokkaParametersConsumer: NamedDomainObjectProvider<Configuration>,
+  /** Provide Dokka Parameter files to other subprojects */
+  val dokkaParametersOutgoing: NamedDomainObjectProvider<Configuration>,
+
+  /** Fetch Dokka Module Descriptor files from other subprojects */
+  val dokkaModuleDescriptorsConsumer: NamedDomainObjectProvider<Configuration>,
+  /** Provide Dokka Module Descriptor files to other subprojects */
+  val dokkaModuleDescriptorsOutgoing: NamedDomainObjectProvider<Configuration>,
+
+  /** Fetch Dokka Module Source Outputs from other subprojects */
+  val dokkaModuleSourceOutputsConsumer: NamedDomainObjectProvider<Configuration>,
+  /** Provide Dokka Module Source Outputs to other subprojects */
+  val dokkaModuleSourceOutputsOutgoing: NamedDomainObjectProvider<Configuration>,
 
 
   /**
@@ -47,4 +57,10 @@ internal data class DokkatooFormatGradleConfigurations(
    * the dependencies are computed automatically.
    */
   val dokkaPluginsIntransitiveClasspath: NamedDomainObjectProvider<Configuration>,
+
+
+  /**
+   * Provides Dokka plugins to other subprojects.
+   */
+  val dokkaPluginsClasspathOutgoing: NamedDomainObjectProvider<Configuration>,
 )

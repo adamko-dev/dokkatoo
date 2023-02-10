@@ -86,7 +86,6 @@ abstract class DokkatooFormatPlugin @Inject constructor(
         version.map { v -> create("$this:$v") }
 
       with(dokkatooExtension.versions) {
-        dokkaPlugin("org.jetbrains:markdown-jvm" version jetbrainsMarkdown)
 
         dokkaPlugin(dokka("kotlin-analysis-intellij"))
         dokkaPlugin(dokka("dokka-base"))
@@ -98,6 +97,8 @@ abstract class DokkatooFormatPlugin @Inject constructor(
         dokkaPlugin("org.freemarker:freemarker" version freemarker)
 
         dokkaGenerator(dokka("dokka-core"))
+        // TODO why does this need a -jvm suffix?
+        dokkaGenerator("org.jetbrains:markdown-jvm" version jetbrainsMarkdown)
       }
     }
   }

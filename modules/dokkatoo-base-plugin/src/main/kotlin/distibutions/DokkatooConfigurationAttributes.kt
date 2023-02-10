@@ -23,11 +23,12 @@ abstract class DokkatooConfigurationAttributes @Inject constructor(
 //    val dokkaBaseUsage: Usage = objects.named("org.jetbrains.dokka")
   val dokkatooBaseUsage: DokkatooBaseAttribute = objects.named("dokkatoo")
 
-  /** for [Configuration]s that provide or consume Dokka configuration files */
-  val dokkaConfiguration: DokkatooCategoryAttribute = objects.named("configuration")
+  /** for [Configuration]s that provide or consume Dokka parameter files */
+  val dokkaParameters: DokkatooCategoryAttribute = objects.named("generator-parameters")
 
   /** for [Configuration]s that provide or consume Dokka module descriptor files */
   val dokkaModuleDescriptors: DokkatooCategoryAttribute = objects.named("module-descriptor")
+  val dokkaModuleSource: DokkatooCategoryAttribute = objects.named("module-source")
 
   val dokkaGeneratorClasspath: DokkatooCategoryAttribute = objects.named("generator-classpath")
 

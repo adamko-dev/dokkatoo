@@ -48,6 +48,7 @@ data class DokkaParametersKxs(
   val modulesKxs: List<DokkaModuleDescriptionKxs>,
 ) : DokkaConfiguration, Named {
 
+
   override val modules: List<DokkaConfiguration.DokkaModuleDescription> =
     modulesKxs.map { it.toCoreModel(outputDir) }
 

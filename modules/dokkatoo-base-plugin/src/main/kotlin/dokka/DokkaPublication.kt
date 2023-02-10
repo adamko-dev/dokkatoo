@@ -1,13 +1,19 @@
 package dev.adamko.dokkatoo.dokka
 
-import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKATOO_CONFIGURATIONS
-import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKATOO_CONFIGURATION_ELEMENTS
+import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKATOO_MODULE_DESCRIPTORS_CONSUMER
+import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKATOO_MODULE_DESCRIPTOR_PROVIDER
+import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKATOO_MODULE_SOURCE_OUTPUT_CONSUMER
+import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKATOO_MODULE_SOURCE_OUTPUT_PROVIDER
+import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKATOO_PARAMETERS
+import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKATOO_PARAMETERS_OUTGOING
 import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKA_GENERATOR_CLASSPATH
 import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKA_PLUGINS_CLASSPATH
+import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKA_PLUGINS_CLASSPATH_OUTGOING
 import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKA_PLUGINS_INTRANSITIVE_CLASSPATH
-import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.TaskName.CREATE_CONFIGURATION
-import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.TaskName.CREATE_MODULE_CONFIGURATION
-import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.TaskName.GENERATE
+import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.TaskName.GENERATE_MODULE
+import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.TaskName.GENERATE_PUBLICATION
+import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.TaskName.PREPARE_MODULE_DESCRIPTOR
+import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.TaskName.PREPARE_PARAMETERS
 import dev.adamko.dokkatoo.dokka.parameters.DokkaParametersGradleBuilder
 import java.io.Serializable
 import javax.inject.Inject
@@ -39,29 +45,36 @@ abstract class DokkaPublication @Inject constructor(
   @get:Input
   abstract val enabled: Property<Boolean>
 
+  @get:Nested
+  abstract val dokkaConfiguration: DokkaParametersGradleBuilder
+
   @Internal
   val taskNames = TaskNames()
 
   @Internal
   val configurationNames = ConfigurationNames()
 
+  private fun String.formatSuffix() = this + formatName.capitalize()
+
   inner class TaskNames : Serializable {
-    val generate: String = GENERATE + formatName.capitalize()
-    val createConfiguration: String = CREATE_CONFIGURATION + formatName.capitalize()
-    val createModuleConfiguration: String =
-      CREATE_MODULE_CONFIGURATION + formatName.capitalize()
+    val generatePublication = GENERATE_PUBLICATION.formatSuffix()
+    val generateModule = GENERATE_MODULE.formatSuffix()
+    val prepareParameters = PREPARE_PARAMETERS.formatSuffix()
+    val prepareModuleDescriptor = PREPARE_MODULE_DESCRIPTOR.formatSuffix()
   }
+
+  // TODO rename 'outgoing' or 'provider' to 'shared'?
 
   inner class ConfigurationNames : Serializable {
-    val dokkaConfigurations: String = DOKKATOO_CONFIGURATIONS + formatName.capitalize()
-    val dokkaConfigurationElements: String = DOKKATOO_CONFIGURATION_ELEMENTS + formatName.capitalize()
-    val dokkaGeneratorClasspath: String = DOKKA_GENERATOR_CLASSPATH + formatName.capitalize()
-    val dokkaPluginsClasspath: String = DOKKA_PLUGINS_CLASSPATH + formatName.capitalize()
-    val dokkaPluginsIntransitiveClasspath: String =
-      DOKKA_PLUGINS_INTRANSITIVE_CLASSPATH + formatName.capitalize()
+    val dokkaParametersConsumer: String = DOKKATOO_PARAMETERS.formatSuffix()
+    val dokkaParametersOutgoing: String = DOKKATOO_PARAMETERS_OUTGOING.formatSuffix()
+    val moduleDescriptors = DOKKATOO_MODULE_DESCRIPTORS_CONSUMER.formatSuffix()
+    val moduleDescriptorsOutgoing = DOKKATOO_MODULE_DESCRIPTOR_PROVIDER.formatSuffix()
+    val moduleSourceOutputConsumer = DOKKATOO_MODULE_SOURCE_OUTPUT_CONSUMER.formatSuffix()
+    val moduleSourceOutputOutgoing = DOKKATOO_MODULE_SOURCE_OUTPUT_PROVIDER.formatSuffix()
+    val dokkaGeneratorClasspath = DOKKA_GENERATOR_CLASSPATH.formatSuffix()
+    val dokkaPluginsClasspath = DOKKA_PLUGINS_CLASSPATH.formatSuffix()
+    val dokkaPluginsIntransitiveClasspath = DOKKA_PLUGINS_INTRANSITIVE_CLASSPATH.formatSuffix()
+    val dokkaPluginsClasspathOutgoing = DOKKA_PLUGINS_CLASSPATH_OUTGOING.formatSuffix()
   }
-
-
-  @get:Nested
-  abstract val dokkaConfiguration: DokkaParametersGradleBuilder
 }

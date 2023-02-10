@@ -68,16 +68,18 @@ class MultiModuleFunctionalTest {
       |//}
     """.trimMargin()
 
-//        createKotlinFile(
-//            "src/main/kotlin/Dummy.kt", """
-//                package com.project.dummy
-//
-//                /** Dummy class - this is only here to trigger Dokka */
-//                class Dummy {
-//                    val nothing: String = ""
-//                }
-//            """.trimIndent()
-//        )
+    //createKotlinFile(
+    //  "src/main/kotlin/Dummy.kt",
+    //    """
+    //      |package com.project.dummy
+    //      |
+    //      |/** Dummy class - this is only here to trigger Dokka */
+    //      |class Dummy {
+    //      |    val nothing: String = ""
+    //      |}
+    //      |
+    //    """.trimMargin()
+    //)
 
     createKtsFile(
       "subproject-hello/build.gradle.kts",
@@ -206,7 +208,7 @@ class MultiModuleFunctionalTest {
     project.projectDir.resolve("subproject/build/dokka/html/com/project/hello/Hello.html")
       .shouldBeAFile()
     project.projectDir.resolve("subproject/build/dokka/html/index.html").shouldBeAFile()
-    project.projectDir.resolve("subproject/build/dokka/html/dokka_configuration.json")
+    project.projectDir.resolve("subproject/build/dokka/html/dokka_parameters.json")
       .shouldBeAFile()
     project.projectDir.resolve("subproject/build/dokka/html/element-list").shouldBeAFile()
     project.projectDir.resolve("subproject/build/dokka/html/element-list").toFile().readText()
@@ -234,7 +236,7 @@ class MultiModuleFunctionalTest {
 
 //        project.projectDir.resolve("subproject/build/dokka-output/com/project/hello/Hello.html").shouldBeAFile()
 //        project.projectDir.resolve("subproject/build/dokka-output/index.html").shouldBeAFile()
-//        project.projectDir.resolve("subproject/build/dokka-config/dokka_configuration.json").shouldBeAFile()
+//        project.projectDir.resolve("subproject/build/dokka-config/dokka_parameters.json").shouldBeAFile()
 //        project.projectDir.resolve("subproject/build/dokka-output/element-list").shouldBeAFile()
 //        project.projectDir.resolve("subproject/build/dokka-output/element-list").toFile().readText().shouldContain(
 //            """
@@ -246,7 +248,7 @@ class MultiModuleFunctionalTest {
 //        )
 
     val dokkaConfigurationFile =
-      project.projectDir.resolve("build/dokka-config/html/dokka_configuration.json")
+      project.projectDir.resolve("build/dokka-config/html/dokka_parameters.json")
     dokkaConfigurationFile.shouldExist()
     dokkaConfigurationFile.shouldBeAFile()
     @OptIn(ExperimentalSerializationApi::class)
@@ -264,7 +266,7 @@ class MultiModuleFunctionalTest {
       )
 
       pluginClasspathJars.shouldContainExactlyInAnyOrder(
-        "markdown-jvm-0.3.1.jar",
+//        "markdown-jvm-0.3.1.jar",
         "kotlin-analysis-intellij-1.7.20.jar",
         "dokka-base-1.7.20.jar",
         "templating-plugin-1.7.20.jar",
