@@ -36,7 +36,7 @@ dependencyResolutionManagement {
 }
 
 include(
-  ":modules:dokkatoo-base-plugin",
+  ":modules:dokkatoo-plugin",
 
   ":externals",
 )

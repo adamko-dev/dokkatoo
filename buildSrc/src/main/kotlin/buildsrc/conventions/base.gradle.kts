@@ -50,13 +50,13 @@ tasks.withType<AbstractCopyTask>().configureEach {
 val kotlinDokkaSource by configurations.registering {
   asConsumer()
   attributes {
-    attribute(Usage.USAGE_ATTRIBUTE, objects.named("rocksdb-src"))
+    attribute(Usage.USAGE_ATTRIBUTE, objects.named("externals-dokka-src"))
   }
 }
 
 val kotlinDokkaSourceElements by configurations.registering {
   asProvider()
   attributes {
-    attribute(Usage.USAGE_ATTRIBUTE, objects.named("rocksdb-src"))
+    attribute(Usage.USAGE_ATTRIBUTE, objects.named("externals-dokka-src"))
   }
 }

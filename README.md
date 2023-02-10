@@ -58,6 +58,18 @@ pluginManagement {
 }
 ```
 
+```kts
+// buildSrc/build.gradle.kts
+
+plugins {
+  `kotlin-dsl`
+}
+
+dependencies {
+  implementation("dev.adamko.dokkatoo:dokkatoo-plugin:0.0.1-SNAPSHOT")
+}
+```
+
 Then the plugin can be applied in any Gradle project, without needing to define a version
 
 ```kts
