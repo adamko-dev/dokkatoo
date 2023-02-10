@@ -15,6 +15,9 @@ abstract class DokkatooExtension: ExtensionAware {
   /** Directory into which [DokkaPublication]s will be produced */
   abstract val dokkatooPublicationDirectory: DirectoryProperty
 
+  /** Directory into which Dokka Modules will be produced */
+  abstract val dokkatooModuleDirectory: DirectoryProperty
+
   abstract val dokkatooConfigurationsDirectory: DirectoryProperty
 
   /** Default Dokkatoo cache directory */

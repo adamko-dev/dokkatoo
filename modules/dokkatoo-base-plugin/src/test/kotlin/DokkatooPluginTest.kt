@@ -1,6 +1,6 @@
 package dev.adamko.dokkatoo
 
-import dev.adamko.dokkatoo.tasks.DokkatooCreateConfigurationTask
+import dev.adamko.dokkatoo.tasks.DokkatooPrepareParametersTask
 import io.kotest.matchers.shouldBe
 import kotlin.test.Test
 import org.gradle.api.Action
@@ -32,7 +32,7 @@ class DokkatooPluginTest {
     val project = ProjectBuilder.builder().build()
     project.plugins.apply("dev.adamko.dokkatoo")
 
-    project.tasks.withType<DokkatooCreateConfigurationTask>().configureEach(action {
+    project.tasks.withType<DokkatooPrepareParametersTask>().configureEach(action {
       dokkaSourceSets.create("Blah", action {
 
         sourceSetScope.set("moduleName")

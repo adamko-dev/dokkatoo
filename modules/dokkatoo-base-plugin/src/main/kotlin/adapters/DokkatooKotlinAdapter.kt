@@ -5,7 +5,7 @@ import com.android.build.gradle.api.LibraryVariant
 import dev.adamko.dokkatoo.DokkatooExtension
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import dev.adamko.dokkatoo.internal.not
-import dev.adamko.dokkatoo.tasks.DokkatooCreateConfigurationTask
+import dev.adamko.dokkatoo.tasks.DokkatooPrepareParametersTask
 import java.io.File
 import javax.inject.Inject
 import org.gradle.api.Plugin
@@ -83,7 +83,7 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
 
       // TODO remove this - tasks shouldn't be configured directly, instead source sets
       //      should be added to the Dokka extension, which will then create and configure appropriate tasks
-      project.tasks.withType<DokkatooCreateConfigurationTask>().configureEach {
+      project.tasks.withType<DokkatooPrepareParametersTask>().configureEach {
         dokkaSourceSets.configureEach {
           suppress.convention(
             todoSourceSetName.flatMap {

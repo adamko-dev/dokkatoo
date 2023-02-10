@@ -4,6 +4,7 @@ import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.jsonMapper
 import dev.adamko.dokkatoo.dokka.parameters.DokkaParametersKxs
 import dev.adamko.dokkatoo.dokka.parameters.DokkaPluginConfigurationGradleBuilder
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetGradleBuilder
+import java.io.IOException
 import javax.inject.Inject
 import kotlinx.serialization.encodeToString
 import org.gradle.api.DomainObjectSet
@@ -18,13 +19,13 @@ import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
 
 /**
- * Builds the Dokka Configuration that the Dokka Generator will use to produce a Dokka Publication for this project.
+ * Builds the Dokka Parameters that the Dokka Generator will use to produce a Dokka Publication for this project.
  *
  * Configurations from other modules (which are potentially from other Gradle subprojects) will also be included
  * via ... TODO explain how to include other subprojects/modules
  */
 @CacheableTask
-abstract class DokkatooCreateConfigurationTask @Inject constructor(
+abstract class DokkatooPrepareParametersTask @Inject constructor(
   objects: ObjectFactory,
 ) : DokkatooTask() {
 
@@ -35,12 +36,14 @@ abstract class DokkatooCreateConfigurationTask @Inject constructor(
   @get:InputFiles
 //    @get:NormalizeLineEndings
   @get:PathSensitive(PathSensitivity.NAME_ONLY)
-  abstract val dokkaSubprojectConfigurations: ConfigurableFileCollection
+  @get:Optional
+  abstract val dokkaSubprojectParameters: ConfigurableFileCollection
 
   /** Dokka Module Configuration files from other subprojects. */
   @get:InputFiles
 //    @get:NormalizeLineEndings
   @get:PathSensitive(PathSensitivity.NAME_ONLY)
+  @get:Optional
   abstract val dokkaModuleDescriptorFiles: ConfigurableFileCollection
 
   @get:LocalState
@@ -99,7 +102,7 @@ abstract class DokkatooCreateConfigurationTask @Inject constructor(
   @get:Input
   abstract val suppressInheritedMembers: Property<Boolean>
 
-  /** @see dev.adamko.dokkatoo.dokka.parameters.DokkaPublication.enabled */
+  /** @see dev.adamko.dokkatoo.dokka.DokkaPublication.enabled */
   @get:Input
 //    @get:Optional
   abstract val publicationEnabled: Property<Boolean>
@@ -164,13 +167,13 @@ abstract class DokkatooCreateConfigurationTask @Inject constructor(
       suppressObviousFunctions = suppressObviousFunctions,
     )
 
-    // fetch any configurations from OTHER subprojects
-    val subprojectConfigs = dokkaSubprojectConfigurations.files.map { file ->
+    // fetch parameters from OTHER subprojects
+    val subprojectConfigs = dokkaSubprojectParameters.files.map { file ->
       val fileContent = file.readText()
       jsonMapper.decodeFromString(DokkaParametersKxs.serializer(), fileContent)
     }
 
-    // now, combine them:
+    // now combine them:
     return subprojectConfigs.fold(baseDokkaConfiguration) { acc, it: DokkaParametersKxs ->
       acc.copy(
         sourceSets = acc.sourceSets + it.sourceSets,
@@ -178,16 +181,22 @@ abstract class DokkatooCreateConfigurationTask @Inject constructor(
         //      so Gradle can correctly de-duplicate jars
 //                pluginsClasspath = acc.pluginsClasspath + it.pluginsClasspath,
       )
+
     }
+//    return baseDokkaConfiguration
   }
 
   private fun dokkaModuleDescriptors(): List<DokkaParametersKxs.DokkaModuleDescriptionKxs> =
     dokkaModuleDescriptorFiles.files.map { file ->
-      val fileContent = file.readText()
-      jsonMapper.decodeFromString(
-        DokkaParametersKxs.DokkaModuleDescriptionKxs.serializer(),
-        fileContent,
-      )
+      try {
+        val fileContent = file.readText()
+        jsonMapper.decodeFromString(
+          DokkaParametersKxs.DokkaModuleDescriptionKxs.serializer(),
+          fileContent,
+        )
+      } catch (ex: Exception) {
+        throw IOException("Could not parse DokkaModuleDescriptionKxs from $file", ex)
+      }
     }
 
   @get:Input

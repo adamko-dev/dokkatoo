@@ -25,16 +25,24 @@ class DokkatooPluginFunctionalTest {
     build.output.invariantNewlines() shouldContain /* language=text */ """
       |Dokkatoo tasks
       |--------------
-      |createDokkatooConfiguration - Runs all Dokkatoo Create Configuration tasks
-      |createDokkatooConfigurationGfm - Creates Dokka Configuration for executing the Dokka Generator for the gfm publication
-      |createDokkatooConfigurationHtml - Creates Dokka Configuration for executing the Dokka Generator for the html publication
-      |createDokkatooConfigurationJavadoc - Creates Dokka Configuration for executing the Dokka Generator for the javadoc publication
-      |createDokkatooConfigurationJekyll - Creates Dokka Configuration for executing the Dokka Generator for the jekyll publication
       |dokkatooGenerate - Runs all Dokkatoo Generate tasks
-      |dokkatooGenerateGfm - Executes the Dokka Generator, producing the gfm publication
-      |dokkatooGenerateHtml - Executes the Dokka Generator, producing the html publication
-      |dokkatooGenerateJavadoc - Executes the Dokka Generator, producing the javadoc publication
-      |dokkatooGenerateJekyll - Executes the Dokka Generator, producing the jekyll publication
+      |dokkatooGenerateModuleGfm - Executes the Dokka Generator, generating a gfm module
+      |dokkatooGenerateModuleHtml - Executes the Dokka Generator, generating a html module
+      |dokkatooGenerateModuleJavadoc - Executes the Dokka Generator, generating a javadoc module
+      |dokkatooGenerateModuleJekyll - Executes the Dokka Generator, generating a jekyll module
+      |dokkatooGeneratePublicationGfm - Executes the Dokka Generator, generating the gfm publication
+      |dokkatooGeneratePublicationHtml - Executes the Dokka Generator, generating the html publication
+      |dokkatooGeneratePublicationJavadoc - Executes the Dokka Generator, generating the javadoc publication
+      |dokkatooGeneratePublicationJekyll - Executes the Dokka Generator, generating the jekyll publication
+      |prepareDokkatooModuleDescriptorGfm - Prepares the Dokka Module Descriptor JSON
+      |prepareDokkatooModuleDescriptorHtml - Prepares the Dokka Module Descriptor JSON
+      |prepareDokkatooModuleDescriptorJavadoc - Prepares the Dokka Module Descriptor JSON
+      |prepareDokkatooModuleDescriptorJekyll - Prepares the Dokka Module Descriptor JSON
+      |prepareDokkatooParameters - Runs all Dokkatoo Create Configuration tasks
+      |prepareDokkatooParametersGfm - Creates Dokka Configuration for executing the Dokka Generator for the gfm publication
+      |prepareDokkatooParametersHtml - Creates Dokka Configuration for executing the Dokka Generator for the html publication
+      |prepareDokkatooParametersJavadoc - Creates Dokka Configuration for executing the Dokka Generator for the javadoc publication
+      |prepareDokkatooParametersJekyll - Creates Dokka Configuration for executing the Dokka Generator for the jekyll publication
       |
     """.trimMargin()
   }
@@ -57,18 +65,69 @@ class DokkatooPluginFunctionalTest {
 
       build.output.invariantNewlines() shouldContain /* language=text */ """
         |--------------------------------------------------
-        |Variant dokkatooConfigurationElements$formatCapitalized
+        |Variant dokkatooParametersElements$formatCapitalized
         |--------------------------------------------------
-        |Provide Dokka Generator Configuration files for $format to other subprojects
+        |Provide Dokka Parameters for $format to other subprojects
         |
         |Capabilities
         |    - :test:unspecified (default capability)
         |Attributes
         |    - dev.adamko.dokkatoo.base     = dokkatoo
-        |    - dev.adamko.dokkatoo.category = configuration
+        |    - dev.adamko.dokkatoo.category = generator-parameters
         |    - dev.adamko.dokkatoo.format   = $format
         |Artifacts
-        |    - build/dokka-config/$format/dokka_configuration.json (artifactType = json)
+        |    - build/dokka-config/$format/dokka_parameters.json (artifactType = json)
+      """.trimMargin().replace('/', File.separatorChar)
+
+      build.output.invariantNewlines() shouldContain /* language=text */ """
+        |--------------------------------------------------
+        |Variant dokkatooPluginElements$formatCapitalized
+        |--------------------------------------------------
+        |Provide the Dokka Plugins classpath for $format to other subprojects
+        |
+        |Capabilities
+        |    - :test:unspecified (default capability)
+        |Attributes
+        |    - dev.adamko.dokkatoo.base       = dokkatoo
+        |    - dev.adamko.dokkatoo.category   = plugins-classpath
+        |    - dev.adamko.dokkatoo.format     = $format
+        |    - org.gradle.category            = library
+        |    - org.gradle.dependency.bundling = external
+        |    - org.gradle.jvm.environment     = standard-jvm
+        |    - org.gradle.libraryelements     = jar
+        |    - org.gradle.usage               = java-runtime
+      """.trimMargin().replace('/', File.separatorChar)
+
+      build.output.invariantNewlines() shouldContain /* language=text */ """
+        |--------------------------------------------------
+        |Variant dokkatooModuleDescriptorsElements$formatCapitalized
+        |--------------------------------------------------
+        |Provide Dokka Module Descriptors for $format to other subprojects
+        |
+        |Capabilities
+        |    - :test:unspecified (default capability)
+        |Attributes
+        |    - dev.adamko.dokkatoo.base     = dokkatoo
+        |    - dev.adamko.dokkatoo.category = module-descriptor
+        |    - dev.adamko.dokkatoo.format   = $format
+        |Artifacts
+        |    - build/dokka-config/${format}/module_descriptor.json (artifactType = json)
+      """.trimMargin().replace('/', File.separatorChar)
+
+      build.output.invariantNewlines() shouldContain /* language=text */ """
+        |--------------------------------------------------
+        |Variant dokkatooModuleSourceElements$formatCapitalized
+        |--------------------------------------------------
+        |Provide Dokka Module Source Output for $format to other subprojects
+        |
+        |Capabilities
+        |    - :test:unspecified (default capability)
+        |Attributes
+        |    - dev.adamko.dokkatoo.base     = dokkatoo
+        |    - dev.adamko.dokkatoo.category = module-source
+        |    - dev.adamko.dokkatoo.format   = $format
+        |Artifacts
+        |    - build/dokka-module/$format
         |
       """.trimMargin().replace('/', File.separatorChar)
     }
@@ -108,13 +167,13 @@ class DokkatooPluginFunctionalTest {
 
       build.output.invariantNewlines() shouldContain /* language=text */ """
         |--------------------------------------------------
-        |Configuration dokkatooConfiguration$formatCapitalized
+        |Configuration dokkatooParameters$formatCapitalized
         |--------------------------------------------------
-        |Fetch Dokka Generator Configuration files for $format from other subprojects
+        |Fetch Dokka Parameters for $format from other subprojects
         |
         |Attributes
         |    - dev.adamko.dokkatoo.base     = dokkatoo
-        |    - dev.adamko.dokkatoo.category = configuration
+        |    - dev.adamko.dokkatoo.category = generator-parameters
         |    - dev.adamko.dokkatoo.format   = $format
         |Extended Configurations
         |    - dokkatoo

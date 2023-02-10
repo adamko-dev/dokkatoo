@@ -12,8 +12,11 @@ import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetGradleBuilder
 import dev.adamko.dokkatoo.formats.*
 import dev.adamko.dokkatoo.internal.asConsumer
 import dev.adamko.dokkatoo.internal.asProvider
-import dev.adamko.dokkatoo.tasks.DokkatooCreateConfigurationTask
 import dev.adamko.dokkatoo.tasks.DokkatooGenerateTask
+import dev.adamko.dokkatoo.tasks.DokkatooGenerateTask.GenerationType.MODULE
+import dev.adamko.dokkatoo.tasks.DokkatooGenerateTask.GenerationType.PUBLICATION
+import dev.adamko.dokkatoo.tasks.DokkatooPrepareModuleDescriptorTask
+import dev.adamko.dokkatoo.tasks.DokkatooPrepareParametersTask
 import dev.adamko.dokkatoo.tasks.DokkatooTask
 import javax.inject.Inject
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -94,6 +97,10 @@ abstract class DokkatooBasePlugin @Inject constructor(
       cacheDirectory.convention(dokkatooExtension.dokkatooCacheDirectory)
     }
 
+    target.tasks.withType<DokkatooPrepareModuleDescriptorTask>().configureEach {
+      moduleName.convention(dokkatooExtension.moduleNameDefault)
+    }
+
     //target.tasks.withType<DokkaConfigurationTask>().configureEach {
     //}
   }
@@ -106,6 +113,7 @@ abstract class DokkatooBasePlugin @Inject constructor(
       moduleVersionDefault.convention(providers.provider { project.version.toString() })
       sourceSetScopeDefault.convention(project.path)
       dokkatooPublicationDirectory.convention(layout.buildDirectory.dir("dokka"))
+      dokkatooModuleDirectory.convention(layout.buildDirectory.dir("dokka-module"))
       dokkatooConfigurationsDirectory.convention(layout.buildDirectory.dir("dokka-config"))
 
       this.extensions.create<DokkatooExtension.Versions>("versions").apply {
@@ -136,27 +144,29 @@ abstract class DokkatooBasePlugin @Inject constructor(
       )
 
       // create tasks
-      val createConfigurationTask = project.tasks.register<DokkatooCreateConfigurationTask>(
-        taskNames.createConfiguration
+      val prepareConfigurationTask = project.tasks.register<DokkatooPrepareParametersTask>(
+        taskNames.prepareParameters
       ) {
         description =
           "Creates Dokka Configuration for executing the Dokka Generator for the $formatName publication"
 
-        dokkaConfigurationJson.convention(dokkatooExtension.dokkatooConfigurationsDirectory.file("$formatName/dokka_configuration.json"))
+        dokkaConfigurationJson.convention(
+          dokkatooExtension.dokkatooConfigurationsDirectory.file("$formatName/dokka_parameters.json")
+        )
 
-        // depend on Dokka Configurations from other subprojects
-        dokkaSubprojectConfigurations.from(
-          gradleConfigurations.dokkaConfigurationsConsumer.map { elements ->
+        // depend on Dokka Module Descriptors from other subprojects
+        dokkaSubprojectParameters.from(
+          gradleConfigurations.dokkaParametersConsumer.map { elements ->
             elements.incoming.artifactView { lenient(true) }.files
           }
         )
 
-        //// depend on Dokka Module Configurations from other subprojects
-        //dokkaModuleDescriptorFiles.from(
-        //    gradleConfigurations.dokkaModuleDescriptorsConsumer.map { elements ->
-        //        elements.incoming.artifactView { lenient(true) }.files
-        //    }
-        //)
+        // depend on Dokka Module Configurations from other subprojects
+        dokkaModuleDescriptorFiles.from(
+          gradleConfigurations.dokkaModuleDescriptorsConsumer.map { elements ->
+            elements.incoming.artifactView { lenient(true) }.files
+          }
+        )
 
         publicationEnabled.convention(this@publication.enabled)
         onlyIf { publicationEnabled.getOrElse(true) }
@@ -227,16 +237,48 @@ abstract class DokkatooBasePlugin @Inject constructor(
         }
       }
 
-      project.tasks.register<DokkatooGenerateTask>(taskNames.generate) {
-        description = "Executes the Dokka Generator, producing the $formatName publication"
-        outputDirectory.convention(dokkatooExtension.dokkatooPublicationDirectory.dir(formatName))
-        dokkaConfigurationJson.convention(createConfigurationTask.flatMap { it.dokkaConfigurationJson })
-        runtimeClasspath.from(gradleConfigurations.dokkaGeneratorClasspath)
+      gradleConfigurations.dokkaParametersOutgoing.configure {
+        outgoing {
+          artifact(prepareConfigurationTask.flatMap { it.dokkaConfigurationJson })
+        }
       }
 
-      gradleConfigurations.dokkaConfigurationsElements.configure {
+      project.tasks.register<DokkatooGenerateTask>(taskNames.generatePublication) {
+        description = "Executes the Dokka Generator, generating the $formatName publication"
+        outputDirectory.convention(dokkatooExtension.dokkatooPublicationDirectory.dir(formatName))
+        dokkaConfigurationJson.convention(prepareConfigurationTask.flatMap { it.dokkaConfigurationJson })
+        runtimeClasspath.from(gradleConfigurations.dokkaGeneratorClasspath)
+        generationType.set(PUBLICATION)
+        dokkaModuleSourceDirectories.from(gradleConfigurations.dokkaModuleSourceOutputsConsumer)
+      }
+
+      val generateModule =
+        project.tasks.register<DokkatooGenerateTask>(taskNames.generateModule) {
+          description = "Executes the Dokka Generator, generating a $formatName module"
+          outputDirectory.convention(dokkatooExtension.dokkatooModuleDirectory.dir(formatName))
+          dokkaConfigurationJson.convention(prepareConfigurationTask.flatMap { it.dokkaConfigurationJson })
+          runtimeClasspath.from(gradleConfigurations.dokkaGeneratorClasspath)
+          generationType.set(MODULE)
+        }
+
+      val prepareModuleDescriptorTask =
+        project.tasks.register<DokkatooPrepareModuleDescriptorTask>(taskNames.prepareModuleDescriptor) {
+          description = "Prepares the Dokka Module Descriptor JSON"
+          includes.from(dokkaConfiguration.includes)
+          dokkaModuleDescriptorJson.convention(
+            dokkatooExtension.dokkatooConfigurationsDirectory.file("$formatName/module_descriptor.json")
+          )
+          sourceOutputDirectory(generateModule.flatMap { it.outputDirectory })
+        }
+
+      gradleConfigurations.dokkaModuleDescriptorsOutgoing.configure {
         outgoing {
-          artifact(createConfigurationTask.flatMap { it.dokkaConfigurationJson })
+          artifact(prepareModuleDescriptorTask.flatMap { it.dokkaModuleDescriptorJson })
+        }
+      }
+      gradleConfigurations.dokkaModuleSourceOutputsOutgoing.configure {
+        outgoing {
+          artifact(generateModule.flatMap { it.outputDirectory })
         }
       }
     }
@@ -371,29 +413,77 @@ abstract class DokkatooBasePlugin @Inject constructor(
       attribute(LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(JAR))
     }
 
-    //<editor-fold desc="Dokka Configuration files">
-    val dokkaConfigurationsConsumer =
-      configurations.register(configurationNames.dokkaConfigurations) {
-        description =
-          "Fetch Dokka Generator Configuration files for $formatName from other subprojects"
+    //<editor-fold desc="Dokka Parameters JSON files">
+    val dokkaParametersConsumer =
+      configurations.register(configurationNames.dokkaParametersConsumer) {
+        description = "Fetch Dokka Parameters for $formatName from other subprojects"
         asConsumer()
         extendsFrom(dokkaConsumer.get())
         isVisible = false
         attributes {
-          dokkaCategory(attributes.dokkaConfiguration)
+          dokkaCategory(attributes.dokkaParameters)
         }
       }
 
-    val dokkaConfigurationsProvider =
-      configurations.register(configurationNames.dokkaConfigurationElements) {
-        description =
-          "Provide Dokka Generator Configuration files for $formatName to other subprojects"
+    val dokkaParametersOutgoing =
+      configurations.register(configurationNames.dokkaParametersOutgoing) {
+        description = "Provide Dokka Parameters for $formatName to other subprojects"
         asProvider()
         // extend from dokkaConfigurationsConsumer, so Dokka Module Configs propagate api() style
-        extendsFrom(dokkaConfigurationsConsumer.get())
+        extendsFrom(dokkaParametersConsumer.get())
         isVisible = true
         attributes {
-          dokkaCategory(attributes.dokkaConfiguration)
+          dokkaCategory(attributes.dokkaParameters)
+        }
+      }
+    //</editor-fold>
+
+    //<editor-fold desc="Dokka Module Descriptor JSON files">
+    val dokkaModuleDescriptorsConsumer =
+      configurations.register(configurationNames.moduleDescriptors) {
+        description = "Fetch Dokka Module Descriptors for $formatName from other subprojects"
+        asConsumer()
+        extendsFrom(dokkaConsumer.get())
+        isVisible = false
+        attributes {
+          dokkaCategory(attributes.dokkaModuleDescriptors)
+        }
+      }
+
+    val dokkaModuleDescriptorsOutgoing =
+      configurations.register(configurationNames.moduleDescriptorsOutgoing) {
+        description = "Provide Dokka Module Descriptors for $formatName to other subprojects"
+        asProvider()
+        // extend from dokkaConfigurationsConsumer, so Dokka Module Configs propagate api() style
+        extendsFrom(dokkaModuleDescriptorsConsumer.get())
+        isVisible = true
+        attributes {
+          dokkaCategory(attributes.dokkaModuleDescriptors)
+        }
+      }
+    //</editor-fold>
+
+    //<editor-fold desc="Dokka Module Descriptor JSON files">
+    val dokkaModuleSourceOutputsConsumer =
+      configurations.register(configurationNames.moduleSourceOutputConsumer) {
+        description = "Fetch Dokka Module Source Output for $formatName from other subprojects"
+        asConsumer()
+        extendsFrom(dokkaConsumer.get())
+        isVisible = false
+        attributes {
+          dokkaCategory(attributes.dokkaModuleSource)
+        }
+      }
+
+    val dokkaModuleSourceOutputsOutgoing =
+      configurations.register(configurationNames.moduleSourceOutputOutgoing) {
+        description = "Provide Dokka Module Source Output for $formatName to other subprojects"
+        asProvider()
+        // extend from dokkaConfigurationsConsumer, so Dokka Module Configs propagate api() style
+        extendsFrom(dokkaModuleDescriptorsConsumer.get())
+        isVisible = true
+        attributes {
+          dokkaCategory(attributes.dokkaModuleSource)
         }
       }
     //</editor-fold>
@@ -418,6 +508,18 @@ abstract class DokkatooBasePlugin @Inject constructor(
         extendsFrom(dokkaPluginsClasspath.get())
         isVisible = false
         isTransitive = false
+        attributes {
+          jvmJar()
+          dokkaCategory(attributes.dokkaPluginsClasspath)
+        }
+      }
+
+    val dokkaPluginsClasspathOutgoing =
+      configurations.register(configurationNames.dokkaPluginsClasspathOutgoing) {
+        description = "Provide the Dokka Plugins classpath for $formatName to other subprojects"
+        asProvider()
+        extendsFrom(dokkaPluginsClasspath.get())
+        isVisible = false
         attributes {
           jvmJar()
           dokkaCategory(attributes.dokkaPluginsClasspath)
@@ -460,11 +562,18 @@ abstract class DokkatooBasePlugin @Inject constructor(
 
     return DokkatooFormatGradleConfigurations(
 //            dokkaConsumer = dokkaConsumer,
-      dokkaConfigurationsConsumer = dokkaConfigurationsConsumer,
-      dokkaConfigurationsElements = dokkaConfigurationsProvider,
+//      dokkaParametersConsumer = dokkaConfigurationsConsumer,
+//      dokkaParametersProvider = dokkaConfigurationsProvider,
+      dokkaModuleDescriptorsConsumer = dokkaModuleDescriptorsConsumer,
+      dokkaModuleDescriptorsOutgoing = dokkaModuleDescriptorsOutgoing,
       dokkaPluginsClasspath = dokkaPluginsClasspath,
       dokkaGeneratorClasspath = dokkaGeneratorClasspath,
       dokkaPluginsIntransitiveClasspath = dokkaPluginsIntransitiveClasspath,
+      dokkaPluginsClasspathOutgoing = dokkaPluginsClasspathOutgoing,
+      dokkaModuleSourceOutputsConsumer = dokkaModuleSourceOutputsConsumer,
+      dokkaModuleSourceOutputsOutgoing = dokkaModuleSourceOutputsOutgoing,
+      dokkaParametersConsumer = dokkaParametersConsumer,
+      dokkaParametersOutgoing = dokkaParametersOutgoing,
     )
   }
 
@@ -475,9 +584,9 @@ abstract class DokkatooBasePlugin @Inject constructor(
       dependsOn(withType<DokkatooGenerateTask>())
     }
 
-    register(TaskName.CREATE_CONFIGURATION, DokkatooTask::class) {
+    register(TaskName.PREPARE_PARAMETERS, DokkatooTask::class) {
       description = "Runs all Dokkatoo Create Configuration tasks"
-      dependsOn(withType<DokkatooCreateConfigurationTask>())
+      dependsOn(withType<DokkatooPrepareParametersTask>())
     }
   }
 
@@ -496,17 +605,22 @@ abstract class DokkatooBasePlugin @Inject constructor(
 
       const val DOKKATOO = "dokkatoo"
 
-      /** Name of the [Configuration] that _consumes_ [org.jetbrains.dokka.DokkaConfiguration] from projects */
-      const val DOKKATOO_CONFIGURATIONS = "dokkatooConfiguration"
+      /** Name of the [Configuration] that _consumes_ [dev.adamko.dokkatoo.dokka.parameters.DokkaParametersKxs] from projects */
+      const val DOKKATOO_PARAMETERS = "dokkatooParameters"
 
       /** Name of the [Configuration] that _provides_ [org.jetbrains.dokka.DokkaConfiguration] to other projects */
-      const val DOKKATOO_CONFIGURATION_ELEMENTS = "dokkatooConfigurationElements"
+      const val DOKKATOO_PARAMETERS_OUTGOING = "dokkatooParametersElements"
 
       /** Name of the [Configuration] that _consumes_ [org.jetbrains.dokka.DokkaConfiguration.DokkaModuleDescription] from projects */
-      const val DOKKATOO_MODULE_DESCRIPTORS = "dokkatooModule"
+      const val DOKKATOO_MODULE_DESCRIPTORS_CONSUMER = "dokkatooModuleDescriptors"
 
       /** Name of the [Configuration] that _provides_ [org.jetbrains.dokka.DokkaConfiguration.DokkaModuleDescription] to other projects */
-      const val DOKKATOO_MODULE_DESCRIPTOR_ELEMENTS = "dokkatooModuleDescriptors"
+      const val DOKKATOO_MODULE_DESCRIPTOR_PROVIDER =
+        "${DOKKATOO_MODULE_DESCRIPTORS_CONSUMER}Elements"
+
+
+      const val DOKKATOO_MODULE_SOURCE_OUTPUT_CONSUMER = "dokkatooModuleSource"
+      const val DOKKATOO_MODULE_SOURCE_OUTPUT_PROVIDER = "dokkatooModuleSourceElements"
 
       /**
        * Classpath used to execute the Dokka Generator.
@@ -515,7 +629,7 @@ abstract class DokkatooBasePlugin @Inject constructor(
        */
       const val DOKKA_GENERATOR_CLASSPATH = "dokkatooGeneratorClasspath"
 
-      /** Dokka Plugins (transitive, so this can be passed to the Dokka Generator Worker classpath) */
+      /** Dokka Plugins (including transitive dependencies, so this can be passed to the Dokka Generator Worker classpath) */
       const val DOKKA_PLUGINS_CLASSPATH = "dokkatooPlugin"
 
       /**
@@ -525,6 +639,9 @@ abstract class DokkatooBasePlugin @Inject constructor(
        */
       internal const val DOKKA_PLUGINS_INTRANSITIVE_CLASSPATH =
         "${DOKKA_PLUGINS_CLASSPATH}Intransitive"
+
+      /** _Provides_ Dokka Plugins Classpath to other subprojects */
+      const val DOKKA_PLUGINS_CLASSPATH_OUTGOING = "${DOKKA_PLUGINS_CLASSPATH}Elements"
     }
 
     /**
@@ -536,8 +653,10 @@ abstract class DokkatooBasePlugin @Inject constructor(
 
     object TaskName {
       const val GENERATE = "dokkatooGenerate"
-      const val CREATE_CONFIGURATION = "createDokkatooConfiguration"
-      const val CREATE_MODULE_CONFIGURATION = "createDokkatooModuleConfiguration"
+      const val GENERATE_PUBLICATION = "${GENERATE}Publication"
+      const val GENERATE_MODULE = "${GENERATE}Module"
+      const val PREPARE_PARAMETERS = "prepareDokkatooParameters"
+      const val PREPARE_MODULE_DESCRIPTOR = "prepareDokkatooModuleDescriptor"
     }
 
     internal val jsonMapper = Json {
