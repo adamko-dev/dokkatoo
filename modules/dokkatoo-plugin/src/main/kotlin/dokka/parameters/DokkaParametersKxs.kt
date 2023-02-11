@@ -56,6 +56,7 @@ data class DokkaParametersKxs(
   override fun getName(): String = moduleName
 
   @Serializable
+  @DokkatooInternalApi
   data class DokkaSourceSetKxs(
     override val sourceSetID: DokkaSourceSetID,
     override val displayName: String,
@@ -88,6 +89,7 @@ data class DokkaParametersKxs(
 
 
   @Serializable
+  @DokkatooInternalApi
   data class SourceLinkDefinitionKxs(
     override val localDirectory: String,
     override val remoteUrl: URL,
@@ -96,6 +98,7 @@ data class DokkaParametersKxs(
 
 
   @Serializable
+  @DokkatooInternalApi
   data class PackageOptionsKxs(
     override val matchingRegex: String,
     override val reportUndocumented: Boolean? = null,
@@ -110,6 +113,7 @@ data class DokkaParametersKxs(
 
 
   @Serializable
+  @DokkatooInternalApi
   data class PluginConfigurationKxs(
     override val fqPluginName: String,
     override val serializationFormat: DokkaConfiguration.SerializationFormat,
@@ -126,6 +130,7 @@ data class DokkaParametersKxs(
    * All other configuration data classes also implement [java.io.Serializable] via their parent interfaces.
    */
   @Serializable
+  @DokkatooInternalApi
   data class DokkaModuleDescriptionKxs(
     /** @see DokkaConfiguration.DokkaModuleDescription.name */
     val moduleName: String,
@@ -173,6 +178,7 @@ data class DokkaParametersKxs(
 
 
   @Serializable
+  @DokkatooInternalApi
   data class ExternalDocumentationLinkKxs(
     override val url: URL,
     override val packageListUrl: URL,
