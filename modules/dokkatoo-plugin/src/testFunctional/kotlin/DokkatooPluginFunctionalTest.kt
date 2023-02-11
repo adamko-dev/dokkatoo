@@ -34,10 +34,10 @@ class DokkatooPluginFunctionalTest {
       |dokkatooGeneratePublicationHtml - Executes the Dokka Generator, generating the html publication
       |dokkatooGeneratePublicationJavadoc - Executes the Dokka Generator, generating the javadoc publication
       |dokkatooGeneratePublicationJekyll - Executes the Dokka Generator, generating the jekyll publication
-      |prepareDokkatooModuleDescriptorGfm - Prepares the Dokka Module Descriptor JSON
-      |prepareDokkatooModuleDescriptorHtml - Prepares the Dokka Module Descriptor JSON
-      |prepareDokkatooModuleDescriptorJavadoc - Prepares the Dokka Module Descriptor JSON
-      |prepareDokkatooModuleDescriptorJekyll - Prepares the Dokka Module Descriptor JSON
+      |prepareDokkatooModuleDescriptorGfm - Prepares the Dokka Module Descriptor for gfm
+      |prepareDokkatooModuleDescriptorHtml - Prepares the Dokka Module Descriptor for html
+      |prepareDokkatooModuleDescriptorJavadoc - Prepares the Dokka Module Descriptor for javadoc
+      |prepareDokkatooModuleDescriptorJekyll - Prepares the Dokka Module Descriptor for jekyll
       |prepareDokkatooParameters - Runs all Dokkatoo Create Configuration tasks
       |prepareDokkatooParametersGfm - Creates Dokka Configuration for executing the Dokka Generator for the gfm publication
       |prepareDokkatooParametersHtml - Creates Dokka Configuration for executing the Dokka Generator for the html publication
