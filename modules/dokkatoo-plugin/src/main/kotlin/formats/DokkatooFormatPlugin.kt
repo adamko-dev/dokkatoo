@@ -32,7 +32,7 @@ abstract class DokkatooFormatPlugin @Inject constructor(
     // apply the plugin that will autoconfigure Dokkatoo to use the sources of a Kotlin project
     target.pluginManager.apply(type = DokkatooKotlinAdapter::class)
 
-    target.plugins.withType<DokkatooBasePlugin>().configureEach {
+    target.plugins.withType<DokkatooBasePlugin>().all {
       val dokkatooExtension = target.extensions.getByType(DokkatooExtension::class)
 
       val publication = dokkatooExtension.dokkatooPublications.create(formatName)
