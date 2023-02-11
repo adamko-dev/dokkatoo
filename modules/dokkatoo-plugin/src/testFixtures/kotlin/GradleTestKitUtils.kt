@@ -18,10 +18,10 @@ class GradleProjectTest(
   val projectDir: Path,
 ) {
   constructor(
+    testProjectName: String,
     baseDir: Path = funcTestTempDir,
-    projectPath: String = randomProjectPath(),
   ) : this(
-    projectDir = baseDir.resolve(projectPath),
+    projectDir = baseDir.resolve(testProjectName),
   )
 
   val runner: GradleRunner = GradleRunner.create().withProjectDir(projectDir.toFile())
@@ -62,8 +62,6 @@ class GradleProjectTest(
       }
       convert(value)
     }
-
-    fun randomProjectPath(): String = Random.nextInt(100_000_000, 999_999_999).toString()
   }
 }
 
@@ -72,12 +70,12 @@ class GradleProjectTest(
  * Load a project from the [GradleProjectTest.integrationTestProjectsDir]
  */
 fun gradleKtsProjectIntegrationTest(
-  projectPath: String = GradleProjectTest.randomProjectPath(),
+  testProjectName: String,
   build: GradleProjectTest.() -> Unit,
 ): GradleProjectTest =
   GradleProjectTest(
     baseDir = GradleProjectTest.integrationTestProjectsDir,
-    projectPath = projectPath,
+    testProjectName = testProjectName,
   ).apply(build)
 
 
@@ -85,14 +83,14 @@ fun gradleKtsProjectIntegrationTest(
  * Builder for testing a Gradle project that uses Kotlin script DSL and creates default
  * `settings.gradle.kts` and `gradle.properties` files.
  *
- * @param[projectPath] the path of the project directory, relative to [baseDir
+ * @param[testProjectName] the path of the project directory, relative to [baseDir
  */
 fun gradleKtsProjectTest(
-  projectPath: String = GradleProjectTest.randomProjectPath(),
+  testProjectName: String,
   baseDir: Path = GradleProjectTest.funcTestTempDir,
   build: GradleProjectTest.() -> Unit,
 ): GradleProjectTest {
-  return GradleProjectTest(baseDir = baseDir, projectPath = projectPath).apply {
+  return GradleProjectTest(baseDir = baseDir, testProjectName = testProjectName).apply {
 
     settingsGradleKts = """
             |rootProject.name = "test"
@@ -128,14 +126,14 @@ fun gradleKtsProjectTest(
  * Builder for testing a Gradle project that uses Groovy script and creates default,
  * `settings.gradle`, and `gradle.properties` files.
  *
- * @param[projectPath] the path of the project directory, relative to [baseDir
+ * @param[testProjectName] the name of the test, which should be distinct across the project
  */
 fun gradleGroovyProjectTest(
+  testProjectName: String,
   baseDir: Path = GradleProjectTest.funcTestTempDir,
-  projectPath: String = GradleProjectTest.randomProjectPath(),
   build: GradleProjectTest.() -> Unit,
 ): GradleProjectTest {
-  return GradleProjectTest(baseDir = baseDir, projectPath = projectPath).apply {
+  return GradleProjectTest(baseDir = baseDir, testProjectName = testProjectName).apply {
 
     settingsGradle = """
             |rootProject.name = "test"

@@ -9,16 +9,17 @@ import java.io.File
 import org.junit.jupiter.api.Test
 
 class DokkatooPluginFunctionalTest {
-
-  @Test
-  fun `expect Dokka Plugin creates Dokka tasks`() {
-    val build = gradleKtsProjectTest {
-      buildGradleKts = """
+  private val testProject = gradleKtsProjectTest("DokkatooPluginFunctionalTest") {
+    buildGradleKts = """
         plugins {
             id("dev.adamko.dokkatoo") version "0.0.1-SNAPSHOT"
         }
       """.trimIndent()
-    }.runner
+  }
+
+  @Test
+  fun `expect Dokka Plugin creates Dokka tasks`() {
+    val build = testProject.runner
       .withArguments("tasks")
       .build()
 
@@ -49,13 +50,7 @@ class DokkatooPluginFunctionalTest {
 
   @Test
   fun `expect Dokka Plugin creates Dokka outgoing variants`() {
-    val build = gradleKtsProjectTest {
-      buildGradleKts = """
-        plugins {
-            id("dev.adamko.dokkatoo") version "0.0.1-SNAPSHOT"
-        }
-      """.trimIndent()
-    }.runner
+    val build = testProject.runner
       .withArguments("outgoingVariants")
       .build()
 
@@ -140,13 +135,7 @@ class DokkatooPluginFunctionalTest {
 
   @Test
   fun `expect Dokka Plugin creates Dokka resolvable configurations`() {
-    val build = gradleKtsProjectTest {
-      buildGradleKts = """
-        plugins {
-            id("dev.adamko.dokkatoo") version "0.0.1-SNAPSHOT"
-        }
-      """.trimIndent()
-    }.runner
+    val build = testProject.runner
       .withArguments("resolvableConfigurations")
       .build()
 
