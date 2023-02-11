@@ -24,6 +24,9 @@ dependencies {
   testFixturesImplementation(gradleApi())
   testFixturesImplementation(gradleTestKit())
   testFixturesImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
+  testFixturesImplementation(platform("io.kotest:kotest-bom:5.5.5"))
+  testFixturesImplementation("io.kotest:kotest-assertions-core")
+  testFixturesImplementation("io.kotest:kotest-assertions-json")
 
   val jacksonVersion = "2.12.7"
   testFixturesImplementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
@@ -121,6 +124,34 @@ testing.suites {
       implementation("org.jetbrains.dokka:dokka-core:1.7.20")
       implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
     }
+
+    targets.configureEach {
+      testTask.configure {
+        val projectTestTempDirPath = "$buildDir/test-temp-dir"
+        inputs.property("projectTestTempDir", projectTestTempDirPath)
+        systemProperty("projectTestTempDir", projectTestTempDirPath)
+
+//        doFirst {
+//          File(projectTestTempDirPath).apply {
+//            deleteRecursively()
+//            mkdirs()
+//          }
+//        }
+
+        when (testType.get()) {
+          TestSuiteType.FUNCTIONAL_TEST,
+          TestSuiteType.INTEGRATION_TEST -> {
+            dependsOn(tasks.matching { it.name == "publishAllPublicationsToTestRepository" })
+
+            systemProperties(
+              "testMavenRepoDir" to file(projectTestMavenRepoDir).canonicalPath,
+            )
+
+            inputs.dir(projectTestMavenRepoDir)
+          }
+        }
+      }
+    }
   }
 
   /** Unit tests suite */
@@ -135,18 +166,11 @@ testing.suites {
         shouldRunAfter(test)
         dependsOn(tasks.matching { it.name == "publishAllPublicationsToTestRepository" })
 
-        val funcTestDir = "$buildDir/functional-tests"
         systemProperties(
           "testMavenRepoDir" to file(projectTestMavenRepoDir).canonicalPath,
-          "funcTestTempDir" to funcTestDir,
         )
 
         inputs.dir(projectTestMavenRepoDir)
-        outputs.dir(funcTestDir)
-
-        doFirst {
-          File(funcTestDir).deleteRecursively()
-        }
       }
     }
   }
@@ -163,25 +187,22 @@ testing.suites {
 
         dependsOn(project.configurations.kotlinDokkaSource)
 
-        val integrationTestProjectsDir =
-          "$rootDir/externals/kotlin-dokka/integration-tests/gradle/projects/"
-        systemProperties(
-          "testMavenRepoDir" to file(projectTestMavenRepoDir).canonicalPath,
-          "integrationTestProjectsDir" to integrationTestProjectsDir,
+        inputs.property("dokkaSourceDir",
+          project.configurations.kotlinDokkaSource.map {
+            val files = it.incoming.artifactView { lenient(true) }.files
+            files.singleOrNull()?.absolutePath
+              ?: error("could not get Dokka source code directory from kotlinDokkaSource configuration. Got ${files.count()} files: $files")
+          }
         )
 
+        systemProperties(
+          "testMavenRepoDir" to file(projectTestMavenRepoDir).canonicalPath,
+        )
+        systemProperty("dokkaSourceDir", inputs.properties["dokkaSourceDir"]!!)
+
         inputs.dir(projectTestMavenRepoDir)
-        outputs.dir(integrationTestProjectsDir)
       }
     }
-
-//        sources {
-//            java {
-//                resources {
-//                    srcDir(tasks.pluginUnderTestMetadata.map { it.outputDirectory })
-//                }
-//            }
-//        }
   }
 
   tasks.check { dependsOn(testFunctional, testIntegration) }

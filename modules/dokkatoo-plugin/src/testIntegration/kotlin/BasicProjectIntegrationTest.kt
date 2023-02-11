@@ -1,138 +1,200 @@
 package dev.adamko.dokkatoo.it
 
-import dev.adamko.dokkatoo.dokka.parameters.DokkaParametersKxs
-import dev.adamko.dokkatoo.utils.gradleKtsProjectIntegrationTest
-import dev.adamko.dokkatoo.utils.gradleProperties
-import dev.adamko.dokkatoo.utils.invariantNewlines
-import dev.adamko.dokkatoo.utils.parseJson
-import io.kotest.assertions.withClue
-import io.kotest.matchers.collections.shouldBeSameSizeAs
-import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
-import io.kotest.matchers.comparables.shouldBeEqualComparingTo
+import dev.adamko.dokkatoo.utils.*
+import dev.adamko.dokkatoo.utils.GradleProjectTest.Companion.integrationTestProjectsDir
+import dev.adamko.dokkatoo.utils.GradleProjectTest.Companion.projectTestTempDir
+import io.kotest.matchers.file.shouldHaveSameStructureAndContentAs
+import io.kotest.matchers.file.shouldHaveSameStructureAs
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
-import kotlinx.serialization.json.Json
 import org.jetbrains.dokka.DokkaConfiguration
 import org.jetbrains.dokka.DokkaConfigurationImpl
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
+/**
+ * Integration test for the `it-basic` project in Dokka
+ *
+ * Runs Dokka & Dokkatoo, and compares the resulting HTML site.
+ */
 class BasicProjectIntegrationTest {
 
-  private val basicProject = gradleKtsProjectIntegrationTest("it-basic") {
-    gradleProperties = gradleProperties.lines().joinToString("\n") { line ->
-      if (line.startsWith("testMavenRepoDir")) {
-        "testMavenRepoDir=${testMavenRepoRelativePath}"
-      } else {
-        line
-      }
-    }
-  }
 
   @Test
-  @Disabled("this test uses a Dokka project that applies the Dokka plugin, so it needs to be updated")
   fun `test basic project`() {
-    val build = basicProject.runner
+
+    val basicProjectSrcDir =
+      integrationTestProjectsDir.resolve("it-basic").toFile()
+    val templateRootGradleKts =
+      integrationTestProjectsDir.resolve("template.root.gradle.kts").toFile()
+    val templateSettingsGradleKts =
+      integrationTestProjectsDir.resolve("template.settings.gradle.kts").toFile()
+
+    val tempDir = projectTestTempDir.resolve("it-basic").toFile()
+
+    val dokkaDir = tempDir.resolve("dokka")
+    basicProjectSrcDir.copyRecursively(dokkaDir, overwrite = true) { _, _ -> OnErrorAction.SKIP }
+    templateRootGradleKts.copyInto(directory = dokkaDir, overwrite = true)
+    templateSettingsGradleKts.copyInto(directory = dokkaDir, overwrite = true)
+
+    val dokkaProject = GradleProjectTest(dokkaDir.toPath()).apply {
+      buildGradleKts = buildGradleKts
+        .replace(
+          // no idea why this needs to be changed
+          """file("../customResources/""",
+          """file("./customResources/""",
+        )
+
+      // update relative paths to the template files - they're now in the same directory
+      settingsGradleKts = settingsGradleKts
+        .replace(
+          """../template.settings.gradle.kts""",
+          """./template.settings.gradle.kts""",
+        )
+      buildGradleKts = buildGradleKts
+        .replace(
+          """../template.root.gradle.kts""",
+          """./template.root.gradle.kts""",
+        )
+    }
+
+    val dokkaBuild = dokkaProject.runner
       .withArguments(
         "clean",
-        "dokkaGenerate",
+        "dokkaHtml",
         "--stacktrace",
         "--info",
       )
       .forwardOutput()
       .withEnvironment(
-        mapOf(
-          "DOKKA_VERSION" to "1.7.20",
-        )
+        "DOKKA_VERSION" to "1.7.20",
       )
       .build()
 
-    build.output.invariantNewlines() shouldContain "BUILD SUCCESSFUL"
-    build.output.invariantNewlines() shouldContain "Generation completed successfully"
+    dokkaBuild.output shouldContain "BUILD SUCCESSFUL"
+    dokkaBuild.output shouldContain "Generation completed successfully"
 
+    val dokkatooDir = tempDir.resolve("dokkatoo")
+    basicProjectSrcDir.copyRecursively(dokkatooDir, overwrite = true) { _, _ -> OnErrorAction.SKIP }
 
-    val actualDokkaConfJson = basicProject
-      .projectDir
-      .resolve("build/dokka-config/html/dokka_parameters.json")
-      .toFile()
-      .readText()
+    val dokkatooProject = GradleProjectTest(dokkatooDir.toPath()).apply {
+      buildGradleKts = """
+import org.jetbrains.dokka.DokkaConfiguration
+import org.jetbrains.dokka.gradle.kotlinSourceSet
 
-    val actualDokkaConf: DokkaConfiguration =
-      Json.decodeFromString(DokkaParametersKxs.serializer(), actualDokkaConfJson)
+plugins {
+  kotlin("jvm") version "1.7.20"
+  id("dev.adamko.dokkatoo") version "0.0.1-SNAPSHOT"
+}
 
-    actualDokkaConf.moduleName shouldBeEqualComparingTo expectedDokkaConf.moduleName
-    if (expectedDokkaConf.moduleVersion == null) {
-      actualDokkaConf.moduleVersion shouldBe null
-    } else {
-      actualDokkaConf.moduleVersion shouldBe expectedDokkaConf.moduleVersion
+version = "1.7.20-SNAPSHOT"
+
+dependencies {
+  implementation(kotlin("stdlib"))
+  testImplementation(kotlin("test-junit"))
+}
+
+dokkatoo {
+  moduleNameDefault.set("Basic Project")
+  dokkatooSourceSets.configureEach {
+    documentedVisibilities(
+      DokkaConfiguration.Visibility.PUBLIC,
+      DokkaConfiguration.Visibility.PROTECTED,
+    )
+    suppressedFiles.from(file("src/main/kotlin/it/suppressedByPath"))
+    perPackageOption {
+      matchingRegex.set("it.suppressedByPackage.*")
+      suppress.set(true)
     }
-
-    // TODO compare output dir...
-    //      This might need a hefty refactor. Currently there's only one Dokka Generator execution, so
-    //      there's only one output dir. We need a Dokka Generator per Dokka format.
-    //        - create a DomainObject for each Dokka Generator execution
-    //        - each DomainObject should have its own configurations, plugins, etc...
-    //        - for each DomainObject, create Dokka tasks
-    // actualDokkaConf.outputDir shouldBeEqualComparingTo expectedDokkaConf.outputDir
-
-    if (expectedDokkaConf.cacheRoot == null) {
-      actualDokkaConf.cacheRoot shouldBe null
-    } else {
-      actualDokkaConf.cacheRoot shouldBe expectedDokkaConf.cacheRoot
-    }
-
-    actualDokkaConf.offlineMode shouldBeEqualComparingTo expectedDokkaConf.offlineMode
-    actualDokkaConf.failOnWarning shouldBeEqualComparingTo expectedDokkaConf.failOnWarning
-
-    withClue("comparing source sets") {
-      // TODO compare source sets
-      actualDokkaConf.sourceSets shouldBeSameSizeAs expectedDokkaConf.sourceSets
-    }
-
-    withClue("comparing modules") {
-      // TODO compare modules
-      actualDokkaConf.modules shouldBeSameSizeAs expectedDokkaConf.modules
-    }
-
-    withClue("comparing plugins classpath") {
-      // TODO compare plugins classpath
-//            actualDokkaConf.pluginsClasspath shouldBeSameSizeAs expectedDokkaConf.pluginsClasspath
-
-      actualDokkaConf.pluginsClasspath.map { it.name }.shouldContainExactlyInAnyOrder(
-        "markdown-jvm-0.3.1.jar",
-        "kotlin-analysis-intellij-1.7.20.jar",
-        "dokka-base-1.7.20.jar",
-        "templating-plugin-1.7.20.jar",
-        "dokka-analysis-1.7.20.jar",
-        "kotlin-analysis-compiler-1.7.20.jar",
-        "kotlinx-html-jvm-0.8.0.jar",
-        "freemarker-2.3.31.jar",
+    perPackageOption {
+      matchingRegex.set("it.overriddenVisibility.*")
+      documentedVisibilities.set(
+        setOf(DokkaConfiguration.Visibility.PRIVATE)
       )
     }
-
-    withClue("comparing plugins configurations") {
-      // TODO compare plugins configuration
-      actualDokkaConf.pluginsConfiguration shouldBeSameSizeAs expectedDokkaConf.pluginsConfiguration
-    }
-
-    withClue("comparing delayTemplateSubstitution") {
-      actualDokkaConf.delayTemplateSubstitution shouldBeEqualComparingTo expectedDokkaConf.delayTemplateSubstitution
-    }
-    withClue("comparing suppressObviousFunctions") {
-      actualDokkaConf.suppressObviousFunctions shouldBeEqualComparingTo expectedDokkaConf.suppressObviousFunctions
-    }
-    withClue("comparing includes") {
-      // TODO compare includes
-      actualDokkaConf.includes shouldBeSameSizeAs expectedDokkaConf.includes
-    }
-    withClue("comparing suppressInheritedMembers") {
-      actualDokkaConf.suppressInheritedMembers shouldBeEqualComparingTo expectedDokkaConf.suppressInheritedMembers
-    }
-    withClue("comparing finalizeCoroutines") {
-      actualDokkaConf.finalizeCoroutines shouldBeEqualComparingTo false // expectedDokkaConf.finalizeCoroutines
+    sourceLink {
+      localDirectory.set(file("src/main"))
+      remoteUrl.set(
+        uri(
+          "https://github.com/Kotlin/dokka/tree/master/integration-tests/gradle/projects/it-basic/src/main"
+        ).toURL()
+      )
     }
   }
+  dokkatooPublications.configureEach {
+    suppressObviousFunctions.set(true)
+    pluginsConfiguration.create("org.jetbrains.dokka.base.DokkaBase") {
+      serializationFormat.set(DokkaConfiguration.SerializationFormat.JSON)
+      values.set(
+        ${"\"\"\""}
+          { 
+            "customStyleSheets": [
+              "${'$'}{file("./customResources/logo-styles.css").invariantSeparatorsPath}", 
+              "${'$'}{file("./customResources/custom-style-to-add.css").invariantSeparatorsPath}"
+            ], 
+            "customAssets": [
+              "${'$'}{file("./customResources/custom-resource.svg").invariantSeparatorsPath}"
+            ] 
+          }
+        ${"\"\"\""}.trimIndent()
+      )
+    }
+    suppressObviousFunctions.set(false)
+  }
 }
+
+
+""".trimIndent()
+
+      settingsGradleKts = """
+rootProject.name = "dokkatoo-it-basic"
+
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+        maven(file("$testMavenRepoRelativePath"))
+    }
+}
+
+@Suppress("UnstableApiUsage")
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+        maven(file("$testMavenRepoRelativePath"))
+    }
+}
+
+""".trimIndent()
+    }
+
+    val dokkatooBuild = dokkatooProject.runner
+      .withArguments(
+        "clean",
+        "dokkatooGeneratePublicationHtml",
+        "--stacktrace",
+        "--info",
+      )
+      .forwardOutput()
+      .build()
+
+    dokkatooBuild.output shouldContain "BUILD SUCCESSFUL"
+    dokkatooBuild.output shouldContain "Generation completed successfully"
+
+    val dokkaHtmlDir = dokkaProject.projectDir.resolve("build/dokka/html")
+
+
+    val dokkatooHtmlDir = dokkatooProject.projectDir.resolve("build/dokka/html")
+
+    val expectedFileTree = dokkaHtmlDir.toPrettyTreeString()
+    val actualFileTree = dokkatooHtmlDir.toPrettyTreeString()
+    println(actualFileTree)
+    expectedFileTree shouldBe actualFileTree
+
+    dokkatooHtmlDir.toFile().shouldHaveSameStructureAs(dokkaHtmlDir.toFile())
+    dokkatooHtmlDir.toFile().shouldHaveSameStructureAndContentAs(dokkaHtmlDir.toFile())
+  }
+}
+
 
 private val expectedDokkaConf: DokkaConfiguration = parseJson<DokkaConfigurationImpl>(
 // language=json

@@ -3,6 +3,7 @@ package dev.adamko.dokkatoo.utils
 import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
+import kotlin.properties.ReadOnlyProperty
 import kotlin.properties.ReadWriteProperty
 import kotlin.random.Random
 import kotlin.reflect.KProperty
@@ -25,7 +26,8 @@ class GradleProjectTest(
 
   val runner: GradleRunner = GradleRunner.create().withProjectDir(projectDir.toFile())
 
-  val testMavenRepoRelativePath: String = projectDir.relativize(testMavenRepoDir).toFile().invariantSeparatorsPath
+  val testMavenRepoRelativePath: String =
+    projectDir.relativize(testMavenRepoDir).toFile().invariantSeparatorsPath
 
   fun createFile(filePath: String, contents: String): File =
     projectDir.resolve(filePath).toFile().apply {
@@ -37,35 +39,29 @@ class GradleProjectTest(
   companion object {
 
     /** file-based Maven Repo that contains the Dokka dependencies */
-    val testMavenRepoDir: Path by lazy {
-      Paths.get(
-        System.getProperty("testMavenRepoDir") ?: error("testMavenRepoDir is unavailable")
-      )
-    }
+    val testMavenRepoDir: Path by systemProperty(Paths::get)
+
+    val projectTestTempDir: Path by systemProperty(Paths::get)
 
     /** Temporary directory for the functional tests. This directory will be auto-deleted. */
     val funcTestTempDir: Path by lazy {
-      Paths.get(
-        System.getProperty("funcTestTempDir") ?: error("funcTestTempDir is unavailable")
-      )
+      projectTestTempDir.resolve("functional-tests")
     }
 
+    private val dokkaSourceDir: Path by systemProperty(Paths::get)
     /** Directory that contains projects used for integration tests */
     val integrationTestProjectsDir: Path by lazy {
-      Paths.get(
-        System.getProperty("integrationTestProjectsDir")
-          ?: error("integrationTestProjectsDir is unavailable")
-      )
+      dokkaSourceDir.resolve("integration-tests/gradle/projects")
     }
 
-//        val testTempDir = Files.createTempDirectory("dokka-tests")
-
-//        fun tempDir(projectPath: String, baseDir: Path = funcTestTempDir): Path {
-//            return when {
-//                baseDir != null -> Paths.get(baseDir, projectPath)
-//                else -> Files.createTempDirectory("dokka-test-$projectPath")
-//            }
-//        }
+    private fun <T> systemProperty(
+      convert: (String) -> T,
+    ) = ReadOnlyProperty<Any, T> { _, property ->
+      val value = requireNotNull(System.getProperty(property.name)) {
+        "system property ${property.name} is unavailable"
+      }
+      convert(value)
+    }
 
     fun randomProjectPath(): String = Random.nextInt(100_000_000, 999_999_999).toString()
   }
@@ -82,9 +78,7 @@ fun gradleKtsProjectIntegrationTest(
   GradleProjectTest(
     baseDir = GradleProjectTest.integrationTestProjectsDir,
     projectPath = projectPath,
-  ).apply {
-    build()
-  }
+  ).apply(build)
 
 
 /**
@@ -214,3 +208,7 @@ fun GradleProjectTest.createKotlinFile(filePath: String, @Language("kotlin") con
 
 fun GradleProjectTest.createKtsFile(filePath: String, @Language("kts") contents: String) =
   createFile(filePath, contents)
+
+
+fun GradleRunner.withEnvironment(vararg map: Pair<String, String>): GradleRunner =
+  withEnvironment(map.toMap())
