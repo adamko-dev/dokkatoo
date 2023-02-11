@@ -171,19 +171,19 @@ abstract class DokkatooBasePlugin @Inject constructor(
         publicationEnabled.convention(this@publication.enabled)
         onlyIf { publicationEnabled.getOrElse(true) }
 
-        cacheRoot.set(dokkaConfiguration.cacheRoot)
-        delayTemplateSubstitution.set(dokkaConfiguration.delayTemplateSubstitution)
-        dokkaSourceSets.addAllLater(providers.provider { this@publication.dokkaConfiguration.dokkaSourceSets })
-        failOnWarning.set(dokkaConfiguration.failOnWarning)
-        finalizeCoroutines.set(dokkaConfiguration.finalizeCoroutines)
-        includes.from(dokkaConfiguration.includes)
-        moduleName.set(dokkaConfiguration.moduleName)
-        moduleVersion.set(dokkaConfiguration.moduleVersion)
-        offlineMode.set(dokkaConfiguration.offlineMode)
-        outputDir.set(dokkaConfiguration.outputDir)
+        cacheRoot.set(this@publication.cacheRoot)
+        delayTemplateSubstitution.set(this@publication.delayTemplateSubstitution)
+        dokkaSourceSets.addAllLater(providers.provider { this@publication.dokkaSourceSets })
+        failOnWarning.set(this@publication.failOnWarning)
+        finalizeCoroutines.set(this@publication.finalizeCoroutines)
+        includes.from(this@publication.includes)
+        moduleName.set(this@publication.moduleName)
+        moduleVersion.set(this@publication.moduleVersion)
+        offlineMode.set(this@publication.offlineMode)
+        outputDir.set(this@publication.outputDir)
         pluginsClasspath.from(gradleConfigurations.dokkaPluginsIntransitiveClasspath)
 
-        pluginsConfiguration.addAllLater(providers.provider { dokkaConfiguration.pluginsConfiguration })
+        pluginsConfiguration.addAllLater(providers.provider { this@publication.pluginsConfiguration })
 
         //<editor-fold desc="adapter for old DSL - to be removed">
         pluginsConfiguration.addAllLater(
@@ -202,8 +202,8 @@ abstract class DokkatooBasePlugin @Inject constructor(
         }
         //</editor-fold>
 
-        suppressInheritedMembers.set(dokkaConfiguration.suppressInheritedMembers)
-        suppressObviousFunctions.set(dokkaConfiguration.suppressObviousFunctions)
+        suppressInheritedMembers.set(this@publication.suppressInheritedMembers)
+        suppressObviousFunctions.set(this@publication.suppressObviousFunctions)
 
         dokkaSourceSets.configureEach {
           // TODO for some reason the conventions need to be set again
@@ -263,8 +263,8 @@ abstract class DokkatooBasePlugin @Inject constructor(
 
       val prepareModuleDescriptorTask =
         project.tasks.register<DokkatooPrepareModuleDescriptorTask>(taskNames.prepareModuleDescriptor) {
-          description = "Prepares the Dokka Module Descriptor JSON"
-          includes.from(dokkaConfiguration.includes)
+          description = "Prepares the Dokka Module Descriptor for $formatName"
+          includes.from(this@publication.includes)
           dokkaModuleDescriptorJson.convention(
             dokkatooExtension.dokkatooConfigurationsDirectory.file("$formatName/module_descriptor.json")
           )
@@ -326,18 +326,16 @@ abstract class DokkatooBasePlugin @Inject constructor(
 
       enabled.convention(true)
 
-      dokkaConfiguration.apply {
-
-        cacheRoot.convention(dokkatooExtension.dokkatooCacheDirectory)
-        delayTemplateSubstitution.convention(false)
-        failOnWarning.convention(false)
-        finalizeCoroutines.convention(false)
-        moduleName.convention(dokkatooExtension.moduleNameDefault)
-        moduleVersion.convention(dokkatooExtension.moduleVersionDefault)
-        offlineMode.convention(false)
-        outputDir.convention(dokkatooExtension.dokkatooPublicationDirectory)
-        suppressInheritedMembers.convention(false)
-        suppressObviousFunctions.convention(true)
+      cacheRoot.convention(dokkatooExtension.dokkatooCacheDirectory)
+      delayTemplateSubstitution.convention(false)
+      failOnWarning.convention(false)
+      finalizeCoroutines.convention(false)
+      moduleName.convention(dokkatooExtension.moduleNameDefault)
+      moduleVersion.convention(dokkatooExtension.moduleVersionDefault)
+      offlineMode.convention(false)
+      outputDir.convention(dokkatooExtension.dokkatooPublicationDirectory)
+      suppressInheritedMembers.convention(false)
+      suppressObviousFunctions.convention(true)
 
         // 'inherit' the common source sets defined in the extension
         dokkaSourceSets.addAllLater(
