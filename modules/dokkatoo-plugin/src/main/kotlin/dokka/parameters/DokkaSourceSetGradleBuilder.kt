@@ -129,6 +129,10 @@ abstract class DokkaSourceSetGradleBuilder(
   @get:Input
   abstract val documentedVisibilities: SetProperty<DokkaConfiguration.Visibility>
 
+  /** Sets [documentedVisibilities] (overrides any previously set values). */
+  fun documentedVisibilities(vararg visibilities: DokkaConfiguration.Visibility): Unit =
+    documentedVisibilities.set(visibilities.asList())
+
   /**
    * Specifies source sets that current source set depends on.
    *
