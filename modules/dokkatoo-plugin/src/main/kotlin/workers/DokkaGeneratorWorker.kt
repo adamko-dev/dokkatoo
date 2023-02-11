@@ -2,6 +2,7 @@ package dev.adamko.dokkatoo.workers
 
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import dev.adamko.dokkatoo.internal.LoggerAdapter
+import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlin.time.nanoseconds
 import org.gradle.api.provider.Property
@@ -16,27 +17,30 @@ import org.jetbrains.dokka.DokkaGenerator
  * The worker requires [DokkaGenerator] is present on the classpath.
  */
 @DokkatooInternalApi
+@OptIn(ExperimentalTime::class)
 abstract class DokkaGeneratorWorker : WorkAction<DokkaGeneratorWorker.Parameters> {
 
   private val logger = LoggerAdapter(DokkaGeneratorWorker::class)
 
   interface Parameters : WorkParameters {
-    val dokkaConfiguration: Property<DokkaConfiguration>
+    val dokkaParameters: Property<DokkaConfiguration>
   }
 
-  @OptIn(ExperimentalTime::class)
   override fun execute() {
-    val dokkaConfiguration = parameters.dokkaConfiguration.get()
-    logger.info("Executing DokkaGeneratorWorker with dokkaConfiguration: $dokkaConfiguration")
+    val dokkaParameters = parameters.dokkaParameters.get()
+    logger.progress("Executing DokkaGeneratorWorker with dokkaParameters: $dokkaParameters")
 
-    val generator = DokkaGenerator(dokkaConfiguration, logger)
+    val generator = DokkaGenerator(dokkaParameters, logger)
 
-    // can't use kotlin.time.measureTime {} because the implementation isn't stable across Kotlin versions
-    val duration = System.nanoTime().let { startTime ->
-      generator.generate()
-      (System.nanoTime() - startTime).nanoseconds
-    }
+    val duration = measureTime { generator.generate() }
 
     logger.info("DokkaGeneratorWorker completed in $duration")
   }
+
+  // can't use kotlin.time.measureTime {} because the implementation isn't stable across Kotlin versions
+  private fun measureTime(block: () -> Unit): Duration =
+    System.nanoTime().let { startTime ->
+      block()
+      (System.nanoTime() - startTime).nanoseconds
+    }
 }
