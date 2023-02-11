@@ -7,19 +7,19 @@ import org.jetbrains.dokka.DokkaConfigurationBuilder
 import org.jetbrains.dokka.DokkaSourceSetID
 
 abstract class DokkaSourceSetIDGradleBuilder(
-  private val named: String
-) : DokkaConfigurationBuilder<DokkaSourceSetID>, Named {
-
   /**
    * Unique identifier of the scope that this source set is placed in.
    * Each scope provide only unique source set names.
+   *
+   * TODO update this doc - DokkaTask doesn't represent one source set scope anymore
    *
    * E.g. One DokkaTask inside the Gradle plugin represents one source set scope, since there cannot be multiple
    * source sets with the same name. However, a Gradle project will not be a proper scope, since there can be
    * multiple DokkaTasks that contain source sets with the same name (but different configuration)
    */
   @get:Input
-  val scopeId: String get() = named
+  val scopeId: String
+) : DokkaConfigurationBuilder<DokkaSourceSetID>, Named {
 
   @get:Input
   abstract var sourceSetName: String
@@ -27,6 +27,6 @@ abstract class DokkaSourceSetIDGradleBuilder(
   override fun build(): DokkaSourceSetID = DokkaSourceSetID(scopeId, sourceSetName)
 
   @Internal
-  override fun getName(): String = named
+  override fun getName(): String = scopeId
 
 }
