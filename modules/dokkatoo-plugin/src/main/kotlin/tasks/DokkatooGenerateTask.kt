@@ -10,7 +10,6 @@ import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.*
 import org.gradle.api.tasks.PathSensitivity.RELATIVE
 import org.gradle.kotlin.dsl.submit
@@ -19,17 +18,16 @@ import org.gradle.workers.WorkerExecutor
 /**
  * Executes the Dokka Generator, and produces documentation.
  *
- * The type of documentation generated is determined by the supplied Dokka Plugins in [dokkaConfigurationJson].
+ * The type of documentation generated is determined by the supplied Dokka Plugins in [dokkaParametersJson].
  */
 @CacheableTask
 abstract class DokkatooGenerateTask @Inject constructor(
-  private val providers: ProviderFactory,
   private val workers: WorkerExecutor,
 ) : DokkatooTask() {
 
   @get:InputFile
   @get:PathSensitive(RELATIVE)
-  abstract val dokkaConfigurationJson: RegularFileProperty
+  abstract val dokkaParametersJson: RegularFileProperty
 
   @get:Classpath
   abstract val runtimeClasspath: ConfigurableFileCollection
@@ -64,13 +62,13 @@ abstract class DokkatooGenerateTask @Inject constructor(
   @TaskAction
   @OptIn(ExperimentalSerializationApi::class) // jsonMapper.decodeFromStream
   fun generateDocumentation() {
-    val dokkaConfigurationJsonFile = dokkaConfigurationJson.get().asFile
+    val dokkaParametersJsonFile = dokkaParametersJson.get().asFile
     val generationType =
       generationType.orNull ?: error("GenerationType is required, but no value was provided")
 
-    val dokkaConfiguration = jsonMapper.decodeFromStream(
+    val dokkaParameters = jsonMapper.decodeFromStream(
       DokkaParametersKxs.serializer(),
-      dokkaConfigurationJsonFile.inputStream(),
+      dokkaParametersJsonFile.inputStream(),
     ).copy(
       outputDir = outputDirectory.get().asFile,
       delayTemplateSubstitution = when (generationType) {
@@ -79,7 +77,7 @@ abstract class DokkatooGenerateTask @Inject constructor(
       },
     )
 
-    logger.info("dokkaConfiguration: $dokkaConfiguration")
+    logger.info("dokkaParameters: $dokkaParameters")
 
     logger.info("DokkaGeneratorWorker runtimeClasspath: ${runtimeClasspath.files.joinToString("\n") { it.name }}")
 
@@ -92,7 +90,7 @@ abstract class DokkatooGenerateTask @Inject constructor(
     }
 
     workQueue.submit(DokkaGeneratorWorker::class) worker@{
-      this@worker.dokkaConfiguration.set(dokkaConfiguration)
+      this@worker.dokkaParameters.set(dokkaParameters)
     }
   }
 
