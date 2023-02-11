@@ -144,9 +144,9 @@ abstract class DokkatooBasePlugin @Inject constructor(
       )
 
       // create tasks
-      val prepareConfigurationTask = project.tasks.register<DokkatooPrepareParametersTask>(
+      val prepareParametersTask = project.tasks.register<DokkatooPrepareParametersTask>(
         taskNames.prepareParameters
-      ) {
+      ) task@{
         description =
           "Creates Dokka Configuration for executing the Dokka Generator for the $formatName publication"
 
@@ -190,8 +190,7 @@ abstract class DokkatooBasePlugin @Inject constructor(
           @Suppress("DEPRECATION")
           pluginsMapConfiguration.map { pluginConfig ->
             pluginConfig.map { (pluginId, pluginConfiguration) ->
-              objects.newInstance<DokkaPluginConfigurationGradleBuilder>().apply {
-                fqPluginName.set(pluginId)
+              objects.newInstance<DokkaPluginConfigurationGradleBuilder>(pluginId).apply {
                 values.set(pluginConfiguration)
               }
             }
@@ -217,7 +216,14 @@ abstract class DokkatooBasePlugin @Inject constructor(
           reportUndocumented.convention(false)
           skipDeprecated.convention(false)
           skipEmptyPackages.convention(true)
-          sourceSetScope.convention(dokkatooExtension.sourceSetScopeDefault)
+//          sourceSetScope.convention()
+          sourceSetScope.convention(
+            // TODO make the new plugin generate _exactly_ the same publication as the old plugin,
+            //      so make the sourceSetScope match the old task path (e.g. :dokkaHtml, :dokkaGfm)
+            this@task.path.replace(":prepareDokkatooParameters", ":dokka")
+            // should be replaced with:
+            // dokkatooExtension.sourceSetScopeDefault
+          )
           //suppress.convention(false) // TODO need to re-enable suppress convention, it's only disabled so the hack workaround 'todoSourceSetName' works
           suppressGeneratedFiles.convention(true)
 
@@ -239,14 +245,14 @@ abstract class DokkatooBasePlugin @Inject constructor(
 
       gradleConfigurations.dokkaParametersOutgoing.configure {
         outgoing {
-          artifact(prepareConfigurationTask.flatMap { it.dokkaConfigurationJson })
+          artifact(prepareParametersTask.flatMap { it.dokkaConfigurationJson })
         }
       }
 
       project.tasks.register<DokkatooGenerateTask>(taskNames.generatePublication) {
         description = "Executes the Dokka Generator, generating the $formatName publication"
         outputDirectory.convention(dokkatooExtension.dokkatooPublicationDirectory.dir(formatName))
-        dokkaConfigurationJson.convention(prepareConfigurationTask.flatMap { it.dokkaConfigurationJson })
+        dokkaParametersJson.convention(prepareParametersTask.flatMap { it.dokkaConfigurationJson })
         runtimeClasspath.from(gradleConfigurations.dokkaGeneratorClasspath)
         generationType.set(PUBLICATION)
         dokkaModuleSourceDirectories.from(gradleConfigurations.dokkaModuleSourceOutputsConsumer)
@@ -256,7 +262,7 @@ abstract class DokkatooBasePlugin @Inject constructor(
         project.tasks.register<DokkatooGenerateTask>(taskNames.generateModule) {
           description = "Executes the Dokka Generator, generating a $formatName module"
           outputDirectory.convention(dokkatooExtension.dokkatooModuleDirectory.dir(formatName))
-          dokkaConfigurationJson.convention(prepareConfigurationTask.flatMap { it.dokkaConfigurationJson })
+          dokkaParametersJson.convention(prepareParametersTask.flatMap { it.dokkaConfigurationJson })
           runtimeClasspath.from(gradleConfigurations.dokkaGeneratorClasspath)
           generationType.set(MODULE)
         }
@@ -337,23 +343,22 @@ abstract class DokkatooBasePlugin @Inject constructor(
       suppressInheritedMembers.convention(false)
       suppressObviousFunctions.convention(true)
 
-        // 'inherit' the common source sets defined in the extension
-        dokkaSourceSets.addAllLater(
-          objects.listProperty<DokkaSourceSetGradleBuilder>().apply {
-            addAll(
-              providers.provider { dokkatooExtension.dokkatooSourceSets }
-            )
-          }
-        )
-
-        // and configure each source set with the defaults
-        dokkaSourceSets.configureEach {
-          configureDefaults()
+      // 'inherit' the common source sets defined in the extension
+      dokkaSourceSets.addAllLater(
+        objects.listProperty<DokkaSourceSetGradleBuilder>().apply {
+          addAll(
+            providers.provider { dokkatooExtension.dokkatooSourceSets }
+          )
         }
+      )
 
-        pluginsConfiguration.configureEach {
-          serializationFormat.convention(DokkaConfiguration.SerializationFormat.JSON)
-        }
+      // and configure each source set with the defaults
+      dokkaSourceSets.configureEach {
+        configureDefaults()
+      }
+
+      pluginsConfiguration.configureEach {
+        serializationFormat.convention(DokkaConfiguration.SerializationFormat.JSON)
       }
     }
   }
