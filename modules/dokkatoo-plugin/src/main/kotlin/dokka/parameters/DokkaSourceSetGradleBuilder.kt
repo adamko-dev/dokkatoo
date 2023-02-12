@@ -217,7 +217,7 @@ abstract class DokkaSourceSetGradleBuilder(
    * Prefer using [externalDocumentationLink] action/closure for adding links.
    */
   @get:Nested
-  abstract val externalDocumentationLinks: DomainObjectSet<DokkaExternalDocumentationLinkGradleBuilder>
+  abstract val externalDocumentationLinks: NamedDomainObjectContainer<DokkaExternalDocumentationLinkGradleBuilder>
 
   /**
    * Platform to be used for setting up code analysis and samples.
@@ -453,6 +453,10 @@ abstract class DokkaSourceSetGradleBuilder(
   }
 
   override fun build(): DokkaParametersKxs.DokkaSourceSetKxs {
+    val externalDocumentationLinks = externalDocumentationLinks
+      .mapNotNull(DokkaExternalDocumentationLinkGradleBuilder::build)
+      .toSet()
+
     return DokkaParametersKxs.DokkaSourceSetKxs(
       sourceSetID = sourceSetID.get(),
       displayName = displayName.get(),
@@ -467,8 +471,7 @@ abstract class DokkaSourceSetGradleBuilder(
       jdkVersion = jdkVersion.get(),
       sourceLinks = sourceLinks.map(DokkaSourceLinkGradleBuilder::build).toSet(),
       perPackageOptions = perPackageOptions.map(DokkaPackageOptionsGradleBuilder::build),
-      externalDocumentationLinks =
-      externalDocumentationLinks.map(DokkaExternalDocumentationLinkGradleBuilder::build).toSet(),
+      externalDocumentationLinks = externalDocumentationLinks,
       languageVersion = languageVersion.orNull,
       apiVersion = apiVersion.orNull,
       noStdlibLink = noStdlibLink.get(),

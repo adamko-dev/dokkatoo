@@ -12,12 +12,14 @@ import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetGradleBuilder
 import dev.adamko.dokkatoo.formats.*
 import dev.adamko.dokkatoo.internal.asConsumer
 import dev.adamko.dokkatoo.internal.asProvider
+import dev.adamko.dokkatoo.internal.not
 import dev.adamko.dokkatoo.tasks.DokkatooGenerateTask
 import dev.adamko.dokkatoo.tasks.DokkatooGenerateTask.GenerationType.MODULE
 import dev.adamko.dokkatoo.tasks.DokkatooGenerateTask.GenerationType.PUBLICATION
 import dev.adamko.dokkatoo.tasks.DokkatooPrepareModuleDescriptorTask
 import dev.adamko.dokkatoo.tasks.DokkatooPrepareParametersTask
 import dev.adamko.dokkatoo.tasks.DokkatooTask
+import java.net.URL
 import javax.inject.Inject
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
@@ -75,10 +77,7 @@ abstract class DokkatooBasePlugin @Inject constructor(
       asConsumer()
       isVisible = false
       attributes {
-        attribute(
-          DOKKATOO_BASE_ATTRIBUTE,
-          configurationAttributes.dokkatooBaseUsage
-        )
+        attribute(DOKKATOO_BASE_ATTRIBUTE, configurationAttributes.dokkatooBaseUsage)
       }
     }
 
@@ -276,7 +275,7 @@ abstract class DokkatooBasePlugin @Inject constructor(
       displayName.convention("main")
       documentedVisibilities.convention(listOf(DokkaConfiguration.Visibility.PUBLIC))
       jdkVersion.convention(8)
-      noAndroidSdkLink.convention(false)
+      noAndroidSdkLink.convention(true)
       noJdkLink.convention(false)
       noStdlibLink.convention(false)
       reportUndocumented.convention(false)
@@ -303,9 +302,38 @@ abstract class DokkatooBasePlugin @Inject constructor(
 
     dokkatooExtension.dokkatooSourceSets.all dss@{
       configureDefaults()
-    }
-    dokkatooExtension.dokkatooPublications.configureEach {
 
+      externalDocumentationLinks {
+        configureEach {
+          packageListUrl.convention(url.map { URL(it, "package-list") })
+        }
+
+        create("jdk") {
+          enabled.convention(!this@dss.noJdkLink)
+          url(this@dss.jdkVersion.map { jdkVersion ->
+            when {
+              jdkVersion < 11 -> "https://docs.oracle.com/javase/${jdkVersion}/docs/api/"
+              else            -> "https://docs.oracle.com/en/java/javase/${jdkVersion}/docs/api/"
+            }
+          })
+        }
+        create("kotlinStdlib") {
+          enabled.convention(!this@dss.noStdlibLink)
+          url("https://kotlinlang.org/api/latest/jvm/stdlib/")
+        }
+        create("androidSdk") {
+          enabled.convention(!this@dss.noAndroidSdkLink)
+          url("https://developer.android.com/reference/kotlin/")
+        }
+        create("androidX") {
+          enabled.convention(!this@dss.noAndroidSdkLink)
+          url("https://developer.android.com/reference/kotlin/")
+          packageListUrl("https://developer.android.com/reference/kotlin/androidx/package-list")
+        }
+      }
+    }
+
+    dokkatooExtension.dokkatooPublications.all {
       enabled.convention(true)
 
       cacheRoot.convention(dokkatooExtension.dokkatooCacheDirectory)

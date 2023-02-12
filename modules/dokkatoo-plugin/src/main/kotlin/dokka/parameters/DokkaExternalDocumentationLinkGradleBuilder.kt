@@ -2,9 +2,12 @@ package dev.adamko.dokkatoo.dokka.parameters
 
 import java.io.Serializable
 import java.net.URL
+import javax.inject.Inject
+import org.gradle.api.Named
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
-import org.jetbrains.dokka.DokkaConfigurationBuilder
+import org.gradle.api.tasks.Internal
 
 /**
  * Configuration builder that allows creating links leading to externally hosted
@@ -28,9 +31,9 @@ import org.jetbrains.dokka.DokkaConfigurationBuilder
  * }
  * ```
  */
-abstract class DokkaExternalDocumentationLinkGradleBuilder :
-  DokkaConfigurationBuilder<DokkaParametersKxs.ExternalDocumentationLinkKxs>,
-  Serializable {
+abstract class DokkaExternalDocumentationLinkGradleBuilder @Inject constructor(
+  private val name: String
+) : Serializable, Named {
 
   /**
    * Root URL of documentation to link with. **Must** contain a trailing slash.
@@ -51,6 +54,20 @@ abstract class DokkaExternalDocumentationLinkGradleBuilder :
   abstract val url: Property<URL>
 
   /**
+   * Set the value of [url].
+   *
+   * @param[value] will be converted to a [URL]
+   */
+  fun url(value: String) = url.set(URL(value))
+
+  /**
+   * Set the value of [url].
+   *
+   * @param[value] will be converted to a [URL]
+   */
+  fun url(value: Provider<String>) = url.set(value.map(::URL))
+
+  /**
    * Specifies the exact location of a `package-list` instead of relying on Dokka
    * automatically resolving it. Can also be a locally cached file to avoid network calls.
    *
@@ -63,9 +80,40 @@ abstract class DokkaExternalDocumentationLinkGradleBuilder :
   @get:Input
   abstract val packageListUrl: Property<URL>
 
-  override fun build() =
-    DokkaParametersKxs.ExternalDocumentationLinkKxs(
-      url = url.get(),
-      packageListUrl = packageListUrl.get(),
-    )
+  /**
+   * Set the value of [packageListUrl].
+   *
+   * @param[value] will be converted to a [URL]
+   */
+  fun packageListUrl(value: String) = packageListUrl.set(URL(value))
+
+  /**
+   * Set the value of [packageListUrl].
+   *
+   * @param[value] will be converted to a [URL]
+   */
+  fun packageListUrl(value: Provider<String>) = packageListUrl.set(value.map(::URL))
+
+  /**
+   * If enabled this link will be passed to the Dokka Generator.
+   *
+   * @see dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetGradleBuilder.noStdlibLink
+   * @see dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetGradleBuilder.noJdkLink
+   * @see dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetGradleBuilder.noAndroidSdkLink
+   */
+  @get:Input
+  abstract val enabled: Property<Boolean>
+
+  internal fun build(): DokkaParametersKxs.ExternalDocumentationLinkKxs? =
+    if (enabled.getOrElse(true)) {
+      DokkaParametersKxs.ExternalDocumentationLinkKxs(
+        url = url.get(),
+        packageListUrl = packageListUrl.get(),
+      )
+    } else {
+      null
+    }
+
+  @Internal
+  override fun getName(): String = name
 }
