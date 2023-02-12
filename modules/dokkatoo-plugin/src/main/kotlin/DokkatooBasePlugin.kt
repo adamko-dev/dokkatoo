@@ -26,6 +26,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ConfigurationContainer
+import org.gradle.api.artifacts.component.ProjectComponentIdentifier
 import org.gradle.api.attributes.*
 import org.gradle.api.attributes.Bundling.BUNDLING_ATTRIBUTE
 import org.gradle.api.attributes.Bundling.EXTERNAL
@@ -157,14 +158,20 @@ abstract class DokkatooBasePlugin @Inject constructor(
         // depend on Dokka Module Descriptors from other subprojects
         dokkaSubprojectParameters.from(
           gradleConfigurations.dokkaParametersConsumer.map { elements ->
-            elements.incoming.artifactView { lenient(true) }.files
+            elements.incoming.artifactView {
+              componentFilter { it is ProjectComponentIdentifier }
+              lenient(true)
+            }.files
           }
         )
 
         // depend on Dokka Module Configurations from other subprojects
         dokkaModuleDescriptorFiles.from(
           gradleConfigurations.dokkaModuleDescriptorsConsumer.map { elements ->
-            elements.incoming.artifactView { lenient(true) }.files
+            elements.incoming.artifactView {
+              componentFilter { it is ProjectComponentIdentifier }
+              lenient(true)
+            }.files
           }
         )
 
