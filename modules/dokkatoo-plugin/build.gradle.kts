@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage") // jvm test suites & test report aggregation are incubating
+
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -11,6 +13,8 @@ plugins {
   `test-report-aggregation`
 
   buildsrc.conventions.`github-maven-publish`
+
+  buildsrc.conventions.`maven-publish-test`
 }
 
 dependencies {
@@ -91,18 +95,6 @@ tasks.withType<KotlinCompile>().configureEach {
   }
 }
 
-val projectTestMavenRepoDir = layout.buildDirectory.dir("test-maven-repo")
-
-publishing {
-  repositories {
-    maven(projectTestMavenRepoDir) {
-      name = "Test"
-    }
-  }
-}
-
-
-@Suppress("UnstableApiUsage") // jvm test suites are incubating
 testing.suites {
 
   withType<JvmTestSuite>().configureEach {
@@ -131,31 +123,28 @@ testing.suites {
         inputs.property("projectTestTempDir", projectTestTempDirPath)
         systemProperty("projectTestTempDir", projectTestTempDirPath)
 
-//        doFirst {
-//          File(projectTestTempDirPath).apply {
-//            deleteRecursively()
-//            mkdirs()
-//          }
-//        }
-
         when (testType.get()) {
           TestSuiteType.FUNCTIONAL_TEST,
           TestSuiteType.INTEGRATION_TEST -> {
             dependsOn(tasks.matching { it.name == "publishAllPublicationsToTestRepository" })
 
             systemProperties(
-              "testMavenRepoDir" to file(projectTestMavenRepoDir).canonicalPath,
+              "testMavenRepoDir" to file(mavenPublishTest.testMavenRepo).canonicalPath,
             )
 
-            inputs.dir(projectTestMavenRepoDir)
+            // depend on the test-publication task, but not the test-maven repo
+            // (otherwise this task will never be up-to-date)
+            dependsOn(tasks.publishToTestMavenRepo)
           }
         }
       }
     }
   }
 
+
   /** Unit tests suite */
   val test by getting(JvmTestSuite::class)
+
 
   /** Functional tests suite */
   val testFunctional by registering(JvmTestSuite::class) {
@@ -164,13 +153,6 @@ testing.suites {
     targets.all {
       testTask.configure {
         shouldRunAfter(test)
-        dependsOn(tasks.matching { it.name == "publishAllPublicationsToTestRepository" })
-
-        systemProperties(
-          "testMavenRepoDir" to file(projectTestMavenRepoDir).canonicalPath,
-        )
-
-        inputs.dir(projectTestMavenRepoDir)
       }
     }
   }
@@ -183,24 +165,18 @@ testing.suites {
     targets.all {
       testTask.configure {
         shouldRunAfter(test, testFunctional)
-        dependsOn(tasks.matching { it.name == "publishAllPublicationsToTestRepository" })
 
         dependsOn(project.configurations.kotlinDokkaSource)
 
         inputs.property("dokkaSourceDir",
-          project.configurations.kotlinDokkaSource.map {
-            val files = it.incoming.artifactView { lenient(true) }.files
+          project.configurations.kotlinDokkaSource.map { dokkaSrcConf ->
+            val files = dokkaSrcConf.incoming.artifactView { lenient(true) }.files
             files.singleOrNull()?.absolutePath
               ?: error("could not get Dokka source code directory from kotlinDokkaSource configuration. Got ${files.count()} files: $files")
           }
         )
 
-        systemProperties(
-          "testMavenRepoDir" to file(projectTestMavenRepoDir).canonicalPath,
-        )
         systemProperty("dokkaSourceDir", inputs.properties["dokkaSourceDir"]!!)
-
-        inputs.dir(projectTestMavenRepoDir)
       }
     }
   }
