@@ -56,6 +56,10 @@ class BasicProjectIntegrationTest {
           """../template.root.gradle.kts""",
           """./template.root.gradle.kts""",
         )
+      var templateGradleSettings: String by projectFile("template.settings.gradle.kts")
+      templateGradleSettings = templateGradleSettings
+        .replace("for-integration-tests-SNAPSHOT", "1.7.20")
+
     }
 
     val dokkaBuild = dokkaProject.runner
