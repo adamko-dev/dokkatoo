@@ -211,3 +211,20 @@ tasks.withType<Test>().configureEach {
 val javaComponent = components["java"] as AdhocComponentWithVariants
 javaComponent.withVariantsFromConfiguration(configurations["testFixturesApiElements"]) { skip() }
 javaComponent.withVariantsFromConfiguration(configurations["testFixturesRuntimeElements"]) { skip() }
+
+
+val aggregateTestReports by tasks.registering(TestReport::class) {
+  group = LifecycleBasePlugin.VERIFICATION_GROUP
+  destinationDirectory.set(layout.buildDirectory.dir("reports/tests/aggregated"))
+
+  dependsOn(tasks.withType<AbstractTestTask>())
+
+  // hardcoded dirs is a bit of a hack, but a fileTree just didn't work
+  testResults.from("$buildDir/test-results/test/binary")
+  testResults.from("$buildDir/test-results/testFunctional/binary")
+  testResults.from("$buildDir/test-results/testIntegration/binary")
+
+  doLast {
+    logger.lifecycle("Aggregated test report: file://${destinationDirectory.asFile.get()}/index.html")
+  }
+}
