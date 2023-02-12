@@ -29,7 +29,9 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinJvmAndroidCompilation
 
 /**
- * The [DokkatooKotlinAdapter] plugin will automatically register Kotlin source sets as Dokka source sets.
+ * The [DokkatooKotlinAdapter] plugin will automatically register Kotlin source sets as Dokka source sets. *
+ *
+ * **Must be applied *after* [dev.adamko.dokkatoo.DokkatooBasePlugin]**
  */
 @DokkatooInternalApi
 abstract class DokkatooKotlinAdapter @Inject constructor(

@@ -2,6 +2,7 @@ package dev.adamko.dokkatoo.formats
 
 import dev.adamko.dokkatoo.DokkatooBasePlugin
 import dev.adamko.dokkatoo.DokkatooExtension
+import dev.adamko.dokkatoo.adapters.DokkatooJavaAdapter
 import dev.adamko.dokkatoo.adapters.DokkatooKotlinAdapter
 import dev.adamko.dokkatoo.dokka.DokkaPublication
 import dev.adamko.dokkatoo.internal.versions
@@ -31,6 +32,7 @@ abstract class DokkatooFormatPlugin @Inject constructor(
     target.pluginManager.apply(DokkatooBasePlugin::class)
     // apply the plugin that will autoconfigure Dokkatoo to use the sources of a Kotlin project
     target.pluginManager.apply(type = DokkatooKotlinAdapter::class)
+    target.pluginManager.apply(type = DokkatooJavaAdapter::class)
 
     target.plugins.withType<DokkatooBasePlugin>().all {
       val dokkatooExtension = target.extensions.getByType(DokkatooExtension::class)
