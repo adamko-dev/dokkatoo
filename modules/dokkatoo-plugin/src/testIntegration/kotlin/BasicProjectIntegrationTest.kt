@@ -3,6 +3,7 @@ package dev.adamko.dokkatoo.it
 import dev.adamko.dokkatoo.utils.*
 import dev.adamko.dokkatoo.utils.GradleProjectTest.Companion.integrationTestProjectsDir
 import dev.adamko.dokkatoo.utils.GradleProjectTest.Companion.projectTestTempDir
+import io.kotest.assertions.withClue
 import io.kotest.matchers.file.shouldHaveSameStructureAndContentAs
 import io.kotest.matchers.file.shouldHaveSameStructureAs
 import io.kotest.matchers.shouldBe
@@ -192,6 +193,41 @@ dependencyResolutionManagement {
 
     dokkatooHtmlDir.toFile().shouldHaveSameStructureAs(dokkaHtmlDir.toFile())
     dokkatooHtmlDir.toFile().shouldHaveSameStructureAndContentAs(dokkaHtmlDir.toFile())
+
+    withClue("Dokkatoo tasks should be cacheable") {
+      val dokkatooBuildCache =
+        dokkatooProject.runner.withArguments(
+          "dokkatooGeneratePublicationHtml",
+          "--stacktrace",
+          "--info",
+          "--build-cache",
+        ).forwardOutput()
+          .build()
+
+      dokkatooBuildCache.output.shouldContainAll(
+        "Task :prepareDokkatooParametersHtml UP-TO-DATE",
+        "Task :dokkatooGeneratePublicationHtml UP-TO-DATE",
+      )
+    }
+
+    // TODO test configuration cache
+//    withClue("Dokkatoo tasks should be configuration-cache compatible") {
+//      val dokkatooBuildCache =
+//        dokkatooProject.runner.withArguments(
+//          "clean",
+//          "dokkatooGenerate",
+//          "--stacktrace",
+//          "--info",
+//          "--no-build-cache",
+//          "--configuration-cache",
+//        ).forwardOutput()
+//          .build()
+//
+//      dokkatooBuildCache.output.shouldContainAll(
+//        "Task :prepareDokkatooParametersHtml UP-TO-DATE",
+//        "Task :dokkatooGeneratePublicationHtml UP-TO-DATE",
+//      )
+//    }
   }
 }
 
