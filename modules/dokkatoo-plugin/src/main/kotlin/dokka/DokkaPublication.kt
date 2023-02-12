@@ -84,35 +84,6 @@ abstract class DokkaPublication @Inject constructor(
   @get:Input
   abstract val offlineMode: Property<Boolean>
 
-  /**
-   * Dokka Source Sets describe the source code that should be included in a Dokka Publication.
-   *
-   * Dokka will not generate documentation unless there is at least there is at least one Dokka Source Set.
-   *
-   * Only source sets that are contained within _this project_ should be included here.
-   * To merge source sets from other projects, use the Gradle dependencies block.
-   *
-   * ```kotlin
-   * dependencies {
-   *   // merge :other-project into this project's Dokka Configuration
-   *   dokka(project(":other-project"))
-   * }
-   * ```
-   *
-   * Or, to include other Dokka Publications as a Dokka Module use
-   *
-   * ```kotlin
-   * dependencies {
-   *   // include :other-project as a module in this project's Dokka Configuration
-   *   dokkaModule(project(":other-project"))
-   * }
-   * ```
-   *
-   * Dokka will merge Dokka Source Sets from other subprojects.
-   */
-  @get:Nested
-  abstract val dokkaSourceSets: NamedDomainObjectContainer<DokkaSourceSetGradleBuilder>
-
 //    @get:InputFiles
 //    @get:Classpath
 //    abstract val pluginsClasspath: ConfigurableFileCollection

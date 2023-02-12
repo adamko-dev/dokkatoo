@@ -101,9 +101,6 @@ abstract class DokkatooBasePlugin @Inject constructor(
     target.tasks.withType<DokkatooPrepareModuleDescriptorTask>().configureEach {
       moduleName.convention(dokkatooExtension.moduleNameDefault)
     }
-
-    //target.tasks.withType<DokkaConfigurationTask>().configureEach {
-    //}
   }
 
 
@@ -175,12 +172,13 @@ abstract class DokkatooBasePlugin @Inject constructor(
           }
         )
 
+        dokkaSourceSets.addAllLater(providers.provider { dokkatooExtension.dokkatooSourceSets })
+
         publicationEnabled.convention(this@publication.enabled)
         onlyIf { publicationEnabled.getOrElse(true) }
 
         cacheRoot.set(this@publication.cacheRoot)
         delayTemplateSubstitution.set(this@publication.delayTemplateSubstitution)
-        dokkaSourceSets.addAllLater(providers.provider { this@publication.dokkaSourceSets })
         failOnWarning.set(this@publication.failOnWarning)
         finalizeCoroutines.set(this@publication.finalizeCoroutines)
         includes.from(this@publication.includes)
@@ -211,42 +209,13 @@ abstract class DokkatooBasePlugin @Inject constructor(
         suppressInheritedMembers.set(this@publication.suppressInheritedMembers)
         suppressObviousFunctions.set(this@publication.suppressObviousFunctions)
 
-        dokkaSourceSets.configureEach {
-          // TODO for some reason the conventions need to be set again
-          analysisPlatform.convention(Platform.DEFAULT)
-          displayName.convention("main")
-          documentedVisibilities.convention(listOf(DokkaConfiguration.Visibility.PUBLIC))
-          jdkVersion.convention(8)
-          noAndroidSdkLink.convention(false)
-          noJdkLink.convention(false)
-          noStdlibLink.convention(false)
-          reportUndocumented.convention(false)
-          skipDeprecated.convention(false)
-          skipEmptyPackages.convention(true)
-//          sourceSetScope.convention()
+        dokkaSourceSets.configureEach dss@{
           sourceSetScope.convention(
             // TODO make the new plugin generate _exactly_ the same publication as the old plugin,
             //      so make the sourceSetScope match the old task path (e.g. :dokkaHtml, :dokkaGfm)
+            //      This should be replaced with: `dokkatooExtension.sourceSetScopeDefault`
             this@task.path.replace(":prepareDokkatooParameters", ":dokka")
-            // should be replaced with:
-            // dokkatooExtension.sourceSetScopeDefault
           )
-          //suppress.convention(false) // TODO need to re-enable suppress convention, it's only disabled so the hack workaround 'todoSourceSetName' works
-          suppressGeneratedFiles.convention(true)
-
-          sourceLinks.configureEach {
-            localDirectory.convention(layout.projectDirectory.asFile)
-            remoteLineSuffix.convention("#L")
-          }
-
-          perPackageOptions.configureEach {
-            matchingRegex.convention(".*")
-            suppress.convention(false)
-            skipDeprecated.convention(false)
-            reportUndocumented.convention(false)
-            @Suppress("DEPRECATION")
-            includeNonPublic.convention(false)
-          }
         }
       }
 
@@ -332,7 +301,7 @@ abstract class DokkatooBasePlugin @Inject constructor(
       }
     }
 
-    dokkatooExtension.dokkatooSourceSets.configureEach {
+    dokkatooExtension.dokkatooSourceSets.all dss@{
       configureDefaults()
     }
     dokkatooExtension.dokkatooPublications.configureEach {
@@ -350,50 +319,11 @@ abstract class DokkatooBasePlugin @Inject constructor(
       suppressInheritedMembers.convention(false)
       suppressObviousFunctions.convention(true)
 
-      // 'inherit' the common source sets defined in the extension
-      dokkaSourceSets.addAllLater(
-        objects.listProperty<DokkaSourceSetGradleBuilder>().apply {
-          addAll(
-            providers.provider { dokkatooExtension.dokkatooSourceSets }
-          )
-        }
-      )
-
-      // and configure each source set with the defaults
-      dokkaSourceSets.configureEach {
-        configureDefaults()
-      }
-
       pluginsConfiguration.configureEach {
         serializationFormat.convention(DokkaConfiguration.SerializationFormat.JSON)
       }
     }
   }
-
-  // I don't think Dokka Modules are necessary - but they might make a return
-//    private fun TaskContainer.registerDokkaModuleConfigurationTask(
-//        dokkaGenerateTask: TaskProvider<DokkaGenerateTask>,
-//    ): TaskProvider<DokkaModuleConfigurationTask> {
-//        val dokkaModuleConfigurationTask =
-//            register<DokkaModuleConfigurationTask>(TaskName.CREATE_DOKKA_MODULE_CONFIGURATION)
-//
-//        withType<DokkaModuleConfigurationTask>().configureEach {
-//            moduleName.set(project.name.map { it.takeIf(Char::isLetterOrDigit) ?: "-" }.joinToString(""))
-//            dokkaModuleConfigurationJson.set(
-//                moduleName.flatMap { moduleName ->
-//                    layout.buildDirectory.file("dokka/$moduleName.json")
-//                }
-//            )
-//
-//            dependsOn(dokkaGenerateTask)
-//
-////            moduleOutputDirectoryPath(dokkaGenerateTask.map { it.outputDirectory })
-//            sourceOutputDirectory(dokkaGenerateTask.map { it.outputDirectory })
-////            sourceOutputDirectory(layout.buildDirectory.dir("dokka/source-output"))
-//        }
-//
-//        return dokkaModuleConfigurationTask
-//    }
 
   /**
    * Create [DokkatooFormatGradleConfigurations].

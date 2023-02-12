@@ -10,7 +10,7 @@ import org.gradle.api.provider.Property
 /**
  * Configure the behaviour of the [DokkatooBasePlugin].
  */
-abstract class DokkatooExtension: ExtensionAware {
+abstract class DokkatooExtension : ExtensionAware {
 
   /** Directory into which [DokkaPublication]s will be produced */
   abstract val dokkatooPublicationDirectory: DirectoryProperty
@@ -43,18 +43,41 @@ abstract class DokkatooExtension: ExtensionAware {
   abstract val dokkatooPublications: NamedDomainObjectContainer<DokkaPublication>
 
   /**
-   * Dokkatoo Source Sets that describe source code in the local project (not other subprojects).
+   * Dokka Source Sets describe the source code that should be included in a Dokka Publication.
    *
-   * These source sets will be added to all [dokkatooPublications].
+   * Dokka will not generate documentation unless there is at least there is at least one Dokka Source Set.
+   *
+   *  TODO make sure dokkatooSourceSets doc is up to date...
+   *
+   * Only source sets that are contained within _this project_ should be included here.
+   * To merge source sets from other projects, use the Gradle dependencies block.
+   *
+   * ```kotlin
+   * dependencies {
+   *   // merge :other-project into this project's Dokka Configuration
+   *   dokka(project(":other-project"))
+   * }
+   * ```
+   *
+   * Or, to include other Dokka Publications as a Dokka Module use
+   *
+   * ```kotlin
+   * dependencies {
+   *   // include :other-project as a module in this project's Dokka Configuration
+   *   dokkaModule(project(":other-project"))
+   * }
+   * ```
+   *
+   * Dokka will merge Dokka Source Sets from other subprojects if...
    */
   abstract val dokkatooSourceSets: NamedDomainObjectContainer<DokkaSourceSetGradleBuilder>
 
   interface Versions {
 
     /** Default version used for Dokka dependencies */
-      val jetbrainsDokka: Property<String>
-      val jetbrainsMarkdown: Property<String>
-      val freemarker: Property<String>
-      val kotlinxHtml: Property<String>
+    val jetbrainsDokka: Property<String>
+    val jetbrainsMarkdown: Property<String>
+    val freemarker: Property<String>
+    val kotlinxHtml: Property<String>
   }
 }
