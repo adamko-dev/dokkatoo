@@ -185,8 +185,8 @@ dependencyResolutionManagement {
 
     val dokkatooHtmlDir = dokkatooProject.projectDir.resolve("build/dokka/html")
 
-    val expectedFileTree = dokkaHtmlDir.toPrettyTreeString()
-    val actualFileTree = dokkatooHtmlDir.toPrettyTreeString()
+    val expectedFileTree = dokkaHtmlDir.toTreeString()
+    val actualFileTree = dokkatooHtmlDir.toTreeString()
     println(actualFileTree)
     expectedFileTree shouldBe actualFileTree
 

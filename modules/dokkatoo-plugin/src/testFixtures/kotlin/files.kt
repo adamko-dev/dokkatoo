@@ -7,30 +7,13 @@ package dev.adamko.dokkatoo.utils
 //import io.kotest.matchers.file.shouldHaveSameContentAs
 //import io.kotest.matchers.file.shouldNotExist
 import java.io.File
-import java.nio.file.Path
+
 //import java.security.MessageDigest
 
 
 fun File.copyInto(directory: File, overwrite: Boolean = false) =
   copyTo(directory.resolve(name), overwrite = overwrite)
 
-
-//fun Path.toPrettyTreeString(): String = toFile().toPrettyTreeString()
-
-fun Path.toPrettyTreeString(): String = prettyTreeString(this)
-
-
-private fun prettyTreeString(root: Path): String {
-  /** Is this file the [root] */
-  fun File.isRoot() = this == root.toFile()
-  fun File.depth() = toPath().relativize(root).nameCount + (if (isRoot()) 0 else 1)
-
-  return root.toFile().walkBottomUp().joinToString("\n") { file ->
-    val indent = "  ".repeat(file.depth())
-    val fileName = file.name + (if (file.isDirectory) "/" else "")
-    fileName.prependIndent(indent)
-  }
-}
 
 //
 //infix fun Path.shouldContainSameFilesAs(expected: Path) {
