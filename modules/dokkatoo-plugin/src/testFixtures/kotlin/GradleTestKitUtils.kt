@@ -3,6 +3,7 @@ package dev.adamko.dokkatoo.utils
 import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
+import kotlin.properties.PropertyDelegateProvider
 import kotlin.properties.ReadOnlyProperty
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
@@ -164,9 +165,31 @@ fun gradleGroovyProjectTest(
 }
 
 
+fun GradleProjectTest.projectFile(
+  @Language("TEXT")
+  filePath: String
+): PropertyDelegateProvider<Any?, ReadWriteProperty<Any?, String>> =
+  PropertyDelegateProvider { _, _ ->
+    TestProjectFileProvidedDelegate(this, filePath)
+  }
+
+
 /** Delegate for reading and writing a [GradleProjectTest] file. */
-private class TestProjectFile(
-  val filePath: String,
+private class TestProjectFileProvidedDelegate(
+  private val project: GradleProjectTest,
+  private val filePath: String,
+) : ReadWriteProperty<Any?, String> {
+  override fun getValue(thisRef: Any?, property: KProperty<*>): String =
+    project.projectDir.resolve(filePath).toFile().readText()
+
+  override fun setValue(thisRef: Any?, property: KProperty<*>, value: String) {
+    project.createFile(filePath, value)
+  }
+}
+
+/** Delegate for reading and writing a [GradleProjectTest] file. */
+private class TestProjectFileDelegate(
+  private val filePath: String,
 ) : ReadWriteProperty<GradleProjectTest, String> {
   override fun getValue(thisRef: GradleProjectTest, property: KProperty<*>): String =
     thisRef.projectDir.resolve(filePath).toFile().readText()
@@ -176,29 +199,30 @@ private class TestProjectFile(
   }
 }
 
+
 /** Set the content of `settings.gradle.kts` */
 @delegate:Language("kts")
-var GradleProjectTest.settingsGradleKts: String by TestProjectFile("settings.gradle.kts")
+var GradleProjectTest.settingsGradleKts: String by TestProjectFileDelegate("settings.gradle.kts")
 
 
 /** Set the content of `build.gradle.kts` */
 @delegate:Language("kts")
-var GradleProjectTest.buildGradleKts: String by TestProjectFile("build.gradle.kts")
+var GradleProjectTest.buildGradleKts: String by TestProjectFileDelegate("build.gradle.kts")
 
 
 /** Set the content of `settings.gradle` */
 @delegate:Language("groovy")
-var GradleProjectTest.settingsGradle: String by TestProjectFile("settings.gradle")
+var GradleProjectTest.settingsGradle: String by TestProjectFileDelegate("settings.gradle")
 
 
 /** Set the content of `build.gradle` */
 @delegate:Language("groovy")
-var GradleProjectTest.buildGradle: String by TestProjectFile("build.gradle")
+var GradleProjectTest.buildGradle: String by TestProjectFileDelegate("build.gradle")
 
 
 /** Set the content of `gradle.properties` */
 @delegate:Language("properties")
-var GradleProjectTest.gradleProperties: String by TestProjectFile("gradle.properties")
+var GradleProjectTest.gradleProperties: String by TestProjectFileDelegate("gradle.properties")
 
 fun GradleProjectTest.createKotlinFile(filePath: String, @Language("kotlin") contents: String) =
   createFile(filePath, contents)
