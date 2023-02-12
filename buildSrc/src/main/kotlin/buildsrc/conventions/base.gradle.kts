@@ -63,6 +63,7 @@ val updateTestReportCss by tasks.registering {
   description = "Hack so the Gradle test reports have dark mode"
   // the CSS is based on https://github.com/gradle/gradle/pull/12177
 
+  mustRunAfter(tasks.withType<Test>())
   mustRunAfter(tasks.withType<TestReport>())
 
   val cssFiles = layout.buildDirectory.asFileTree.matching {
@@ -151,6 +152,10 @@ val updateTestReportCss by tasks.registering {
       }
     }
   }
+}
+
+tasks.withType<Test>().configureEach {
+  finalizedBy(updateTestReportCss)
 }
 
 tasks.withType<TestReport>().configureEach {
