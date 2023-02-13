@@ -29,6 +29,7 @@ dependencies {
   testFixturesImplementation(gradleTestKit())
   testFixturesImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
   testFixturesImplementation(platform("io.kotest:kotest-bom:5.5.5"))
+  testFixturesImplementation("io.kotest:kotest-runner-junit5")
   testFixturesImplementation("io.kotest:kotest-assertions-core")
   testFixturesImplementation("io.kotest:kotest-assertions-json")
 

@@ -1,13 +1,14 @@
 package dev.adamko.dokkatoo.it
 
 import dev.adamko.dokkatoo.utils.*
-import dev.adamko.dokkatoo.utils.GradleProjectTest.Companion.integrationTestProjectsDir
+import dev.adamko.dokkatoo.utils.GradleProjectTest.Companion.dokkaSrcIntegrationTestProjectsDir
 import dev.adamko.dokkatoo.utils.GradleProjectTest.Companion.projectTestTempDir
 import io.kotest.assertions.withClue
 import io.kotest.matchers.file.shouldHaveSameStructureAndContentAs
 import io.kotest.matchers.file.shouldHaveSameStructureAs
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
+import io.kotest.matchers.string.shouldNotContain
 import org.jetbrains.dokka.DokkaConfiguration
 import org.jetbrains.dokka.DokkaConfigurationImpl
 import org.junit.jupiter.api.Test
@@ -19,16 +20,15 @@ import org.junit.jupiter.api.Test
  */
 class BasicProjectIntegrationTest {
 
-
   @Test
   fun `test basic project`() {
 
     val basicProjectSrcDir =
-      integrationTestProjectsDir.resolve("it-basic").toFile()
+      dokkaSrcIntegrationTestProjectsDir.resolve("it-basic").toFile()
     val templateRootGradleKts =
-      integrationTestProjectsDir.resolve("template.root.gradle.kts").toFile()
+      dokkaSrcIntegrationTestProjectsDir.resolve("template.root.gradle.kts").toFile()
     val templateSettingsGradleKts =
-      integrationTestProjectsDir.resolve("template.settings.gradle.kts").toFile()
+      dokkaSrcIntegrationTestProjectsDir.resolve("template.settings.gradle.kts").toFile()
 
     val tempDir = projectTestTempDir.resolve("it-basic").toFile()
 
@@ -186,8 +186,6 @@ dependencyResolutionManagement {
     dokkatooBuild.output shouldContain "Generation completed successfully"
 
     val dokkaHtmlDir = dokkaProject.projectDir.resolve("build/dokka/html")
-
-
     val dokkatooHtmlDir = dokkatooProject.projectDir.resolve("build/dokka/html")
 
     val expectedFileTree = dokkaHtmlDir.toTreeString()
@@ -208,10 +206,13 @@ dependencyResolutionManagement {
         ).forwardOutput()
           .build()
 
-      dokkatooBuildCache.output.shouldContainAll(
+      dokkatooBuildCache.output shouldContainAll listOf(
         "Task :prepareDokkatooParametersHtml UP-TO-DATE",
         "Task :dokkatooGeneratePublicationHtml UP-TO-DATE",
       )
+      withClue("Dokka Generator should not be triggered, so check it doesn't log anything") {
+        dokkatooBuild.output shouldNotContain "Generation completed successfully"
+      }
     }
 
     // TODO test configuration cache
