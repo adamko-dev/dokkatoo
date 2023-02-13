@@ -65,5 +65,5 @@ jobs:
         if: always()
         with:
           report_paths: |
-            **/build/test-results/test/TEST-*.xml
+            **/build/test-results/**/TEST-*.xml
           require_tests: false

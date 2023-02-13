@@ -4,15 +4,6 @@ plugins {
   buildsrc.conventions.base
 }
 
-
-//
-//val kotlinDokkaSource by configurations.creating<Configuration> {
-//  asConsumer()
-//  attributes {
-//    attribute(Usage.USAGE_ATTRIBUTE, objects.named("rocksdb-src"))
-//  }
-//}
-
 dependencies {
   kotlinDokkaSource("kotlin:dokka:1.7.20@zip")
 }
@@ -30,7 +21,7 @@ val kotlinDokkaPrepareSource by tasks.registering(Sync::class) {
         .map { artifacts -> artifacts.map { zipTree(it.file) } }
     }
   ) {
-    // drop the first dir (rocksdb-$version)
+    // drop the first dir (dokka-$version)
     eachFile {
       relativePath = relativePath.dropDirectories(1)
     }
