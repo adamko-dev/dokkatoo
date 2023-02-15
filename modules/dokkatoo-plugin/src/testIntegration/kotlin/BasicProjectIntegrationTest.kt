@@ -100,7 +100,7 @@ dependencies {
 }
 
 dokkatoo {
-  moduleNameDefault.set("Basic Project")
+  moduleName.set("Basic Project")
   dokkatooSourceSets.configureEach {
     documentedVisibilities(
       DokkaConfiguration.Visibility.PUBLIC,
@@ -191,7 +191,7 @@ dependencyResolutionManagement {
 
     val expectedFileTree = dokkaHtmlDir.toTreeString()
     val actualFileTree = dokkatooHtmlDir.toTreeString()
-    println(actualFileTree)
+    println((actualFileTree to expectedFileTree).sideBySide())
     expectedFileTree shouldBe actualFileTree
 
     dokkatooHtmlDir.toFile().shouldHaveSameStructureAs(dokkaHtmlDir.toFile())
