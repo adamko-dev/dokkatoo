@@ -89,11 +89,12 @@ abstract class DokkatooFormatPlugin @Inject constructor(
 
       with(dokkatooExtension.versions) {
 
-        dokkaPlugin(dokka("kotlin-analysis-intellij"))
-        dokkaPlugin(dokka("dokka-base"))
-        dokkaPlugin(dokka("templating-plugin"))
         dokkaPlugin(dokka("dokka-analysis"))
+        dokkaPlugin(dokka("templating-plugin"))
+        dokkaPlugin(dokka("dokka-base"))
+        dokkaPlugin(dokka("kotlin-analysis-intellij"))
         dokkaPlugin(dokka("kotlin-analysis-compiler"))
+//        dokkaPlugin(dokka("all-modules-page-plugin"))
 
         dokkaPlugin("org.jetbrains.kotlinx:kotlinx-html" version kotlinxHtml)
         dokkaPlugin("org.freemarker:freemarker" version freemarker)
