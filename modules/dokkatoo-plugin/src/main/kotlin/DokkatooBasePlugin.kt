@@ -8,11 +8,8 @@ import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes.Companio
 import dev.adamko.dokkatoo.distibutions.DokkatooFormatGradleConfigurations
 import dev.adamko.dokkatoo.dokka.DokkaPublication
 import dev.adamko.dokkatoo.dokka.parameters.DokkaPluginConfigurationGradleBuilder
-import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetGradleBuilder
 import dev.adamko.dokkatoo.formats.*
-import dev.adamko.dokkatoo.internal.asConsumer
-import dev.adamko.dokkatoo.internal.asProvider
-import dev.adamko.dokkatoo.internal.not
+import dev.adamko.dokkatoo.internal.*
 import dev.adamko.dokkatoo.tasks.DokkatooGenerateTask
 import dev.adamko.dokkatoo.tasks.DokkatooGenerateTask.GenerationType.MODULE
 import dev.adamko.dokkatoo.tasks.DokkatooGenerateTask.GenerationType.PUBLICATION
@@ -28,7 +25,6 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ConfigurationContainer
-import org.gradle.api.artifacts.component.ProjectComponentIdentifier
 import org.gradle.api.attributes.*
 import org.gradle.api.attributes.Bundling.BUNDLING_ATTRIBUTE
 import org.gradle.api.attributes.Bundling.EXTERNAL
@@ -45,6 +41,7 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.kotlin.dsl.*
+import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.jetbrains.dokka.DokkaConfiguration
 import org.jetbrains.dokka.Platform
 
@@ -59,6 +56,8 @@ abstract class DokkatooBasePlugin @Inject constructor(
 ) : Plugin<Project> {
 
   override fun apply(target: Project) {
+    // apply the lifecycle-base plugin so the clean task is available
+    target.pluginManager.apply(LifecycleBasePlugin::class)
 
     val dokkatooExtension = createExtension(target)
 
@@ -88,32 +87,37 @@ abstract class DokkatooBasePlugin @Inject constructor(
       configurationAttributes,
     )
 
-    configureDokkaPublicationsDefaults(
-      dokkatooExtension = dokkatooExtension,
-    )
-
+    configureDokkaPublicationsDefaults(dokkatooExtension)
+    configureDokkatooSourceSetsDefaults(dokkatooExtension)
 
     target.tasks.withType<DokkatooGenerateTask>().configureEach {
       cacheDirectory.convention(dokkatooExtension.dokkatooCacheDirectory)
+      enableWorkerDebug.convention(false)
     }
 
-    target.tasks.withType<DokkatooPrepareModuleDescriptorTask>().configureEach {
-      moduleName.convention(dokkatooExtension.moduleNameDefault)
+    target.tasks.withType<DokkatooPrepareModuleDescriptorTask>().all task@{
+      moduleName.convention(dokkatooExtension.moduleName)
+      dokkatooExtension.dokkatooSourceSets.all dss@{
+        this@task.includes.from(this@dss.includes)
+      }
+      modulePath.convention(dokkatooExtension.modulePath)
     }
   }
 
 
   private fun createExtension(project: Project): DokkatooExtension {
     return project.extensions.create<DokkatooExtension>(EXTENSION_NAME).apply {
+      moduleName.convention(providers.provider { project.name })
+      moduleVersion.convention(providers.provider { project.version.toString() })
+      modulePath.convention(project.pathAsFilePath())
+
       dokkatooCacheDirectory.convention(null)
-      moduleNameDefault.convention(providers.provider { project.name })
-      moduleVersionDefault.convention(providers.provider { project.version.toString() })
       sourceSetScopeDefault.convention(project.path)
       dokkatooPublicationDirectory.convention(layout.buildDirectory.dir("dokka"))
       dokkatooModuleDirectory.convention(layout.buildDirectory.dir("dokka-module"))
       dokkatooConfigurationsDirectory.convention(layout.buildDirectory.dir("dokka-config"))
 
-      this.extensions.create<DokkatooExtension.Versions>("versions").apply {
+      extensions.create<DokkatooExtension.Versions>("versions").apply {
         jetbrainsDokka.convention("1.7.20")
         jetbrainsMarkdown.convention("0.3.1")
         freemarker.convention("2.3.31")
@@ -151,21 +155,24 @@ abstract class DokkatooBasePlugin @Inject constructor(
           dokkatooExtension.dokkatooConfigurationsDirectory.file("$formatName/dokka_parameters.json")
         )
 
-        // depend on Dokka Module Descriptors from other subprojects
+        // depend on Dokka Module Parameters from other subprojects
         dokkaSubprojectParameters.from(
-          gradleConfigurations.dokkaParametersConsumer.map { elements ->
-            elements.incoming.artifactView {
-              componentFilter { it is ProjectComponentIdentifier }
-              lenient(true)
-            }.files
-          }
+          // TODO Merging config from other subprojects is the equivalent of the current 'Collect' task.
+          //      It needs a separate Gradle Configuration so subprojects to 'Collect' can be specifically declared.
+          //      Disabled for now, so I can get non-Collect functionality working.
+//          gradleConfigurations.dokkaParametersConsumer.map { elements ->
+//            elements.incoming.artifactView {
+//              componentFilter { it is ProjectComponentIdentifier }
+//              lenient(true)
+//            }.files
+//          }
         )
 
-        // depend on Dokka Module Configurations from other subprojects
-        dokkaModuleDescriptorFiles.from(
-          gradleConfigurations.dokkaModuleDescriptorsConsumer.map { elements ->
+        // depend on Dokka Module Descriptors from other subprojects
+        dokkaModuleFiles.from(
+          gradleConfigurations.dokkaModuleConsumer.map { elements ->
             elements.incoming.artifactView {
-              componentFilter { it is ProjectComponentIdentifier }
+              componentFilter(LocalProjectOnlyFilter)
               lenient(true)
             }.files
           }
@@ -209,12 +216,7 @@ abstract class DokkatooBasePlugin @Inject constructor(
         suppressObviousFunctions.set(this@publication.suppressObviousFunctions)
 
         dokkaSourceSets.configureEach dss@{
-          sourceSetScope.convention(
-            // TODO make the new plugin generate _exactly_ the same publication as the old plugin,
-            //      so make the sourceSetScope match the old task path (e.g. :dokkaHtml, :dokkaGfm)
-            //      This should be replaced with: `dokkatooExtension.sourceSetScopeDefault`
-            this@task.path.replace(":prepareDokkatooParameters", ":dokka")
-          )
+          sourceSetScope.convention(this@task.path)
         }
       }
 
@@ -230,7 +232,7 @@ abstract class DokkatooBasePlugin @Inject constructor(
         dokkaParametersJson.convention(prepareParametersTask.flatMap { it.dokkaConfigurationJson })
         runtimeClasspath.from(gradleConfigurations.dokkaGeneratorClasspath)
         generationType.set(PUBLICATION)
-        dokkaModuleSourceDirectories.from(gradleConfigurations.dokkaModuleSourceOutputsConsumer)
+        dokkaModuleFiles.from(gradleConfigurations.dokkaModuleConsumer)
       }
 
       val generateModule =
@@ -252,25 +254,50 @@ abstract class DokkatooBasePlugin @Inject constructor(
           sourceOutputDirectory(generateModule.flatMap { it.outputDirectory })
         }
 
-      gradleConfigurations.dokkaModuleDescriptorsOutgoing.configure {
+      gradleConfigurations.dokkaModuleOutgoing.configure {
         outgoing {
           artifact(prepareModuleDescriptorTask.flatMap { it.dokkaModuleDescriptorJson })
         }
       }
-      gradleConfigurations.dokkaModuleSourceOutputsOutgoing.configure {
+      gradleConfigurations.dokkaModuleOutgoing.configure {
         outgoing {
-          artifact(generateModule.flatMap { it.outputDirectory })
+          artifact(generateModule.flatMap { it.outputDirectory }) {
+            type = "directory"
+          }
         }
       }
     }
   }
 
-  /** Set defaults in all [DokkaPublication]s */
+  /** Set defaults in all [DokkatooExtension.dokkatooPublications]s */
   private fun configureDokkaPublicationsDefaults(
     dokkatooExtension: DokkatooExtension,
   ) {
+    dokkatooExtension.dokkatooPublications.all {
+      enabled.convention(true)
 
-    fun DokkaSourceSetGradleBuilder.configureDefaults() {
+      cacheRoot.convention(dokkatooExtension.dokkatooCacheDirectory)
+      delayTemplateSubstitution.convention(false)
+      failOnWarning.convention(false)
+      finalizeCoroutines.convention(false)
+      moduleName.convention(dokkatooExtension.moduleName)
+      moduleVersion.convention(dokkatooExtension.moduleVersion)
+      offlineMode.convention(false)
+      outputDir.convention(dokkatooExtension.dokkatooPublicationDirectory)
+      suppressInheritedMembers.convention(false)
+      suppressObviousFunctions.convention(true)
+
+      pluginsConfiguration.configureEach {
+        serializationFormat.convention(DokkaConfiguration.SerializationFormat.JSON)
+      }
+    }
+  }
+
+  /** Set defaults in all [DokkatooExtension.dokkatooSourceSets]s */
+  private fun configureDokkatooSourceSetsDefaults(
+    dokkatooExtension: DokkatooExtension,
+  ) {
+    dokkatooExtension.dokkatooSourceSets.all dss@{
       analysisPlatform.convention(Platform.DEFAULT)
       displayName.convention("main")
       documentedVisibilities.convention(listOf(DokkaConfiguration.Visibility.PUBLIC))
@@ -298,10 +325,6 @@ abstract class DokkatooBasePlugin @Inject constructor(
         @Suppress("DEPRECATION")
         includeNonPublic.convention(false)
       }
-    }
-
-    dokkatooExtension.dokkatooSourceSets.all dss@{
-      configureDefaults()
 
       externalDocumentationLinks {
         configureEach {
@@ -330,25 +353,6 @@ abstract class DokkatooBasePlugin @Inject constructor(
           url("https://developer.android.com/reference/kotlin/")
           packageListUrl("https://developer.android.com/reference/kotlin/androidx/package-list")
         }
-      }
-    }
-
-    dokkatooExtension.dokkatooPublications.all {
-      enabled.convention(true)
-
-      cacheRoot.convention(dokkatooExtension.dokkatooCacheDirectory)
-      delayTemplateSubstitution.convention(false)
-      failOnWarning.convention(false)
-      finalizeCoroutines.convention(false)
-      moduleName.convention(dokkatooExtension.moduleNameDefault)
-      moduleVersion.convention(dokkatooExtension.moduleVersionDefault)
-      offlineMode.convention(false)
-      outputDir.convention(dokkatooExtension.dokkatooPublicationDirectory)
-      suppressInheritedMembers.convention(false)
-      suppressObviousFunctions.convention(true)
-
-      pluginsConfiguration.configureEach {
-        serializationFormat.convention(DokkaConfiguration.SerializationFormat.JSON)
       }
     }
   }
@@ -406,52 +410,27 @@ abstract class DokkatooBasePlugin @Inject constructor(
       }
     //</editor-fold>
 
-    //<editor-fold desc="Dokka Module Descriptor JSON files">
-    val dokkaModuleDescriptorsConsumer =
-      configurations.register(configurationNames.moduleDescriptors) {
-        description = "Fetch Dokka Module Descriptors for $formatName from other subprojects"
+    //<editor-fold desc="Dokka Module files">
+    val dokkaModuleConsumer =
+      configurations.register(configurationNames.moduleDescriptorFiles) {
+        description = "Fetch Dokka Module files for $formatName from other subprojects"
         asConsumer()
         extendsFrom(dokkaConsumer.get())
         isVisible = false
         attributes {
-          dokkaCategory(attributes.dokkaModuleDescriptors)
+          dokkaCategory(attributes.dokkaModuleFiles)
         }
       }
 
-    val dokkaModuleDescriptorsOutgoing =
-      configurations.register(configurationNames.moduleDescriptorsOutgoing) {
-        description = "Provide Dokka Module Descriptors for $formatName to other subprojects"
+    val dokkaModuleOutgoing =
+      configurations.register(configurationNames.moduleDescriptorFilesOutgoing) {
+        description = "Provide Dokka Module files for $formatName to other subprojects"
         asProvider()
         // extend from dokkaConfigurationsConsumer, so Dokka Module Configs propagate api() style
-        extendsFrom(dokkaModuleDescriptorsConsumer.get())
+        extendsFrom(dokkaModuleConsumer.get())
         isVisible = true
         attributes {
-          dokkaCategory(attributes.dokkaModuleDescriptors)
-        }
-      }
-    //</editor-fold>
-
-    //<editor-fold desc="Dokka Module Descriptor JSON files">
-    val dokkaModuleSourceOutputsConsumer =
-      configurations.register(configurationNames.moduleSourceOutputConsumer) {
-        description = "Fetch Dokka Module Source Output for $formatName from other subprojects"
-        asConsumer()
-        extendsFrom(dokkaConsumer.get())
-        isVisible = false
-        attributes {
-          dokkaCategory(attributes.dokkaModuleSource)
-        }
-      }
-
-    val dokkaModuleSourceOutputsOutgoing =
-      configurations.register(configurationNames.moduleSourceOutputOutgoing) {
-        description = "Provide Dokka Module Source Output for $formatName to other subprojects"
-        asProvider()
-        // extend from dokkaConfigurationsConsumer, so Dokka Module Configs propagate api() style
-        extendsFrom(dokkaModuleDescriptorsConsumer.get())
-        isVisible = true
-        attributes {
-          dokkaCategory(attributes.dokkaModuleSource)
+          dokkaCategory(attributes.dokkaModuleFiles)
         }
       }
     //</editor-fold>
@@ -529,17 +508,12 @@ abstract class DokkatooBasePlugin @Inject constructor(
     //</editor-fold>
 
     return DokkatooFormatGradleConfigurations(
-//            dokkaConsumer = dokkaConsumer,
-//      dokkaParametersConsumer = dokkaConfigurationsConsumer,
-//      dokkaParametersProvider = dokkaConfigurationsProvider,
-      dokkaModuleDescriptorsConsumer = dokkaModuleDescriptorsConsumer,
-      dokkaModuleDescriptorsOutgoing = dokkaModuleDescriptorsOutgoing,
+      dokkaModuleConsumer = dokkaModuleConsumer,
+      dokkaModuleOutgoing = dokkaModuleOutgoing,
       dokkaPluginsClasspath = dokkaPluginsClasspath,
       dokkaGeneratorClasspath = dokkaGeneratorClasspath,
       dokkaPluginsIntransitiveClasspath = dokkaPluginsIntransitiveClasspath,
       dokkaPluginsClasspathOutgoing = dokkaPluginsClasspathOutgoing,
-      dokkaModuleSourceOutputsConsumer = dokkaModuleSourceOutputsConsumer,
-      dokkaModuleSourceOutputsOutgoing = dokkaModuleSourceOutputsOutgoing,
       dokkaParametersConsumer = dokkaParametersConsumer,
       dokkaParametersOutgoing = dokkaParametersOutgoing,
     )
@@ -547,14 +521,15 @@ abstract class DokkatooBasePlugin @Inject constructor(
 
 
   private fun TaskContainer.createDokkaLifecycleTasks() {
-    register(TaskName.GENERATE, DokkatooTask::class) {
-      description = "Runs all Dokkatoo Generate tasks"
-      dependsOn(withType<DokkatooGenerateTask>())
-    }
-
-    register(TaskName.PREPARE_PARAMETERS, DokkatooTask::class) {
+    val prepareParameters = register<DokkatooTask>(TaskName.PREPARE_PARAMETERS) {
       description = "Runs all Dokkatoo Create Configuration tasks"
       dependsOn(withType<DokkatooPrepareParametersTask>())
+    }
+
+    register<DokkatooTask>(TaskName.GENERATE) {
+      description = "Runs all Dokkatoo Generate tasks"
+      dependsOn(prepareParameters)
+      dependsOn(withType<DokkatooGenerateTask>())
     }
   }
 
@@ -579,16 +554,11 @@ abstract class DokkatooBasePlugin @Inject constructor(
       /** Name of the [Configuration] that _provides_ [org.jetbrains.dokka.DokkaConfiguration] to other projects */
       const val DOKKATOO_PARAMETERS_OUTGOING = "dokkatooParametersElements"
 
-      /** Name of the [Configuration] that _consumes_ [org.jetbrains.dokka.DokkaConfiguration.DokkaModuleDescription] from projects */
-      const val DOKKATOO_MODULE_DESCRIPTORS_CONSUMER = "dokkatooModuleDescriptors"
+      /** Name of the [Configuration] that _consumes_ all [org.jetbrains.dokka.DokkaConfiguration.DokkaModuleDescription] files */
+      const val DOKKATOO_MODULE_FILES_CONSUMER = "dokkatooModule"
 
-      /** Name of the [Configuration] that _provides_ [org.jetbrains.dokka.DokkaConfiguration.DokkaModuleDescription] to other projects */
-      const val DOKKATOO_MODULE_DESCRIPTOR_PROVIDER =
-        "${DOKKATOO_MODULE_DESCRIPTORS_CONSUMER}Elements"
-
-
-      const val DOKKATOO_MODULE_SOURCE_OUTPUT_CONSUMER = "dokkatooModuleSource"
-      const val DOKKATOO_MODULE_SOURCE_OUTPUT_PROVIDER = "dokkatooModuleSourceElements"
+      /** Name of the [Configuration] that _provides_ all [org.jetbrains.dokka.DokkaConfiguration.DokkaModuleDescription] files to other projects */
+      const val DOKKATOO_MODULE_FILES_PROVIDER = "${DOKKATOO_MODULE_FILES_CONSUMER}Elements"
 
       /**
        * Classpath used to execute the Dokka Generator.

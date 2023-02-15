@@ -1,13 +1,15 @@
 package dev.adamko.dokkatoo.it
 
 import dev.adamko.dokkatoo.utils.*
-import dev.adamko.dokkatoo.utils.GradleProjectTest.Companion.integrationTestProjectsDir
+import dev.adamko.dokkatoo.utils.GradleProjectTest.Companion.dokkaSrcIntegrationTestProjectsDir
 import dev.adamko.dokkatoo.utils.GradleProjectTest.Companion.projectTestTempDir
 import io.kotest.assertions.withClue
 import io.kotest.matchers.file.shouldHaveSameStructureAndContentAs
 import io.kotest.matchers.file.shouldHaveSameStructureAs
+import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
+import io.kotest.matchers.string.shouldNotContain
 import org.jetbrains.dokka.DokkaConfiguration
 import org.jetbrains.dokka.DokkaConfigurationImpl
 import org.junit.jupiter.api.Test
@@ -19,18 +21,17 @@ import org.junit.jupiter.api.Test
  */
 class BasicProjectIntegrationTest {
 
-
   @Test
   fun `test basic project`() {
 
     val basicProjectSrcDir =
-      integrationTestProjectsDir.resolve("it-basic").toFile()
+      dokkaSrcIntegrationTestProjectsDir.resolve("it-basic").toFile()
     val templateRootGradleKts =
-      integrationTestProjectsDir.resolve("template.root.gradle.kts").toFile()
+      dokkaSrcIntegrationTestProjectsDir.resolve("template.root.gradle.kts").toFile()
     val templateSettingsGradleKts =
-      integrationTestProjectsDir.resolve("template.settings.gradle.kts").toFile()
+      dokkaSrcIntegrationTestProjectsDir.resolve("template.settings.gradle.kts").toFile()
 
-    val tempDir = projectTestTempDir.resolve("it-basic").toFile()
+    val tempDir = projectTestTempDir.resolve("it/it-basic").toFile()
 
     val dokkaDir = tempDir.resolve("dokka")
     basicProjectSrcDir.copyRecursively(dokkaDir, overwrite = true) { _, _ -> OnErrorAction.SKIP }
@@ -99,7 +100,7 @@ dependencies {
 }
 
 dokkatoo {
-  moduleNameDefault.set("Basic Project")
+  moduleName.set("Basic Project")
   dokkatooSourceSets.configureEach {
     documentedVisibilities(
       DokkaConfiguration.Visibility.PUBLIC,
@@ -147,6 +148,11 @@ dokkatoo {
   }
 }
 
+tasks.withType<dev.adamko.dokkatoo.tasks.DokkatooPrepareParametersTask>().configureEach { 
+  dokkaSourceSets.configureEach { 
+    sourceSetScope.set(":dokkaHtml")
+  }
+}
 
 """.trimIndent()
 
@@ -186,32 +192,32 @@ dependencyResolutionManagement {
     dokkatooBuild.output shouldContain "Generation completed successfully"
 
     val dokkaHtmlDir = dokkaProject.projectDir.resolve("build/dokka/html")
-
-
     val dokkatooHtmlDir = dokkatooProject.projectDir.resolve("build/dokka/html")
 
     val expectedFileTree = dokkaHtmlDir.toTreeString()
     val actualFileTree = dokkatooHtmlDir.toTreeString()
-    println(actualFileTree)
+    println((actualFileTree to expectedFileTree).sideBySide())
     expectedFileTree shouldBe actualFileTree
 
     dokkatooHtmlDir.toFile().shouldHaveSameStructureAs(dokkaHtmlDir.toFile())
     dokkatooHtmlDir.toFile().shouldHaveSameStructureAndContentAs(dokkaHtmlDir.toFile())
 
     withClue("Dokkatoo tasks should be cacheable") {
-      val dokkatooBuildCache =
-        dokkatooProject.runner.withArguments(
-          "dokkatooGeneratePublicationHtml",
-          "--stacktrace",
-          "--info",
-          "--build-cache",
-        ).forwardOutput()
-          .build()
-
-      dokkatooBuildCache.output.shouldContainAll(
-        "Task :prepareDokkatooParametersHtml UP-TO-DATE",
-        "Task :dokkatooGeneratePublicationHtml UP-TO-DATE",
-      )
+      dokkatooProject.runner.withArguments(
+        "dokkatooGeneratePublicationHtml",
+        "--stacktrace",
+        "--info",
+        "--build-cache",
+      ).forwardOutput()
+        .build().should { buildResult ->
+          buildResult.output shouldContainAll listOf(
+            "Task :prepareDokkatooParametersHtml UP-TO-DATE",
+            "Task :dokkatooGeneratePublicationHtml UP-TO-DATE",
+          )
+          withClue("Dokka Generator should not be triggered, so check it doesn't log anything") {
+            buildResult.output shouldNotContain "Generation completed successfully"
+          }
+        }
     }
 
     // TODO test configuration cache

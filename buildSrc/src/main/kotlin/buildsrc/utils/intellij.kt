@@ -15,8 +15,7 @@ fun IdeaModule.excludeGeneratedGradleDsl(layout: ProjectLayout) {
 
   excludeDirs.addAll(
     layout.projectDirectory.asFile.walk()
-      .filter { it.isDirectory }
-      .filter { it.parentFile.name in generatedSrcDirs }
+      .filter { it.isDirectory && it.parentFile.name in generatedSrcDirs }
       .flatMap { file ->
         file.walk().maxDepth(1).filter { it.isDirectory }.toList()
       }

@@ -24,18 +24,6 @@ abstract class DokkatooPrepareModuleDescriptorTask @Inject constructor(
   @get:Input
   abstract val moduleName: Property<String>
 
-//    @get:Input
-//    protected abstract val moduleOutputDirectoryPath: Property<String>
-//
-//    /**
-//     * Evaluated as a file as defined by [org.gradle.api.Project.file].
-//     */
-//    fun moduleOutputDirectoryPath(path: Any) {
-//        moduleOutputDirectoryPath.set(
-//            layout.files(path).singleFile.invariantSeparatorsPath
-//        )
-//    }
-
   @get:Input
   protected abstract val sourceOutputDirectory: Property<String>
 
@@ -53,18 +41,21 @@ abstract class DokkatooPrepareModuleDescriptorTask @Inject constructor(
   @get:OutputFile
   abstract val dokkaModuleDescriptorJson: RegularFileProperty
 
+  @get:Input
+  abstract val modulePath: Property<String>
+
   @TaskAction
   fun generateModuleConfiguration() {
     val moduleName = moduleName.get()
-//        val moduleOutputDirectory = layout.files(moduleOutputDirectoryPath).singleFile
     val sourceOutputDirectory = layout.files(sourceOutputDirectory).singleFile
     val includes = includes.files
+    val modulePath = modulePath.get()
 
     val moduleDesc = DokkaParametersKxs.DokkaModuleDescriptionKxs(
-      moduleName = moduleName,
-//            moduleOutputDirectory = moduleOutputDirectory,
+      name = moduleName,
       sourceOutputDirectory = sourceOutputDirectory,
       includes = includes,
+      modulePath = modulePath,
     )
 
     val encodedModuleDesc = jsonMapper.encodeToString(moduleDesc)

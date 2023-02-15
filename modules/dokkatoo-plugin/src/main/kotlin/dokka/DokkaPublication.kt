@@ -1,9 +1,7 @@
 package dev.adamko.dokkatoo.dokka
 
-import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKATOO_MODULE_DESCRIPTORS_CONSUMER
-import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKATOO_MODULE_DESCRIPTOR_PROVIDER
-import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKATOO_MODULE_SOURCE_OUTPUT_CONSUMER
-import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKATOO_MODULE_SOURCE_OUTPUT_PROVIDER
+import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKATOO_MODULE_FILES_CONSUMER
+import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKATOO_MODULE_FILES_PROVIDER
 import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKATOO_PARAMETERS
 import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKATOO_PARAMETERS_OUTGOING
 import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKA_GENERATOR_CLASSPATH
@@ -14,9 +12,7 @@ import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.TaskName.GENERATE_MODULE
 import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.TaskName.GENERATE_PUBLICATION
 import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.TaskName.PREPARE_MODULE_DESCRIPTOR
 import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.TaskName.PREPARE_PARAMETERS
-import dev.adamko.dokkatoo.dokka.parameters.DokkaModuleDescriptionGradleBuilder
 import dev.adamko.dokkatoo.dokka.parameters.DokkaPluginConfigurationGradleBuilder
-import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetGradleBuilder
 import java.io.Serializable
 import javax.inject.Inject
 import org.gradle.api.Named
@@ -123,17 +119,6 @@ abstract class DokkaPublication @Inject constructor(
   // TODO probably not needed any more, since Dokka Generator now runs in an isolated JVM process
   abstract val finalizeCoroutines: Property<Boolean>
 
-  /**
-   * Dokka Module Descriptions describe an independent Dokka publication, and these
-   * descriptions are used by _other_ Dokka Configurations.
-   *
-   * The other Dokka Modules must have been generated using [delayTemplateSubstitution] set to `true`.
-   *
-   * Only add a module if you want the Dokka Publication produced by _this project_ to be
-   * included in the Dokka Publication of _another_ project.
-   */
-  abstract val dokkaModules: NamedDomainObjectContainer<DokkaModuleDescriptionGradleBuilder>
-
   @Internal
   val taskNames = TaskNames()
 
@@ -154,10 +139,8 @@ abstract class DokkaPublication @Inject constructor(
   inner class ConfigurationNames : Serializable {
     val dokkaParametersConsumer: String = DOKKATOO_PARAMETERS.formatSuffix()
     val dokkaParametersOutgoing: String = DOKKATOO_PARAMETERS_OUTGOING.formatSuffix()
-    val moduleDescriptors = DOKKATOO_MODULE_DESCRIPTORS_CONSUMER.formatSuffix()
-    val moduleDescriptorsOutgoing = DOKKATOO_MODULE_DESCRIPTOR_PROVIDER.formatSuffix()
-    val moduleSourceOutputConsumer = DOKKATOO_MODULE_SOURCE_OUTPUT_CONSUMER.formatSuffix()
-    val moduleSourceOutputOutgoing = DOKKATOO_MODULE_SOURCE_OUTPUT_PROVIDER.formatSuffix()
+    val moduleDescriptorFiles = DOKKATOO_MODULE_FILES_CONSUMER.formatSuffix()
+    val moduleDescriptorFilesOutgoing = DOKKATOO_MODULE_FILES_PROVIDER.formatSuffix()
     val dokkaGeneratorClasspath = DOKKA_GENERATOR_CLASSPATH.formatSuffix()
     val dokkaPluginsClasspath = DOKKA_PLUGINS_CLASSPATH.formatSuffix()
     val dokkaPluginsIntransitiveClasspath = DOKKA_PLUGINS_INTRANSITIVE_CLASSPATH.formatSuffix()

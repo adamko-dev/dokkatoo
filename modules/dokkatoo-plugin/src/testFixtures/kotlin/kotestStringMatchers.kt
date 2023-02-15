@@ -7,17 +7,27 @@ import io.kotest.matchers.should
 import io.kotest.matchers.shouldNot
 
 
+infix fun String?.shouldContainAll(substrings: Iterable<String>): String? {
+  this should containAll(substrings)
+  return this
+}
+
+infix fun String?.shouldNotContainAll(substrings: Iterable<String>): String? {
+  this shouldNot containAll(substrings)
+  return this
+}
+
 fun String?.shouldContainAll(vararg substrings: String): String? {
-  this should containAll(*substrings)
+  this should containAll(substrings.asList())
   return this
 }
 
 fun String?.shouldNotContainAll(vararg substrings: String): String? {
-  this shouldNot containAll(*substrings)
+  this shouldNot containAll(substrings.asList())
   return this
 }
 
-private fun containAll(vararg substrings: String) =
+private fun containAll(substrings: Iterable<String>) =
   neverNullMatcher<String> { value ->
     MatcherResult(
       substrings.all { it in value },

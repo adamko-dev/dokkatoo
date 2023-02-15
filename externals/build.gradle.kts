@@ -27,6 +27,14 @@ val kotlinDokkaPrepareSource by tasks.registering(Sync::class) {
     }
   }
   into(layout.projectDirectory.dir("kotlin-dokka"))
+  exclude(
+    "*.github",
+    "*.gradle",
+    "**/gradlew",
+    "**/gradlew.bat",
+    "**/gradle/wrapper/gradle-wrapper.jar",
+    "**/gradle/wrapper/gradle-wrapper.properties",
+  )
 }
 
 configurations.kotlinDokkaSourceElements.configure {

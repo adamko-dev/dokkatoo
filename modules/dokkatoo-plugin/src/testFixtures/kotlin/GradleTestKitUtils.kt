@@ -15,8 +15,8 @@ import org.intellij.lang.annotations.Language
 
 
 class GradleProjectTest(
-  val projectDir: Path,
-) {
+  override val projectDir: Path,
+) : ProjectDirectoryScope {
   constructor(
     testProjectName: String,
     baseDir: Path = funcTestTempDir,
@@ -29,12 +29,6 @@ class GradleProjectTest(
   val testMavenRepoRelativePath: String =
     projectDir.relativize(testMavenRepoDir).toFile().invariantSeparatorsPath
 
-  fun createFile(filePath: String, contents: String): File =
-    projectDir.resolve(filePath).toFile().apply {
-      parentFile.mkdirs()
-      createNewFile()
-      writeText(contents)
-    }
 
   companion object {
 
@@ -49,9 +43,13 @@ class GradleProjectTest(
     }
 
     private val dokkaSourceDir: Path by systemProperty(Paths::get)
-    /** Directory that contains projects used for integration tests */
-    val integrationTestProjectsDir: Path by lazy {
+    /** Dokka Source directory that contains Gradle projects used for integration tests */
+    val dokkaSrcIntegrationTestProjectsDir: Path by lazy {
       dokkaSourceDir.resolve("integration-tests/gradle/projects")
+    }
+    /** Dokka Source directory that contains example Gradle projects */
+    val dokkaSrcExampleProjectsDir: Path by lazy {
+      dokkaSourceDir.resolve("examples/gradle")
     }
 
     private fun <T> systemProperty(
@@ -67,14 +65,14 @@ class GradleProjectTest(
 
 
 /**
- * Load a project from the [GradleProjectTest.integrationTestProjectsDir]
+ * Load a project from the [GradleProjectTest.dokkaSrcIntegrationTestProjectsDir]
  */
 fun gradleKtsProjectIntegrationTest(
   testProjectName: String,
   build: GradleProjectTest.() -> Unit,
 ): GradleProjectTest =
   GradleProjectTest(
-    baseDir = GradleProjectTest.integrationTestProjectsDir,
+    baseDir = GradleProjectTest.dokkaSrcIntegrationTestProjectsDir,
     testProjectName = testProjectName,
   ).apply(build)
 
@@ -188,41 +186,75 @@ private class TestProjectFileProvidedDelegate(
 }
 
 /** Delegate for reading and writing a [GradleProjectTest] file. */
-private class TestProjectFileDelegate(
+class TestProjectFileDelegate(
   private val filePath: String,
-) : ReadWriteProperty<GradleProjectTest, String> {
-  override fun getValue(thisRef: GradleProjectTest, property: KProperty<*>): String =
+) : ReadWriteProperty<ProjectDirectoryScope, String> {
+  override fun getValue(thisRef: ProjectDirectoryScope, property: KProperty<*>): String =
     thisRef.projectDir.resolve(filePath).toFile().readText()
 
-  override fun setValue(thisRef: GradleProjectTest, property: KProperty<*>, value: String) {
+  override fun setValue(thisRef: ProjectDirectoryScope, property: KProperty<*>, value: String) {
     thisRef.createFile(filePath, value)
   }
 }
 
 
+@DslMarker
+annotation class ProjectDirectoryDsl
+
+@ProjectDirectoryDsl
+interface ProjectDirectoryScope {
+  val projectDir: Path
+}
+
+private data class ProjectDirectoryScopeImpl(
+  override val projectDir: Path
+) : ProjectDirectoryScope
+
+
+fun ProjectDirectoryScope.createFile(filePath: String, contents: String): File =
+  projectDir.resolve(filePath).toFile().apply {
+    parentFile.mkdirs()
+    createNewFile()
+    writeText(contents)
+  }
+
+@ProjectDirectoryDsl
+fun ProjectDirectoryScope.dir(
+  path: String,
+  block: ProjectDirectoryScope.() -> Unit = {},
+): ProjectDirectoryScope =
+  ProjectDirectoryScopeImpl(projectDir.resolve(path)).apply(block)
+
+
+@ProjectDirectoryDsl
+fun ProjectDirectoryScope.file(
+  path: String
+): Path = projectDir.resolve(path)
+
+
 /** Set the content of `settings.gradle.kts` */
 @delegate:Language("kts")
-var GradleProjectTest.settingsGradleKts: String by TestProjectFileDelegate("settings.gradle.kts")
+var ProjectDirectoryScope.settingsGradleKts: String by TestProjectFileDelegate("settings.gradle.kts")
 
 
 /** Set the content of `build.gradle.kts` */
 @delegate:Language("kts")
-var GradleProjectTest.buildGradleKts: String by TestProjectFileDelegate("build.gradle.kts")
+var ProjectDirectoryScope.buildGradleKts: String by TestProjectFileDelegate("build.gradle.kts")
 
 
 /** Set the content of `settings.gradle` */
 @delegate:Language("groovy")
-var GradleProjectTest.settingsGradle: String by TestProjectFileDelegate("settings.gradle")
+var ProjectDirectoryScope.settingsGradle: String by TestProjectFileDelegate("settings.gradle")
 
 
 /** Set the content of `build.gradle` */
 @delegate:Language("groovy")
-var GradleProjectTest.buildGradle: String by TestProjectFileDelegate("build.gradle")
+var ProjectDirectoryScope.buildGradle: String by TestProjectFileDelegate("build.gradle")
 
 
 /** Set the content of `gradle.properties` */
 @delegate:Language("properties")
-var GradleProjectTest.gradleProperties: String by TestProjectFileDelegate("gradle.properties")
+var ProjectDirectoryScope.gradleProperties: String by TestProjectFileDelegate("gradle.properties")
 
 fun GradleProjectTest.createKotlinFile(filePath: String, @Language("kotlin") contents: String) =
   createFile(filePath, contents)

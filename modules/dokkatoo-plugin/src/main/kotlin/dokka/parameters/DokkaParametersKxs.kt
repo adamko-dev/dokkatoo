@@ -10,16 +10,13 @@ import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import java.io.File
 import java.net.URL
 import java.nio.file.Paths
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.UseSerializers
+import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import org.gradle.api.Named
-import org.gradle.api.logging.Logging
 import org.jetbrains.dokka.*
 
 
@@ -49,9 +46,8 @@ data class DokkaParametersKxs(
   val modulesKxs: List<DokkaModuleDescriptionKxs>,
 ) : DokkaConfiguration, Named {
 
-
-  override val modules: List<DokkaConfiguration.DokkaModuleDescription> =
-    modulesKxs.map { it.toCoreModel(outputDir) }
+  override val modules: List<DokkaConfiguration.DokkaModuleDescription>
+    get() = modulesKxs
 
   override fun getName(): String = moduleName
 
@@ -133,47 +129,18 @@ data class DokkaParametersKxs(
   @DokkatooInternalApi
   data class DokkaModuleDescriptionKxs(
     /** @see DokkaConfiguration.DokkaModuleDescription.name */
-    val moduleName: String,
+    override val name: String,
     /** @see DokkaConfiguration.DokkaModuleDescription.sourceOutputDirectory */
-    val sourceOutputDirectory: File,
+    override val sourceOutputDirectory: File,
     /** @see DokkaConfiguration.DokkaModuleDescription.includes */
-    val includes: Set<File>,
+    override val includes: Set<File>,
 
-//        /**
-//         * Not part of the Dokka spec - will be used before Dokka Generation to compute the relative dir
-//         * @see toCoreModel
-//         */
-//        val moduleOutputDirectory: File,
-  ) : java.io.Serializable, Named {
+    /** @see [org.gradle.api.Project.getPath] */
+    val modulePath: String,
+  ) : DokkaConfiguration.DokkaModuleDescription {
 
-    override fun getName(): String = moduleName
-
-    /**
-     * Map this Module Description to [DokkaConfiguration.DokkaModuleDescription]
-     *
-     * This is necessary because [DokkaConfiguration.DokkaModuleDescription] requires a relative path
-     * to the root output directory, and this is unknown when a [DokkaModuleDescriptionKxs] is created.
-     */
-    fun toCoreModel(
-      rootOutputDirectory: File
-    ): DokkaConfiguration.DokkaModuleDescription {
-//            val relativePathToOutputDirectory = moduleOutputDirectory.relativeToOrSelf(rootOutputDirectory)
-      val relativePathToOutputDirectory =
-        sourceOutputDirectory.relativeToOrSelf(rootOutputDirectory)
-
-      logger.info("relativePathToOutputDirectory: $relativePathToOutputDirectory")
-
-      return DokkaModuleDescriptionImpl(
-        name = name,
-        relativePathToOutputDirectory = relativePathToOutputDirectory,
-        sourceOutputDirectory = sourceOutputDirectory,
-        includes = includes,
-      )
-    }
-
-    companion object {
-      private val logger = Logging.getLogger(DokkaModuleDescriptionKxs::class.java)
-    }
+    override val relativePathToOutputDirectory =
+      File(modulePath.removePrefix(":").replace(':', '/'))
   }
 
 

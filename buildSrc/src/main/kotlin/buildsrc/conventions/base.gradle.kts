@@ -161,3 +161,9 @@ tasks.withType<Test>().configureEach {
 tasks.withType<TestReport>().configureEach {
   finalizedBy(updateTestReportCss)
 }
+
+tasks.matching { it.name == "validatePlugins" }.configureEach {
+  // prevent warning
+  // Task ':validatePlugins' uses this output of task ':updateTestReportCss' without declaring an explicit or implicit dependency.
+  mustRunAfter(updateTestReportCss)
+}

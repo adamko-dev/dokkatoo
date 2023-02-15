@@ -72,6 +72,7 @@ class DokkatooPluginFunctionalTest {
         |    - dev.adamko.dokkatoo.format   = $format
         |Artifacts
         |    - build/dokka-config/$format/dokka_parameters.json (artifactType = json)
+        |
       """.trimMargin().replace('/', File.separatorChar)
 
       build.output.invariantNewlines() shouldContain /* language=text */ """
@@ -91,38 +92,24 @@ class DokkatooPluginFunctionalTest {
         |    - org.gradle.jvm.environment     = standard-jvm
         |    - org.gradle.libraryelements     = jar
         |    - org.gradle.usage               = java-runtime
+        |
       """.trimMargin().replace('/', File.separatorChar)
 
       build.output.invariantNewlines() shouldContain /* language=text */ """
         |--------------------------------------------------
-        |Variant dokkatooModuleDescriptorsElements$formatCapitalized
+        |Variant dokkatooModuleElements$formatCapitalized
         |--------------------------------------------------
-        |Provide Dokka Module Descriptors for $format to other subprojects
+        |Provide Dokka Module files for $format to other subprojects
         |
         |Capabilities
         |    - :test:unspecified (default capability)
         |Attributes
         |    - dev.adamko.dokkatoo.base     = dokkatoo
-        |    - dev.adamko.dokkatoo.category = module-descriptor
+        |    - dev.adamko.dokkatoo.category = module-files
         |    - dev.adamko.dokkatoo.format   = $format
         |Artifacts
-        |    - build/dokka-config/${format}/module_descriptor.json (artifactType = json)
-      """.trimMargin().replace('/', File.separatorChar)
-
-      build.output.invariantNewlines() shouldContain /* language=text */ """
-        |--------------------------------------------------
-        |Variant dokkatooModuleSourceElements$formatCapitalized
-        |--------------------------------------------------
-        |Provide Dokka Module Source Output for $format to other subprojects
-        |
-        |Capabilities
-        |    - :test:unspecified (default capability)
-        |Attributes
-        |    - dev.adamko.dokkatoo.base     = dokkatoo
-        |    - dev.adamko.dokkatoo.category = module-source
-        |    - dev.adamko.dokkatoo.format   = $format
-        |Artifacts
-        |    - build/dokka-module/$format
+        |    - build/dokka-config/$format/module_descriptor.json (artifactType = json)
+        |    - build/dokka-module/$format (artifactType = directory)
         |
       """.trimMargin().replace('/', File.separatorChar)
     }
@@ -147,7 +134,8 @@ class DokkatooPluginFunctionalTest {
         |Fetch all Dokkatoo files from all configurations in other subprojects
         |
         |Attributes
-        |    - dev.adamko.dokkatoo.base = dokka
+        |    - dev.adamko.dokkatoo.base = dokkatoo
+        |
       """.trimMargin()
     }
 
@@ -166,6 +154,7 @@ class DokkatooPluginFunctionalTest {
         |    - dev.adamko.dokkatoo.format   = $format
         |Extended Configurations
         |    - dokkatoo
+        |
       """.trimMargin()
 
 
@@ -186,6 +175,7 @@ class DokkatooPluginFunctionalTest {
         |    - org.gradle.usage               = java-runtime
         |Extended Configurations
         |    - dokkatooPlugin$formatCapitalized
+        |
      """.trimMargin()
 
       build.output.invariantNewlines() shouldContain /* language=text */ """
@@ -203,6 +193,7 @@ class DokkatooPluginFunctionalTest {
         |    - org.gradle.jvm.environment     = standard-jvm
         |    - org.gradle.libraryelements     = jar
         |    - org.gradle.usage               = java-runtime
+        |
       """.trimMargin()
 
       build.output.invariantNewlines() shouldContain /* language=text */ """
@@ -222,6 +213,7 @@ class DokkatooPluginFunctionalTest {
         |    - org.gradle.usage               = java-runtime
         |Extended Configurations
         |    - dokkatooPlugin$formatCapitalized
+        |
       """.trimMargin()
     }
 

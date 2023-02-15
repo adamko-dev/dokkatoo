@@ -17,6 +17,7 @@ import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
+import org.gradle.api.tasks.PathSensitivity.RELATIVE
 
 /**
  * Builds the Dokka Parameters that the Dokka Generator will use to produce a Dokka Publication for this project.
@@ -35,16 +36,16 @@ abstract class DokkatooPrepareParametersTask @Inject constructor(
   /** Dokka Configuration files from other subprojects that will be merged into this Dokka Configuration */
   @get:InputFiles
 //    @get:NormalizeLineEndings
-  @get:PathSensitive(PathSensitivity.NAME_ONLY)
+  @get:PathSensitive(RELATIVE)
   @get:Optional
   abstract val dokkaSubprojectParameters: ConfigurableFileCollection
 
-  /** Dokka Module Configuration files from other subprojects. */
+  /** Dokka Module files from other subprojects. */
   @get:InputFiles
 //    @get:NormalizeLineEndings
-  @get:PathSensitive(PathSensitivity.NAME_ONLY)
+  @get:PathSensitive(RELATIVE)
   @get:Optional
-  abstract val dokkaModuleDescriptorFiles: ConfigurableFileCollection
+  abstract val dokkaModuleFiles: ConfigurableFileCollection
 
   @get:LocalState
   abstract val cacheRoot: DirectoryProperty
@@ -59,7 +60,7 @@ abstract class DokkatooPrepareParametersTask @Inject constructor(
   abstract val failOnWarning: Property<Boolean>
 
   @get:InputFiles
-  @get:PathSensitive(PathSensitivity.RELATIVE)
+  @get:PathSensitive(RELATIVE)
   abstract val includes: ConfigurableFileCollection
 
   @get:Input
@@ -135,7 +136,9 @@ abstract class DokkatooPrepareParametersTask @Inject constructor(
       logger.info("Dokka source set ${it.sourceSetID.get()} ${if (suppressed) "is" else "isn't"} suppressed")
       suppressed
     }.map(DokkaSourceSetGradleBuilder::build)
+
     val pluginsClasspath = pluginsClasspath.files.toList()
+
     val pluginsConfiguration =
       pluginsConfiguration.map(DokkaPluginConfigurationGradleBuilder::build)
     val failOnWarning = failOnWarning.get()
@@ -176,7 +179,7 @@ abstract class DokkatooPrepareParametersTask @Inject constructor(
     // now combine them:
     return subprojectConfigs.fold(baseDokkaConfiguration) { acc, it: DokkaParametersKxs ->
       acc.copy(
-        sourceSets = acc.sourceSets + it.sourceSets,
+//        sourceSets = acc.sourceSets + it.sourceSets,
         // TODO remove plugin classpath aggregation, plugin classpath should be shared via Gradle Configuration
         //      so Gradle can correctly de-duplicate jars
 //                pluginsClasspath = acc.pluginsClasspath + it.pluginsClasspath,
@@ -186,18 +189,21 @@ abstract class DokkatooPrepareParametersTask @Inject constructor(
 //    return baseDokkaConfiguration
   }
 
-  private fun dokkaModuleDescriptors(): List<DokkaParametersKxs.DokkaModuleDescriptionKxs> =
-    dokkaModuleDescriptorFiles.files.map { file ->
-      try {
-        val fileContent = file.readText()
-        jsonMapper.decodeFromString(
-          DokkaParametersKxs.DokkaModuleDescriptionKxs.serializer(),
-          fileContent,
-        )
-      } catch (ex: Exception) {
-        throw IOException("Could not parse DokkaModuleDescriptionKxs from $file", ex)
+  private fun dokkaModuleDescriptors(): List<DokkaParametersKxs.DokkaModuleDescriptionKxs> {
+    return dokkaModuleFiles.asFileTree
+      .matching { include("**/module_descriptor.json") }
+      .files.map { file ->
+        try {
+          val fileContent = file.readText()
+          jsonMapper.decodeFromString(
+            DokkaParametersKxs.DokkaModuleDescriptionKxs.serializer(),
+            fileContent,
+          )
+        } catch (ex: Exception) {
+          throw IOException("Could not parse DokkaModuleDescriptionKxs from $file", ex)
+        }
       }
-    }
+  }
 
   @get:Input
   @Deprecated("TODO write adapter to the new DSL")

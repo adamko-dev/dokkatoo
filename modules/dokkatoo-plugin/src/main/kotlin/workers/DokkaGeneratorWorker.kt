@@ -37,10 +37,12 @@ abstract class DokkaGeneratorWorker : WorkAction<DokkaGeneratorWorker.Parameters
     logger.info("DokkaGeneratorWorker completed in $duration")
   }
 
-  // can't use kotlin.time.measureTime {} because the implementation isn't stable across Kotlin versions
-  private fun measureTime(block: () -> Unit): Duration =
-    System.nanoTime().let { startTime ->
-      block()
-      (System.nanoTime() - startTime).nanoseconds
-    }
+  companion object {
+    // can't use kotlin.time.measureTime {} because the implementation isn't stable across Kotlin versions
+    private fun measureTime(block: () -> Unit): Duration =
+      System.nanoTime().let { startTime ->
+        block()
+        (System.nanoTime() - startTime).nanoseconds
+      }
+  }
 }

@@ -23,8 +23,9 @@ abstract class DokkatooExtension : ExtensionAware {
   /** Default Dokkatoo cache directory */
   abstract val dokkatooCacheDirectory: DirectoryProperty
 
-  abstract val moduleNameDefault: Property<String>
-  abstract val moduleVersionDefault: Property<String>
+  abstract val moduleName: Property<String>
+  abstract val moduleVersion: Property<String>
+  abstract val modulePath: Property<String>
 
   /**
    * String used to discriminate between source sets that originate from different Gradle subprojects
