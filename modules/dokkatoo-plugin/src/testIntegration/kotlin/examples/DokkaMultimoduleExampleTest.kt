@@ -140,9 +140,7 @@ private fun initDokkaProject(
   return GradleProjectTest(destinationDir.toPath()).apply {
     copyExampleProject()
 
-    val dokkaVersion =
-      "for-integration-tests-SNAPSHOT"
-//      "1.7.20"
+    val dokkaVersion = "1.7.20"
     settingsGradleKts = settingsGradleKts
       .replace(
         Regex("""id\("org\.jetbrains\.dokka"\) version \("[\d.]+"\)"""),
