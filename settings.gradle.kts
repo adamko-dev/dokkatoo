@@ -44,3 +44,7 @@ include(
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 enableFeaturePreview("STABLE_CONFIGURATION_CACHE")
+
+//if (file("./externals/kotlin-dokka").exists()) {
+//  includeBuild("./externals/kotlin-dokka")
+//}
