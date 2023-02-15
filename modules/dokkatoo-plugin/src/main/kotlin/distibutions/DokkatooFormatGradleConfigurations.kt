@@ -10,6 +10,7 @@ import org.gradle.api.artifacts.Configuration
  */
 @DokkatooInternalApi
 internal data class DokkatooFormatGradleConfigurations(
+// rename to DokkatooFormatDependencyCollections?
 
 //    /** Fetch all Dokka files from all configurations in other subprojects */
 //    val dokkaConsumer: NamedDomainObjectProvider<Configuration>,
@@ -20,15 +21,10 @@ internal data class DokkatooFormatGradleConfigurations(
   /** Provide Dokka Parameter files to other subprojects */
   val dokkaParametersOutgoing: NamedDomainObjectProvider<Configuration>,
 
-  /** Fetch Dokka Module Descriptor files from other subprojects */
-  val dokkaModuleDescriptorsConsumer: NamedDomainObjectProvider<Configuration>,
-  /** Provide Dokka Module Descriptor files to other subprojects */
-  val dokkaModuleDescriptorsOutgoing: NamedDomainObjectProvider<Configuration>,
-
-  /** Fetch Dokka Module Source Outputs from other subprojects */
-  val dokkaModuleSourceOutputsConsumer: NamedDomainObjectProvider<Configuration>,
-  /** Provide Dokka Module Source Outputs to other subprojects */
-  val dokkaModuleSourceOutputsOutgoing: NamedDomainObjectProvider<Configuration>,
+  /** Fetch Dokka Module files from other subprojects */
+  val dokkaModuleConsumer: NamedDomainObjectProvider<Configuration>,
+  /** Provide Dokka Module files to other subprojects */
+  val dokkaModuleOutgoing: NamedDomainObjectProvider<Configuration>,
 
 
   /**

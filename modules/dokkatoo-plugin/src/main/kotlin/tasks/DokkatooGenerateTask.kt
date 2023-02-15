@@ -11,6 +11,7 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
+import org.gradle.api.tasks.PathSensitivity.NAME_ONLY
 import org.gradle.api.tasks.PathSensitivity.RELATIVE
 import org.gradle.kotlin.dsl.submit
 import org.gradle.workers.WorkerExecutor
@@ -26,7 +27,7 @@ abstract class DokkatooGenerateTask @Inject constructor(
 ) : DokkatooTask() {
 
   @get:InputFile
-  @get:PathSensitive(RELATIVE)
+  @get:PathSensitive(NAME_ONLY)
   abstract val dokkaParametersJson: RegularFileProperty
 
   @get:Classpath
@@ -42,9 +43,9 @@ abstract class DokkatooGenerateTask @Inject constructor(
   abstract val outputDirectory: DirectoryProperty
 
   /**
-   * Generating a Dokka Module? Set this to `true`.
+   * Generating a Dokka Module? Set this to [GenerationType.MODULE].
    *
-   * Generating a Dokka Publication? `false`.
+   * Generating a Dokka Publication? [GenerationType.PUBLICATION].
    */
   @get:Input
   abstract val generationType: Property<GenerationType>
@@ -52,7 +53,11 @@ abstract class DokkatooGenerateTask @Inject constructor(
   @get:InputFiles
   @get:Optional
   @get:PathSensitive(RELATIVE)
-  abstract val dokkaModuleSourceDirectories: ConfigurableFileCollection
+  abstract val dokkaModuleFiles: ConfigurableFileCollection
+
+  @get:Input
+  @get:Optional
+  abstract val enableWorkerDebug: Property<Boolean>
 
   enum class GenerationType {
     MODULE,
@@ -79,13 +84,18 @@ abstract class DokkatooGenerateTask @Inject constructor(
 
     logger.info("dokkaParameters: $dokkaParameters")
 
+    dokkaParameters.modulesKxs.forEach {
+      // workaround https://github.com/Kotlin/dokka/issues/2866
+      outputDirectory.dir(it.modulePath).get().asFile.mkdirs()
+    }
+
     logger.info("DokkaGeneratorWorker runtimeClasspath: ${runtimeClasspath.files.joinToString("\n") { it.name }}")
 
     val workQueue = workers.processIsolation {
       classpath.from(runtimeClasspath)
-//            classpath.from(pluginClasspath)
       forkOptions {
         defaultCharacterEncoding = "UTF-8"
+        debug = enableWorkerDebug.getOrElse(false)
       }
     }
 

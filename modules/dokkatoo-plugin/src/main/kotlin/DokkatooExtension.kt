@@ -25,6 +25,7 @@ abstract class DokkatooExtension : ExtensionAware {
 
   abstract val moduleName: Property<String>
   abstract val moduleVersion: Property<String>
+  abstract val modulePath: Property<String>
 
   /**
    * String used to discriminate between source sets that originate from different Gradle subprojects

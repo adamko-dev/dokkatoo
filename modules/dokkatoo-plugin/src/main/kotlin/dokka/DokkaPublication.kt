@@ -14,9 +14,7 @@ import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.TaskName.GENERATE_MODULE
 import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.TaskName.GENERATE_PUBLICATION
 import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.TaskName.PREPARE_MODULE_DESCRIPTOR
 import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.TaskName.PREPARE_PARAMETERS
-import dev.adamko.dokkatoo.dokka.parameters.DokkaModuleDescriptionGradleBuilder
 import dev.adamko.dokkatoo.dokka.parameters.DokkaPluginConfigurationGradleBuilder
-import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetGradleBuilder
 import java.io.Serializable
 import javax.inject.Inject
 import org.gradle.api.Named
@@ -122,17 +120,6 @@ abstract class DokkaPublication @Inject constructor(
   @get:Input
   // TODO probably not needed any more, since Dokka Generator now runs in an isolated JVM process
   abstract val finalizeCoroutines: Property<Boolean>
-
-  /**
-   * Dokka Module Descriptions describe an independent Dokka publication, and these
-   * descriptions are used by _other_ Dokka Configurations.
-   *
-   * The other Dokka Modules must have been generated using [delayTemplateSubstitution] set to `true`.
-   *
-   * Only add a module if you want the Dokka Publication produced by _this project_ to be
-   * included in the Dokka Publication of _another_ project.
-   */
-  abstract val dokkaModules: NamedDomainObjectContainer<DokkaModuleDescriptionGradleBuilder>
 
   @Internal
   val taskNames = TaskNames()
