@@ -29,7 +29,10 @@ private fun buildTreeString(
       append("$margin${currentPrefix}${entry.name}")
 
       if (entry.isDirectory) {
-        append("/\n")
+        append("/")
+        if (entry.countDirectoryEntries() > 0) {
+          append("\n")
+        }
         append(buildTreeString(entry, margin + nextPrefix))
       }
     }
@@ -38,6 +41,10 @@ private fun buildTreeString(
 
 private fun File.listDirectoryEntries(): Sequence<File> =
   walkTopDown().maxDepth(1).filter { it != this@listDirectoryEntries }
+
+
+private fun File.countDirectoryEntries(): Int =
+  listDirectoryEntries().count()
 
 private data class PrefixPair(
   /** The current entry should be prefixed with this */
