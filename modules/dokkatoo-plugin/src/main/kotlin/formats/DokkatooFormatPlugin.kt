@@ -5,6 +5,7 @@ import dev.adamko.dokkatoo.DokkatooExtension
 import dev.adamko.dokkatoo.adapters.DokkatooJavaAdapter
 import dev.adamko.dokkatoo.adapters.DokkatooKotlinAdapter
 import dev.adamko.dokkatoo.dokka.DokkaPublication
+import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import dev.adamko.dokkatoo.internal.versions
 import javax.inject.Inject
 import org.gradle.api.Plugin
@@ -51,6 +52,10 @@ abstract class DokkatooFormatPlugin @Inject constructor(
     }
   }
 
+  /**
+   * Utility for adding dependencies to [org.gradle.api.artifacts.Configuration]s.
+   */
+  @DokkatooInternalApi
   class PublicationPluginContext(
     val project: Project,
     val dokkatooExtension: DokkatooExtension,
