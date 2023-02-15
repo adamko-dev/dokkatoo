@@ -1,9 +1,7 @@
 package dev.adamko.dokkatoo.dokka
 
-import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKATOO_MODULE_DESCRIPTORS_CONSUMER
-import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKATOO_MODULE_DESCRIPTOR_PROVIDER
-import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKATOO_MODULE_SOURCE_OUTPUT_CONSUMER
-import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKATOO_MODULE_SOURCE_OUTPUT_PROVIDER
+import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKATOO_MODULE_FILES_CONSUMER
+import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKATOO_MODULE_FILES_PROVIDER
 import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKATOO_PARAMETERS
 import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKATOO_PARAMETERS_OUTGOING
 import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKA_GENERATOR_CLASSPATH
@@ -141,10 +139,8 @@ abstract class DokkaPublication @Inject constructor(
   inner class ConfigurationNames : Serializable {
     val dokkaParametersConsumer: String = DOKKATOO_PARAMETERS.formatSuffix()
     val dokkaParametersOutgoing: String = DOKKATOO_PARAMETERS_OUTGOING.formatSuffix()
-    val moduleDescriptors = DOKKATOO_MODULE_DESCRIPTORS_CONSUMER.formatSuffix()
-    val moduleDescriptorsOutgoing = DOKKATOO_MODULE_DESCRIPTOR_PROVIDER.formatSuffix()
-    val moduleSourceOutputConsumer = DOKKATOO_MODULE_SOURCE_OUTPUT_CONSUMER.formatSuffix()
-    val moduleSourceOutputOutgoing = DOKKATOO_MODULE_SOURCE_OUTPUT_PROVIDER.formatSuffix()
+    val moduleDescriptorFiles = DOKKATOO_MODULE_FILES_CONSUMER.formatSuffix()
+    val moduleDescriptorFilesOutgoing = DOKKATOO_MODULE_FILES_PROVIDER.formatSuffix()
     val dokkaGeneratorClasspath = DOKKA_GENERATOR_CLASSPATH.formatSuffix()
     val dokkaPluginsClasspath = DOKKA_PLUGINS_CLASSPATH.formatSuffix()
     val dokkaPluginsIntransitiveClasspath = DOKKA_PLUGINS_INTRANSITIVE_CLASSPATH.formatSuffix()

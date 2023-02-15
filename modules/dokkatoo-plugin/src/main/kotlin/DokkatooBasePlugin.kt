@@ -266,7 +266,9 @@ abstract class DokkatooBasePlugin @Inject constructor(
       }
       gradleConfigurations.dokkaModuleOutgoing.configure {
         outgoing {
-          artifact(generateModule.flatMap { it.outputDirectory })
+          artifact(generateModule.flatMap { it.outputDirectory }) {
+            type = "directory"
+          }
         }
       }
     }
@@ -415,25 +417,25 @@ abstract class DokkatooBasePlugin @Inject constructor(
 
     //<editor-fold desc="Dokka Module files">
     val dokkaModuleConsumer =
-      configurations.register(configurationNames.moduleDescriptors) {
+      configurations.register(configurationNames.moduleDescriptorFiles) {
         description = "Fetch Dokka Module files for $formatName from other subprojects"
         asConsumer()
         extendsFrom(dokkaConsumer.get())
         isVisible = false
         attributes {
-          dokkaCategory(attributes.dokkaModuleDescriptors)
+          dokkaCategory(attributes.dokkaModuleFiles)
         }
       }
 
     val dokkaModuleOutgoing =
-      configurations.register(configurationNames.moduleDescriptorsOutgoing) {
+      configurations.register(configurationNames.moduleDescriptorFilesOutgoing) {
         description = "Provide Dokka Module files for $formatName to other subprojects"
         asProvider()
         // extend from dokkaConfigurationsConsumer, so Dokka Module Configs propagate api() style
         extendsFrom(dokkaModuleConsumer.get())
         isVisible = true
         attributes {
-          dokkaCategory(attributes.dokkaModuleDescriptors)
+          dokkaCategory(attributes.dokkaModuleFiles)
         }
       }
     //</editor-fold>
@@ -557,16 +559,11 @@ abstract class DokkatooBasePlugin @Inject constructor(
       /** Name of the [Configuration] that _provides_ [org.jetbrains.dokka.DokkaConfiguration] to other projects */
       const val DOKKATOO_PARAMETERS_OUTGOING = "dokkatooParametersElements"
 
-      /** Name of the [Configuration] that _consumes_ [org.jetbrains.dokka.DokkaConfiguration.DokkaModuleDescription] from projects */
-      const val DOKKATOO_MODULE_DESCRIPTORS_CONSUMER = "dokkatooModuleDescriptors"
+      /** Name of the [Configuration] that _consumes_ all [org.jetbrains.dokka.DokkaConfiguration.DokkaModuleDescription] files */
+      const val DOKKATOO_MODULE_FILES_CONSUMER = "dokkatooModule"
 
-      /** Name of the [Configuration] that _provides_ [org.jetbrains.dokka.DokkaConfiguration.DokkaModuleDescription] to other projects */
-      const val DOKKATOO_MODULE_DESCRIPTOR_PROVIDER =
-        "${DOKKATOO_MODULE_DESCRIPTORS_CONSUMER}Elements"
-
-
-      const val DOKKATOO_MODULE_SOURCE_OUTPUT_CONSUMER = "dokkatooModuleSource"
-      const val DOKKATOO_MODULE_SOURCE_OUTPUT_PROVIDER = "dokkatooModuleSourceElements"
+      /** Name of the [Configuration] that _provides_ all [org.jetbrains.dokka.DokkaConfiguration.DokkaModuleDescription] files to other projects */
+      const val DOKKATOO_MODULE_FILES_PROVIDER = "${DOKKATOO_MODULE_FILES_CONSUMER}Elements"
 
       /**
        * Classpath used to execute the Dokka Generator.

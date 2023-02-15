@@ -26,9 +26,9 @@ abstract class DokkatooConfigurationAttributes @Inject constructor(
   /** for [Configuration]s that provide or consume Dokka parameter files */
   val dokkaParameters: DokkatooCategoryAttribute = objects.named("generator-parameters")
 
-  /** for [Configuration]s that provide or consume Dokka module descriptor files */
-  val dokkaModuleDescriptors: DokkatooCategoryAttribute = objects.named("module-descriptor")
-  val dokkaModuleSource: DokkatooCategoryAttribute = objects.named("module-source")
+  /** for [Configuration]s that provide or consume Dokka Module files */
+  val dokkaModuleFiles: DokkatooCategoryAttribute = objects.named("module-files")
+//  val dokkaModuleSource: DokkatooCategoryAttribute = objects.named("module-source")
 
   val dokkaGeneratorClasspath: DokkatooCategoryAttribute = objects.named("generator-classpath")
 
