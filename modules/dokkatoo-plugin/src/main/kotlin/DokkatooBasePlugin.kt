@@ -216,12 +216,7 @@ abstract class DokkatooBasePlugin @Inject constructor(
         suppressObviousFunctions.set(this@publication.suppressObviousFunctions)
 
         dokkaSourceSets.configureEach dss@{
-          sourceSetScope.convention(
-            // TODO make the new plugin generate _exactly_ the same publication as the old plugin,
-            //      so make the sourceSetScope match the old task path (e.g. :dokkaHtml, :dokkaGfm)
-            //      This should be replaced with: `dokkatooExtension.sourceSetScopeDefault`
-            this@task.path.replace(":prepareDokkatooParameters", ":dokka")
-          )
+          sourceSetScope.convention(this@task.path)
         }
       }
 

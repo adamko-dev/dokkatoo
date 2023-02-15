@@ -148,6 +148,11 @@ dokkatoo {
   }
 }
 
+tasks.withType<dev.adamko.dokkatoo.tasks.DokkatooPrepareParametersTask>().configureEach { 
+  dokkaSourceSets.configureEach { 
+    sourceSetScope.set(":dokkaHtml")
+  }
+}
 
 """.trimIndent()
 

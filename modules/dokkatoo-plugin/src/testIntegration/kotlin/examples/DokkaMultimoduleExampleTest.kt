@@ -7,6 +7,7 @@ import io.kotest.assertions.withClue
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.file.shouldHaveSameStructureAndContentAs
 import io.kotest.matchers.file.shouldHaveSameStructureAs
+import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
@@ -56,7 +57,7 @@ class DokkaMultimoduleExampleTest : FunSpec({
 
     context("expect dokka and dokkatoo HTML is the same") {
       val dokkaHtmlDir =
-        dokkaProject.projectDir.resolve("parentProject/build/dokka/htmlMultiModule")
+        dokkaProject.projectDir.resolve("parentProject/build/dokka/html")
       val dokkatooHtmlDir = dokkatooProject.projectDir.resolve("parentProject/build/dokka/html")
 
       test("expect file trees are the same") {
@@ -87,22 +88,24 @@ class DokkaMultimoduleExampleTest : FunSpec({
       dokkatooBuild.output shouldContain "BUILD SUCCESSFUL"
       dokkatooBuild.output shouldContain "Generation completed successfully"
 
-      val dokkatooBuildCache =
-        dokkatooProject.runner.withArguments(
-          ":parentProject:dokkatooGeneratePublicationHtml",
-          "--stacktrace",
-          "--info",
-          "--build-cache",
-        ).forwardOutput()
-          .build()
+      dokkatooProject.runner.withArguments(
+        ":parentProject:dokkatooGeneratePublicationHtml",
+        "--stacktrace",
+        "--info",
+        "--build-cache",
+      ).forwardOutput()
+        .build().should { dokkatooBuildCache ->
 
-      dokkatooBuildCache.output shouldContainAll listOf(
-        "Task :prepareDokkatooParametersHtml UP-TO-DATE",
-        "Task :dokkatooGeneratePublicationHtml UP-TO-DATE",
-      )
-      withClue("Dokka Generator should not be triggered, so check it doesn't log anything") {
-        dokkatooBuild.output shouldNotContain "Generation completed successfully"
-      }
+          dokkatooBuildCache.output shouldContainAll listOf(
+            "> Task :parentProject:prepareDokkatooParametersHtml UP-TO-DATE",
+            "> Task :parentProject:dokkatooGeneratePublicationHtml UP-TO-DATE",
+            "BUILD SUCCESSFUL",
+            "8 actionable tasks: 8 up-to-date",
+          )
+          withClue("Dokka Generator should not be triggered, so check it doesn't log anything") {
+            dokkatooBuildCache.output shouldNotContain "Generation completed successfully"
+          }
+        }
     }
 
     xtest("expect Dokkatoo is compatible with Gradle Configuration Cache") {
@@ -176,6 +179,23 @@ private fun initDokkaProject(
     // compileOnly("org.jetbrains.dokka:templating-plugin:1.7.20")
     // compileOnly("org.jetbrains.dokka:kotlin-analysis-intellij:1.7.20")
     """.trimIndent()
+
+    dir("parentProject") {
+
+      buildGradleKts += """
+        |
+        |val hackDokkaHtmlDir by tasks.registering(Sync::class) {
+        |  // sync directories so the dirs in both dokka and dokkatoo are the same
+        |  from(layout.buildDirectory.dir("dokka/htmlMultiModule"))
+        |  into(layout.buildDirectory.dir("dokka/html"))
+        |}
+        |
+        |tasks.matching { "dokka" in it.name.toLowerCase() && it.name != hackDokkaHtmlDir.name }.configureEach { 
+        |  finalizedBy(hackDokkaHtmlDir)
+        |}
+        |
+      """.trimMargin()
+    }
   }
 }
 
@@ -244,15 +264,13 @@ private fun initDokkatooProject(
           |  dokkatooSourceSets.configureEach { 
           |    includes.from("Module.md")
           |  }
-          |  //dokkatooSourceSets.configureEach { 
-          |  //  includes.from(
-          |  //    layout
-          |  //      .projectDirectory
-          |  //      .dir("src/main")
-          |  //      .asFileTree
-          |  //      .matching { include("**/Module.md") }
-          |  //  )
-          |  //}
+          |  modulePath.set("childProjectA") // match the original dokka default 
+          |}
+          |
+          |tasks.withType<dev.adamko.dokkatoo.tasks.DokkatooPrepareParametersTask>().configureEach { 
+          |  dokkaSourceSets.configureEach { 
+          |    sourceSetScope.set(":parentProject:childProjectA:dokkaHtmlPartial")
+          |  }
           |}
           |
         """.trimMargin()
@@ -268,15 +286,13 @@ private fun initDokkatooProject(
           |  dokkatooSourceSets.configureEach { 
           |    includes.from("Module.md")
           |  }
-          |  //dokkatooSourceSets.configureEach { 
-          |  //  includes.from(
-          |  //    layout
-          |  //      .projectDirectory
-          |  //      .dir("src/main")
-          |  //      .asFileTree
-          |  //      .matching { include("**/Module.md") }
-          |  //  )
-          |  //}
+          |  modulePath.set("childProjectB") // match the original dokka default
+          |}
+          |
+          |tasks.withType<dev.adamko.dokkatoo.tasks.DokkatooPrepareParametersTask>().configureEach { 
+          |  dokkaSourceSets.configureEach { 
+          |    sourceSetScope.set(":parentProject:childProjectB:dokkaHtmlPartial")
+          |  }
           |}
           |
         """.trimMargin()
