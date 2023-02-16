@@ -1,0 +1,16 @@
+rootProject.name = "it-collector-0"
+
+pluginManagement {
+  repositories {
+    gradlePluginPortal()
+    mavenCentral()
+    maven { url = providers.gradleProperty("testMavenRepo") }
+  }
+}
+
+dependencyResolutionManagement {
+  repositories {
+    mavenCentral()
+    maven { url = providers.gradleProperty("testMavenRepo") }
+  }
+}

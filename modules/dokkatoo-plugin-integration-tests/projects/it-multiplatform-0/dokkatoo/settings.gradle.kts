@@ -1,9 +1,6 @@
-rootProject.name = "dokkatoo-multimodule-example"
+rootProject.name = "it-multiplatform-0"
 
 pluginManagement {
-  plugins {
-    kotlin("jvm") version "1.7.20"
-  }
   repositories {
     gradlePluginPortal()
     mavenCentral()
@@ -18,7 +15,3 @@ dependencyResolutionManagement {
     maven(providers.gradleProperty("testMavenRepo"))
   }
 }
-
-include(":parentProject")
-include(":parentProject:childProjectA")
-include(":parentProject:childProjectB")
