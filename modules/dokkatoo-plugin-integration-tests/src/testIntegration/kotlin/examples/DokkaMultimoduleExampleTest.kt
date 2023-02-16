@@ -127,9 +127,9 @@ class DokkaMultimoduleExampleTest : FunSpec({
 })
 
 
-private fun GradleProjectTest.copyExampleProject() {
+fun GradleProjectTest.copyExampleProject(dir: String) {
   exampleProjectsDir
-    .resolve("multimodule-example/dokka")
+    .resolve("multimodule-example/$dir")
     .toFile()
     .copyRecursively(projectDir.toFile(), overwrite = true) { _, _ -> OnErrorAction.SKIP }
 }
@@ -138,7 +138,7 @@ private fun initDokkaProject(
   destinationDir: File,
 ): GradleProjectTest {
   return GradleProjectTest(destinationDir.toPath()).apply {
-    copyExampleProject()
+    copyExampleProject("dokka")
 
     val dokkaVersion = "1.7.20"
     settingsGradleKts = settingsGradleKts
@@ -201,100 +201,6 @@ private fun initDokkatooProject(
   destinationDir: File,
 ): GradleProjectTest {
   return GradleProjectTest(destinationDir.toPath()).apply {
-    copyExampleProject()
-
-    settingsGradleKts = """
-      |rootProject.name = "dokkatoo-multimodule-example"
-      |
-      |pluginManagement {
-      |    plugins {
-      |        kotlin("jvm") version "1.7.20"
-      |    }
-      |    repositories {
-      |        gradlePluginPortal()
-      |        mavenCentral()
-      |        maven(file("$testMavenRepoRelativePath"))
-      |    }
-      |}
-      |
-      |@Suppress("UnstableApiUsage")
-      |dependencyResolutionManagement {
-      |    repositories {
-      |        mavenCentral()
-      |        maven(file("$testMavenRepoRelativePath"))
-      |    }
-      |}
-      |
-      |include(":parentProject")
-      |include(":parentProject:childProjectA")
-      |include(":parentProject:childProjectB")
-      |
-    """.trimMargin()
-
-
-    file("build.gradle.kts").toFile().delete()
-
-    dir("parentProject") {
-
-      buildGradleKts = """
-        |plugins {
-        |  kotlin("jvm") version "1.7.20" apply false
-        |  id("dev.adamko.dokkatoo") version "0.0.1-SNAPSHOT"
-        |}
-        |
-        |dependencies {
-        |  dokkatoo(project(":parentProject:childProjectA"))
-        |  dokkatoo(project(":parentProject:childProjectB"))
-        |  dokkatooPluginHtml("org.jetbrains.dokka:all-modules-page-plugin:1.7.20")
-        |  dokkatooPluginHtml("org.jetbrains.dokka:templating-plugin:1.7.20")
-        |}
-        |
-      """.trimMargin()
-
-      dir("childProjectA") {
-        buildGradleKts = """
-          |plugins {
-          |  kotlin("jvm")
-          |  id("dev.adamko.dokkatoo") version "0.0.1-SNAPSHOT"
-          |}
-          |
-          |dokkatoo {
-          |  dokkatooSourceSets.configureEach { 
-          |    includes.from("Module.md")
-          |  }
-          |  modulePath.set("childProjectA") // match the original dokka default 
-          |}
-          |
-          |tasks.withType<dev.adamko.dokkatoo.tasks.DokkatooPrepareParametersTask>().configureEach { 
-          |  dokkaSourceSets.configureEach { 
-          |    sourceSetScope.set(":parentProject:childProjectA:dokkaHtmlPartial")
-          |  }
-          |}
-          |
-        """.trimMargin()
-      }
-      dir("childProjectB") {
-        buildGradleKts = """
-          |plugins {
-          |  kotlin("jvm")
-          |  id("dev.adamko.dokkatoo") version "0.0.1-SNAPSHOT"
-          |}
-          |
-          |dokkatoo {
-          |  dokkatooSourceSets.configureEach { 
-          |    includes.from("Module.md")
-          |  }
-          |  modulePath.set("childProjectB") // match the original dokka default
-          |}
-          |
-          |tasks.withType<dev.adamko.dokkatoo.tasks.DokkatooPrepareParametersTask>().configureEach { 
-          |  dokkaSourceSets.configureEach { 
-          |    sourceSetScope.set(":parentProject:childProjectB:dokkaHtmlPartial")
-          |  }
-          |}
-          |
-        """.trimMargin()
-      }
-    }
+    copyExampleProject("dokkatoo")
   }
 }

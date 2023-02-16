@@ -1,4 +1,4 @@
-rootProject.name = "dokkatoo-it-basic"
+rootProject.name = "it-basic"
 
 pluginManagement {
   repositories {
