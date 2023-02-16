@@ -44,13 +44,9 @@ class GradleProjectTest(
 
     private val dokkaSourceDir: Path by systemProperty(Paths::get)
     /** Dokka Source directory that contains Gradle projects used for integration tests */
-    val dokkaSrcIntegrationTestProjectsDir: Path by lazy {
-      dokkaSourceDir.resolve("integration-tests/gradle/projects")
-    }
+    val integrationTestProjectsDir: Path by systemProperty(Paths::get)
     /** Dokka Source directory that contains example Gradle projects */
-    val dokkaSrcExampleProjectsDir: Path by lazy {
-      dokkaSourceDir.resolve("examples/gradle")
-    }
+    val exampleProjectsDir: Path by systemProperty(Paths::get)
 
     private fun <T> systemProperty(
       convert: (String) -> T,
@@ -64,17 +60,17 @@ class GradleProjectTest(
 }
 
 
-/**
- * Load a project from the [GradleProjectTest.dokkaSrcIntegrationTestProjectsDir]
- */
-fun gradleKtsProjectIntegrationTest(
-  testProjectName: String,
-  build: GradleProjectTest.() -> Unit,
-): GradleProjectTest =
-  GradleProjectTest(
-    baseDir = GradleProjectTest.dokkaSrcIntegrationTestProjectsDir,
-    testProjectName = testProjectName,
-  ).apply(build)
+///**
+// * Load a project from the [GradleProjectTest.dokkaSrcIntegrationTestProjectsDir]
+// */
+//fun gradleKtsProjectIntegrationTest(
+//  testProjectName: String,
+//  build: GradleProjectTest.() -> Unit,
+//): GradleProjectTest =
+//  GradleProjectTest(
+//    baseDir = GradleProjectTest.dokkaSrcIntegrationTestProjectsDir,
+//    testProjectName = testProjectName,
+//  ).apply(build)
 
 
 /**

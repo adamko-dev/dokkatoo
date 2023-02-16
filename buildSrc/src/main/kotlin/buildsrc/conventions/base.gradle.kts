@@ -45,20 +45,6 @@ tasks.withType<AbstractCopyTask>().configureEach {
   includeEmptyDirs = false
 }
 
-val kotlinDokkaSource by configurations.registering {
-  asConsumer()
-  attributes {
-    attribute(Usage.USAGE_ATTRIBUTE, objects.named("externals-dokka-src"))
-  }
-}
-
-val kotlinDokkaSourceElements by configurations.registering {
-  asProvider()
-  attributes {
-    attribute(Usage.USAGE_ATTRIBUTE, objects.named("externals-dokka-src"))
-  }
-}
-
 val updateTestReportCss by tasks.registering {
   description = "Hack so the Gradle test reports have dark mode"
   // the CSS is based on https://github.com/gradle/gradle/pull/12177

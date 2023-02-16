@@ -1,5 +1,8 @@
 package buildsrc.conventions
 
+import buildsrc.conventions.utils.asConsumer
+import buildsrc.conventions.utils.asProvider
+
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
@@ -9,24 +12,26 @@ Utility for publishing a project to a local Maven directory for use in integrati
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-abstract class MavenPublishTest {
-  abstract val testMavenRepo: DirectoryProperty
-  internal abstract val testMavenRepoTemp: DirectoryProperty
+abstract class MavenPublishTest(
+  val testMavenRepo: Provider<Directory>
+) {
+  companion object {
+    val attribute = Attribute.of("maven-publish-test", String::class.java)
+  }
 }
 
-val mavenPublishTest = extensions.create<MavenPublishTest>("mavenPublishTest").apply {
-  testMavenRepo.convention(layout.buildDirectory.dir("test-maven-repo"))
-  testMavenRepoTemp.convention(layout.buildDirectory.dir("tmp/test-maven-repo"))
-}
+val Gradle.rootGradle: Gradle get() = generateSequence(gradle) { it.parent }.last()
+
+val mavenPublishTestExtension = extensions.create<MavenPublishTest>(
+  "mavenPublishTest",
+  gradle.rootGradle.rootProject.layout.buildDirectory.dir("test-maven-repo"),
+)
 
 
-val publishToTestMavenRepo by tasks.registering(Sync::class) {
+val publishToTestMavenRepo by tasks.registering {
   group = PublishingPlugin.PUBLISH_TASK_GROUP
   description = "Publishes all Maven publications to the test Maven repository."
-  from(mavenPublishTest.testMavenRepoTemp)
-  into(mavenPublishTest.testMavenRepo)
 }
-
 
 
 plugins.withType<MavenPublishPlugin>().all {
@@ -46,15 +51,15 @@ plugins.withType<MavenPublishPlugin>().all {
         group = PublishingPlugin.PUBLISH_TASK_GROUP
         outputs.cacheIf { true }
         publication = this@publication
-        val destinationDir = mavenPublishTest.testMavenRepoTemp.asFile
-        inputs.property("testMavenRepoTempDir", destinationDir.map { it.invariantSeparatorsPath })
+        val destinationDir = mavenPublishTestExtension.testMavenRepo.get().asFile
+        inputs.property("testMavenRepoTempDir", destinationDir.invariantSeparatorsPath)
         doFirst {
           /**
-           * `maven.repo.local` will set the destination directry
+           * `maven.repo.local` will set the destination directory for this [PublishToMavenLocal] task.
            *
            * @see org.gradle.api.internal.artifacts.mvnsettings.DefaultLocalMavenRepositoryLocator.getLocalMavenRepository
            */
-          System.setProperty("maven.repo.local", destinationDir.get().absolutePath)
+          System.setProperty("maven.repo.local", destinationDir.absolutePath)
         }
       }
 
@@ -62,4 +67,33 @@ plugins.withType<MavenPublishPlugin>().all {
         dependsOn(installTask)
       }
     }
+}
+
+
+val testMavenPublication by configurations.registering {
+  asConsumer()
+  isVisible = false
+  attributes {
+    attribute(MavenPublishTest.attribute, "testMavenRepo")
+  }
+}
+
+val testMavenPublicationElements by configurations.registering {
+  asProvider()
+  isVisible = true
+  extendsFrom(testMavenPublication.get())
+  attributes {
+    attribute(MavenPublishTest.attribute, "testMavenRepo")
+  }
+  outgoing {
+    artifact(mavenPublishTestExtension.testMavenRepo) {
+      builtBy(publishToTestMavenRepo)
+    }
+  }
+}
+
+dependencies {
+  attributesSchema {
+    attribute(MavenPublishTest.attribute)
+  }
 }
