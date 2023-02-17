@@ -111,7 +111,6 @@ abstract class DokkatooBasePlugin @Inject constructor(
       moduleVersion.convention(providers.provider { project.version.toString() })
       modulePath.convention(project.pathAsFilePath())
 
-      dokkatooCacheDirectory.convention(null)
       sourceSetScopeDefault.convention(project.path)
       dokkatooPublicationDirectory.convention(layout.buildDirectory.dir("dokka"))
       dokkatooModuleDirectory.convention(layout.buildDirectory.dir("dokka-module"))
