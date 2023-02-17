@@ -4,7 +4,7 @@ pluginManagement {
   repositories {
     gradlePluginPortal()
     mavenCentral()
-    maven(providers.gradleProperty("testMavenRepo"))
+    maven(providers.gradleProperty("testMavenRepo").map { rootDir.resolve(it) })
   }
 }
 
@@ -12,6 +12,6 @@ pluginManagement {
 dependencyResolutionManagement {
   repositories {
     mavenCentral()
-    maven(providers.gradleProperty("testMavenRepo"))
+    maven(providers.gradleProperty("testMavenRepo").map { rootDir.resolve(it) })
   }
 }
