@@ -92,7 +92,10 @@ abstract class DokkatooBasePlugin @Inject constructor(
 
     target.tasks.withType<DokkatooGenerateTask>().configureEach {
       cacheDirectory.convention(dokkatooExtension.dokkatooCacheDirectory)
-      enableWorkerDebug.convention(false)
+      workerDebugEnabled.convention(false)
+      // increase memory - DokkaGenerator is hungry
+      workerMinHeapSize.convention("256m")
+      workerMaxHeapSize.convention("1g")
     }
 
     target.tasks.withType<DokkatooPrepareModuleDescriptorTask>().all task@{
