@@ -150,6 +150,6 @@ private fun initDokkatooProject(
   destinationDir: File,
 ): GradleProjectTest {
   return GradleProjectTest(destinationDir.toPath()).apply {
-    copyExampleProject("it-basic/dokkatoo")
+    copyIntegrationTestProject("it-basic/dokkatoo")
   }
 }

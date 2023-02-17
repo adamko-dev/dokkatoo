@@ -17,12 +17,11 @@ import org.intellij.lang.annotations.Language
 class GradleProjectTest(
   override val projectDir: Path,
 ) : ProjectDirectoryScope {
+
   constructor(
     testProjectName: String,
     baseDir: Path = funcTestTempDir,
-  ) : this(
-    projectDir = baseDir.resolve(testProjectName),
-  )
+  ) : this(projectDir = baseDir.resolve(testProjectName))
 
   val runner: GradleRunner = GradleRunner.create().withProjectDir(projectDir.toFile())
 
