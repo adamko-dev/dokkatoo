@@ -93,9 +93,10 @@ abstract class DokkatooBasePlugin @Inject constructor(
     target.tasks.withType<DokkatooGenerateTask>().configureEach {
       cacheDirectory.convention(dokkatooExtension.dokkatooCacheDirectory)
       workerDebugEnabled.convention(false)
-      // increase memory - DokkaGenerator is hungry
+      // increase memory - DokkaGenerator is hungry https://github.com/Kotlin/dokka/issues/1405
       workerMinHeapSize.convention("256m")
       workerMaxHeapSize.convention("1g")
+      workerJvmArgs.set(listOf("-XX:MaxMetaspaceSize=512m"))
     }
 
     target.tasks.withType<DokkatooPrepareModuleDescriptorTask>().all task@{

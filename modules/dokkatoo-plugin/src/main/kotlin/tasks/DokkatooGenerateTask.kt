@@ -9,6 +9,7 @@ import kotlinx.serialization.json.decodeFromStream
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import org.gradle.api.tasks.PathSensitivity.NAME_ONLY
@@ -58,16 +59,16 @@ abstract class DokkatooGenerateTask @Inject constructor(
 
   /** @see JavaForkOptions.getDebug */
   @get:Input
-  @get:Optional
   abstract val workerDebugEnabled: Property<Boolean>
   /** @see JavaForkOptions.getMinHeapSize */
   @get:Input
-  @get:Optional
   abstract val workerMinHeapSize: Property<String>
   /** @see JavaForkOptions.getMaxHeapSize */
   @get:Input
-  @get:Optional
   abstract val workerMaxHeapSize: Property<String>
+  /** @see JavaForkOptions.jvmArgs */
+  @get:Input
+  abstract val workerJvmArgs: ListProperty<String>
 
   enum class GenerationType {
     MODULE,
@@ -108,6 +109,7 @@ abstract class DokkatooGenerateTask @Inject constructor(
         maxHeapSize = workerMinHeapSize.get()
         enableAssertions = true
         debug = workerDebugEnabled.get()
+        jvmArgs = workerJvmArgs.get()
       }
     }
 
