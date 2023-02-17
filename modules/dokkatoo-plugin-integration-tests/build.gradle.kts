@@ -90,6 +90,7 @@ testing.suites {
         systemProperty("integrationTestProjectsDir", "$projectDir/projects")
         systemProperty("testMavenRepoDir", file(mavenPublishTest.testMavenRepo).canonicalPath)
         doFirst {
+          // workaround for lazy-properties not working https://github.com/gradle/gradle/issues/12247
           systemProperty("exampleProjectsDir", dokkatooExamplesDir.get())
         }
       }
@@ -175,7 +176,6 @@ tasks.setupDokkaTemplateProjects {
   destinationToSources.set(
     mapOf(
       //@formatter:off
-
       "projects/it-android-0/dokka"                to listOf("integration-tests/gradle/projects/it-android-0"),
       "projects/it-basic/dokka"                    to listOf("integration-tests/gradle/projects/it-basic"),
       "projects/it-basic-groovy/dokka"             to listOf("integration-tests/gradle/projects/it-basic-groovy"),
