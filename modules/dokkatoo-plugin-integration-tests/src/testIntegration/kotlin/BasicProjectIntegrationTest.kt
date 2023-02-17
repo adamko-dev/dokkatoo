@@ -1,6 +1,5 @@
 package dev.adamko.dokkatoo.it
 
-import dev.adamko.dokkatoo.it.examples.copyExampleProject
 import dev.adamko.dokkatoo.utils.*
 import dev.adamko.dokkatoo.utils.GradleProjectTest.Companion.integrationTestProjectsDir
 import dev.adamko.dokkatoo.utils.GradleProjectTest.Companion.projectTestTempDir
@@ -24,13 +23,12 @@ class BasicProjectIntegrationTest {
   @Test
   fun `test basic project`() {
 
-    val basicProjectSrcDir =
-      integrationTestProjectsDir.resolve("it-basic/dokka").toFile()
+    val basicProjectSrcDir = integrationTestProjectsDir.resolve("it-basic/dokka")
 
     val tempDir = projectTestTempDir.resolve("it/it-basic").toFile()
 
     val dokkaDir = tempDir.resolve("dokka")
-    basicProjectSrcDir.copyRecursively(dokkaDir, overwrite = true) { _, _ -> OnErrorAction.SKIP }
+    basicProjectSrcDir.toFile().copyRecursively(dokkaDir, overwrite = true) { _, _ -> OnErrorAction.SKIP }
 
     val dokkaProject = initDokkaProject(dokkaDir)
 
@@ -122,7 +120,7 @@ private fun initDokkaProject(
   destinationDir: File,
 ): GradleProjectTest {
   return GradleProjectTest(destinationDir.toPath()).apply {
-    copyExampleProject("dokka")
+    copyIntegrationTestProject("it-basic/dokka")
 
     buildGradleKts = buildGradleKts
       .replace(
@@ -152,6 +150,6 @@ private fun initDokkatooProject(
   destinationDir: File,
 ): GradleProjectTest {
   return GradleProjectTest(destinationDir.toPath()).apply {
-    copyExampleProject("dokkatoo")
+    copyExampleProject("it-basic/dokkatoo")
   }
 }

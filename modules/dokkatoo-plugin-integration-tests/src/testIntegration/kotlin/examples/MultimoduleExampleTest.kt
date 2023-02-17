@@ -1,7 +1,6 @@
 package dev.adamko.dokkatoo.it.examples
 
 import dev.adamko.dokkatoo.utils.*
-import dev.adamko.dokkatoo.utils.GradleProjectTest.Companion.exampleProjectsDir
 import dev.adamko.dokkatoo.utils.GradleProjectTest.Companion.projectTestTempDir
 import io.kotest.assertions.withClue
 import io.kotest.core.spec.style.FunSpec
@@ -14,14 +13,14 @@ import io.kotest.matchers.string.shouldNotContain
 import java.io.File
 import kotlin.text.Regex.Companion.escapeReplacement
 
-class DokkaMultimoduleExampleTest : FunSpec({
+class MultimoduleExampleTest : FunSpec({
 
   val dokkaProject = initDokkaProject(
-    projectTestTempDir.resolve("it/examples/dokka-multimodule-example").toFile()
+    projectTestTempDir.resolve("it/examples/multimodule-example/dokka").toFile()
   )
 
   val dokkatooProject = initDokkatooProject(
-    projectTestTempDir.resolve("it/examples/dokkatoo-multimodule-example").toFile()
+    projectTestTempDir.resolve("it/examples/multimodule-example/dokkatoo").toFile()
   )
 
   context("compare dokka and dokkatoo HTML generators") {
@@ -126,19 +125,11 @@ class DokkaMultimoduleExampleTest : FunSpec({
   }
 })
 
-
-fun GradleProjectTest.copyExampleProject(dir: String) {
-  exampleProjectsDir
-    .resolve("multimodule-example/$dir")
-    .toFile()
-    .copyRecursively(projectDir.toFile(), overwrite = true) { _, _ -> OnErrorAction.SKIP }
-}
-
 private fun initDokkaProject(
   destinationDir: File,
 ): GradleProjectTest {
   return GradleProjectTest(destinationDir.toPath()).apply {
-    copyExampleProject("dokka")
+    copyExampleProject("multimodule-example/dokka")
 
     val dokkaVersion = "1.7.20"
     settingsGradleKts = settingsGradleKts
@@ -201,6 +192,6 @@ private fun initDokkatooProject(
   destinationDir: File,
 ): GradleProjectTest {
   return GradleProjectTest(destinationDir.toPath()).apply {
-    copyExampleProject("dokkatoo")
+    copyExampleProject("multimodule-example/dokkatoo")
   }
 }
