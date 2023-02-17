@@ -7,7 +7,7 @@ pluginManagement {
   repositories {
     gradlePluginPortal()
     mavenCentral()
-    maven(providers.gradleProperty("testMavenRepo").map(::file))
+    maven(providers.gradleProperty("testMavenRepo"))
   }
 }
 
@@ -15,7 +15,7 @@ pluginManagement {
 dependencyResolutionManagement {
   repositories {
     mavenCentral()
-    maven(providers.gradleProperty("testMavenRepo").map(::file))
+    maven(providers.gradleProperty("testMavenRepo"))
   }
 }
 
