@@ -1,4 +1,4 @@
-package dev.adamko.dokkatoo.it
+package dev.adamko.dokkatoo.tests.integration
 
 import dev.adamko.dokkatoo.utils.*
 import dev.adamko.dokkatoo.utils.GradleProjectTest.Companion.integrationTestProjectsDir
