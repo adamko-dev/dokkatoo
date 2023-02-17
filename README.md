@@ -77,6 +77,8 @@ Dokkatoo is published on the [Gradle Plugin Portal](https://plugins.gradle.org/s
 
 Once the Dokkatoo plugin is applied to a project, it can be configuring using the `dokkatoo {}` DSL.
 
+Here is an example - it is not exhaustive and does not cover all functionality.
+
 ```kotlin
 // build.gradle.kts
 
