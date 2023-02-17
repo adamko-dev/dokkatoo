@@ -201,3 +201,8 @@ tasks.setupDokkaTemplateProjects {
     }
   )
 }
+
+tasks.withType<Test>().configureEach {
+  // this seems to help OOM errors in the Worker Daemons
+  setForkEvery(1)
+}
