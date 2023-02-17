@@ -92,7 +92,11 @@ abstract class DokkatooBasePlugin @Inject constructor(
 
     target.tasks.withType<DokkatooGenerateTask>().configureEach {
       cacheDirectory.convention(dokkatooExtension.dokkatooCacheDirectory)
-      enableWorkerDebug.convention(false)
+      workerDebugEnabled.convention(false)
+      // increase memory - DokkaGenerator is hungry https://github.com/Kotlin/dokka/issues/1405
+      workerMinHeapSize.convention("256m")
+      workerMaxHeapSize.convention("1g")
+      workerJvmArgs.set(listOf("-XX:MaxMetaspaceSize=512m"))
     }
 
     target.tasks.withType<DokkatooPrepareModuleDescriptorTask>().all task@{
@@ -111,7 +115,6 @@ abstract class DokkatooBasePlugin @Inject constructor(
       moduleVersion.convention(providers.provider { project.version.toString() })
       modulePath.convention(project.pathAsFilePath())
 
-      dokkatooCacheDirectory.convention(null)
       sourceSetScopeDefault.convention(project.path)
       dokkatooPublicationDirectory.convention(layout.buildDirectory.dir("dokka"))
       dokkatooModuleDirectory.convention(layout.buildDirectory.dir("dokka-module"))

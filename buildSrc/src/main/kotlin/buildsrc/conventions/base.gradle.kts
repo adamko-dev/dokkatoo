@@ -1,7 +1,5 @@
 package buildsrc.conventions
 
-import buildsrc.conventions.utils.asConsumer
-import buildsrc.conventions.utils.asProvider
 import java.time.Duration
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
@@ -45,20 +43,6 @@ tasks.withType<AbstractCopyTask>().configureEach {
   includeEmptyDirs = false
 }
 
-val kotlinDokkaSource by configurations.registering {
-  asConsumer()
-  attributes {
-    attribute(Usage.USAGE_ATTRIBUTE, objects.named("externals-dokka-src"))
-  }
-}
-
-val kotlinDokkaSourceElements by configurations.registering {
-  asProvider()
-  attributes {
-    attribute(Usage.USAGE_ATTRIBUTE, objects.named("externals-dokka-src"))
-  }
-}
-
 val updateTestReportCss by tasks.registering {
   description = "Hack so the Gradle test reports have dark mode"
   // the CSS is based on https://github.com/gradle/gradle/pull/12177
@@ -71,7 +55,7 @@ val updateTestReportCss by tasks.registering {
     include("reports/**/css/style.css")
   }
 
-  outputs.files(cssFiles)
+  outputs.files(cssFiles.files)
 
   doLast {
     cssFiles.forEach { cssFile ->

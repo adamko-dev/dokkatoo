@@ -36,7 +36,7 @@ dependencies {
   val jacksonVersion = "2.12.7"
   testFixturesImplementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
 
-  kotlinDokkaSource(projects.externals)
+//  kotlinDokkaSource(projects.externals)
 
   // don't define test dependencies here, instead define them in the testing.suites {} configuration below
 }
@@ -167,17 +167,17 @@ testing.suites {
       testTask.configure {
         shouldRunAfter(test, testFunctional)
 
-        dependsOn(project.configurations.kotlinDokkaSource)
+//        dependsOn(project.configurations.kotlinDokkaSource)
 
-        inputs.property("dokkaSourceDir",
-          project.configurations.kotlinDokkaSource.map { dokkaSrcConf ->
-            val files = dokkaSrcConf.incoming.artifactView { lenient(true) }.files
-            files.singleOrNull()?.absolutePath
-              ?: error("could not get Dokka source code directory from kotlinDokkaSource configuration. Got ${files.count()} files: $files")
-          }
-        )
-
-        systemProperty("dokkaSourceDir", inputs.properties["dokkaSourceDir"]!!)
+//        inputs.property("dokkaSourceDir",
+//          project.configurations.kotlinDokkaSource.map { dokkaSrcConf ->
+//            val files = dokkaSrcConf.incoming.artifactView { lenient(true) }.files
+//            files.singleOrNull()?.absolutePath
+//              ?: error("could not get Dokka source code directory from kotlinDokkaSource configuration. Got ${files.count()} files: $files")
+//          }
+//        )
+//
+//        systemProperty("dokkaSourceDir", inputs.properties["dokkaSourceDir"]!!)
       }
     }
   }

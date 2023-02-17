@@ -9,11 +9,13 @@ import kotlinx.serialization.json.decodeFromStream
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import org.gradle.api.tasks.PathSensitivity.NAME_ONLY
 import org.gradle.api.tasks.PathSensitivity.RELATIVE
 import org.gradle.kotlin.dsl.submit
+import org.gradle.process.JavaForkOptions
 import org.gradle.workers.WorkerExecutor
 
 /**
@@ -55,9 +57,18 @@ abstract class DokkatooGenerateTask @Inject constructor(
   @get:PathSensitive(RELATIVE)
   abstract val dokkaModuleFiles: ConfigurableFileCollection
 
+  /** @see JavaForkOptions.getDebug */
   @get:Input
-  @get:Optional
-  abstract val enableWorkerDebug: Property<Boolean>
+  abstract val workerDebugEnabled: Property<Boolean>
+  /** @see JavaForkOptions.getMinHeapSize */
+  @get:Input
+  abstract val workerMinHeapSize: Property<String>
+  /** @see JavaForkOptions.getMaxHeapSize */
+  @get:Input
+  abstract val workerMaxHeapSize: Property<String>
+  /** @see JavaForkOptions.jvmArgs */
+  @get:Input
+  abstract val workerJvmArgs: ListProperty<String>
 
   enum class GenerationType {
     MODULE,
@@ -68,8 +79,7 @@ abstract class DokkatooGenerateTask @Inject constructor(
   @OptIn(ExperimentalSerializationApi::class) // jsonMapper.decodeFromStream
   fun generateDocumentation() {
     val dokkaParametersJsonFile = dokkaParametersJson.get().asFile
-    val generationType =
-      generationType.orNull ?: error("GenerationType is required, but no value was provided")
+    val generationType: GenerationType = generationType.get()
 
     val dokkaParameters = jsonMapper.decodeFromStream(
       DokkaParametersKxs.serializer(),
@@ -95,7 +105,11 @@ abstract class DokkatooGenerateTask @Inject constructor(
       classpath.from(runtimeClasspath)
       forkOptions {
         defaultCharacterEncoding = "UTF-8"
-        debug = enableWorkerDebug.getOrElse(false)
+        minHeapSize = workerMinHeapSize.get()
+        maxHeapSize = workerMinHeapSize.get()
+        enableAssertions = true
+        debug = workerDebugEnabled.get()
+        jvmArgs = workerJvmArgs.get()
       }
     }
 

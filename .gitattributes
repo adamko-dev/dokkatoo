@@ -9,4 +9,7 @@
 
 
 # Exclude external libs from GitHub language stats https://github.com/github/linguist/blob/v7.24.1/docs/overrides.md
-externals/*/**        linguist-vendored
+examples/**                                                       linguist-documentation
+examples/*/dokka                                                  linguist-vendored
+modules/dokkatoo-plugin-integration-tests/projects/**dokka/       linguist-vendored
+modules/dokkatoo-plugin-integration-tests/projects/**dokkatoo/    linguist-documentation

@@ -69,6 +69,20 @@ abstract class DokkaSourceLinkGradleBuilder :
   abstract val remoteUrl: Property<URL>
 
   /**
+   * Set the value of [remoteUrl].
+   *
+   * @param[value] will be converted to a [URL]
+   */
+  fun remoteUrl(value: String) = remoteUrl.set(URL(value))
+
+  /**
+   * Set the value of [remoteUrl].
+   *
+   * @param[value] will be converted to a [URL]
+   */
+  fun remoteUrl(value: Provider<String>) = remoteUrl.set(value.map(::URL))
+
+  /**
    * Suffix used to append source code line number to the URL. This will help readers navigate
    * not only to the file, but to the specific line number of the declaration.
    *

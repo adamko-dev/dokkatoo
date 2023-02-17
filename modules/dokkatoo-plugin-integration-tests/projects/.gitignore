@@ -1,0 +1,5 @@
+.idea
+**/gradle/wrapper/**
+gradlew.bat
+gradlew
+gradle.properties
