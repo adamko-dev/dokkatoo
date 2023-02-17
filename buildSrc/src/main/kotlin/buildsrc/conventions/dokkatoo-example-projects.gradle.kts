@@ -45,7 +45,7 @@ val updateGradlePropertiesInDokkatooExamples by tasks.registering {
 
   outputs.files(gradlePropertiesFiles)
 
-  val testMavenRepoPath = mavenPublishTestExtension.testMavenRepo.map { it.asFile.absolutePath }
+  val testMavenRepoPath = mavenPublishTestExtension.testMavenRepo.map { it.asFile.canonicalPath }
   inputs.property("testMavenRepoPath", testMavenRepoPath)
 
   doLast task@{
