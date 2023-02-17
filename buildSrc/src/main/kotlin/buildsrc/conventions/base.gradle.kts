@@ -1,7 +1,5 @@
 package buildsrc.conventions
 
-import buildsrc.conventions.utils.asConsumer
-import buildsrc.conventions.utils.asProvider
 import java.time.Duration
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
@@ -57,7 +55,7 @@ val updateTestReportCss by tasks.registering {
     include("reports/**/css/style.css")
   }
 
-  outputs.files(cssFiles)
+  outputs.files(cssFiles.files)
 
   doLast {
     cssFiles.forEach { cssFile ->
