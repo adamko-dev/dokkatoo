@@ -1,8 +1,6 @@
 package buildsrc.conventions
 
 import buildsrc.conventions.Maven_publish_test_gradle.MavenPublishTest
-import buildsrc.conventions.utils.asConsumer
-import buildsrc.conventions.utils.asProvider
 import buildsrc.tasks.SetupDokkaProjects
 
 plugins {
@@ -30,7 +28,7 @@ val mavenPublishTestExtension = extensions.getByType<MavenPublishTest>()
 val updateGradlePropertiesInDokkatooExamples by tasks.registering {
   group = "dokkatoo examples"
 
-  shouldRunAfter(tasks.withType<SetupDokkaProjects>())
+  mustRunAfter(tasks.withType<SetupDokkaProjects>())
 
   val gradlePropertiesFiles =
     layout.projectDirectory.asFileTree
