@@ -316,7 +316,7 @@ abstract class DokkatooBasePlugin @Inject constructor(
       suppressGeneratedFiles.convention(true)
 
       sourceLinks.configureEach {
-        localDirectory.convention(layout.projectDirectory.asFile)
+        localDirectory.convention(layout.projectDirectory)
         remoteLineSuffix.convention("#L")
       }
 
@@ -325,8 +325,6 @@ abstract class DokkatooBasePlugin @Inject constructor(
         suppress.convention(false)
         skipDeprecated.convention(false)
         reportUndocumented.convention(false)
-        @Suppress("DEPRECATION")
-        includeNonPublic.convention(false)
       }
 
       externalDocumentationLinks {
