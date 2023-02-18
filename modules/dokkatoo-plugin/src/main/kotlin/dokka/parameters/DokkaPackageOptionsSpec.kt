@@ -83,13 +83,6 @@ abstract class DokkaPackageOptionsSpec :
   @get:Input
   abstract val reportUndocumented: Property<Boolean>
 
-  /**
-   * Deprecated. Use [documentedVisibilities] instead.
-   */
-  @get:Input
-  @Deprecated("Use documentedVisibilities instead")
-  abstract val includeNonPublic: Property<Boolean>
-
 
   override fun build() = DokkaParametersKxs.PackageOptionsKxs(
     matchingRegex = matchingRegex.get(),
