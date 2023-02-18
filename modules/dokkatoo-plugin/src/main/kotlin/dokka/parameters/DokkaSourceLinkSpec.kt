@@ -25,7 +25,7 @@ import org.jetbrains.dokka.DokkaConfigurationBuilder
  * }
  * ```
  */
-abstract class DokkaSourceLinkGradleBuilder :
+abstract class DokkaSourceLinkSpec :
   DokkaConfigurationBuilder<DokkaParametersKxs.SourceLinkDefinitionKxs>,
   Serializable {
 

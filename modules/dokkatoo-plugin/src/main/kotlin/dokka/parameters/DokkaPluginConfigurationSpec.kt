@@ -12,7 +12,7 @@ import org.jetbrains.dokka.DokkaConfigurationBuilder
 /**
  * @param[pluginFqn] Fully qualified classname of the Dokka Plugin
  */
-abstract class DokkaPluginConfigurationGradleBuilder @Inject constructor(
+abstract class DokkaPluginConfigurationSpec @Inject constructor(
   @get:Internal
   val pluginFqn: String
 ) :

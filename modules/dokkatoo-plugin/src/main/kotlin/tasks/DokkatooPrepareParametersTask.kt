@@ -2,8 +2,8 @@ package dev.adamko.dokkatoo.tasks
 
 import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.jsonMapper
 import dev.adamko.dokkatoo.dokka.parameters.DokkaParametersKxs
-import dev.adamko.dokkatoo.dokka.parameters.DokkaPluginConfigurationGradleBuilder
-import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetGradleBuilder
+import dev.adamko.dokkatoo.dokka.parameters.DokkaPluginConfigurationSpec
+import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec
 import java.io.IOException
 import javax.inject.Inject
 import kotlinx.serialization.encodeToString
@@ -54,7 +54,7 @@ abstract class DokkatooPrepareParametersTask @Inject constructor(
   abstract val delayTemplateSubstitution: Property<Boolean>
 
   @get:Nested
-  abstract val dokkaSourceSets: NamedDomainObjectContainer<DokkaSourceSetGradleBuilder>
+  abstract val dokkaSourceSets: NamedDomainObjectContainer<DokkaSourceSetSpec>
 
   @get:Input
   abstract val failOnWarning: Property<Boolean>
@@ -95,7 +95,7 @@ abstract class DokkatooPrepareParametersTask @Inject constructor(
   abstract val pluginsClasspath: ConfigurableFileCollection
 
   @get:Nested
-  abstract val pluginsConfiguration: DomainObjectSet<DokkaPluginConfigurationGradleBuilder>
+  abstract val pluginsConfiguration: DomainObjectSet<DokkaPluginConfigurationSpec>
 
   @get:Input
   abstract val suppressObviousFunctions: Property<Boolean>
@@ -135,12 +135,12 @@ abstract class DokkatooPrepareParametersTask @Inject constructor(
       val suppressed = it.suppress.get()
       logger.info("Dokka source set ${it.sourceSetID.get()} ${if (suppressed) "is" else "isn't"} suppressed")
       suppressed
-    }.map(DokkaSourceSetGradleBuilder::build)
+    }.map(DokkaSourceSetSpec::build)
 
     val pluginsClasspath = pluginsClasspath.files.toList()
 
     val pluginsConfiguration =
-      pluginsConfiguration.map(DokkaPluginConfigurationGradleBuilder::build)
+      pluginsConfiguration.map(DokkaPluginConfigurationSpec::build)
     val failOnWarning = failOnWarning.get()
     val delayTemplateSubstitution = delayTemplateSubstitution.get()
     val suppressObviousFunctions = suppressObviousFunctions.get()

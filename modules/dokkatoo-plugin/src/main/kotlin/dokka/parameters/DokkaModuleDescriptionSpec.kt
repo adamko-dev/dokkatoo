@@ -9,7 +9,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.jetbrains.dokka.DokkaConfigurationBuilder
 
-abstract class DokkaModuleDescriptionGradleBuilder @Inject constructor(
+abstract class DokkaModuleDescriptionSpec @Inject constructor(
   @get:Input
   val moduleName: String,
 ) : DokkaConfigurationBuilder<DokkaParametersKxs.DokkaModuleDescriptionKxs>, Named {

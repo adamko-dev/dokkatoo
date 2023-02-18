@@ -7,7 +7,7 @@ import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes.Companio
 import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes.Companion.DOKKA_FORMAT_ATTRIBUTE
 import dev.adamko.dokkatoo.distibutions.DokkatooFormatGradleConfigurations
 import dev.adamko.dokkatoo.dokka.DokkaPublication
-import dev.adamko.dokkatoo.dokka.parameters.DokkaPluginConfigurationGradleBuilder
+import dev.adamko.dokkatoo.dokka.parameters.DokkaPluginConfigurationSpec
 import dev.adamko.dokkatoo.formats.*
 import dev.adamko.dokkatoo.internal.*
 import dev.adamko.dokkatoo.tasks.DokkatooGenerateTask
@@ -204,7 +204,7 @@ abstract class DokkatooBasePlugin @Inject constructor(
           @Suppress("DEPRECATION")
           pluginsMapConfiguration.map { pluginConfig ->
             pluginConfig.map { (pluginId, pluginConfiguration) ->
-              objects.newInstance<DokkaPluginConfigurationGradleBuilder>(pluginId).apply {
+              objects.newInstance<DokkaPluginConfigurationSpec>(pluginId).apply {
                 values.set(pluginConfiguration)
               }
             }
