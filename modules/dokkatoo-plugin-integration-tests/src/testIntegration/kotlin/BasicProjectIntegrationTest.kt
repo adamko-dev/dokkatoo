@@ -46,7 +46,7 @@ class BasicProjectIntegrationTest {
         "clean",
         "dokkaHtml",
         "--stacktrace",
-        "--debug",
+        "--info",
       )
       .forwardOutput()
       .withEnvironment(
