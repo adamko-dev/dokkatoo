@@ -40,7 +40,7 @@ Dokkatoo is published on the [Gradle Plugin Portal](https://plugins.gradle.org/s
 
 ### Quick start
 
-1. Apply the appropriate plugin for any formats you'd like to generate
+1. Apply the appropriate plugin for any formats you'd like to generate.
 
    For example, HTML and Javadoc
    ```kotlin
@@ -64,6 +64,7 @@ Dokkatoo is published on the [Gradle Plugin Portal](https://plugins.gradle.org/s
      id("dev.adamko.dokkatoo") version "$dokkatooVersion"
    }
    ```
+   [Read more about the available formats in the Dokka docs](https://github.com/Kotlin/dokka#output-formats).
 2. Run the generation task
 
    ```shell
