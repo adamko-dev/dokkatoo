@@ -1,6 +1,7 @@
 package dev.adamko.dokkatoo.dokka.parameters
 
 import dev.adamko.dokkatoo.create_
+import io.kotest.assertions.fail
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
@@ -8,6 +9,7 @@ import io.kotest.matchers.string.shouldContain
 import java.net.URL
 import org.gradle.api.Project
 import org.gradle.api.internal.provider.MissingValueException
+import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.domainObjectContainer
 import org.gradle.testfixtures.ProjectBuilder
 
@@ -75,6 +77,23 @@ class DokkaExternalDocumentationLinkSpecTest : FunSpec({
       }
 
       caughtException.message shouldContain "Cannot query the value of property 'packageListUrl' because it has no value available"
+    }
+
+    test("expect null when not enabled") {
+
+      val actual = project.createExternalDocLinkSpec("test") {
+
+        fun <T> failingProvider(propertyName: String): Provider<T> = project.provider {
+          fail("ExternalDocLink is disabled - $propertyName should not be queried")
+        }
+
+        url(failingProvider("url"))
+        packageListUrl(failingProvider("packageListUrl"))
+
+        enabled.set(false)
+      }
+
+      actual.build() shouldBe null
     }
   }
 })
