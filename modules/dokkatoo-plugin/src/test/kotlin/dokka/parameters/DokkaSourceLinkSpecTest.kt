@@ -131,6 +131,8 @@ class DokkaSourceLinkSpecTest : FunSpec({
     }
   }
 }) {
+
+  /** Re-implement [DokkaSourceLinkSpec] to make [localDirectoryPath] accessible in tests */
   abstract class DokkaSourceLinkSpec2 : DokkaSourceLinkSpec() {
     val localDirectoryPath2: Provider<String>
       get() = super.localDirectoryPath
