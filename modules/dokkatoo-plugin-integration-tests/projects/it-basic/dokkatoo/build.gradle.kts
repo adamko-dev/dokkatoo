@@ -3,7 +3,7 @@ import org.jetbrains.dokka.gradle.kotlinSourceSet
 
 plugins {
   kotlin("jvm") version "1.7.20"
-  id("dev.adamko.dokkatoo") version "0.0.1-SNAPSHOT"
+  id("dev.adamko.dokkatoo") version "0.0.2-SNAPSHOT"
 }
 
 version = "1.7.20-SNAPSHOT"
@@ -62,8 +62,8 @@ dokkatoo {
   }
 }
 
-tasks.withType<dev.adamko.dokkatoo.tasks.DokkatooPrepareParametersTask>().configureEach { 
-  dokkaSourceSets.configureEach { 
+tasks.withType<dev.adamko.dokkatoo.tasks.DokkatooPrepareParametersTask>().configureEach {
+  dokkaSourceSets.configureEach {
     sourceSetScope.set(":dokkaHtml")
   }
 }
