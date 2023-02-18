@@ -7,7 +7,7 @@ import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes.Companio
 import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes.Companion.DOKKA_FORMAT_ATTRIBUTE
 import dev.adamko.dokkatoo.distibutions.DokkatooFormatGradleConfigurations
 import dev.adamko.dokkatoo.dokka.DokkaPublication
-import dev.adamko.dokkatoo.dokka.parameters.DokkaPluginConfigurationGradleBuilder
+import dev.adamko.dokkatoo.dokka.parameters.DokkaPluginConfigurationSpec
 import dev.adamko.dokkatoo.formats.*
 import dev.adamko.dokkatoo.internal.*
 import dev.adamko.dokkatoo.tasks.DokkatooGenerateTask
@@ -204,7 +204,7 @@ abstract class DokkatooBasePlugin @Inject constructor(
           @Suppress("DEPRECATION")
           pluginsMapConfiguration.map { pluginConfig ->
             pluginConfig.map { (pluginId, pluginConfiguration) ->
-              objects.newInstance<DokkaPluginConfigurationGradleBuilder>(pluginId).apply {
+              objects.newInstance<DokkaPluginConfigurationSpec>(pluginId).apply {
                 values.set(pluginConfiguration)
               }
             }
@@ -316,7 +316,7 @@ abstract class DokkatooBasePlugin @Inject constructor(
       suppressGeneratedFiles.convention(true)
 
       sourceLinks.configureEach {
-        localDirectory.convention(layout.projectDirectory.asFile)
+        localDirectory.convention(layout.projectDirectory)
         remoteLineSuffix.convention("#L")
       }
 
@@ -325,8 +325,6 @@ abstract class DokkatooBasePlugin @Inject constructor(
         suppress.convention(false)
         skipDeprecated.convention(false)
         reportUndocumented.convention(false)
-        @Suppress("DEPRECATION")
-        includeNonPublic.convention(false)
       }
 
       externalDocumentationLinks {

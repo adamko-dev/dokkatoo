@@ -12,7 +12,7 @@ import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.TaskName.GENERATE_MODULE
 import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.TaskName.GENERATE_PUBLICATION
 import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.TaskName.PREPARE_MODULE_DESCRIPTOR
 import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.TaskName.PREPARE_PARAMETERS
-import dev.adamko.dokkatoo.dokka.parameters.DokkaPluginConfigurationGradleBuilder
+import dev.adamko.dokkatoo.dokka.parameters.DokkaPluginConfigurationSpec
 import java.io.Serializable
 import javax.inject.Inject
 import org.gradle.api.Named
@@ -85,7 +85,7 @@ abstract class DokkaPublication @Inject constructor(
 //    abstract val pluginsClasspath: ConfigurableFileCollection
 
   @get:Nested
-  abstract val pluginsConfiguration: NamedDomainObjectContainer<DokkaPluginConfigurationGradleBuilder>
+  abstract val pluginsConfiguration: NamedDomainObjectContainer<DokkaPluginConfigurationSpec>
 
 //    /** Dokka Configuration files from other subprojects that will be merged into this Dokka Configuration */
 //    @get:InputFiles

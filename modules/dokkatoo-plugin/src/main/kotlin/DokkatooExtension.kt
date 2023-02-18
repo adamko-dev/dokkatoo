@@ -1,7 +1,7 @@
 package dev.adamko.dokkatoo
 
 import dev.adamko.dokkatoo.dokka.DokkaPublication
-import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetGradleBuilder
+import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.plugins.ExtensionAware
@@ -71,7 +71,7 @@ abstract class DokkatooExtension : ExtensionAware {
    *
    * Dokka will merge Dokka Source Sets from other subprojects if...
    */
-  abstract val dokkatooSourceSets: NamedDomainObjectContainer<DokkaSourceSetGradleBuilder>
+  abstract val dokkatooSourceSets: NamedDomainObjectContainer<DokkaSourceSetSpec>
 
   interface Versions {
 

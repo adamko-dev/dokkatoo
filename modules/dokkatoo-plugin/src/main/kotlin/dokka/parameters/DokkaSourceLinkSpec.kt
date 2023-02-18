@@ -1,8 +1,8 @@
 package dev.adamko.dokkatoo.dokka.parameters
 
-import java.io.File
 import java.io.Serializable
 import java.net.URL
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
@@ -25,7 +25,7 @@ import org.jetbrains.dokka.DokkaConfigurationBuilder
  * }
  * ```
  */
-abstract class DokkaSourceLinkGradleBuilder :
+abstract class DokkaSourceLinkSpec :
   DokkaConfigurationBuilder<DokkaParametersKxs.SourceLinkDefinitionKxs>,
   Serializable {
 
@@ -43,16 +43,15 @@ abstract class DokkaSourceLinkGradleBuilder :
    * ```
    */
   @get:Internal // changing contents of the directory should not invalidate the task
-  abstract val localDirectory: Property<File>
+  abstract val localDirectory: DirectoryProperty
 
   /**
    * The relative path to [localDirectory] from the project directory. Declared as an input to invalidate the task if that path changes.
    * Should not be used anywhere directly.
    */
-//    @Suppress("unused")
   @get:Input
   protected val localDirectoryPath: Provider<String>
-    get() = localDirectory.map { it.path }
+    get() = localDirectory.map { it.asFile.invariantSeparatorsPath }
 
   /**
    * URL of source code hosting service that can be accessed by documentation readers,
@@ -103,7 +102,7 @@ abstract class DokkaSourceLinkGradleBuilder :
 
   override fun build(): DokkaParametersKxs.SourceLinkDefinitionKxs {
     return DokkaParametersKxs.SourceLinkDefinitionKxs(
-      localDirectory = localDirectory.get().canonicalPath,
+      localDirectory = localDirectory.get().asFile.invariantSeparatorsPath,
       remoteUrl = remoteUrl.get(),
       remoteLineSuffix = remoteLineSuffix.orNull,
     )

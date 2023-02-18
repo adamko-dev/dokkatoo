@@ -1,8 +1,16 @@
 package dev.adamko.dokkatoo.tests.integration
 
-import dev.adamko.dokkatoo.utils.*
+import dev.adamko.dokkatoo.utils.GradleProjectTest
 import dev.adamko.dokkatoo.utils.GradleProjectTest.Companion.integrationTestProjectsDir
 import dev.adamko.dokkatoo.utils.GradleProjectTest.Companion.projectTestTempDir
+import dev.adamko.dokkatoo.utils.buildGradleKts
+import dev.adamko.dokkatoo.utils.copyIntegrationTestProject
+import dev.adamko.dokkatoo.utils.projectFile
+import dev.adamko.dokkatoo.utils.settingsGradleKts
+import dev.adamko.dokkatoo.utils.shouldContainAll
+import dev.adamko.dokkatoo.utils.sideBySide
+import dev.adamko.dokkatoo.utils.toTreeString
+import dev.adamko.dokkatoo.utils.withEnvironment
 import io.kotest.assertions.withClue
 import io.kotest.matchers.file.shouldHaveSameStructureAndContentAs
 import io.kotest.matchers.file.shouldHaveSameStructureAs
@@ -28,7 +36,8 @@ class BasicProjectIntegrationTest {
     val tempDir = projectTestTempDir.resolve("it/it-basic").toFile()
 
     val dokkaDir = tempDir.resolve("dokka")
-    basicProjectSrcDir.toFile().copyRecursively(dokkaDir, overwrite = true) { _, _ -> OnErrorAction.SKIP }
+    basicProjectSrcDir.toFile()
+      .copyRecursively(dokkaDir, overwrite = true) { _, _ -> OnErrorAction.SKIP }
 
     val dokkaProject = initDokkaProject(dokkaDir)
 
@@ -128,6 +137,11 @@ private fun initDokkaProject(
         """file("../customResources/""",
         """file("./customResources/""",
       )
+      // update relative paths to the template files - they're now in the same directory
+      .replace(
+        """../template.root.gradle.kts""",
+        """./template.root.gradle.kts""",
+      )
 
     // update relative paths to the template files - they're now in the same directory
     settingsGradleKts = settingsGradleKts
@@ -135,11 +149,7 @@ private fun initDokkaProject(
         """../template.settings.gradle.kts""",
         """./template.settings.gradle.kts""",
       )
-    buildGradleKts = buildGradleKts
-      .replace(
-        """../template.root.gradle.kts""",
-        """./template.root.gradle.kts""",
-      )
+
     var templateGradleSettings: String by projectFile("template.settings.gradle.kts")
     templateGradleSettings = templateGradleSettings
       .replace("for-integration-tests-SNAPSHOT", "1.7.20")

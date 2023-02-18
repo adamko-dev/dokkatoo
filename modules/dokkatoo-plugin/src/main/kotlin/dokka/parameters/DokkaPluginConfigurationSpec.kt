@@ -12,8 +12,8 @@ import org.jetbrains.dokka.DokkaConfigurationBuilder
 /**
  * @param[pluginFqn] Fully qualified classname of the Dokka Plugin
  */
-abstract class DokkaPluginConfigurationGradleBuilder @Inject constructor(
-  @get:Internal
+abstract class DokkaPluginConfigurationSpec @Inject constructor(
+  @get:Input
   val pluginFqn: String
 ) :
   DokkaConfigurationBuilder<DokkaParametersKxs.PluginConfigurationKxs>,
@@ -32,6 +32,6 @@ abstract class DokkaPluginConfigurationGradleBuilder @Inject constructor(
     values = values.get(),
   )
 
-  @Input
+  @Internal
   override fun getName(): String = pluginFqn
 }

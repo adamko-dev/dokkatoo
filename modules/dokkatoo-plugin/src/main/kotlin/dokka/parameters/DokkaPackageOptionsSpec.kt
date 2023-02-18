@@ -27,7 +27,7 @@ import org.jetbrains.dokka.DokkaConfigurationBuilder
  * }
  * ```
  */
-abstract class DokkaPackageOptionsGradleBuilder :
+abstract class DokkaPackageOptionsSpec :
   DokkaConfigurationBuilder<DokkaParametersKxs.PackageOptionsKxs>,
   Serializable {
 
@@ -53,7 +53,7 @@ abstract class DokkaPackageOptionsGradleBuilder :
    * This can be used if you want to document protected/internal/private declarations within a
    * specific package, as well as if you want to exclude public declarations and only document internal API.
    *
-   * Can be configured for a whole source set, see [DokkaSourceSetGradleBuilder.documentedVisibilities].
+   * Can be configured for a whole source set, see [DokkaSourceSetSpec.documentedVisibilities].
    *
    * Default is [DokkaConfiguration.Visibility.PUBLIC].
    */
@@ -63,7 +63,7 @@ abstract class DokkaPackageOptionsGradleBuilder :
   /**
    * Whether to document declarations annotated with [Deprecated].
    *
-   * Can be overridden on source set level by setting [DokkaSourceSetGradleBuilder.skipDeprecated].
+   * Can be overridden on source set level by setting [DokkaSourceSetSpec.skipDeprecated].
    *
    * Default is `false`.
    */
@@ -76,19 +76,12 @@ abstract class DokkaPackageOptionsGradleBuilder :
    *
    * This setting works well with [AbstractDokkaTask.failOnWarning].
    *
-   * Can be overridden on source set level by setting [DokkaSourceSetGradleBuilder.reportUndocumented].
+   * Can be overridden on source set level by setting [DokkaSourceSetSpec.reportUndocumented].
    *
    * Default is `false`.
    */
   @get:Input
   abstract val reportUndocumented: Property<Boolean>
-
-  /**
-   * Deprecated. Use [documentedVisibilities] instead.
-   */
-  @get:Input
-  @Deprecated("Use documentedVisibilities instead")
-  abstract val includeNonPublic: Property<Boolean>
 
 
   override fun build() = DokkaParametersKxs.PackageOptionsKxs(

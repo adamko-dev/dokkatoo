@@ -1,6 +1,5 @@
 package dev.adamko.dokkatoo.dokka.parameters
 
-import java.io.File
 import java.io.Serializable
 import java.net.URL
 import javax.inject.Inject
@@ -36,7 +35,7 @@ import org.jetbrains.dokka.*
  * }
  * ```
  */
-abstract class DokkaSourceSetGradleBuilder(
+abstract class DokkaSourceSetSpec(
   private val name: String
 ) :
   DokkaConfigurationBuilder<DokkaParametersKxs.DokkaSourceSetKxs>,
@@ -122,7 +121,7 @@ abstract class DokkaSourceSetGradleBuilder(
    * This can be used if you want to document protected/internal/private declarations,
    * as well as if you want to exclude public declarations and only document internal API.
    *
-   * Can be configured on per-package basis, see [DokkaPackageOptionsGradleBuilder.documentedVisibilities].
+   * Can be configured on per-package basis, see [DokkaPackageOptionsSpec.documentedVisibilities].
    *
    * Default is [DokkaConfiguration.Visibility.PUBLIC].
    */
@@ -144,7 +143,7 @@ abstract class DokkaSourceSetGradleBuilder(
    * By default, the values are deduced from information provided by the Kotlin Gradle plugin.
    */
   @get:Nested
-  abstract val dependentSourceSets: NamedDomainObjectContainer<DokkaSourceSetIDGradleBuilder>
+  abstract val dependentSourceSets: NamedDomainObjectContainer<DokkaSourceSetIDSpec>
 
   /**
    * Classpath for analysis and interactive samples.
@@ -161,8 +160,6 @@ abstract class DokkaSourceSetGradleBuilder(
   /**
    * Source code roots to be analyzed and documented.
    * Accepts directories and individual `.kt` / `.java` files.
-   *
-   * Prefer using [sourceRoot] function to append source roots to this list.
    *
    * By default, source roots are deduced from information provided by the Kotlin Gradle plugin.
    */
@@ -185,7 +182,7 @@ abstract class DokkaSourceSetGradleBuilder(
    *
    * This setting works well with [AbstractDokkaTask.failOnWarning].
    *
-   * Can be overridden for a specific package by setting [DokkaPackageOptionsGradleBuilder.reportUndocumented].
+   * Can be overridden for a specific package by setting [DokkaPackageOptionsSpec.reportUndocumented].
    *
    * Default is `false`.
    */
@@ -194,22 +191,22 @@ abstract class DokkaSourceSetGradleBuilder(
 
   /**
    * Specifies the location of the project source code on the Web. If provided, Dokka generates
-   * "source" links for each declaration. See [DokkaSourceLinkGradleBuilder] for more details.
+   * "source" links for each declaration. See [DokkaSourceLinkSpec] for more details.
    *
    * Prefer using [sourceLink] action/closure for adding source links.
    *
    * @see sourceLink
    */
   @get:Nested
-  abstract val sourceLinks: DomainObjectSet<DokkaSourceLinkGradleBuilder>
+  abstract val sourceLinks: DomainObjectSet<DokkaSourceLinkSpec>
 
   /**
    * Allows to customize documentation generation options on a per-package basis.
    *
-   * @see DokkaPackageOptionsGradleBuilder for details
+   * @see DokkaPackageOptionsSpec for details
    */
   @get:Nested
-  abstract val perPackageOptions: DomainObjectSet<DokkaPackageOptionsGradleBuilder>
+  abstract val perPackageOptions: DomainObjectSet<DokkaPackageOptionsSpec>
 
   /**
    * Allows linking to Dokka/Javadoc documentation of the project's dependencies.
@@ -217,7 +214,7 @@ abstract class DokkaSourceSetGradleBuilder(
    * Prefer using [externalDocumentationLink] action/closure for adding links.
    */
   @get:Nested
-  abstract val externalDocumentationLinks: NamedDomainObjectContainer<DokkaExternalDocumentationLinkGradleBuilder>
+  abstract val externalDocumentationLinks: NamedDomainObjectContainer<DokkaExternalDocumentationLinkSpec>
 
   /**
    * Platform to be used for setting up code analysis and samples.
@@ -242,7 +239,7 @@ abstract class DokkaSourceSetGradleBuilder(
   /**
    * Whether to document declarations annotated with [Deprecated].
    *
-   * Can be overridden on package level by setting [DokkaPackageOptionsGradleBuilder.skipDeprecated].
+   * Can be overridden on package level by setting [DokkaPackageOptionsSpec.skipDeprecated].
    *
    * Default is `false`.
    */
@@ -336,52 +333,14 @@ abstract class DokkaSourceSetGradleBuilder(
   @get:Input
   abstract val jdkVersion: Property<Int>
 
-  fun DokkaSourceSetID(sourceSetName: String): DokkaSourceSetIDGradleBuilder {
-    return dependentSourceSets.create("TODO figure out scope ID") {
-      this.sourceSetName = sourceSetName
-    }
-  }
-
-  /** Convenient override to **append** source sets to [dependentSourceSets] */
-  fun dependsOn(sourceSet: SourceSet): Unit = dependsOn(sourceSet.name)
-
-//    /** Convenient override to **append** source sets to [dependentSourceSets] */
-//    fun dependsOn(sourceSet: DokkaSourceSetGradleBuilder): Unit {
-//        dependentSourceSets.add(sourceSet.sourceSetID.get())
-//    }
-
-  /** Convenient override to **append** source sets to [dependentSourceSets] */
-  fun dependsOn(sourceSet: DokkaConfiguration.DokkaSourceSet): Unit =
-    dependsOn(sourceSet.sourceSetID)
-
-  /** Convenient override to **append** source sets to [dependentSourceSets] */
-  fun dependsOn(sourceSetName: String): Unit = dependsOn(sourceSetName)
-
-  /** Convenient override to **append** source sets to [dependentSourceSets] */
-  fun dependsOn(sourceSetID: DokkaSourceSetID) {
-    dependentSourceSets.create(sourceSetID.scopeId) {
-      sourceSetName = sourceSetID.sourceSetName
-    }
-  }
-
-  /** Convenient override to **append** source roots to [sourceRoots] */
-  fun sourceRoot(file: File) {
-    sourceRoots.from(file)
-  }
-
-  /** Convenient override to **append** source roots to [sourceRoots] */
-  fun sourceRoot(path: String) {
-    sourceRoots.from(path)
-  }
-
   /**
    * Action for configuring source links, appending to [sourceLinks].
    *
-   * @see [DokkaSourceLinkGradleBuilder] for details.
+   * @see [DokkaSourceLinkSpec] for details.
    */
-  fun sourceLink(action: Action<in DokkaSourceLinkGradleBuilder>) {
+  fun sourceLink(action: Action<in DokkaSourceLinkSpec>) {
     sourceLinks.add(
-      objects.newInstance(DokkaSourceLinkGradleBuilder::class).also {
+      objects.newInstance(DokkaSourceLinkSpec::class).also {
         action.execute(it)
       }
     )
@@ -401,11 +360,11 @@ abstract class DokkaSourceSetGradleBuilder(
   /**
    * Action for configuring package options, appending to [perPackageOptions].
    *
-   * @see [DokkaPackageOptionsGradleBuilder] for details.
+   * @see [DokkaPackageOptionsSpec] for details.
    */
-  fun perPackageOption(action: Action<in DokkaPackageOptionsGradleBuilder>) {
+  fun perPackageOption(action: Action<in DokkaPackageOptionsSpec>) {
     perPackageOptions.add(
-      objects.newInstance(DokkaPackageOptionsGradleBuilder::class).also {
+      objects.newInstance(DokkaPackageOptionsSpec::class).also {
         action.execute(it)
       }
     )
@@ -425,11 +384,11 @@ abstract class DokkaSourceSetGradleBuilder(
   /**
    * Action for configuring external documentation links, appending to [externalDocumentationLinks].
    *
-   * See [DokkaExternalDocumentationLinkGradleBuilder] for details.
+   * See [DokkaExternalDocumentationLinkSpec] for details.
    */
-  fun externalDocumentationLink(action: Action<in DokkaExternalDocumentationLinkGradleBuilder>) {
+  fun externalDocumentationLink(action: Action<in DokkaExternalDocumentationLinkSpec>) {
     externalDocumentationLinks.add(
-      objects.newInstance(DokkaExternalDocumentationLinkGradleBuilder::class).also {
+      objects.newInstance(DokkaExternalDocumentationLinkSpec::class).also {
         action.execute(it)
       }
     )
@@ -443,7 +402,7 @@ abstract class DokkaSourceSetGradleBuilder(
   /** Convenient override to **append** external documentation links to [externalDocumentationLinks]. */
   fun externalDocumentationLink(url: URL, packageListUrl: URL? = null) {
     externalDocumentationLinks.add(
-      objects.newInstance(DokkaExternalDocumentationLinkGradleBuilder::class).also {
+      objects.newInstance(DokkaExternalDocumentationLinkSpec::class).also {
         it.url.set(url)
         if (packageListUrl != null) {
           it.packageListUrl.set(packageListUrl)
@@ -454,7 +413,7 @@ abstract class DokkaSourceSetGradleBuilder(
 
   override fun build(): DokkaParametersKxs.DokkaSourceSetKxs {
     val externalDocumentationLinks = externalDocumentationLinks
-      .mapNotNull(DokkaExternalDocumentationLinkGradleBuilder::build)
+      .mapNotNull(DokkaExternalDocumentationLinkSpec::build)
       .toSet()
 
     return DokkaParametersKxs.DokkaSourceSetKxs(
@@ -462,15 +421,15 @@ abstract class DokkaSourceSetGradleBuilder(
       displayName = displayName.get(),
       classpath = classpath.files.toList(),
       sourceRoots = sourceRoots.files,
-      dependentSourceSets = dependentSourceSets.map(DokkaSourceSetIDGradleBuilder::build).toSet(),
+      dependentSourceSets = dependentSourceSets.map(DokkaSourceSetIDSpec::build).toSet(),
       samples = samples.files,
       includes = includes.files,
       reportUndocumented = reportUndocumented.get(),
       skipEmptyPackages = skipEmptyPackages.get(),
       skipDeprecated = skipDeprecated.get(),
       jdkVersion = jdkVersion.get(),
-      sourceLinks = sourceLinks.map(DokkaSourceLinkGradleBuilder::build).toSet(),
-      perPackageOptions = perPackageOptions.map(DokkaPackageOptionsGradleBuilder::build),
+      sourceLinks = sourceLinks.map(DokkaSourceLinkSpec::build).toSet(),
+      perPackageOptions = perPackageOptions.map(DokkaPackageOptionsSpec::build),
       externalDocumentationLinks = externalDocumentationLinks,
       languageVersion = languageVersion.orNull,
       apiVersion = apiVersion.orNull,

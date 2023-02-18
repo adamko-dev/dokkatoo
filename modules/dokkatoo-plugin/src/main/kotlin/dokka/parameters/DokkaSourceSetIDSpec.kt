@@ -6,7 +6,7 @@ import org.gradle.api.tasks.Internal
 import org.jetbrains.dokka.DokkaConfigurationBuilder
 import org.jetbrains.dokka.DokkaSourceSetID
 
-abstract class DokkaSourceSetIDGradleBuilder(
+abstract class DokkaSourceSetIDSpec(
   /**
    * Unique identifier of the scope that this source set is placed in.
    * Each scope provide only unique source set names.

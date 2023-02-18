@@ -31,7 +31,7 @@ import org.gradle.api.tasks.Internal
  * }
  * ```
  */
-abstract class DokkaExternalDocumentationLinkGradleBuilder @Inject constructor(
+abstract class DokkaExternalDocumentationLinkSpec @Inject constructor(
   private val name: String
 ) : Serializable, Named {
 
@@ -97,9 +97,9 @@ abstract class DokkaExternalDocumentationLinkGradleBuilder @Inject constructor(
   /**
    * If enabled this link will be passed to the Dokka Generator.
    *
-   * @see dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetGradleBuilder.noStdlibLink
-   * @see dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetGradleBuilder.noJdkLink
-   * @see dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetGradleBuilder.noAndroidSdkLink
+   * @see dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec.noStdlibLink
+   * @see dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec.noJdkLink
+   * @see dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec.noAndroidSdkLink
    */
   @get:Input
   abstract val enabled: Property<Boolean>
