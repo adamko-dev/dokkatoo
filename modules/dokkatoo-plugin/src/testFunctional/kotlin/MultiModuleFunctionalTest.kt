@@ -31,7 +31,7 @@ class MultiModuleFunctionalTest {
       |    // Kotlin plugin shouldn't be necessary here, but without it Dokka errors
       |    // with ClassNotFound KotlinPluginExtension... very weird
       |    kotlin("jvm") version "1.7.20" apply false
-      |    id("dev.adamko.dokkatoo") version "0.0.1-SNAPSHOT"
+      |    id("dev.adamko.dokkatoo") version "0.0.2-SNAPSHOT"
       |}
       |
       |dependencies {
@@ -90,7 +90,7 @@ class MultiModuleFunctionalTest {
         |
         |plugins {
         |    kotlin("jvm") version "1.7.20"
-        |    id("dev.adamko.dokkatoo") version "0.0.1-SNAPSHOT"
+        |    id("dev.adamko.dokkatoo") version "0.0.2-SNAPSHOT"
         |}
         |
         |// TODO copy the DSL from the old plugin
@@ -144,7 +144,7 @@ class MultiModuleFunctionalTest {
         |
         |plugins {
         |    kotlin("jvm") version "1.7.20"
-        |    id("dev.adamko.dokkatoo") version "0.0.1-SNAPSHOT"
+        |    id("dev.adamko.dokkatoo") version "0.0.2-SNAPSHOT"
         |}
         |
         |logger.lifecycle("with kotlin extension " + kotlin::class.toString())
