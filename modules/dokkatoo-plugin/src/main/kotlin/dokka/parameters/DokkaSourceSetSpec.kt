@@ -1,6 +1,5 @@
 package dev.adamko.dokkatoo.dokka.parameters
 
-import java.io.File
 import java.io.Serializable
 import java.net.URL
 import javax.inject.Inject
@@ -161,8 +160,6 @@ abstract class DokkaSourceSetSpec(
   /**
    * Source code roots to be analyzed and documented.
    * Accepts directories and individual `.kt` / `.java` files.
-   *
-   * Prefer using [sourceRoot] function to append source roots to this list.
    *
    * By default, source roots are deduced from information provided by the Kotlin Gradle plugin.
    */
@@ -335,44 +332,6 @@ abstract class DokkaSourceSetSpec(
    */
   @get:Input
   abstract val jdkVersion: Property<Int>
-
-  fun DokkaSourceSetID(sourceSetName: String): DokkaSourceSetIDSpec {
-    return dependentSourceSets.create("TODO figure out scope ID") {
-      this.sourceSetName = sourceSetName
-    }
-  }
-
-  /** Convenient override to **append** source sets to [dependentSourceSets] */
-  fun dependsOn(sourceSet: SourceSet): Unit = dependsOn(sourceSet.name)
-
-//    /** Convenient override to **append** source sets to [dependentSourceSets] */
-//    fun dependsOn(sourceSet: DokkaSourceSetGradleBuilder): Unit {
-//        dependentSourceSets.add(sourceSet.sourceSetID.get())
-//    }
-
-  /** Convenient override to **append** source sets to [dependentSourceSets] */
-  fun dependsOn(sourceSet: DokkaConfiguration.DokkaSourceSet): Unit =
-    dependsOn(sourceSet.sourceSetID)
-
-  /** Convenient override to **append** source sets to [dependentSourceSets] */
-  fun dependsOn(sourceSetName: String): Unit = dependsOn(sourceSetName)
-
-  /** Convenient override to **append** source sets to [dependentSourceSets] */
-  fun dependsOn(sourceSetID: DokkaSourceSetID) {
-    dependentSourceSets.create(sourceSetID.scopeId) {
-      sourceSetName = sourceSetID.sourceSetName
-    }
-  }
-
-  /** Convenient override to **append** source roots to [sourceRoots] */
-  fun sourceRoot(file: File) {
-    sourceRoots.from(file)
-  }
-
-  /** Convenient override to **append** source roots to [sourceRoots] */
-  fun sourceRoot(path: String) {
-    sourceRoots.from(path)
-  }
 
   /**
    * Action for configuring source links, appending to [sourceLinks].
