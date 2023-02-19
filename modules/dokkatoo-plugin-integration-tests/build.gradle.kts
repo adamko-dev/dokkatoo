@@ -11,6 +11,7 @@ plugins {
   `jvm-test-suite`
   `test-report-aggregation`
 
+  buildsrc.conventions.`java-base`
   buildsrc.conventions.`dokka-source-downloader`
   buildsrc.conventions.`maven-publish-test`
   buildsrc.conventions.`dokkatoo-example-projects`
@@ -209,10 +210,4 @@ tasks.withType<Test>().configureEach {
     "-Xmx1g",
     "-XX:MaxMetaspaceSize=512m",
   )
-}
-
-java {
-  toolchain {
-    languageVersion.set(JavaLanguageVersion.of(11))
-  }
 }
