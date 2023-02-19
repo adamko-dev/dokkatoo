@@ -22,7 +22,7 @@ class MultiModuleFunctionalTest : FunSpec({
   context("when dokkatoo generates all formats") {
     val build = project.runner
       .withArguments("clean", ":dokkatooGenerate", "--stacktrace", "--info")
-      //.forwardOutput()
+      .forwardOutput()
       .build()
 
 

@@ -43,8 +43,7 @@ class MultimoduleExampleTest : FunSpec({
           "dokkaHtmlMultiModule",
           "--stacktrace",
           "--info",
-        )
-        //.forwardOutput()
+        ).forwardOutput()
         .build()
 
       dokkaBuild.output shouldContain "BUILD SUCCESSFUL"
@@ -58,8 +57,7 @@ class MultimoduleExampleTest : FunSpec({
           ":parentProject:dokkatooGeneratePublicationHtml",
           "--stacktrace",
           "--info",
-        )
-        //.forwardOutput()
+        ).forwardOutput()
         .build()
 
       test("expect build is successful") {
@@ -67,7 +65,7 @@ class MultimoduleExampleTest : FunSpec({
       }
 
       test("expect all dokka workers are successful") {
-        build.output.invariantNewlines() shouldContain "BUILD SUCCESSFUL"
+
         val dokkaWorkerLogs = dokkatooProject.findFiles { it.name == "dokka-worker.log" }
 //      dokkaWorkerLogs shouldHaveCount 1
         dokkaWorkerLogs.firstOrNull().shouldNotBeNull().should { dokkaWorkerLog ->
@@ -108,8 +106,7 @@ class MultimoduleExampleTest : FunSpec({
           ":parentProject:dokkatooGeneratePublicationHtml",
           "--info",
           "--stacktrace",
-        )
-        //.forwardOutput()
+        ).forwardOutput()
         .build()
 
 
@@ -136,8 +133,7 @@ class MultimoduleExampleTest : FunSpec({
           "--stacktrace",
           "--info",
           "--build-cache",
-        )
-          //.forwardOutput()
+        ).forwardOutput()
           .build().should { dokkatooBuildCache ->
 
             dokkatooBuildCache.output shouldContainAll listOf(
@@ -162,8 +158,7 @@ class MultimoduleExampleTest : FunSpec({
           "--info",
           "--no-build-cache",
           "--configuration-cache",
-        )
-        //.forwardOutput()
+        ).forwardOutput()
         .build()
 
       dokkatooBuild.output shouldContain "BUILD SUCCESSFUL"

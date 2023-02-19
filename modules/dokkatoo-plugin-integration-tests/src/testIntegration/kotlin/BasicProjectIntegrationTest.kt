@@ -41,8 +41,7 @@ class BasicProjectIntegrationTest : FunSpec({
         "dokkaHtml",
         "--stacktrace",
         "--info",
-      )
-      //.forwardOutput()
+      ).forwardOutput()
       .withEnvironment(
         "DOKKA_VERSION" to "1.7.20",
       )
@@ -54,8 +53,7 @@ class BasicProjectIntegrationTest : FunSpec({
         "dokkatooGeneratePublicationHtml",
         "--stacktrace",
         "--info",
-      )
-      //.forwardOutput()
+      ).forwardOutput()
       .build()
 
     test("expect project builds successfully") {

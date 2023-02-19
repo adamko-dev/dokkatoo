@@ -40,8 +40,7 @@ class GradleExampleTest : FunSpec({
           "dokkaHtml",
           "--stacktrace",
           "--info",
-        )
-        //.forwardOutput()
+        ).forwardOutput()
         .build()
 
       dokkaBuild.output shouldContain "BUILD SUCCESSFUL"
@@ -55,8 +54,7 @@ class GradleExampleTest : FunSpec({
           ":dokkatooGeneratePublicationHtml",
           "--stacktrace",
           "--info",
-        )
-        //.forwardOutput()
+        ).forwardOutput()
         .build()
 
 
@@ -137,8 +135,7 @@ class GradleExampleTest : FunSpec({
           "--info",
           "--no-build-cache",
           "--configuration-cache",
-        )
-        //.forwardOutput()
+        ).forwardOutput()
         .build()
 
       dokkatooBuild.output shouldContain "BUILD SUCCESSFUL"
