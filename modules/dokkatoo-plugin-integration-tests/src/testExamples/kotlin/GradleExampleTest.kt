@@ -1,11 +1,20 @@
 package dev.adamko.dokkatoo.tests.examples
 
-import dev.adamko.dokkatoo.utils.*
+import dev.adamko.dokkatoo.utils.GradleProjectTest
 import dev.adamko.dokkatoo.utils.GradleProjectTest.Companion.projectTestTempDir
+import dev.adamko.dokkatoo.utils.buildGradleKts
+import dev.adamko.dokkatoo.utils.copyExampleProject
+import dev.adamko.dokkatoo.utils.findFiles
+import dev.adamko.dokkatoo.utils.shouldContainAll
+import dev.adamko.dokkatoo.utils.sideBySide
+import dev.adamko.dokkatoo.utils.toTreeString
 import io.kotest.assertions.withClue
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.file.shouldBeAFile
 import io.kotest.matchers.file.shouldHaveSameStructureAndContentAs
 import io.kotest.matchers.file.shouldHaveSameStructureAs
+import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.sequences.shouldHaveCount
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
@@ -32,7 +41,7 @@ class GradleExampleTest : FunSpec({
           "--stacktrace",
           "--info",
         )
-        .forwardOutput()
+        //.forwardOutput()
         .build()
 
       dokkaBuild.output shouldContain "BUILD SUCCESSFUL"
@@ -47,11 +56,17 @@ class GradleExampleTest : FunSpec({
           "--stacktrace",
           "--info",
         )
-        .forwardOutput()
+        //.forwardOutput()
         .build()
 
+
       dokkatooBuild.output shouldContain "BUILD SUCCESSFUL"
-      dokkatooBuild.output shouldContain "Generation completed successfully"
+
+      val dokkaWorkerLogs = dokkatooProject.findFiles { it.name == "dokka-worker.log" }
+      dokkaWorkerLogs shouldHaveCount 1
+      val dokkaWorkerLog = dokkaWorkerLogs.first()
+      dokkaWorkerLog.shouldNotBeNull().shouldBeAFile()
+      dokkaWorkerLog.readText() shouldContain "Generation completed successfully"
     }
 
     context("expect dokka and dokkatoo HTML is the same") {
@@ -71,6 +86,8 @@ class GradleExampleTest : FunSpec({
       }
     }
   }
+
+
   context("Gradle caching") {
     test("expect Dokkatoo is compatible with Gradle Build Cache") {
       val dokkatooBuild = dokkatooProject.runner
@@ -80,11 +97,16 @@ class GradleExampleTest : FunSpec({
           "--info",
           "--stacktrace",
         )
-        .forwardOutput()
+        //.forwardOutput()
         .build()
 
       dokkatooBuild.output shouldContain "BUILD SUCCESSFUL"
-      dokkatooBuild.output shouldContain "Generation completed successfully"
+
+      val dokkaWorkerLogs = dokkatooProject.findFiles { it.name == "dokka-worker.log" }
+      dokkaWorkerLogs shouldHaveCount 1
+      val dokkaWorkerLog = dokkaWorkerLogs.first()
+      dokkaWorkerLog.shouldNotBeNull().shouldBeAFile()
+      dokkaWorkerLog.readText() shouldContain "Generation completed successfully"
 
       dokkatooProject.runner.withArguments(
         ":dokkatooGeneratePublicationHtml",
@@ -116,7 +138,7 @@ class GradleExampleTest : FunSpec({
           "--no-build-cache",
           "--configuration-cache",
         )
-        .forwardOutput()
+        //.forwardOutput()
         .build()
 
       dokkatooBuild.output shouldContain "BUILD SUCCESSFUL"

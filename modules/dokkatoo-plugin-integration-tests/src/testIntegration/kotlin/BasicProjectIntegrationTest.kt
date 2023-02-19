@@ -48,7 +48,7 @@ class BasicProjectIntegrationTest {
         "--stacktrace",
         "--info",
       )
-      .forwardOutput()
+      //.forwardOutput()
       .withEnvironment(
         "DOKKA_VERSION" to "1.7.20",
       )
@@ -68,7 +68,7 @@ class BasicProjectIntegrationTest {
         "--stacktrace",
         "--info",
       )
-      .forwardOutput()
+      //.forwardOutput()
       .build()
 
     dokkatooBuild.output shouldContain "BUILD SUCCESSFUL"
