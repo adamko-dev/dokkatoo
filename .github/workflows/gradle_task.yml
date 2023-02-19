@@ -57,7 +57,9 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: build-report-${{ runner.os }}${{ github.action }}
-          path: "**/build/reports/"
+          path: |
+            **/build/reports/
+            **/*.hprof
           if-no-files-found: ignore
 
       - name: Publish Test Reports

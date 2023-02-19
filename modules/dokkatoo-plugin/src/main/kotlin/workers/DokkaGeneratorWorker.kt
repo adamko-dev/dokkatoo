@@ -5,6 +5,7 @@ import dev.adamko.dokkatoo.internal.LoggerAdapter
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlin.time.nanoseconds
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.workers.WorkAction
 import org.gradle.workers.WorkParameters
@@ -20,21 +21,23 @@ import org.jetbrains.dokka.DokkaGenerator
 @OptIn(ExperimentalTime::class)
 abstract class DokkaGeneratorWorker : WorkAction<DokkaGeneratorWorker.Parameters> {
 
-  private val logger = LoggerAdapter(DokkaGeneratorWorker::class)
-
   interface Parameters : WorkParameters {
     val dokkaParameters: Property<DokkaConfiguration>
+    val logFile: RegularFileProperty
   }
 
   override fun execute() {
-    val dokkaParameters = parameters.dokkaParameters.get()
-    logger.progress("Executing DokkaGeneratorWorker with dokkaParameters: $dokkaParameters")
+    LoggerAdapter(parameters.logFile.get().asFile).use { logger ->
 
-    val generator = DokkaGenerator(dokkaParameters, logger)
+      val dokkaParameters = parameters.dokkaParameters.get()
+      logger.progress("Executing DokkaGeneratorWorker with dokkaParameters: $dokkaParameters")
 
-    val duration = measureTime { generator.generate() }
+      val generator = DokkaGenerator(dokkaParameters, logger)
 
-    logger.info("DokkaGeneratorWorker completed in $duration")
+      val duration = measureTime { generator.generate() }
+
+      logger.info("DokkaGeneratorWorker completed in $duration")
+    }
   }
 
   companion object {

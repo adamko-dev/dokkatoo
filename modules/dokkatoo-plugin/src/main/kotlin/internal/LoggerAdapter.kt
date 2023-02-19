@@ -1,25 +1,33 @@
 package dev.adamko.dokkatoo.internal
 
+import java.io.File
+import java.io.Writer
 import java.util.concurrent.atomic.AtomicInteger
-import kotlin.reflect.KClass
-import org.gradle.api.logging.Logger
-import org.gradle.api.logging.Logging
 import org.jetbrains.dokka.utilities.DokkaLogger
+import org.jetbrains.dokka.utilities.LoggingLevel
 
 /**
- * Adapt a Gradle [Logger] to a [DokkaLogger], to be used by Dokka when generating documentation.
+ * Logs all Dokka messages to a file.
  *
- * Using the Gradle logger means that the log-level wil be controlled by the standard
- * Gradle command line options, e.g. `--info`.
- *
- * @param[logger] A Gradle logger
  * @see org.jetbrains.dokka.DokkaGenerator
  */
+// Gradle causes OOM errors when there is a lot of console output. Logging to file is a workaround.
+// https://github.com/gradle/gradle/issues/23965
+// https://github.com/gradle/gradle/issues/15621
 internal class LoggerAdapter(
-  private val logger: Logger
-) : DokkaLogger {
+  outputFile: File
+) : DokkaLogger, AutoCloseable {
 
-  constructor(kClass: KClass<*>) : this(Logging.getLogger(kClass.java))
+  private val logWriter: Writer
+
+  init {
+    if (!outputFile.exists()) {
+      outputFile.parentFile.mkdirs()
+      outputFile.createNewFile()
+    }
+
+    logWriter = outputFile.bufferedWriter()
+  }
 
   private val warningsCounter = AtomicInteger()
   private val errorsCounter = AtomicInteger()
@@ -32,17 +40,26 @@ internal class LoggerAdapter(
     get() = errorsCounter.get()
     set(value) = errorsCounter.set(value)
 
-  override fun debug(message: String) = logger.debug(message)
-  override fun progress(message: String) = logger.lifecycle(message)
-  override fun info(message: String) = logger.info(message)
+  override fun debug(message: String) = log(LoggingLevel.DEBUG, message)
+  override fun progress(message: String) = log(LoggingLevel.PROGRESS, message)
+  override fun info(message: String) = log(LoggingLevel.INFO, message)
 
   override fun warn(message: String) {
     warningsCount++
-    logger.warn(message)
+    log(LoggingLevel.WARN, message)
   }
 
   override fun error(message: String) {
     errorsCount++
-    logger.error(message)
+    log(LoggingLevel.ERROR, message)
+  }
+
+  @Synchronized
+  private fun log(level: LoggingLevel, message: String) {
+    logWriter.appendLine("[${level.name}] $message")
+  }
+
+  override fun close() {
+    logWriter.close()
   }
 }

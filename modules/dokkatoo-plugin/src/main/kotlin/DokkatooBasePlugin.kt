@@ -93,6 +93,7 @@ abstract class DokkatooBasePlugin @Inject constructor(
     target.tasks.withType<DokkatooGenerateTask>().configureEach {
       cacheDirectory.convention(dokkatooExtension.dokkatooCacheDirectory)
       workerDebugEnabled.convention(false)
+      workerLogFile.set(temporaryDir.resolve("dokka-worker.log"))
       // increase memory - DokkaGenerator is hungry https://github.com/Kotlin/dokka/issues/1405
       workerMinHeapSize.convention("256m")
       workerMaxHeapSize.convention("1g")
