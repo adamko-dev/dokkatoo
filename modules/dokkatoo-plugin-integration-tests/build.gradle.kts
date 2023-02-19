@@ -210,3 +210,9 @@ tasks.withType<Test>().configureEach {
     "-XX:MaxMetaspaceSize=512m",
   )
 }
+
+java {
+  toolchain {
+    languageVersion.set(JavaLanguageVersion.of(11))
+  }
+}

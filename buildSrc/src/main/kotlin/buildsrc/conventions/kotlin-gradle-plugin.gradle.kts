@@ -9,3 +9,13 @@ plugins {
 tasks.validatePlugins {
   enableStricterValidation.set(true)
 }
+
+java {
+  withSourcesJar()
+}
+
+java {
+  toolchain {
+    languageVersion.set(JavaLanguageVersion.of(11))
+  }
+}

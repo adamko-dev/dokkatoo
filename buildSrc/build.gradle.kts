@@ -9,3 +9,9 @@ dependencies {
 
   implementation("com.gradle.publish:plugin-publish-plugin:1.1.0")
 }
+
+java {
+  toolchain {
+    languageVersion.set(JavaLanguageVersion.of(11))
+  }
+}
