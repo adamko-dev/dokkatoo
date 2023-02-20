@@ -60,6 +60,7 @@ jobs:
           path: |
             **/build/reports/
             **/*.hprof
+            **/*.log
           if-no-files-found: ignore
 
       - name: Publish Test Reports
