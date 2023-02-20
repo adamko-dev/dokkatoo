@@ -12,6 +12,10 @@ Utility for publishing a project to a local Maven directory for use in integrati
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+plugins {
+  base
+}
+
 abstract class MavenPublishTest(
   val testMavenRepo: Provider<Directory>
 ) {
@@ -42,10 +46,12 @@ plugins.withType<MavenPublishPlugin>().all {
       val publicationName = this@publication.name
       val installTaskName = "publish${publicationName.capitalize()}PublicationToTestMavenRepo"
 
-      // Register a publiction task for each publication.
+      // Register a publication task for each publication.
       // Use PublishToMavenLocal, because the PublishToMavenRepository task will *always* create
       // a new jar, even if nothing has changed, and append a timestamp, which results in a large
-      // directory. PublishToMavenLocal does not append a timestamp, so the target directory is smaller
+      // directory and tasks are never up-to-date.
+      // PublishToMavenLocal does not append a timestamp, so the target directory is smaller, and
+      // up-to-date checks work.
       val installTask = tasks.register<PublishToMavenLocal>(installTaskName) {
         description = "Publishes Maven publication '$publicationName' to the test Maven repository."
         group = PublishingPlugin.PUBLISH_TASK_GROUP
@@ -65,6 +71,10 @@ plugins.withType<MavenPublishPlugin>().all {
 
       publishToTestMavenRepo.configure {
         dependsOn(installTask)
+      }
+
+      tasks.check {
+        mustRunAfter(installTask)
       }
     }
 }

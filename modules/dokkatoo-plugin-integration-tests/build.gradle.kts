@@ -17,6 +17,8 @@ plugins {
   buildsrc.conventions.`dokkatoo-example-projects`
 }
 
+description = "Integration tests for Dokkatoo Gradle Plugin. The tests use Gradle TestKit to run the template projects that are committed in the repo."
+
 dependencies {
   testMavenPublication(projects.modules.dokkatooPlugin)
   exampleProjects(projects.examples)
