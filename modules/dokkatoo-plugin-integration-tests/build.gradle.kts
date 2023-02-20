@@ -203,11 +203,11 @@ tasks.setupDokkaTemplateProjects {
   )
 }
 
-tasks.withType<Test>().configureEach {
-  // this seems to help OOM errors in the Worker Daemons
-  setForkEvery(1)
-  jvmArgs(
-    "-Xmx1g",
-    "-XX:MaxMetaspaceSize=512m",
-  )
-}
+//tasks.withType<Test>().configureEach {
+//  // this seems to help OOM errors in the Worker Daemons
+//  setForkEvery(1)
+//  jvmArgs(
+//    "-Xmx1g",
+//    "-XX:MaxMetaspaceSize=512m",
+//  )
+//}
