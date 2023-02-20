@@ -27,11 +27,12 @@ dependencies {
 
   testFixturesImplementation(gradleApi())
   testFixturesImplementation(gradleTestKit())
+  testFixturesCompileOnly("org.jetbrains.dokka:dokka-core:1.7.20")
   testFixturesImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
-  testFixturesImplementation(platform("io.kotest:kotest-bom:5.5.5"))
-  testFixturesImplementation("io.kotest:kotest-runner-junit5")
-  testFixturesImplementation("io.kotest:kotest-assertions-core")
-  testFixturesImplementation("io.kotest:kotest-assertions-json")
+  testFixturesApi(platform("io.kotest:kotest-bom:5.5.5"))
+  testFixturesApi("io.kotest:kotest-runner-junit5")
+  testFixturesApi("io.kotest:kotest-assertions-core")
+  testFixturesApi("io.kotest:kotest-assertions-json")
 
 //  kotlinDokkaSource(projects.externals)
 
@@ -104,12 +105,7 @@ testing.suites {
       implementation("org.jetbrains.kotlin:kotlin-test:1.7.20")
       //implementation(project.dependencies.kotlin("test")) // helper function doesn't work?
 
-      implementation(project.dependencies.platform("io.kotest:kotest-bom:5.5.5"))
-      implementation("io.kotest:kotest-runner-junit5")
-      implementation("io.kotest:kotest-assertions-core")
-      implementation("io.kotest:kotest-assertions-json")
-
-      implementation(project.dependencies.testFixtures(project()))
+      implementation(project.dependencies.testFixtures(project))
 
       implementation("org.jetbrains.dokka:dokka-core:1.7.20")
       implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
