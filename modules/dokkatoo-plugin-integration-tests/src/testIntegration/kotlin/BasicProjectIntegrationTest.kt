@@ -30,7 +30,7 @@ import java.io.File
  * Runs Dokka & Dokkatoo, and compares the resulting HTML site.
  */
 @EnabledIf(NotWindowsCondition::class) // https://github.com/adamko-dev/dokkatoo/issues/10
-class BasicProjectIntegrationTest : FunSpec(funSpec@{
+class BasicProjectIntegrationTest : FunSpec({
 
   val tempDir = projectTestTempDir.resolve("it/it-basic").toFile()
 
