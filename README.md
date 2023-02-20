@@ -19,24 +19,25 @@ then what is Dokkatoo for?
 Dokkatoo has a number of improvements over the existing Dokka Gradle Plugin:
 
 * Compatible with [Gradle Build Cache](https://docs.gradle.org/current/userguide/build_cache.html)
-* Compatible with 
-[Gradle Configuration Cache](https://docs.gradle.org/current/userguide/configuration_cache.html)
-(soon!)
+* Compatible with
+  [Gradle Configuration Cache](https://docs.gradle.org/current/userguide/configuration_cache.html)
+  ([soon!](https://github.com/adamko-dev/dokkatoo/issues/11))
 * Safe cross-project sharing and aggregation
 * Parallel execution
 
 ### Status
 
-Dokkatoo has basic functionality, and can generate documentation for single-projects and 
+Dokkatoo has basic functionality, and can generate documentation for single-projects and
 multimodule projects.
 
-Be aware that many of things are untested, broken, and undocumented. Please 
+Be aware that many of things are untested, broken, and undocumented. Please
 [create an issue](https://github.com/adamko-dev/dokkatoo/issues)
 if something is not as you'd expect, or like.
 
 ## Usage
 
-Dokkatoo is published on the [Gradle Plugin Portal](https://plugins.gradle.org/search?term=dokkatoo).
+Dokkatoo is published on
+the [Gradle Plugin Portal](https://plugins.gradle.org/search?term=dokkatoo).
 
 ### Quick start
 
@@ -72,7 +73,6 @@ Dokkatoo is published on the [Gradle Plugin Portal](https://plugins.gradle.org/s
    ```
 
 3. View the results in `./build/dokka/`
-
 
 #### Configuring Dokkatoo
 
@@ -135,7 +135,7 @@ Dokkatoo can aggregate documentation from subprojects.
 
 To do this, apply the Dokkatoo plugin in all subprojects that should be documented.
 
-In the aggregating project, depend on the other subprojects. 
+In the aggregating project, depend on the other subprojects.
 
 ```kts
 // ./build.gradle.kts
@@ -152,7 +152,7 @@ dependencies {
 }
 ```
 
-Run the Dokkatoo generation task.  
+Run the Dokkatoo generation task.
 
 ```shell
 ./gradlew :dokkatooGeneratePublicationHtml
@@ -169,7 +169,7 @@ Dokkatoo will then generate documentation into `./docs/build/dokka/`
 Dokkatoo is not a drop-in replacement for the Dokka Gradle Plugin, and requires migration.
 
 When Dokkatoo matures, a guide will be made available. For now, check the
-[example projects](./examples/README.md) for comparative examples.
+[example projects](./examples#readme) for comparative examples.
 
 ###### Apply both Dokka Gradle Plugin and Dokkatoo
 
