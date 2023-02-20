@@ -1,34 +1,31 @@
 package dev.adamko.dokkatoo
 
 import dev.adamko.dokkatoo.tasks.DokkatooPrepareParametersTask
+import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
-import kotlin.test.Test
 import org.gradle.api.Action
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.hasPlugin
 import org.gradle.kotlin.dsl.withType
 import org.gradle.testfixtures.ProjectBuilder
 
-class DokkatooPluginTest {
+class DokkatooPluginTest : FunSpec({
 
-  @Test
-  fun `expect plugin id can be applied to project successfully`() {
+  test("expect plugin id can be applied to project successfully") {
     val project = ProjectBuilder.builder().build()
     project.plugins.apply("dev.adamko.dokkatoo")
     project.plugins.hasPlugin("dev.adamko.dokkatoo") shouldBe true
     project.plugins.hasPlugin(DokkatooPlugin::class) shouldBe true
   }
 
-  @Test
-  fun `expect plugin class can be applied to project successfully`() {
+  test("expect plugin class can be applied to project successfully") {
     val project = ProjectBuilder.builder().build()
     project.plugins.apply(type = DokkatooPlugin::class)
     project.plugins.hasPlugin("dev.adamko.dokkatoo") shouldBe true
     project.plugins.hasPlugin(DokkatooPlugin::class) shouldBe true
   }
 
-  @Test
-  fun `dokka configuration task`() {
+  test("dokka configuration task") {
     val project = ProjectBuilder.builder().build()
     project.plugins.apply("dev.adamko.dokkatoo")
 
@@ -63,7 +60,7 @@ class DokkatooPluginTest {
       })
     })
   }
-}
+})
 
 @Suppress("ObjectLiteralToLambda") // workaround for https://youtrack.jetbrains.com/issue/KTIJ-14684
 private inline fun <T : Any> action(crossinline block: T.() -> Unit) =
