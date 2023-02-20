@@ -70,6 +70,10 @@ abstract class DokkatooGenerateTask @Inject constructor(
   @get:Input
   abstract val workerJvmArgs: ListProperty<String>
 
+  //  @get:Internal
+  @get:LocalState
+  abstract val workerLogFile: RegularFileProperty
+
   enum class GenerationType {
     MODULE,
     PUBLICATION,
@@ -115,6 +119,7 @@ abstract class DokkatooGenerateTask @Inject constructor(
 
     workQueue.submit(DokkaGeneratorWorker::class) worker@{
       this@worker.dokkaParameters.set(dokkaParameters)
+      this@worker.logFile.set(workerLogFile)
     }
   }
 

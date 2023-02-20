@@ -1,46 +1,40 @@
 package dev.adamko.dokkatoo.tests.integration
 
 import dev.adamko.dokkatoo.utils.GradleProjectTest
-import dev.adamko.dokkatoo.utils.GradleProjectTest.Companion.integrationTestProjectsDir
 import dev.adamko.dokkatoo.utils.GradleProjectTest.Companion.projectTestTempDir
 import dev.adamko.dokkatoo.utils.buildGradleKts
 import dev.adamko.dokkatoo.utils.copyIntegrationTestProject
+import dev.adamko.dokkatoo.utils.findFiles
 import dev.adamko.dokkatoo.utils.projectFile
 import dev.adamko.dokkatoo.utils.settingsGradleKts
 import dev.adamko.dokkatoo.utils.shouldContainAll
+import dev.adamko.dokkatoo.utils.shouldNotContainAnyOf
 import dev.adamko.dokkatoo.utils.sideBySide
 import dev.adamko.dokkatoo.utils.toTreeString
 import dev.adamko.dokkatoo.utils.withEnvironment
-import io.kotest.assertions.withClue
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.file.shouldBeAFile
 import io.kotest.matchers.file.shouldHaveSameStructureAndContentAs
 import io.kotest.matchers.file.shouldHaveSameStructureAs
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
-import io.kotest.matchers.string.shouldNotContain
 import java.io.File
-import org.junit.jupiter.api.Test
 
 /**
  * Integration test for the `it-basic` project in Dokka
  *
  * Runs Dokka & Dokkatoo, and compares the resulting HTML site.
  */
-class BasicProjectIntegrationTest {
+class BasicProjectIntegrationTest : FunSpec({
 
-  @Test
-  fun `test basic project`() {
+  val tempDir = projectTestTempDir.resolve("it/it-basic").toFile()
 
-    val basicProjectSrcDir = integrationTestProjectsDir.resolve("it-basic/dokka")
+  val dokkatooProject = initDokkatooProject(tempDir.resolve("dokkatoo"))
+  val dokkaProject = initDokkaProject(tempDir.resolve("dokka"))
 
-    val tempDir = projectTestTempDir.resolve("it/it-basic").toFile()
-
-    val dokkaDir = tempDir.resolve("dokka")
-    basicProjectSrcDir.toFile()
-      .copyRecursively(dokkaDir, overwrite = true) { _, _ -> OnErrorAction.SKIP }
-
-    val dokkaProject = initDokkaProject(dokkaDir)
-
+  context("when generating HTML") {
     val dokkaBuild = dokkaProject.runner
       .withArguments(
         "clean",
@@ -54,13 +48,6 @@ class BasicProjectIntegrationTest {
       )
       .build()
 
-    dokkaBuild.output shouldContain "BUILD SUCCESSFUL"
-    dokkaBuild.output shouldContain "Generation completed successfully"
-
-    val dokkatooDir = tempDir.resolve("dokkatoo")
-
-    val dokkatooProject = initDokkatooProject(dokkatooDir)
-
     val dokkatooBuild = dokkatooProject.runner
       .withArguments(
         "clean",
@@ -71,40 +58,79 @@ class BasicProjectIntegrationTest {
       .forwardOutput()
       .build()
 
-    dokkatooBuild.output shouldContain "BUILD SUCCESSFUL"
-    dokkatooBuild.output shouldContain "Generation completed successfully"
+    test("expect project builds successfully") {
+      dokkatooBuild.output shouldContain "BUILD SUCCESSFUL"
+    }
 
-    val dokkaHtmlDir = dokkaProject.projectDir.resolve("build/dokka/html")
-    val dokkatooHtmlDir = dokkatooProject.projectDir.resolve("build/dokka/html")
+    context("with Dokka") {
 
-    val expectedFileTree = dokkaHtmlDir.toTreeString()
-    val actualFileTree = dokkatooHtmlDir.toTreeString()
-    println((actualFileTree to expectedFileTree).sideBySide())
-    expectedFileTree shouldBe actualFileTree
+      test("expect project builds successfully") {
+        dokkaBuild.output shouldContain "BUILD SUCCESSFUL"
+      }
 
-    dokkatooHtmlDir.toFile().shouldHaveSameStructureAs(dokkaHtmlDir.toFile())
-    dokkatooHtmlDir.toFile().shouldHaveSameStructureAndContentAs(dokkaHtmlDir.toFile())
+      test("expect all dokka workers are successful") {
 
-    withClue("Dokkatoo tasks should be cacheable") {
-      dokkatooProject.runner.withArguments(
-        "dokkatooGeneratePublicationHtml",
-        "--stacktrace",
-        "--info",
-        "--build-cache",
-      ).forwardOutput()
+        val dokkaWorkerLogs = dokkatooProject.findFiles { it.name == "dokka-worker.log" }
+//      dokkaWorkerLogs shouldHaveCount 1
+        dokkaWorkerLogs.firstOrNull().shouldNotBeNull().should { dokkaWorkerLog ->
+          dokkaWorkerLog.shouldBeAFile()
+          dokkaWorkerLog.readText().shouldNotContainAnyOf(
+            "[ERROR]",
+            "[WARN]",
+          )
+        }
+      }
+    }
+
+    context("with Dokkatoo") {
+
+      test("expect all dokka workers are successful") {
+
+        val dokkaWorkerLogs = dokkatooProject.findFiles { it.name == "dokka-worker.log" }
+//      dokkaWorkerLogs shouldHaveCount 1
+        dokkaWorkerLogs.firstOrNull().shouldNotBeNull().should { dokkaWorkerLog ->
+          dokkaWorkerLog.shouldBeAFile()
+          dokkaWorkerLog.readText().shouldNotContainAnyOf(
+            "[ERROR]",
+            "[WARN]",
+          )
+        }
+      }
+    }
+
+    test("expect the same HTML is generated") {
+
+      val dokkaHtmlDir = dokkaProject.projectDir.resolve("build/dokka/html")
+      val dokkatooHtmlDir = dokkatooProject.projectDir.resolve("build/dokka/html")
+
+      val expectedFileTree = dokkaHtmlDir.toTreeString()
+      val actualFileTree = dokkatooHtmlDir.toTreeString()
+      println((actualFileTree to expectedFileTree).sideBySide())
+      expectedFileTree shouldBe actualFileTree
+
+      dokkatooHtmlDir.toFile().shouldHaveSameStructureAs(dokkaHtmlDir.toFile())
+      dokkatooHtmlDir.toFile().shouldHaveSameStructureAndContentAs(dokkaHtmlDir.toFile())
+    }
+
+    test("Dokkatoo tasks should be cacheable") {
+      dokkatooProject.runner
+        .withArguments(
+          "dokkatooGeneratePublicationHtml",
+          "--stacktrace",
+          "--info",
+          "--build-cache",
+        )
+        .forwardOutput()
         .build().should { buildResult ->
           buildResult.output shouldContainAll listOf(
             "Task :prepareDokkatooParametersHtml UP-TO-DATE",
             "Task :dokkatooGeneratePublicationHtml UP-TO-DATE",
           )
-          withClue("Dokka Generator should not be triggered, so check it doesn't log anything") {
-            buildResult.output shouldNotContain "Generation completed successfully"
-          }
         }
     }
 
     // TODO test configuration cache
-//    withClue("Dokkatoo tasks should be configuration-cache compatible") {
+//    test("Dokkatoo tasks should be configuration-cache compatible") {
 //      val dokkatooBuildCache =
 //        dokkatooProject.runner.withArguments(
 //          "clean",
@@ -122,7 +148,7 @@ class BasicProjectIntegrationTest {
 //      )
 //    }
   }
-}
+})
 
 
 private fun initDokkaProject(

@@ -34,3 +34,32 @@ private fun containAll(substrings: Iterable<String>) =
       { "${value.print().value} should include substrings ${substrings.print().value}" },
       { "${value.print().value} should not include substrings ${substrings.print().value}" })
   }
+
+
+infix fun String?.shouldContainAnyOf(substrings: Iterable<String>): String? {
+  this should containAnyOf(substrings)
+  return this
+}
+
+infix fun String?.shouldNotContainAnyOf(substrings: Iterable<String>): String? {
+  this shouldNot containAnyOf(substrings)
+  return this
+}
+
+fun String?.shouldContainAnyOf(vararg substrings: String): String? {
+  this should containAnyOf(substrings.asList())
+  return this
+}
+
+fun String?.shouldNotContainAnyOf(vararg substrings: String): String? {
+  this shouldNot containAnyOf(substrings.asList())
+  return this
+}
+
+private fun containAnyOf(substrings: Iterable<String>) =
+  neverNullMatcher<String> { value ->
+    MatcherResult(
+      substrings.any { it in value },
+      { "${value.print().value} should include any of these substrings ${substrings.print().value}" },
+      { "${value.print().value} should not include any of these substrings ${substrings.print().value}" })
+  }

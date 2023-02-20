@@ -227,6 +227,10 @@ fun ProjectDirectoryScope.file(
 ): Path = projectDir.resolve(path)
 
 
+fun ProjectDirectoryScope.findFiles(matcher: (File) -> Boolean): Sequence<File> =
+  projectDir.toFile().walk().filter(matcher)
+
+
 /** Set the content of `settings.gradle.kts` */
 @delegate:Language("kts")
 var ProjectDirectoryScope.settingsGradleKts: String by TestProjectFileDelegate("settings.gradle.kts")
@@ -251,10 +255,10 @@ var ProjectDirectoryScope.buildGradle: String by TestProjectFileDelegate("build.
 @delegate:Language("properties")
 var ProjectDirectoryScope.gradleProperties: String by TestProjectFileDelegate("gradle.properties")
 
-fun GradleProjectTest.createKotlinFile(filePath: String, @Language("kotlin") contents: String) =
+fun ProjectDirectoryScope.createKotlinFile(filePath: String, @Language("kotlin") contents: String) =
   createFile(filePath, contents)
 
-fun GradleProjectTest.createKtsFile(filePath: String, @Language("kts") contents: String) =
+fun ProjectDirectoryScope.createKtsFile(filePath: String, @Language("kts") contents: String) =
   createFile(filePath, contents)
 
 

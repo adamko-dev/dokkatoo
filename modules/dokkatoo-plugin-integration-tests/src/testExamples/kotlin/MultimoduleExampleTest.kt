@@ -1,11 +1,23 @@
 package dev.adamko.dokkatoo.tests.examples
 
-import dev.adamko.dokkatoo.utils.*
+import dev.adamko.dokkatoo.utils.GradleProjectTest
 import dev.adamko.dokkatoo.utils.GradleProjectTest.Companion.projectTestTempDir
+import dev.adamko.dokkatoo.utils.buildGradleKts
+import dev.adamko.dokkatoo.utils.copyExampleProject
+import dev.adamko.dokkatoo.utils.dir
+import dev.adamko.dokkatoo.utils.findFiles
+import dev.adamko.dokkatoo.utils.invariantNewlines
+import dev.adamko.dokkatoo.utils.settingsGradleKts
+import dev.adamko.dokkatoo.utils.shouldContainAll
+import dev.adamko.dokkatoo.utils.shouldNotContainAnyOf
+import dev.adamko.dokkatoo.utils.sideBySide
+import dev.adamko.dokkatoo.utils.toTreeString
 import io.kotest.assertions.withClue
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.file.shouldBeAFile
 import io.kotest.matchers.file.shouldHaveSameStructureAndContentAs
 import io.kotest.matchers.file.shouldHaveSameStructureAs
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
@@ -39,8 +51,8 @@ class MultimoduleExampleTest : FunSpec({
       dokkaBuild.output shouldContain "Generation completed successfully"
     }
 
-    test("expect dokkatoo can generate HTML") {
-      val dokkatooBuild = dokkatooProject.runner
+    context("when Dokkatoo generates HTML") {
+      val build = dokkatooProject.runner
         .withArguments(
           "clean",
           ":parentProject:dokkatooGeneratePublicationHtml",
@@ -50,8 +62,22 @@ class MultimoduleExampleTest : FunSpec({
         .forwardOutput()
         .build()
 
-      dokkatooBuild.output shouldContain "BUILD SUCCESSFUL"
-      dokkatooBuild.output shouldContain "Generation completed successfully"
+      test("expect build is successful") {
+        build.output shouldContain "BUILD SUCCESSFUL"
+      }
+
+      test("expect all dokka workers are successful") {
+
+        val dokkaWorkerLogs = dokkatooProject.findFiles { it.name == "dokka-worker.log" }
+//      dokkaWorkerLogs shouldHaveCount 1
+        dokkaWorkerLogs.firstOrNull().shouldNotBeNull().should { dokkaWorkerLog ->
+          dokkaWorkerLog.shouldBeAFile()
+          dokkaWorkerLog.readText().shouldNotContainAnyOf(
+            "[ERROR]",
+            "[WARN]",
+          )
+        }
+      }
     }
 
     context("expect dokka and dokkatoo HTML is the same") {
@@ -72,9 +98,11 @@ class MultimoduleExampleTest : FunSpec({
       }
     }
   }
+
+
   context("Gradle caching") {
-    test("expect Dokkatoo is compatible with Gradle Build Cache") {
-      val dokkatooBuild = dokkatooProject.runner
+    context("expect Dokkatoo is compatible with Gradle Build Cache") {
+      val build = dokkatooProject.runner
         .withArguments(
           "clean",
           ":parentProject:dokkatooGeneratePublicationHtml",
@@ -84,27 +112,46 @@ class MultimoduleExampleTest : FunSpec({
         .forwardOutput()
         .build()
 
-      dokkatooBuild.output shouldContain "BUILD SUCCESSFUL"
-      dokkatooBuild.output shouldContain "Generation completed successfully"
 
-      dokkatooProject.runner.withArguments(
-        ":parentProject:dokkatooGeneratePublicationHtml",
-        "--stacktrace",
-        "--info",
-        "--build-cache",
-      ).forwardOutput()
-        .build().should { dokkatooBuildCache ->
+      test("expect build is successful") {
+        build.output shouldContain "BUILD SUCCESSFUL"
+      }
 
-          dokkatooBuildCache.output shouldContainAll listOf(
-            "> Task :parentProject:prepareDokkatooParametersHtml UP-TO-DATE",
-            "> Task :parentProject:dokkatooGeneratePublicationHtml UP-TO-DATE",
-            "BUILD SUCCESSFUL",
-            "8 actionable tasks: 8 up-to-date",
+      test("expect all dokka workers are successful") {
+        build.output.invariantNewlines() shouldContain "BUILD SUCCESSFUL"
+        val dokkaWorkerLogs = dokkatooProject.findFiles { it.name == "dokka-worker.log" }
+//      dokkaWorkerLogs shouldHaveCount 1
+        dokkaWorkerLogs.firstOrNull().shouldNotBeNull().should { dokkaWorkerLog ->
+          dokkaWorkerLog.shouldBeAFile()
+          dokkaWorkerLog.readText().shouldNotContainAnyOf(
+            "[ERROR]",
+            "[WARN]",
           )
-          withClue("Dokka Generator should not be triggered, so check it doesn't log anything") {
-            dokkatooBuildCache.output shouldNotContain "Generation completed successfully"
-          }
         }
+      }
+
+      test("expect tasks are UP-TO-DATE") {
+        dokkatooProject.runner
+          .withArguments(
+            ":parentProject:dokkatooGeneratePublicationHtml",
+            "--stacktrace",
+            "--info",
+            "--build-cache",
+          )
+          .forwardOutput()
+          .build().should { dokkatooBuildCache ->
+
+            dokkatooBuildCache.output shouldContainAll listOf(
+              "> Task :parentProject:prepareDokkatooParametersHtml UP-TO-DATE",
+              "> Task :parentProject:dokkatooGeneratePublicationHtml UP-TO-DATE",
+              "BUILD SUCCESSFUL",
+              "8 actionable tasks: 8 up-to-date",
+            )
+            withClue("Dokka Generator should not be triggered, so check it doesn't log anything") {
+              dokkatooBuildCache.output shouldNotContain "Generation completed successfully"
+            }
+          }
+      }
     }
 
     xtest("expect Dokkatoo is compatible with Gradle Configuration Cache") {
