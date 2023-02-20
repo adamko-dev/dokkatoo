@@ -1,6 +1,6 @@
 @file:Suppress("UnstableApiUsage") // jvm test suites & test report aggregation are incubating
 
-import org.gradle.api.tasks.testing.logging.TestLogEvent
+import buildsrc.conventions.utils.skipTestFixturesPublications
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -16,6 +16,8 @@ plugins {
 
   buildsrc.conventions.`maven-publish-test`
 }
+
+description = "Generates documentation for Kotlin projects (using Dokka)"
 
 dependencies {
   implementation("org.jetbrains.dokka:dokka-core:1.7.20")
@@ -35,8 +37,6 @@ dependencies {
   testFixturesApi("io.kotest:kotest-assertions-json")
   testFixturesApi("io.kotest:kotest-framework-datatest")
 
-//  kotlinDokkaSource(projects.externals)
-
   // don't define test dependencies here, instead define them in the testing.suites {} configuration below
 }
 
@@ -46,20 +46,20 @@ gradlePlugin {
   plugins.register("dokkatoo") {
     id = "dev.adamko.dokkatoo"
     displayName = "Dokkatoo"
-    description = "Generates documentation sites for Kotlin projects using Dokka"
+    description = "Generates documentation for Kotlin projects (using Dokka)"
     implementationClass = "dev.adamko.dokkatoo.DokkatooPlugin"
   }
 
   fun registerDokkaPlugin(
-    className: String,
+    pluginClass: String,
     shortName: String,
     longName: String = shortName,
   ) {
-    plugins.register(className) {
+    plugins.register(pluginClass) {
       id = "dev.adamko.dokkatoo-${shortName.toLowerCase()}"
       displayName = "Dokkatoo $shortName"
-      description = "Generates $longName documentation sites for Kotlin projects using Dokka"
-      implementationClass = "dev.adamko.dokkatoo.formats.$className"
+      description = "Generates $longName documentation for Kotlin projects (using Dokka)"
+      implementationClass = "dev.adamko.dokkatoo.formats.$pluginClass"
     }
   }
   registerDokkaPlugin("DokkatooGfmPlugin", "GFM", longName = "GFM (GitHub Flavoured Markdown)")
@@ -88,7 +88,7 @@ pluginBundle {
 
 tasks.withType<KotlinCompile>().configureEach {
   kotlinOptions {
-    this.freeCompilerArgs += listOf(
+    freeCompilerArgs += listOf(
       "-opt-in=kotlin.RequiresOptIn",
       "-opt-in=dev.adamko.dokkatoo.internal.DokkatooInternalApi",
     )
@@ -137,11 +137,14 @@ testing.suites {
 
 
   /** Unit tests suite */
-  val test by getting(JvmTestSuite::class)
+  val test by getting(JvmTestSuite::class) {
+    description = "Standard unit tests"
+  }
 
 
   /** Functional tests suite */
   val testFunctional by registering(JvmTestSuite::class) {
+    description = "Tests that use Gradle TestKit to test functionality"
     testType.set(TestSuiteType.FUNCTIONAL_TEST)
 
     targets.all {
@@ -151,37 +154,10 @@ testing.suites {
     }
   }
 
-  tasks.check { dependsOn(testFunctional) }
+  tasks.check { dependsOn(test, testFunctional) }
 }
 
-
-tasks.withType<Test>().configureEach {
-
-  mustRunAfter(tasks.withType<AbstractPublishToMaven>())
-
-  testLogging {
-    events = setOf(
-      TestLogEvent.STARTED,
-      TestLogEvent.PASSED,
-      TestLogEvent.SKIPPED,
-      TestLogEvent.FAILED,
-      TestLogEvent.STANDARD_OUT,
-      TestLogEvent.STANDARD_ERROR,
-    )
-    showStandardStreams = true
-    showExceptions = true
-    showCauses = true
-    showStackTraces = true
-  }
-}
-
-
-// don't publish test fixtures (which causes warnings when publishing)
-// https://docs.gradle.org/current/userguide/java_testing.html#publishing_test_fixtures
-val javaComponent = components["java"] as AdhocComponentWithVariants
-javaComponent.withVariantsFromConfiguration(configurations["testFixturesApiElements"]) { skip() }
-javaComponent.withVariantsFromConfiguration(configurations["testFixturesRuntimeElements"]) { skip() }
-
+skipTestFixturesPublications()
 
 val aggregateTestReports by tasks.registering(TestReport::class) {
   group = LifecycleBasePlugin.VERIFICATION_GROUP

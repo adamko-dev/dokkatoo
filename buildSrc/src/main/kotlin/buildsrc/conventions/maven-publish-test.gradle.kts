@@ -12,6 +12,10 @@ Utility for publishing a project to a local Maven directory for use in integrati
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+plugins {
+  base
+}
+
 abstract class MavenPublishTest(
   val testMavenRepo: Provider<Directory>
 ) {
@@ -65,6 +69,10 @@ plugins.withType<MavenPublishPlugin>().all {
 
       publishToTestMavenRepo.configure {
         dependsOn(installTask)
+      }
+
+      tasks.check {
+        mustRunAfter(installTask)
       }
     }
 }
