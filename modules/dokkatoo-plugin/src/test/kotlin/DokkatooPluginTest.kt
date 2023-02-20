@@ -1,39 +1,39 @@
 package dev.adamko.dokkatoo
 
 import dev.adamko.dokkatoo.tasks.DokkatooPrepareParametersTask
+import dev.adamko.dokkatoo.utils.configureEach_
+import dev.adamko.dokkatoo.utils.create_
+import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
-import kotlin.test.Test
-import org.gradle.api.Action
+import io.kotest.matchers.string.shouldEndWith
 import org.gradle.kotlin.dsl.apply
+import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.hasPlugin
 import org.gradle.kotlin.dsl.withType
 import org.gradle.testfixtures.ProjectBuilder
 
-class DokkatooPluginTest {
+class DokkatooPluginTest : FunSpec({
 
-  @Test
-  fun `expect plugin id can be applied to project successfully`() {
+  test("expect plugin id can be applied to project successfully") {
     val project = ProjectBuilder.builder().build()
     project.plugins.apply("dev.adamko.dokkatoo")
     project.plugins.hasPlugin("dev.adamko.dokkatoo") shouldBe true
     project.plugins.hasPlugin(DokkatooPlugin::class) shouldBe true
   }
 
-  @Test
-  fun `expect plugin class can be applied to project successfully`() {
+  test("expect plugin class can be applied to project successfully") {
     val project = ProjectBuilder.builder().build()
     project.plugins.apply(type = DokkatooPlugin::class)
     project.plugins.hasPlugin("dev.adamko.dokkatoo") shouldBe true
     project.plugins.hasPlugin(DokkatooPlugin::class) shouldBe true
   }
 
-  @Test
-  fun `dokka configuration task`() {
+  test("dokka configuration task") {
     val project = ProjectBuilder.builder().build()
     project.plugins.apply("dev.adamko.dokkatoo")
 
-    project.tasks.withType<DokkatooPrepareParametersTask>().configureEach(action {
-      dokkaSourceSets.create("Blah", action {
+    project.tasks.withType<DokkatooPrepareParametersTask>().configureEach_ {
+      dokkaSourceSets.create_("Blah") {
 
         sourceSetScope.set("moduleName")
         classpath.setFrom(emptyList<String>())
@@ -60,13 +60,46 @@ class DokkatooPluginTest {
         //noJdkLink = false
         //suppressedFiles = emptySet()
         //analysisPlatform = org.jetbrains.dokka.Platform.DEFAULT
-      })
-    })
+      }
+    }
   }
-}
 
-@Suppress("ObjectLiteralToLambda") // workaround for https://youtrack.jetbrains.com/issue/KTIJ-14684
-private inline fun <T : Any> action(crossinline block: T.() -> Unit) =
-  object : Action<T> {
-    override fun execute(t: T) = t.block()
+  context("Dokkatoo property conventions") {
+    val project = ProjectBuilder.builder().build()
+    project.plugins.apply("dev.adamko.dokkatoo")
+
+    val extension = project.extensions.getByType<DokkatooExtension>()
+
+    context("DokkatooSourceSets") {
+      val testSourceSet = extension.dokkatooSourceSets.create("Test")
+
+      context("JDK external documentation link") {
+        val jdkLink = testSourceSet.externalDocumentationLinks.getByName("jdk")
+
+        test("when noJdkLink is true, expect jdk link is disabled") {
+          testSourceSet.noJdkLink.set(true)
+          jdkLink.enabled.get() shouldBe false
+        }
+
+        test("when noJdkLink is false, expect jdk link is enabled") {
+          testSourceSet.noJdkLink.set(false)
+          jdkLink.enabled.get() shouldBe true
+        }
+
+        (5..10).forEach { jdkVersion ->
+          test("when jdkVersion is $jdkVersion, expect packageListUrl uses package-list file") {
+            testSourceSet.jdkVersion.set(jdkVersion)
+            jdkLink.packageListUrl.get().toString() shouldEndWith "package-list"
+          }
+        }
+
+        (11..22).forEach { jdkVersion ->
+          test("when jdkVersion is $jdkVersion, expect packageListUrl uses element-list file") {
+            testSourceSet.jdkVersion.set(jdkVersion)
+            jdkLink.packageListUrl.get().toString() shouldEndWith "element-list"
+          }
+        }
+      }
+    }
   }
+})

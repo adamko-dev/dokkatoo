@@ -348,6 +348,12 @@ abstract class DokkatooBasePlugin @Inject constructor(
               else            -> "https://docs.oracle.com/en/java/javase/${jdkVersion}/docs/api/"
             }
           })
+          packageListUrl(this@dss.jdkVersion.map { jdkVersion ->
+            when {
+              jdkVersion < 11 -> "https://docs.oracle.com/javase/${jdkVersion}/docs/api/package-list"
+              else            -> "https://docs.oracle.com/en/java/javase/${jdkVersion}/docs/api/element-list"
+            }
+          })
         }
         create("kotlinStdlib") {
           enabled.convention(!this@dss.noStdlibLink)

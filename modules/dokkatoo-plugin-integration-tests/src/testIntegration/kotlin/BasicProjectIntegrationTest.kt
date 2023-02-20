@@ -2,6 +2,7 @@ package dev.adamko.dokkatoo.tests.integration
 
 import dev.adamko.dokkatoo.utils.GradleProjectTest
 import dev.adamko.dokkatoo.utils.GradleProjectTest.Companion.projectTestTempDir
+import dev.adamko.dokkatoo.utils.NotWindowsCondition
 import dev.adamko.dokkatoo.utils.buildGradleKts
 import dev.adamko.dokkatoo.utils.copyIntegrationTestProject
 import dev.adamko.dokkatoo.utils.findFiles
@@ -12,6 +13,7 @@ import dev.adamko.dokkatoo.utils.shouldNotContainAnyOf
 import dev.adamko.dokkatoo.utils.sideBySide
 import dev.adamko.dokkatoo.utils.toTreeString
 import dev.adamko.dokkatoo.utils.withEnvironment
+import io.kotest.core.annotation.EnabledIf
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.file.shouldBeAFile
 import io.kotest.matchers.file.shouldHaveSameStructureAndContentAs
@@ -27,6 +29,7 @@ import java.io.File
  *
  * Runs Dokka & Dokkatoo, and compares the resulting HTML site.
  */
+@EnabledIf(NotWindowsCondition::class) // https://github.com/adamko-dev/dokkatoo/issues/10
 class BasicProjectIntegrationTest : FunSpec({
 
   val tempDir = projectTestTempDir.resolve("it/it-basic").toFile()

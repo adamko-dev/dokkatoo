@@ -1,6 +1,6 @@
 package dev.adamko.dokkatoo.dokka.parameters
 
-import dev.adamko.dokkatoo.create_
+import dev.adamko.dokkatoo.utils.create_
 import io.kotest.assertions.fail
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec

@@ -1,4 +1,6 @@
-package dev.adamko.dokkatoo
+@file:Suppress("FunctionName")
+
+package dev.adamko.dokkatoo.utils
 
 import dev.adamko.dokkatoo.dokka.parameters.DokkaExternalDocumentationLinkSpec
 import dev.adamko.dokkatoo.dokka.parameters.DokkaPackageOptionsSpec
@@ -39,41 +41,41 @@ import org.gradle.api.artifacts.DependencySet
 @Suppress("unused")
 private object Explain
 
-internal fun Project.subprojects_(configure: Project.() -> Unit) =
+fun Project.subprojects_(configure: Project.() -> Unit) =
   subprojects(configure)
 
 @Suppress("SpellCheckingInspection")
-internal fun Project.allprojects_(configure: Project.() -> Unit) =
+fun Project.allprojects_(configure: Project.() -> Unit) =
   allprojects(configure)
 
-internal fun <T> DomainObjectCollection<T>.configureEach_(configure: T.() -> Unit) =
+fun <T> DomainObjectCollection<T>.configureEach_(configure: T.() -> Unit) =
   configureEach(configure)
 
-internal fun <T> DomainObjectCollection<T>.all_(configure: T.() -> Unit) =
+fun <T> DomainObjectCollection<T>.all_(configure: T.() -> Unit) =
   all(configure)
 
-internal fun Configuration.withDependencies_(action: DependencySet.() -> Unit): Configuration =
+fun Configuration.withDependencies_(action: DependencySet.() -> Unit): Configuration =
   withDependencies(action)
 
 
-internal fun <T> NamedDomainObjectContainer<T>.create_(name: String, configure: T.() -> Unit): T =
+fun <T> NamedDomainObjectContainer<T>.create_(name: String, configure: T.() -> Unit): T =
   create(name, configure)
 
-internal fun <T> NamedDomainObjectContainer<T>.register_(
+fun <T> NamedDomainObjectContainer<T>.register_(
   name: String,
   configure: T.() -> Unit
 ): NamedDomainObjectProvider<T> =
   register(name, configure)
 
 
-internal fun DokkaSourceSetSpec.externalDocumentationLink_(
+fun DokkaSourceSetSpec.externalDocumentationLink_(
   action: DokkaExternalDocumentationLinkSpec.() -> Unit
 ) = externalDocumentationLink(action)
 
-internal fun DokkaSourceSetSpec.sourceLink_(
+fun DokkaSourceSetSpec.sourceLink_(
   action: DokkaSourceLinkSpec.() -> Unit
 ) = sourceLink(action)
 
-internal fun DokkaSourceSetSpec.perPackageOption_(
+fun DokkaSourceSetSpec.perPackageOption_(
   action: DokkaPackageOptionsSpec.() -> Unit
 ) = perPackageOption(action)

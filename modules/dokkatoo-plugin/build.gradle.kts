@@ -27,14 +27,13 @@ dependencies {
 
   testFixturesImplementation(gradleApi())
   testFixturesImplementation(gradleTestKit())
+  testFixturesCompileOnly("org.jetbrains.dokka:dokka-core:1.7.20")
   testFixturesImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
-  testFixturesImplementation(platform("io.kotest:kotest-bom:5.5.5"))
-  testFixturesImplementation("io.kotest:kotest-runner-junit5")
-  testFixturesImplementation("io.kotest:kotest-assertions-core")
-  testFixturesImplementation("io.kotest:kotest-assertions-json")
-
-  val jacksonVersion = "2.12.7"
-  testFixturesImplementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
+  testFixturesApi(platform("io.kotest:kotest-bom:5.5.5"))
+  testFixturesApi("io.kotest:kotest-runner-junit5")
+  testFixturesApi("io.kotest:kotest-assertions-core")
+  testFixturesApi("io.kotest:kotest-assertions-json")
+  testFixturesApi("io.kotest:kotest-framework-datatest")
 
 //  kotlinDokkaSource(projects.externals)
 
@@ -105,14 +104,8 @@ testing.suites {
       implementation(project.dependencies.gradleTestKit())
 
       implementation("org.jetbrains.kotlin:kotlin-test:1.7.20")
-      //implementation(project.dependencies.kotlin("test")) // helper function doesn't work?
 
-      implementation(project.dependencies.platform("io.kotest:kotest-bom:5.5.5"))
-      implementation("io.kotest:kotest-runner-junit5")
-      implementation("io.kotest:kotest-assertions-core")
-      implementation("io.kotest:kotest-assertions-json")
-
-      implementation(project.dependencies.testFixtures(project()))
+      implementation(project.dependencies.testFixtures(project))
 
       implementation("org.jetbrains.dokka:dokka-core:1.7.20")
       implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
@@ -158,31 +151,7 @@ testing.suites {
     }
   }
 
-
-  /** Integration tests suite */
-  val testIntegration by registering(JvmTestSuite::class) {
-    testType.set(TestSuiteType.INTEGRATION_TEST)
-
-    targets.all {
-      testTask.configure {
-        shouldRunAfter(test, testFunctional)
-
-//        dependsOn(project.configurations.kotlinDokkaSource)
-
-//        inputs.property("dokkaSourceDir",
-//          project.configurations.kotlinDokkaSource.map { dokkaSrcConf ->
-//            val files = dokkaSrcConf.incoming.artifactView { lenient(true) }.files
-//            files.singleOrNull()?.absolutePath
-//              ?: error("could not get Dokka source code directory from kotlinDokkaSource configuration. Got ${files.count()} files: $files")
-//          }
-//        )
-//
-//        systemProperty("dokkaSourceDir", inputs.properties["dokkaSourceDir"]!!)
-      }
-    }
-  }
-
-  tasks.check { dependsOn(testFunctional, testIntegration) }
+  tasks.check { dependsOn(testFunctional) }
 }
 
 
