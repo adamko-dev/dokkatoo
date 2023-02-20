@@ -40,10 +40,6 @@ dependencies {
   // don't define test dependencies here, instead define them in the testing.suites {} configuration below
 }
 
-java {
-  withSourcesJar()
-}
-
 gradlePlugin {
   isAutomatedPublishing = true
 
