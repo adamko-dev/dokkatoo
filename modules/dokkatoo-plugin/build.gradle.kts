@@ -33,9 +33,6 @@ dependencies {
   testFixturesImplementation("io.kotest:kotest-assertions-core")
   testFixturesImplementation("io.kotest:kotest-assertions-json")
 
-  val jacksonVersion = "2.12.7"
-  testFixturesImplementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
-
 //  kotlinDokkaSource(projects.externals)
 
   // don't define test dependencies here, instead define them in the testing.suites {} configuration below
