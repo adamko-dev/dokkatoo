@@ -41,7 +41,8 @@ class BasicProjectIntegrationTest : FunSpec({
         "dokkaHtml",
         "--stacktrace",
         "--info",
-      ).forwardOutput()
+      )
+      .forwardOutput()
       .withEnvironment(
         "DOKKA_VERSION" to "1.7.20",
       )
@@ -53,7 +54,8 @@ class BasicProjectIntegrationTest : FunSpec({
         "dokkatooGeneratePublicationHtml",
         "--stacktrace",
         "--info",
-      ).forwardOutput()
+      )
+      .forwardOutput()
       .build()
 
     test("expect project builds successfully") {
@@ -111,12 +113,14 @@ class BasicProjectIntegrationTest : FunSpec({
     }
 
     test("Dokkatoo tasks should be cacheable") {
-      dokkatooProject.runner.withArguments(
-        "dokkatooGeneratePublicationHtml",
-        "--stacktrace",
-        "--info",
-        "--build-cache",
-      ).forwardOutput()
+      dokkatooProject.runner
+        .withArguments(
+          "dokkatooGeneratePublicationHtml",
+          "--stacktrace",
+          "--info",
+          "--build-cache",
+        )
+        .forwardOutput()
         .build().should { buildResult ->
           buildResult.output shouldContainAll listOf(
             "Task :prepareDokkatooParametersHtml UP-TO-DATE",

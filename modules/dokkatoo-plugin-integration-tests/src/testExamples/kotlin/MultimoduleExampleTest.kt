@@ -43,7 +43,8 @@ class MultimoduleExampleTest : FunSpec({
           "dokkaHtmlMultiModule",
           "--stacktrace",
           "--info",
-        ).forwardOutput()
+        )
+        .forwardOutput()
         .build()
 
       dokkaBuild.output shouldContain "BUILD SUCCESSFUL"
@@ -57,7 +58,8 @@ class MultimoduleExampleTest : FunSpec({
           ":parentProject:dokkatooGeneratePublicationHtml",
           "--stacktrace",
           "--info",
-        ).forwardOutput()
+        )
+        .forwardOutput()
         .build()
 
       test("expect build is successful") {
@@ -106,7 +108,8 @@ class MultimoduleExampleTest : FunSpec({
           ":parentProject:dokkatooGeneratePublicationHtml",
           "--info",
           "--stacktrace",
-        ).forwardOutput()
+        )
+        .forwardOutput()
         .build()
 
 
@@ -128,12 +131,14 @@ class MultimoduleExampleTest : FunSpec({
       }
 
       test("expect tasks are UP-TO-DATE") {
-        dokkatooProject.runner.withArguments(
-          ":parentProject:dokkatooGeneratePublicationHtml",
-          "--stacktrace",
-          "--info",
-          "--build-cache",
-        ).forwardOutput()
+        dokkatooProject.runner
+          .withArguments(
+            ":parentProject:dokkatooGeneratePublicationHtml",
+            "--stacktrace",
+            "--info",
+            "--build-cache",
+          )
+          .forwardOutput()
           .build().should { dokkatooBuildCache ->
 
             dokkatooBuildCache.output shouldContainAll listOf(
@@ -158,7 +163,8 @@ class MultimoduleExampleTest : FunSpec({
           "--info",
           "--no-build-cache",
           "--configuration-cache",
-        ).forwardOutput()
+        )
+        .forwardOutput()
         .build()
 
       dokkatooBuild.output shouldContain "BUILD SUCCESSFUL"
