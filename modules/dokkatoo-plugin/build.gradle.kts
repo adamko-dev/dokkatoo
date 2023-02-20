@@ -45,27 +45,31 @@ java {
 }
 
 gradlePlugin {
+  isAutomatedPublishing = true
+
   plugins.register("dokkatoo") {
     id = "dev.adamko.dokkatoo"
     displayName = "Dokkatoo"
     description = "Generates documentation sites for Kotlin projects using Dokka"
     implementationClass = "dev.adamko.dokkatoo.DokkatooPlugin"
-    isAutomatedPublishing = true
   }
 
-  fun registerDokkaPlugin(format: String, className: String) {
-    plugins.register("dokkatoo${format.toLowerCase().capitalize()}") {
-      id = "dev.adamko.dokkatoo-${format.toLowerCase()}"
-      displayName = "Dokkatoo $format"
-      description = "Generates $format documentation sites for Kotlin projects using Dokka"
+  fun registerDokkaPlugin(
+    className: String,
+    shortName: String,
+    longName: String = shortName,
+  ) {
+    plugins.register(className) {
+      id = "dev.adamko.dokkatoo-${shortName.toLowerCase()}"
+      displayName = "Dokkatoo $shortName"
+      description = "Generates $longName documentation sites for Kotlin projects using Dokka"
       implementationClass = "dev.adamko.dokkatoo.formats.$className"
-      isAutomatedPublishing = true
     }
   }
-  registerDokkaPlugin("gfm", "DokkatooGfmPlugin")
-  registerDokkaPlugin("html", "DokkatooHtmlPlugin")
-  registerDokkaPlugin("javadoc", "DokkatooJavadocPlugin")
-  registerDokkaPlugin("jekyll", "DokkatooJekyllPlugin")
+  registerDokkaPlugin("DokkatooGfmPlugin", "GFM", longName = "GFM (GitHub Flavoured Markdown)")
+  registerDokkaPlugin("DokkatooHtmlPlugin", "HTML")
+  registerDokkaPlugin("DokkatooJavadocPlugin", "Javadoc")
+  registerDokkaPlugin("DokkatooJekyllPlugin", "Jekyll")
 }
 
 pluginBundle {
