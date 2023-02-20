@@ -33,6 +33,7 @@ dependencies {
   testFixturesApi("io.kotest:kotest-runner-junit5")
   testFixturesApi("io.kotest:kotest-assertions-core")
   testFixturesApi("io.kotest:kotest-assertions-json")
+  testFixturesApi("io.kotest:kotest-framework-datatest")
 
 //  kotlinDokkaSource(projects.externals)
 
@@ -103,7 +104,6 @@ testing.suites {
       implementation(project.dependencies.gradleTestKit())
 
       implementation("org.jetbrains.kotlin:kotlin-test:1.7.20")
-      //implementation(project.dependencies.kotlin("test")) // helper function doesn't work?
 
       implementation(project.dependencies.testFixtures(project))
 
@@ -151,31 +151,7 @@ testing.suites {
     }
   }
 
-
-  /** Integration tests suite */
-  val testIntegration by registering(JvmTestSuite::class) {
-    testType.set(TestSuiteType.INTEGRATION_TEST)
-
-    targets.all {
-      testTask.configure {
-        shouldRunAfter(test, testFunctional)
-
-//        dependsOn(project.configurations.kotlinDokkaSource)
-
-//        inputs.property("dokkaSourceDir",
-//          project.configurations.kotlinDokkaSource.map { dokkaSrcConf ->
-//            val files = dokkaSrcConf.incoming.artifactView { lenient(true) }.files
-//            files.singleOrNull()?.absolutePath
-//              ?: error("could not get Dokka source code directory from kotlinDokkaSource configuration. Got ${files.count()} files: $files")
-//          }
-//        )
-//
-//        systemProperty("dokkaSourceDir", inputs.properties["dokkaSourceDir"]!!)
-      }
-    }
-  }
-
-  tasks.check { dependsOn(testFunctional, testIntegration) }
+  tasks.check { dependsOn(testFunctional) }
 }
 
 
