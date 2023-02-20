@@ -110,7 +110,7 @@ abstract class DokkatooGenerateTask @Inject constructor(
       forkOptions {
         defaultCharacterEncoding = "UTF-8"
         minHeapSize = workerMinHeapSize.get()
-        maxHeapSize = workerMinHeapSize.get()
+        maxHeapSize = workerMaxHeapSize.get()
         enableAssertions = true
         debug = workerDebugEnabled.get()
         jvmArgs = workerJvmArgs.get()
