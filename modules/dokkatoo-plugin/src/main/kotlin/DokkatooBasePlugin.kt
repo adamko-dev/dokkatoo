@@ -95,11 +95,11 @@ abstract class DokkatooBasePlugin @Inject constructor(
       workerDebugEnabled.convention(false)
       workerLogFile.set(temporaryDir.resolve("dokka-worker.log"))
       // increase memory - DokkaGenerator is hungry https://github.com/Kotlin/dokka/issues/1405
-      workerMinHeapSize.convention("256m")
-      workerMaxHeapSize.convention("1g")
+      workerMinHeapSize.convention("512m")
+      workerMaxHeapSize.convention("2g")
       workerJvmArgs.set(
         listOf(
-          "-XX:MaxMetaspaceSize=512m",
+          //"-XX:MaxMetaspaceSize=512m",
           "-XX:+HeapDumpOnOutOfMemoryError",
           //"-XX:StartFlightRecording=disk=true,name={path.drop(1).map { if (it.isLetterOrDigit()) it else '-' }.joinToString("")},dumponexit=true,duration=30s",
           //"-XX:FlightRecorderOptions=repository=$baseDir/jfr,stackdepth=512",

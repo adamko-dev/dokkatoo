@@ -7,7 +7,6 @@ import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec
 import java.io.IOException
 import javax.inject.Inject
 import kotlinx.serialization.encodeToString
-import org.gradle.api.DomainObjectSet
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
@@ -95,7 +94,7 @@ abstract class DokkatooPrepareParametersTask @Inject constructor(
   abstract val pluginsClasspath: ConfigurableFileCollection
 
   @get:Nested
-  abstract val pluginsConfiguration: DomainObjectSet<DokkaPluginConfigurationSpec>
+  abstract val pluginsConfiguration: NamedDomainObjectContainer<DokkaPluginConfigurationSpec>
 
   @get:Input
   abstract val suppressObviousFunctions: Property<Boolean>
