@@ -1,5 +1,6 @@
 @file:Suppress("UnstableApiUsage") // jvm test suites & test report aggregation are incubating
 
+import buildsrc.conventions.utils.skipTestFixturesPublications
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -169,12 +170,7 @@ tasks.withType<Test>().configureEach {
   }
 }
 
-
-// don't publish test fixtures (which causes warnings when publishing)
-// https://docs.gradle.org/current/userguide/java_testing.html#publishing_test_fixtures
-val javaComponent = components["java"] as AdhocComponentWithVariants
-javaComponent.withVariantsFromConfiguration(configurations["testFixturesApiElements"]) { skip() }
-javaComponent.withVariantsFromConfiguration(configurations["testFixturesRuntimeElements"]) { skip() }
+skipTestFixturesPublications()
 
 tasks.setupDokkaTemplateProjects {
   destinationToSources.set(
