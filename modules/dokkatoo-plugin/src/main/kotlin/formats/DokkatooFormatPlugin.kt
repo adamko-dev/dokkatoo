@@ -10,6 +10,7 @@ import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKA_
 import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKA_PLUGINS_CLASSPATH
 import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKA_PLUGINS_CLASSPATH_OUTGOING
 import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKA_PLUGINS_INTRANSITIVE_CLASSPATH
+import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.TaskName
 import dev.adamko.dokkatoo.DokkatooExtension
 import dev.adamko.dokkatoo.adapters.DokkatooJavaAdapter
 import dev.adamko.dokkatoo.adapters.DokkatooKotlinAdapter
@@ -407,7 +408,7 @@ abstract class DokkatooFormatPlugin @Inject constructor(
 //  }
 
     val prepareParameters = project.tasks.register<DokkatooPrepareParametersTask>(
-      DokkatooBasePlugin.Companion.TaskName.PREPARE_PARAMETERS.appendFormatName()
+      TaskName.PREPARE_PARAMETERS.appendFormatName()
     ) task@{
       description =
         "Creates Dokka Configuration for executing the Dokka Generator for the $formatName publication"
@@ -468,7 +469,7 @@ abstract class DokkatooFormatPlugin @Inject constructor(
     }
 
     val generatePublication = project.tasks.register<DokkatooGenerateTask>(
-      DokkatooBasePlugin.Companion.TaskName.GENERATE_PUBLICATION.appendFormatName()
+      TaskName.GENERATE_PUBLICATION.appendFormatName()
     ) {
       description = "Executes the Dokka Generator, generating the $formatName publication"
       generationType.set(DokkatooGenerateTask.GenerationType.PUBLICATION)
@@ -479,25 +480,27 @@ abstract class DokkatooFormatPlugin @Inject constructor(
       dokkaModuleFiles.from(dependencyCollections.dokkaModuleConsumer)
     }
 
-    val generateModule =
-      project.tasks.register<DokkatooGenerateTask>(DokkatooBasePlugin.Companion.TaskName.GENERATE_MODULE.appendFormatName()) {
-        description = "Executes the Dokka Generator, generating a $formatName module"
-        generationType.set(DokkatooGenerateTask.GenerationType.MODULE)
+    val generateModule = project.tasks.register<DokkatooGenerateTask>(
+      TaskName.GENERATE_MODULE.appendFormatName()
+    ) {
+      description = "Executes the Dokka Generator, generating a $formatName module"
+      generationType.set(DokkatooGenerateTask.GenerationType.MODULE)
 
-        outputDirectory.convention(dokkatooExtension.dokkatooModuleDirectory.dir(formatName))
-        dokkaParametersJson.convention(prepareParameters.flatMap { it.dokkaConfigurationJson })
-        runtimeClasspath.from(dependencyCollections.dokkaGeneratorClasspath)
-      }
+      outputDirectory.convention(dokkatooExtension.dokkatooModuleDirectory.dir(formatName))
+      dokkaParametersJson.convention(prepareParameters.flatMap { it.dokkaConfigurationJson })
+      runtimeClasspath.from(dependencyCollections.dokkaGeneratorClasspath)
+    }
 
-    val prepareModuleDescriptor =
-      project.tasks.register<DokkatooPrepareModuleDescriptorTask>(DokkatooBasePlugin.Companion.TaskName.PREPARE_MODULE_DESCRIPTOR.appendFormatName()) {
-        description = "Prepares the Dokka Module Descriptor for $formatName"
-        includes.from(publication.includes)
-        dokkaModuleDescriptorJson.convention(
-          dokkatooExtension.dokkatooConfigurationsDirectory.file("$formatName/module_descriptor.json")
-        )
-        sourceOutputDirectory(generateModule.flatMap { it.outputDirectory })
-      }
+    val prepareModuleDescriptor = project.tasks.register<DokkatooPrepareModuleDescriptorTask>(
+      TaskName.PREPARE_MODULE_DESCRIPTOR.appendFormatName()
+    ) {
+      description = "Prepares the Dokka Module Descriptor for $formatName"
+      includes.from(publication.includes)
+      dokkaModuleDescriptorJson.convention(
+        dokkatooExtension.dokkatooConfigurationsDirectory.file("$formatName/module_descriptor.json")
+      )
+      sourceOutputDirectory(generateModule.flatMap { it.outputDirectory })
+    }
   }
 
   companion object
