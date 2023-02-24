@@ -28,11 +28,13 @@ abstract class DokkatooJavaAdapter @Inject constructor() : Plugin<Project> {
     project.plugins.withType<JavaBasePlugin>().configureEach {
 
       // fetch the toolchain, and use the language version as Dokka's jdkVersion
-      val toolchain = project.extensions.getByType<JavaPluginExtension>().toolchain
+      val toolchainLanguageVersion = project.extensions.getByType<JavaPluginExtension>()
+        .toolchain
+        .languageVersion
 
       val dokka = project.extensions.getByType<DokkatooExtension>()
       dokka.dokkatooSourceSets.configureEach {
-        jdkVersion.set(toolchain.languageVersion.map { it.asInt() }.orElse(8))
+        jdkVersion.set(toolchainLanguageVersion.map { it.asInt() }.orElse(8))
       }
     }
   }

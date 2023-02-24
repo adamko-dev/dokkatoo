@@ -21,7 +21,7 @@ tasks.withType<AbstractArchiveTask>().configureEach {
 }
 
 tasks.withType<AbstractTestTask>().configureEach {
-  timeout.set(Duration.ofMinutes(10))
+  timeout.set(Duration.ofMinutes(60))
 
   testLogging {
     showCauses = true

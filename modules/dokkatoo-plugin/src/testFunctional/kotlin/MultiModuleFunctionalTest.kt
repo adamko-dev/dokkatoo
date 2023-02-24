@@ -3,6 +3,9 @@ package dev.adamko.dokkatoo
 import dev.adamko.dokkatoo.dokka.parameters.DokkaParametersKxs
 import dev.adamko.dokkatoo.utils.*
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.inspectors.forAll
+import io.kotest.inspectors.shouldForAll
+import io.kotest.matchers.collections.shouldBeIn
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.collections.shouldNotContainAnyOf
 import io.kotest.matchers.file.shouldBeAFile
@@ -13,6 +16,8 @@ import io.kotest.matchers.should
 import io.kotest.matchers.string.shouldContain
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.decodeFromStream
+import org.gradle.testkit.runner.TaskOutcome.FROM_CACHE
+import org.gradle.testkit.runner.TaskOutcome.UP_TO_DATE
 
 class MultiModuleFunctionalTest : FunSpec({
 
@@ -21,7 +26,12 @@ class MultiModuleFunctionalTest : FunSpec({
 
   context("when dokkatoo generates all formats") {
     val build = project.runner
-      .withArguments("clean", ":dokkatooGenerate", "--stacktrace", "--info")
+      .withArguments(
+        "clean",
+        ":dokkatooGenerate",
+        "--stacktrace",
+        "--info",
+      )
       .forwardOutput()
       .build()
 
@@ -123,6 +133,99 @@ class MultiModuleFunctionalTest : FunSpec({
       }
     }
   }
+
+  context("Gradle caching") {
+    context("expect Dokkatoo is compatible with Gradle Build Cache") {
+      // for some weird reason Gradle can't run clean and dokkatooGenerate together
+      project.runner.withArguments("clean")
+
+      val build = project.runner
+        .withArguments(
+          //"clean",
+          ":dokkatooGenerate",
+          "--stacktrace",
+          "--info",
+          "--build-cache",
+        )
+        .forwardOutput()
+        .build()
+
+      test("expect build is successful") {
+        build.output shouldContain "BUILD SUCCESSFUL"
+      }
+
+      test("expect all dokka workers are successful") {
+        val dokkaWorkerLogs = project.findFiles { it.name == "dokka-worker.log" }
+        dokkaWorkerLogs.forAll { dokkaWorkerLog ->
+          dokkaWorkerLog.shouldBeAFile()
+          dokkaWorkerLog.readText().shouldNotContainAnyOf(
+            "[ERROR]",
+            "[WARN]",
+          )
+        }
+      }
+
+      context("when build cache is enabled") {
+        project.runner
+          .withArguments(
+            ":dokkatooGenerate",
+            "--stacktrace",
+            "--info",
+            "--build-cache",
+          )
+          .forwardOutput()
+          .build().let { dokkatooBuildCache ->
+
+            test("expect build is successful") {
+              dokkatooBuildCache.output shouldContainAll listOf(
+                "BUILD SUCCESSFUL",
+                "36 actionable tasks: 36 up-to-date",
+              )
+            }
+
+            test("expect all dokkatoo tasks are up-to-date") {
+              build.tasks.filter {
+                "dokkatoo" in it.path.substringAfterLast(':').toLowerCase()
+              }.shouldForAll {
+                it.outcome.shouldBeIn(FROM_CACHE, UP_TO_DATE)
+              }
+            }
+          }
+      }
+    }
+
+    context("Gradle Configuration Cache") {
+      // for some weird reason Gradle can't run clean and dokkatooGenerate together
+      project.runner.withArguments("clean")
+
+      val build = project.runner
+        .withArguments(
+          //"clean",
+          ":dokkatooGenerate",
+          "--stacktrace",
+          "--info",
+          "--no-build-cache",
+          "--configuration-cache",
+        )
+        .forwardOutput()
+        .build()
+
+      test("expect build is successful") {
+        build.output shouldContain "BUILD SUCCESSFUL"
+      }
+
+      test("expect all dokka workers are successful") {
+        val dokkaWorkerLogs = project.findFiles { it.name == "dokka-worker.log" }
+        dokkaWorkerLogs.forAll { dokkaWorkerLog ->
+          dokkaWorkerLog.shouldBeAFile()
+          dokkaWorkerLog.readText().shouldNotContainAnyOf(
+            "[ERROR]",
+            "[WARN]",
+          )
+        }
+      }
+    }
+  }
 })
 
 private fun initDokkatooProject(): GradleProjectTest {
@@ -136,10 +239,6 @@ private fun initDokkatooProject(): GradleProjectTest {
     """.trimMargin()
 
     buildGradleKts = """
-      |//import org.jetbrains.dokka.gradle.tasks.DokkaConfigurationTask
-      |//import org.jetbrains.dokka.gradle.dokka_configuration.DokkaConfigurationKxs
-      |//import org.jetbrains.dokka.*
-      |
       |plugins {
       |  // Kotlin plugin shouldn't be necessary here, but without it Dokka errors
       |  // with ClassNotFound KotlinPluginExtension... very weird
@@ -153,72 +252,15 @@ private fun initDokkatooProject(): GradleProjectTest {
       |  dokkatooPluginHtml("org.jetbrains.dokka:all-modules-page-plugin:1.7.20")
       |}
       |
-      |//tasks.withType<DokkaConfigurationTask>().configureEach {
-      |//    sourceSets.add(
-      |//        DokkaConfigurationKxs.DokkaSourceSetKxs(
-      |//            displayName = "The Root Project",
-      |//            sourceSetID = DokkaSourceSetID("moduleName", "main"),
-      |//            classpath = emptyList(),
-      |//            sourceRoots = setOf(file("src/main/kotlin")),
-      |//            dependentSourceSets = emptySet(),
-      |//            samples = emptySet(),
-      |//            includes = emptySet(),
-      |//            documentedVisibilities = DokkaConfiguration.Visibility.values().toSet(),
-      |//            reportUndocumented = false,
-      |//            skipEmptyPackages = true,
-      |//            skipDeprecated = false,
-      |//            jdkVersion = 8,
-      |//            sourceLinks = emptySet(),
-      |//            perPackageOptions = emptyList(),
-      |//            externalDocumentationLinks = emptySet(),
-      |//            languageVersion = null,
-      |//            apiVersion = null,
-      |//            noStdlibLink = false,
-      |//            noJdkLink = false,
-      |//            suppressedFiles = emptySet(),
-      |//            analysisPlatform = org.jetbrains.dokka.Platform.DEFAULT,
-      |//        )
-      |//    )
-      |//}
-      |
     """.trimMargin()
 
     dir("subproject-hello") {
       buildGradleKts = """
-          |//import org.jetbrains.dokka.gradle.tasks.DokkaConfigurationTask
-          |//import org.jetbrains.dokka.gradle.dokka_configuration.DokkaConfigurationKxs
-          |//import org.jetbrains.dokka.*
-          |
           |plugins {
           |    kotlin("jvm") version "1.7.20"
           |    id("dev.adamko.dokkatoo") version "0.0.2-SNAPSHOT"
           |}
           |
-          |// TODO copy the DSL from the old plugin
-          |//tasks.withType<DokkaConfigurationTask>().configureEach {
-          |    //dokkaSourceSets.create("Hello Subproject") {
-          |       // sourceSetID = DokkaSourceSetID("moduleName", "main")
-          |       // classpath = emptyList()
-          |       // sourceRoots = setOf(file("src/main/kotlin"))
-          |       // dependentSourceSets = emptySet()
-          |       // samples = emptySet()
-          |       // includes = emptySet()
-          |       // documentedVisibilities = DokkaConfiguration.Visibility.values().toSet()
-          |       // reportUndocumented = false
-          |       // skipEmptyPackages = true
-          |       // skipDeprecated = false
-          |       // jdkVersion = 8
-          |       // sourceLinks = emptySet()
-          |       // perPackageOptions = emptyList()
-          |       // externalDocumentationLinks = emptySet()
-          |       // languageVersion = null
-          |       // apiVersion = null
-          |       // noStdlibLink = false
-          |       // noJdkLink = false
-          |       // suppressedFiles = emptySet()
-          |       // analysisPlatform = org.jetbrains.dokka.Platform.DEFAULT
-          |    //}
-          |//}
         """.trimMargin()
 
       createKotlinFile(
@@ -231,6 +273,7 @@ private fun initDokkatooProject(): GradleProjectTest {
           |    /** prints `Hello` to the console */  
           |    fun sayHello() = println("Hello")
           |}
+          |
         """.trimMargin()
       )
     }
@@ -238,46 +281,11 @@ private fun initDokkatooProject(): GradleProjectTest {
     dir("subproject-goodbye") {
 
       buildGradleKts = """
-          |
-          |//import org.jetbrains.dokka.gradle.tasks.DokkaConfigurationTask
-          |//import org.jetbrains.dokka.gradle.dokka_configuration.DokkaConfigurationKxs
-          |//import org.jetbrains.dokka.*
-          |
           |plugins {
           |    kotlin("jvm") version "1.7.20"
           |    id("dev.adamko.dokkatoo") version "0.0.2-SNAPSHOT"
           |}
           |
-          |logger.lifecycle("with kotlin extension " + kotlin::class.toString())
-          |
-          |//tasks.withType<DokkaConfigurationTask>().configureEach {
-          |   // dokkaSourceSets.create("Goodbye Subproject") {}
-          |//    sourceSets.add(
-          |//        DokkaConfigurationKxs.DokkaSourceSetKxs(
-          |//            displayName = "My Subproject",
-          |//            sourceSetID = DokkaSourceSetID("moduleName", "main"),
-          |//            classpath = emptyList(),
-          |//            sourceRoots = setOf(file("src/main/kotlin")),
-          |//            dependentSourceSets = emptySet(),
-          |//            samples = emptySet(),
-          |//            includes = emptySet(),
-          |//            documentedVisibilities = DokkaConfiguration.Visibility.values().toSet(),
-          |//            reportUndocumented = false,
-          |//            skipEmptyPackages = true,
-          |//            skipDeprecated = false,
-          |//            jdkVersion = 8,
-          |//            sourceLinks = emptySet(),
-          |//            perPackageOptions = emptyList(),
-          |//            externalDocumentationLinks = emptySet(),
-          |//            languageVersion = null,
-          |//            apiVersion = null,
-          |//            noStdlibLink = false,
-          |//            noJdkLink = false,
-          |//            suppressedFiles = emptySet(),
-          |//            analysisPlatform = org.jetbrains.dokka.Platform.DEFAULT,
-          |//        )
-          |//    )
-          |//}
         """.trimMargin()
 
       createKotlinFile(
@@ -290,6 +298,7 @@ private fun initDokkatooProject(): GradleProjectTest {
           |    /** prints a goodbye message to the console */  
           |    fun sayHello() = println("Goodbye!")
           |}
+          |
         """.trimMargin()
       )
     }

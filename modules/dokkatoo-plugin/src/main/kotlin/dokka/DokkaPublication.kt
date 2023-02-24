@@ -13,6 +13,7 @@ import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.TaskName.GENERATE_PUBLIC
 import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.TaskName.PREPARE_MODULE_DESCRIPTOR
 import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.TaskName.PREPARE_PARAMETERS
 import dev.adamko.dokkatoo.dokka.parameters.DokkaPluginConfigurationSpec
+import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import java.io.Serializable
 import javax.inject.Inject
 import org.gradle.api.Named
@@ -127,6 +128,7 @@ abstract class DokkaPublication @Inject constructor(
 
   private fun String.formatSuffix() = this + formatName.capitalize()
 
+  @DokkatooInternalApi
   inner class TaskNames : Serializable {
     val generatePublication = GENERATE_PUBLICATION.formatSuffix()
     val generateModule = GENERATE_MODULE.formatSuffix()
@@ -136,6 +138,7 @@ abstract class DokkaPublication @Inject constructor(
 
   // TODO rename 'outgoing' or 'provider' to 'shared'?
 
+  @DokkatooInternalApi
   inner class ConfigurationNames : Serializable {
     val dokkaParametersConsumer: String = DOKKATOO_PARAMETERS.formatSuffix()
     val dokkaParametersOutgoing: String = DOKKATOO_PARAMETERS_OUTGOING.formatSuffix()

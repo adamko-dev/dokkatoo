@@ -2,6 +2,7 @@ package dev.adamko.dokkatoo
 
 import dev.adamko.dokkatoo.dokka.DokkaPublication
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec
+import java.io.Serializable
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.plugins.ExtensionAware
@@ -10,7 +11,7 @@ import org.gradle.api.provider.Property
 /**
  * Configure the behaviour of the [DokkatooBasePlugin].
  */
-abstract class DokkatooExtension : ExtensionAware {
+abstract class DokkatooExtension : ExtensionAware, Serializable {
 
   /** Directory into which [DokkaPublication]s will be produced */
   abstract val dokkatooPublicationDirectory: DirectoryProperty

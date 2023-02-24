@@ -5,6 +5,7 @@ import dev.adamko.dokkatoo.utils.GradleProjectTest.Companion.projectTestTempDir
 import dev.adamko.dokkatoo.utils.buildGradleKts
 import dev.adamko.dokkatoo.utils.copyExampleProject
 import dev.adamko.dokkatoo.utils.dir
+import dev.adamko.dokkatoo.utils.file
 import dev.adamko.dokkatoo.utils.findFiles
 import dev.adamko.dokkatoo.utils.invariantNewlines
 import dev.adamko.dokkatoo.utils.settingsGradleKts
@@ -101,6 +102,7 @@ class MultimoduleExampleTest : FunSpec({
 
 
   context("Gradle caching") {
+
     context("expect Dokkatoo is compatible with Gradle Build Cache") {
       val build = dokkatooProject.runner
         .withArguments(
@@ -154,20 +156,34 @@ class MultimoduleExampleTest : FunSpec({
       }
     }
 
-    xtest("expect Dokkatoo is compatible with Gradle Configuration Cache") {
-      val dokkatooBuild = dokkatooProject.runner
-        .withArguments(
-          "clean",
-          ":parentProject:dokkatooGeneratePublicationHtml",
-          "--stacktrace",
-          "--info",
-          "--no-build-cache",
-          "--configuration-cache",
-        )
-        .forwardOutput()
-        .build()
+    context("expect Dokkatoo is compatible with Gradle Configuration Cache") {
+      dokkatooProject.file(".gradle/configuration-cache").toFile().deleteRecursively()
+      dokkatooProject.file("build/reports/configuration-cache").toFile().deleteRecursively()
 
-      dokkatooBuild.output shouldContain "BUILD SUCCESSFUL"
+      val configCacheRunner =
+        dokkatooProject.runner
+          .withArguments(
+            "clean",
+            ":parentProject:dokkatooGeneratePublicationHtml",
+            "--stacktrace",
+            "--no-build-cache",
+            "--configuration-cache",
+          )
+          .forwardOutput()
+
+      test("first build should store the configuration cache") {
+        configCacheRunner.build().should { buildResult ->
+          buildResult.output shouldContain "BUILD SUCCESSFUL"
+          buildResult.output shouldContain "0 problems were found storing the configuration cache"
+        }
+      }
+
+      test("second build should reuse the configuration cache") {
+        configCacheRunner.build().should { buildResult ->
+          buildResult.output shouldContain "BUILD SUCCESSFUL"
+          buildResult.output shouldContain "Configuration cache entry reused"
+        }
+      }
     }
   }
 })
