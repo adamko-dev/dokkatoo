@@ -45,7 +45,6 @@ internal operator fun Provider<Boolean>.not(): Provider<Boolean> = map { !it }
 internal object LocalProjectOnlyFilter : Spec<ComponentIdentifier> {
   override fun isSatisfiedBy(element: ComponentIdentifier?): Boolean =
     element is ProjectComponentIdentifier
-
 }
 
 

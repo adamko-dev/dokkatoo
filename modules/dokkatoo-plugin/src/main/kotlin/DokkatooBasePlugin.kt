@@ -83,18 +83,16 @@ abstract class DokkatooBasePlugin @Inject constructor(
       )
     }
 
-    target.tasks.withType<DokkatooPrepareModuleDescriptorTask>().all task@{
+    target.tasks.withType<DokkatooPrepareModuleDescriptorTask>().configureEach task@{
       moduleName.convention(dokkatooExtension.moduleName)
-      dokkatooExtension.dokkatooSourceSets.all dss@{
-        this@task.includes.from(this@dss.includes)
-      }
+      includes.from(providers.provider { dokkatooExtension.dokkatooSourceSets.flatMap { it.includes } })
       modulePath.convention(dokkatooExtension.modulePath)
     }
+
     target.tasks.withType<DokkatooPrepareParametersTask>().configureEach task@{
       onlyIf { publicationEnabled.getOrElse(true) }
     }
   }
-
 
   private fun createExtension(project: Project): DokkatooExtension {
     return project.extensions.create<DokkatooExtension>(EXTENSION_NAME).apply {
@@ -144,9 +142,18 @@ abstract class DokkatooBasePlugin @Inject constructor(
   private fun configureDokkatooSourceSetsDefaults(
     dokkatooExtension: DokkatooExtension,
   ) {
+    val sourceSetScopeConvention = dokkatooExtension.sourceSetScopeDefault
+
     dokkatooExtension.dokkatooSourceSets.all dss@{
       analysisPlatform.convention(Platform.DEFAULT)
-      displayName.convention("main")
+      displayName.convention(
+        analysisPlatform.map { platform ->
+          name.substringBeforeLast(
+            delimiter = "Main",
+            missingDelimiterValue = platform.name,
+          )
+        }
+      )
       documentedVisibilities.convention(listOf(DokkaConfiguration.Visibility.PUBLIC))
       jdkVersion.convention(8)
       noAndroidSdkLink.convention(true)
@@ -155,8 +162,12 @@ abstract class DokkatooBasePlugin @Inject constructor(
       reportUndocumented.convention(false)
       skipDeprecated.convention(false)
       skipEmptyPackages.convention(true)
-      sourceSetScope.convention(dokkatooExtension.sourceSetScopeDefault)
-      //suppress.convention(false) // TODO need to re-enable suppress convention, it's only disabled so the hack workaround 'todoSourceSetName' works
+      sourceSetScope.convention(sourceSetScopeConvention)
+
+      // Manually added sourceSets should not be suppressed by default. dokkatooSourceSets that are
+      // automatically added by DokkatooKotlinAdapter will have a sensible value for suppress.
+      suppress.convention(false)
+
       suppressGeneratedFiles.convention(true)
 
       sourceLinks.configureEach {
