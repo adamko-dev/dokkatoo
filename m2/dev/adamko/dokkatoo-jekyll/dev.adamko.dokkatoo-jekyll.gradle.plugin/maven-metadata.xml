@@ -3,11 +3,10 @@
   <groupId>dev.adamko.dokkatoo-jekyll</groupId>
   <artifactId>dev.adamko.dokkatoo-jekyll.gradle.plugin</artifactId>
   <versioning>
-    <latest>0.0.2</latest>
-    <release>0.0.2</release>
+    <latest>0.0.3-SNAPSHOT</latest>
     <versions>
-      <version>0.0.2</version>
+      <version>0.0.3-SNAPSHOT</version>
     </versions>
-    <lastUpdated>20230224145232</lastUpdated>
+    <lastUpdated>20230224145448</lastUpdated>
   </versioning>
 </metadata>
