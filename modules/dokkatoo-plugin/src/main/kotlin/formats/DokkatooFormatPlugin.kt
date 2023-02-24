@@ -82,7 +82,7 @@ abstract class DokkatooFormatPlugin @Inject constructor(
     target.pluginManager.apply(type = DokkatooKotlinAdapter::class)
     target.pluginManager.apply(type = DokkatooJavaAdapter::class)
 
-    target.plugins.withType<DokkatooBasePlugin>().all {
+    target.plugins.withType<DokkatooBasePlugin>().configureEach {
       val dokkatooExtension = target.extensions.getByType(DokkatooExtension::class)
 
       val publication = dokkatooExtension.dokkatooPublications.create(formatName)
@@ -423,7 +423,7 @@ abstract class DokkatooFormatPlugin @Inject constructor(
           elements.incoming.artifactView {
             componentFilter(LocalProjectOnlyFilter)
             lenient(true)
-          }.files
+          }.artifacts.artifactFiles
         }
       )
 

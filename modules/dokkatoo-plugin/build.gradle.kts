@@ -109,6 +109,8 @@ testing.suites {
 
       implementation("org.jetbrains.dokka:dokka-core:1.7.20")
       implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
+
+      runtimeOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:$embeddedKotlinVersion")
     }
 
     targets.configureEach {
@@ -173,4 +175,7 @@ val aggregateTestReports by tasks.registering(TestReport::class) {
   doLast {
     logger.lifecycle("Aggregated test report: file://${destinationDirectory.asFile.get()}/index.html")
   }
+}
+tasks.withType<KotlinCompile>().configureEach {
+  kotlinOptions.freeCompilerArgs += "-Xsam-conversions=class" // https://docs.gradle.org/current/userguide/configuration_cache.html#config_cache:not_yet_implemented:storing_lambdas
 }
