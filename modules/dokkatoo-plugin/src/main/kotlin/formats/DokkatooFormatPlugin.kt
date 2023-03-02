@@ -1,16 +1,6 @@
 package dev.adamko.dokkatoo.formats
 
 import dev.adamko.dokkatoo.DokkatooBasePlugin
-import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName
-import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKATOO_MODULE_FILES_CONSUMER
-import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKATOO_MODULE_FILES_PROVIDER
-import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKATOO_PARAMETERS
-import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKATOO_PARAMETERS_OUTGOING
-import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKA_GENERATOR_CLASSPATH
-import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKA_PLUGINS_CLASSPATH
-import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKA_PLUGINS_CLASSPATH_OUTGOING
-import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKA_PLUGINS_INTRANSITIVE_CLASSPATH
-import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.TaskName
 import dev.adamko.dokkatoo.DokkatooExtension
 import dev.adamko.dokkatoo.adapters.DokkatooJavaAdapter
 import dev.adamko.dokkatoo.adapters.DokkatooKotlinAdapter
@@ -78,6 +68,7 @@ abstract class DokkatooFormatPlugin @Inject constructor(
 
     // apply DokkatooBasePlugin
     target.pluginManager.apply(DokkatooBasePlugin::class)
+
     // apply the plugin that will autoconfigure Dokkatoo to use the sources of a Kotlin project
     target.pluginManager.apply(type = DokkatooKotlinAdapter::class)
     target.pluginManager.apply(type = DokkatooJavaAdapter::class)
@@ -87,9 +78,10 @@ abstract class DokkatooFormatPlugin @Inject constructor(
 
       val publication = dokkatooExtension.dokkatooPublications.create(formatName)
 
-      val dokkatooConsumer = target.configurations.named(ConfigurationName.DOKKATOO)
+      val dokkatooConsumer =
+        target.configurations.named(DokkatooBasePlugin.dependencyContainerNames.dokkatoo)
 
-      val dependencyCollections = DependencyCollections(
+      val dependencyContainers = DependencyContainers(
         formatName = formatName,
         dokkatooConsumer = dokkatooConsumer,
         project = target,
@@ -99,17 +91,17 @@ abstract class DokkatooFormatPlugin @Inject constructor(
         project = target,
         publication = publication,
         dokkatooExtension = dokkatooExtension,
-        dependencyCollections = dependencyCollections,
+        dependencyContainers = dependencyContainers,
         objects = objects,
         providers = providers,
       )
 
-      dependencyCollections.dokkaParametersOutgoing.configure {
+      dependencyContainers.dokkaParametersOutgoing.configure {
         outgoing {
           artifact(dokkatooTasks.prepareParameters.flatMap { it.dokkaConfigurationJson })
         }
       }
-      dependencyCollections.dokkaModuleOutgoing.configure {
+      dependencyContainers.dokkaModuleOutgoing.configure {
         outgoing {
           artifact(dokkatooTasks.prepareModuleDescriptor.flatMap { it.dokkaModuleDescriptorJson })
         }
@@ -120,7 +112,7 @@ abstract class DokkatooFormatPlugin @Inject constructor(
         }
       }
 
-      // TODO DokkaCollect replacement
+      // TODO DokkaCollect replacement - share raw files without first generating a Dokka Module
       //dependencyCollections.dokkaParametersOutgoing.configure {
       //  outgoing {
       //    artifact(dokkatooTasks.prepareParametersTask.flatMap { it.dokkaConfigurationJson })
@@ -130,7 +122,7 @@ abstract class DokkatooFormatPlugin @Inject constructor(
       val context = DokkatooFormatPluginContext(
         project = target,
         dokkatooExtension = dokkatooExtension,
-        publication = publication,
+        formatName = formatName,
       )
 
       context.configure()
@@ -148,15 +140,14 @@ abstract class DokkatooFormatPlugin @Inject constructor(
   open fun DokkatooFormatPluginContext.configure() {}
 
 
-  //  /**
-//   * Utility for adding dependencies to [org.gradle.api.artifacts.Configuration]s.
-//   */
   @DokkatooInternalApi
   class DokkatooFormatPluginContext(
     val project: Project,
     val dokkatooExtension: DokkatooExtension,
-    val publication: DokkaPublication,
+    formatName: String,
   ) {
+    private val dependencyContainerNames = DokkatooBasePlugin.DependencyContainerNames(formatName)
+
     var addDefaultDokkaDependencies = true
 
     /** Create a [Dependency] for  */
@@ -165,21 +156,21 @@ abstract class DokkatooFormatPlugin @Inject constructor(
 
     /** Add a dependency to the Dokka plugins classpath */
     fun DependencyHandler.dokkaPlugin(dependency: Provider<Dependency>): Unit =
-      addProvider(publication.configurationNames.dokkaPluginsClasspath, dependency)
+      addProvider(dependencyContainerNames.dokkaPluginsClasspath, dependency)
 
     /** Add a dependency to the Dokka plugins classpath */
     fun DependencyHandler.dokkaPlugin(dependency: String) {
-      add(publication.configurationNames.dokkaPluginsClasspath, dependency)
+      add(dependencyContainerNames.dokkaPluginsClasspath, dependency)
     }
 
     /** Add a dependency to the Dokka Generator classpath */
     fun DependencyHandler.dokkaGenerator(dependency: Provider<Dependency>) {
-      addProvider(publication.configurationNames.dokkaGeneratorClasspath, dependency)
+      addProvider(dependencyContainerNames.dokkaGeneratorClasspath, dependency)
     }
 
     /** Add a dependency to the Dokka Generator classpath */
     fun DependencyHandler.dokkaGenerator(dependency: String) {
-      add(publication.configurationNames.dokkaGeneratorClasspath, dependency)
+      add(dependencyContainerNames.dokkaGeneratorClasspath, dependency)
     }
   }
 
@@ -219,7 +210,7 @@ abstract class DokkatooFormatPlugin @Inject constructor(
    * is used to configure Dokka behaviour.)
    */
   @DokkatooInternalApi
-  class DependencyCollections(
+  class DependencyContainers(
     private val formatName: String,
     dokkatooConsumer: NamedDomainObjectProvider<Configuration>,
     project: Project,
@@ -227,7 +218,7 @@ abstract class DokkatooFormatPlugin @Inject constructor(
 
     private val objects: ObjectFactory = project.objects
 
-    private fun String.appendFormatName() = this + formatName.capitalize()
+    private val dependencyContainerNames = DokkatooBasePlugin.DependencyContainerNames(formatName)
 
     private val dokkatooAttributes: DokkatooConfigurationAttributes = objects.newInstance()
 
@@ -249,7 +240,7 @@ abstract class DokkatooFormatPlugin @Inject constructor(
     // TODO sharing parameters is required for a 'DokkaCollect' equivalent, but this is not implemented yet
     /** Fetch Dokka Parameter files from other subprojects */
     val dokkaParametersConsumer: NamedDomainObjectProvider<Configuration> =
-      project.configurations.register(DOKKATOO_PARAMETERS.appendFormatName()) {
+      project.configurations.register(dependencyContainerNames.dokkatooParametersConsumer) {
         description = "Fetch Dokka Parameters for $formatName from other subprojects"
         asConsumer()
         extendsFrom(dokkatooConsumer.get())
@@ -261,7 +252,7 @@ abstract class DokkatooFormatPlugin @Inject constructor(
 
     /** Provide Dokka Parameter files to other subprojects */
     val dokkaParametersOutgoing: NamedDomainObjectProvider<Configuration> =
-      project.configurations.register(DOKKATOO_PARAMETERS_OUTGOING.appendFormatName()) {
+      project.configurations.register(dependencyContainerNames.dokkatooParametersOutgoing) {
         description = "Provide Dokka Parameters for $formatName to other subprojects"
         asProvider()
         // extend from dokkaConfigurationsConsumer, so Dokka Module Configs propagate api() style
@@ -276,7 +267,7 @@ abstract class DokkatooFormatPlugin @Inject constructor(
     //<editor-fold desc="Dokka Module files">
     /** Fetch Dokka Module files from other subprojects */
     val dokkaModuleConsumer: NamedDomainObjectProvider<Configuration> =
-      project.configurations.register(DOKKATOO_MODULE_FILES_CONSUMER.appendFormatName()) {
+      project.configurations.register(dependencyContainerNames.dokkatooModuleFilesConsumer) {
         description = "Fetch Dokka Module files for $formatName from other subprojects"
         asConsumer()
         extendsFrom(dokkatooConsumer.get())
@@ -287,7 +278,7 @@ abstract class DokkatooFormatPlugin @Inject constructor(
       }
     /** Provide Dokka Module files to other subprojects */
     val dokkaModuleOutgoing: NamedDomainObjectProvider<Configuration> =
-      project.configurations.register(DOKKATOO_MODULE_FILES_PROVIDER.appendFormatName()) {
+      project.configurations.register(dependencyContainerNames.dokkatooModuleFilesProvider) {
         description = "Provide Dokka Module files for $formatName to other subprojects"
         asProvider()
         // extend from dokkaConfigurationsConsumer, so Dokka Module Configs propagate api() style
@@ -308,7 +299,7 @@ abstract class DokkatooFormatPlugin @Inject constructor(
      * Should not contain runtime dependencies.
      */
     val dokkaPluginsClasspath: NamedDomainObjectProvider<Configuration> =
-      project.configurations.register(DOKKA_PLUGINS_CLASSPATH.appendFormatName()) {
+      project.configurations.register(dependencyContainerNames.dokkaPluginsClasspath) {
         description = "Dokka Plugins classpath for $formatName"
         asConsumer()
         isVisible = false
@@ -325,26 +316,13 @@ abstract class DokkatooFormatPlugin @Inject constructor(
      * the dependencies are computed automatically.
      */
     val dokkaPluginsIntransitiveClasspath: NamedDomainObjectProvider<Configuration> =
-      project.configurations.register(DOKKA_PLUGINS_INTRANSITIVE_CLASSPATH.appendFormatName()) {
+      project.configurations.register(dependencyContainerNames.dokkaPluginsIntransitiveClasspath) {
         description =
           "Dokka Plugins classpath for $formatName - for internal use. Fetch only the plugins (no transitive dependencies) for use in the Dokka JSON Configuration."
         asConsumer()
         extendsFrom(dokkaPluginsClasspath.get())
         isVisible = false
         isTransitive = false
-        attributes {
-          jvmJar()
-          dokkaCategory(dokkatooAttributes.dokkaPluginsClasspath)
-        }
-      }
-
-    /** Provides Dokka plugins to other subprojects. */
-    val dokkaPluginsClasspathOutgoing: NamedDomainObjectProvider<Configuration> =
-      project.configurations.register(DOKKA_PLUGINS_CLASSPATH_OUTGOING.appendFormatName()) {
-        description = "Provide the Dokka Plugins classpath for $formatName to other subprojects"
-        asProvider()
-        extendsFrom(dokkaPluginsClasspath.get())
-        isVisible = false
         attributes {
           jvmJar()
           dokkaCategory(dokkatooAttributes.dokkaPluginsClasspath)
@@ -364,14 +342,11 @@ abstract class DokkatooFormatPlugin @Inject constructor(
      * @see dev.adamko.dokkatoo.tasks.DokkatooGenerateTask
      */
     val dokkaGeneratorClasspath: NamedDomainObjectProvider<Configuration> =
-      project.configurations.register(DOKKA_GENERATOR_CLASSPATH.appendFormatName()) {
+      project.configurations.register(dependencyContainerNames.dokkaGeneratorClasspath) {
         description =
           "Dokka Generator runtime classpath for $formatName - will be used in Dokka Worker. Should contain all transitive dependencies, plugins (and their transitive dependencies), so Dokka Worker can run."
         asConsumer()
         isVisible = false
-
-        // also receive the classpath from other subprojects
-//                extendsFrom(dokkaConsumer.get())
 
         // extend from plugins classpath, so Dokka Worker can run the plugins
         extendsFrom(dokkaPluginsClasspath.get())
@@ -390,28 +365,20 @@ abstract class DokkatooFormatPlugin @Inject constructor(
     project: Project,
     private val publication: DokkaPublication,
     private val dokkatooExtension: DokkatooExtension,
-    private val dependencyCollections: DependencyCollections,
+    private val dependencyContainers: DependencyContainers,
 
     private val objects: ObjectFactory,
     private val providers: ProviderFactory,
   ) {
     private val formatName: String get() = publication.formatName
 
-    private fun String.appendFormatName() = this + formatName.capitalize()
-
-
-//  val taskName = object : Serializable {
-//    val generatePublication = GENERATE_PUBLICATION.appendFormatName()
-//    val generateModule = GENERATE_MODULE.appendFormatName()
-//    val prepareParameters = PREPARE_PARAMETERS.appendFormatName()
-//    val prepareModuleDescriptor = PREPARE_MODULE_DESCRIPTOR.appendFormatName()
-//  }
+    private val taskNames = DokkatooBasePlugin.TaskNames(formatName)
 
     val prepareParameters = project.tasks.register<DokkatooPrepareParametersTask>(
-      TaskName.PREPARE_PARAMETERS.appendFormatName()
+      taskNames.prepareParameters
     ) task@{
       description =
-        "Creates Dokka Configuration for executing the Dokka Generator for the $formatName publication"
+        "Prepares Dokka parameters for generating the $formatName publication"
 
       dokkaConfigurationJson.convention(
         dokkatooExtension.dokkatooConfigurationsDirectory.file("$formatName/dokka_parameters.json")
@@ -419,7 +386,7 @@ abstract class DokkatooFormatPlugin @Inject constructor(
 
       // depend on Dokka Module Descriptors from other subprojects
       dokkaModuleFiles.from(
-        dependencyCollections.dokkaModuleConsumer.map { elements ->
+        dependencyContainers.dokkaModuleConsumer.map { elements ->
           elements.incoming.artifactView {
             componentFilter(LocalProjectOnlyFilter)
             lenient(true)
@@ -440,7 +407,7 @@ abstract class DokkatooFormatPlugin @Inject constructor(
       moduleVersion.convention(publication.moduleVersion)
       offlineMode.convention(publication.offlineMode)
       outputDir.convention(publication.outputDir)
-      pluginsClasspath.from(dependencyCollections.dokkaPluginsIntransitiveClasspath)
+      pluginsClasspath.from(dependencyContainers.dokkaPluginsIntransitiveClasspath)
 
       pluginsConfiguration.addAllLater(providers.provider { publication.pluginsConfiguration })
 
@@ -469,30 +436,30 @@ abstract class DokkatooFormatPlugin @Inject constructor(
     }
 
     val generatePublication = project.tasks.register<DokkatooGenerateTask>(
-      TaskName.GENERATE_PUBLICATION.appendFormatName()
+      taskNames.generatePublication
     ) {
       description = "Executes the Dokka Generator, generating the $formatName publication"
       generationType.set(DokkatooGenerateTask.GenerationType.PUBLICATION)
 
       outputDirectory.convention(dokkatooExtension.dokkatooPublicationDirectory.dir(formatName))
       dokkaParametersJson.convention(prepareParameters.flatMap { it.dokkaConfigurationJson })
-      runtimeClasspath.from(dependencyCollections.dokkaGeneratorClasspath)
-      dokkaModuleFiles.from(dependencyCollections.dokkaModuleConsumer)
+      runtimeClasspath.from(dependencyContainers.dokkaGeneratorClasspath)
+      dokkaModuleFiles.from(dependencyContainers.dokkaModuleConsumer)
     }
 
     val generateModule = project.tasks.register<DokkatooGenerateTask>(
-      TaskName.GENERATE_MODULE.appendFormatName()
+      taskNames.generateModule
     ) {
       description = "Executes the Dokka Generator, generating a $formatName module"
       generationType.set(DokkatooGenerateTask.GenerationType.MODULE)
 
       outputDirectory.convention(dokkatooExtension.dokkatooModuleDirectory.dir(formatName))
       dokkaParametersJson.convention(prepareParameters.flatMap { it.dokkaConfigurationJson })
-      runtimeClasspath.from(dependencyCollections.dokkaGeneratorClasspath)
+      runtimeClasspath.from(dependencyContainers.dokkaGeneratorClasspath)
     }
 
     val prepareModuleDescriptor = project.tasks.register<DokkatooPrepareModuleDescriptorTask>(
-      TaskName.PREPARE_MODULE_DESCRIPTOR.appendFormatName()
+      taskNames.prepareModuleDescriptor
     ) {
       description = "Prepares the Dokka Module Descriptor for $formatName"
       includes.from(publication.includes)

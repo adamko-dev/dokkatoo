@@ -32,11 +32,12 @@ abstract class DokkatooGenerateTask @Inject constructor(
   @get:PathSensitive(NAME_ONLY)
   abstract val dokkaParametersJson: RegularFileProperty
 
+  /**
+   * Contains both the Dokka Generator classpath and Dokka plugins, and any transitive dependencies
+   * of either.
+   */
   @get:Classpath
   abstract val runtimeClasspath: ConfigurableFileCollection
-
-//    @get:Classpath
-//    abstract val pluginClasspath: ConfigurableFileCollection
 
   @get:LocalState
   abstract val cacheDirectory: DirectoryProperty
@@ -70,7 +71,6 @@ abstract class DokkatooGenerateTask @Inject constructor(
   @get:Input
   abstract val workerJvmArgs: ListProperty<String>
 
-  //  @get:Internal
   @get:LocalState
   abstract val workerLogFile: RegularFileProperty
 
