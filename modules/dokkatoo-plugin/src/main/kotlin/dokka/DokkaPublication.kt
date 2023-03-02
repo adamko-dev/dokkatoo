@@ -1,19 +1,6 @@
 package dev.adamko.dokkatoo.dokka
 
-import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKATOO_MODULE_FILES_CONSUMER
-import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKATOO_MODULE_FILES_PROVIDER
-import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKATOO_PARAMETERS
-import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKATOO_PARAMETERS_OUTGOING
-import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKA_GENERATOR_CLASSPATH
-import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKA_PLUGINS_CLASSPATH
-import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKA_PLUGINS_CLASSPATH_OUTGOING
-import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKA_PLUGINS_INTRANSITIVE_CLASSPATH
-import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.TaskName.GENERATE_MODULE
-import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.TaskName.GENERATE_PUBLICATION
-import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.TaskName.PREPARE_MODULE_DESCRIPTOR
-import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.TaskName.PREPARE_PARAMETERS
 import dev.adamko.dokkatoo.dokka.parameters.DokkaPluginConfigurationSpec
-import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import java.io.Serializable
 import javax.inject.Inject
 import org.gradle.api.Named
@@ -39,9 +26,6 @@ abstract class DokkaPublication @Inject constructor(
 
   @Internal
   override fun getName(): String = formatName
-
-  @get:Internal
-  abstract val description: Property<String>
 
   @get:Input
   abstract val enabled: Property<Boolean>
@@ -81,10 +65,6 @@ abstract class DokkaPublication @Inject constructor(
   @get:Input
   abstract val offlineMode: Property<Boolean>
 
-//    @get:InputFiles
-//    @get:Classpath
-//    abstract val pluginsClasspath: ConfigurableFileCollection
-
   @get:Nested
   abstract val pluginsConfiguration: NamedDomainObjectContainer<DokkaPluginConfigurationSpec>
 
@@ -119,34 +99,4 @@ abstract class DokkaPublication @Inject constructor(
   @get:Input
   // TODO probably not needed any more, since Dokka Generator now runs in an isolated JVM process
   abstract val finalizeCoroutines: Property<Boolean>
-
-  @Internal
-  val taskNames = TaskNames()
-
-  @Internal
-  val configurationNames = ConfigurationNames()
-
-  private fun String.formatSuffix() = this + formatName.capitalize()
-
-  @DokkatooInternalApi
-  inner class TaskNames : Serializable {
-    val generatePublication = GENERATE_PUBLICATION.formatSuffix()
-    val generateModule = GENERATE_MODULE.formatSuffix()
-    val prepareParameters = PREPARE_PARAMETERS.formatSuffix()
-    val prepareModuleDescriptor = PREPARE_MODULE_DESCRIPTOR.formatSuffix()
-  }
-
-  // TODO rename 'outgoing' or 'provider' to 'shared'?
-
-  @DokkatooInternalApi
-  inner class ConfigurationNames : Serializable {
-    val dokkaParametersConsumer: String = DOKKATOO_PARAMETERS.formatSuffix()
-    val dokkaParametersOutgoing: String = DOKKATOO_PARAMETERS_OUTGOING.formatSuffix()
-    val moduleDescriptorFiles = DOKKATOO_MODULE_FILES_CONSUMER.formatSuffix()
-    val moduleDescriptorFilesOutgoing = DOKKATOO_MODULE_FILES_PROVIDER.formatSuffix()
-    val dokkaGeneratorClasspath = DOKKA_GENERATOR_CLASSPATH.formatSuffix()
-    val dokkaPluginsClasspath = DOKKA_PLUGINS_CLASSPATH.formatSuffix()
-    val dokkaPluginsIntransitiveClasspath = DOKKA_PLUGINS_INTRANSITIVE_CLASSPATH.formatSuffix()
-    val dokkaPluginsClasspathOutgoing = DOKKA_PLUGINS_CLASSPATH_OUTGOING.formatSuffix()
-  }
 }

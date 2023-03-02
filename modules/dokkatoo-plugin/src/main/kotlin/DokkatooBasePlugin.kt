@@ -1,6 +1,5 @@
 package dev.adamko.dokkatoo
 
-import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.ConfigurationName.DOKKA_PLUGINS_CLASSPATH
 import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes
 import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes.Companion.DOKKATOO_BASE_ATTRIBUTE
 import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes.Companion.DOKKATOO_CATEGORY_ATTRIBUTE
@@ -54,7 +53,7 @@ abstract class DokkatooBasePlugin @Inject constructor(
       attribute(DOKKA_FORMAT_ATTRIBUTE)
     }
 
-    target.configurations.register(ConfigurationName.DOKKATOO) {
+    target.configurations.register(dependencyContainerNames.dokkatoo) {
       description = "Fetch all Dokkatoo files from all configurations in other subprojects"
       asConsumer()
       isVisible = false
@@ -90,7 +89,7 @@ abstract class DokkatooBasePlugin @Inject constructor(
     }
 
     target.tasks.withType<DokkatooPrepareParametersTask>().configureEach task@{
-      onlyIf { publicationEnabled.getOrElse(true) }
+      onlyIf("publication must be enabled") { publicationEnabled.getOrElse(true) }
     }
   }
 
@@ -220,13 +219,13 @@ abstract class DokkatooBasePlugin @Inject constructor(
   }
 
   private fun TaskContainer.createDokkaLifecycleTasks() {
-    val prepareParameters = register<DokkatooTask>(TaskName.PREPARE_PARAMETERS) {
-      description = "Runs all Dokkatoo Create Configuration tasks"
+    val prepareParameters = register<DokkatooTask>(taskNames.prepareParameters) {
+      description = "Prepares Dokka parameters for all formats"
       dependsOn(withType<DokkatooPrepareParametersTask>())
     }
 
-    register<DokkatooTask>(TaskName.GENERATE) {
-      description = "Runs all Dokkatoo Generate tasks"
+    register<DokkatooTask>(taskNames.generate) {
+      description = "Generates Dokkatoo publications for all formats"
       dependsOn(prepareParameters)
       dependsOn(withType<DokkatooGenerateTask>())
     }
@@ -237,64 +236,14 @@ abstract class DokkatooBasePlugin @Inject constructor(
     const val EXTENSION_NAME = "dokkatoo"
 
     /**
-     * Names of the Gradle [Configuration]s used by the [Dokkatoo Plugin][DokkatooBasePlugin].
-     *
-     * Beware the confusing terminology:
-     * - [Gradle Configurations][org.gradle.api.artifacts.Configuration] - share files between subprojects. Each has a name.
-     * - [DokkaConfiguration][org.jetbrains.dokka.DokkaConfiguration] - parameters for executing the Dokka Generator
-     */
-    object ConfigurationName {
-
-      const val DOKKATOO = "dokkatoo"
-
-      /** Name of the [Configuration] that _consumes_ [dev.adamko.dokkatoo.dokka.parameters.DokkaParametersKxs] from projects */
-      const val DOKKATOO_PARAMETERS = "dokkatooParameters"
-
-      /** Name of the [Configuration] that _provides_ [org.jetbrains.dokka.DokkaConfiguration] to other projects */
-      const val DOKKATOO_PARAMETERS_OUTGOING = "dokkatooParametersElements"
-
-      /** Name of the [Configuration] that _consumes_ all [org.jetbrains.dokka.DokkaConfiguration.DokkaModuleDescription] files */
-      const val DOKKATOO_MODULE_FILES_CONSUMER = "dokkatooModule"
-
-      /** Name of the [Configuration] that _provides_ all [org.jetbrains.dokka.DokkaConfiguration.DokkaModuleDescription] files to other projects */
-      const val DOKKATOO_MODULE_FILES_PROVIDER = "${DOKKATOO_MODULE_FILES_CONSUMER}Elements"
-
-      /**
-       * Classpath used to execute the Dokka Generator.
-       *
-       * Extends [DOKKA_PLUGINS_CLASSPATH], so Dokka plugins and their dependencies are included.
-       */
-      const val DOKKA_GENERATOR_CLASSPATH = "dokkatooGeneratorClasspath"
-
-      /** Dokka Plugins (including transitive dependencies, so this can be passed to the Dokka Generator Worker classpath) */
-      const val DOKKA_PLUGINS_CLASSPATH = "dokkatooPlugin"
-
-      /**
-       * Dokka Plugins (excluding transitive dependencies) will be used to create Dokka Generator Parameters
-       *
-       * Generally, this configuration should not be invoked manually. Instead, use [DOKKA_PLUGINS_CLASSPATH].
-       */
-      internal const val DOKKA_PLUGINS_INTRANSITIVE_CLASSPATH =
-        "${DOKKA_PLUGINS_CLASSPATH}Intransitive"
-
-      /** _Provides_ Dokka Plugins Classpath to other subprojects */
-      const val DOKKA_PLUGINS_CLASSPATH_OUTGOING = "${DOKKA_PLUGINS_CLASSPATH}Elements"
-    }
-
-    /**
      * The group of all Dokkatoo Gradle tasks.
      *
      * @see org.gradle.api.Task.getGroup
      */
     const val TASK_GROUP = "dokkatoo"
 
-    object TaskName {
-      const val GENERATE = "dokkatooGenerate"
-      const val GENERATE_PUBLICATION = "${GENERATE}Publication"
-      const val GENERATE_MODULE = "${GENERATE}Module"
-      const val PREPARE_PARAMETERS = "prepareDokkatooParameters"
-      const val PREPARE_MODULE_DESCRIPTOR = "prepareDokkatooModuleDescriptor"
-    }
+    val taskNames = TaskNames(null)
+    val dependencyContainerNames = DependencyContainerNames(null)
 
     internal val jsonMapper = Json {
       prettyPrint = true
@@ -302,4 +251,66 @@ abstract class DokkatooBasePlugin @Inject constructor(
       prettyPrintIndent = "  "
     }
   }
+
+  @DokkatooInternalApi
+  abstract class HasFormatName {
+    abstract val formatName: String?
+
+    /** Appends [formatName] to the end of the string, camelcase style, if [formatName] is not null */
+    protected fun String.appendFormat(): String =
+      when (val name = formatName) {
+        null -> this
+        else -> this + name.capitalize()
+      }
+  }
+
+  /**
+   * Names of the Gradle [Configuration]s used by the [Dokkatoo Plugin][DokkatooBasePlugin].
+   *
+   * Beware the confusing terminology:
+   * - [Gradle Configurations][org.gradle.api.artifacts.Configuration] - share files between subprojects. Each has a name.
+   * - [DokkaConfiguration][org.jetbrains.dokka.DokkaConfiguration] - parameters for executing the Dokka Generator
+   */
+  class DependencyContainerNames(override val formatName: String?) : HasFormatName() {
+
+    val dokkatoo = "dokkatoo".appendFormat()
+
+    /** Name of the [Configuration] that _consumes_ [dev.adamko.dokkatoo.dokka.parameters.DokkaParametersKxs] from projects */
+    val dokkatooParametersConsumer = "dokkatooParameters".appendFormat()
+
+    /** Name of the [Configuration] that _provides_ [org.jetbrains.dokka.DokkaConfiguration] to other projects */
+    val dokkatooParametersOutgoing = "dokkatooParametersElements".appendFormat()
+
+    /** Name of the [Configuration] that _consumes_ all [org.jetbrains.dokka.DokkaConfiguration.DokkaModuleDescription] files */
+    val dokkatooModuleFilesConsumer = "dokkatooModule".appendFormat()
+
+    /** Name of the [Configuration] that _provides_ all [org.jetbrains.dokka.DokkaConfiguration.DokkaModuleDescription] files to other projects */
+    val dokkatooModuleFilesProvider = "dokkatooModuleElements".appendFormat()
+
+    /**
+     * Classpath used to execute the Dokka Generator.
+     *
+     * Extends [dokkaPluginsClasspath], so Dokka plugins and their dependencies are included.
+     */
+    val dokkaGeneratorClasspath = "dokkatooGeneratorClasspath".appendFormat()
+
+    /** Dokka Plugins (including transitive dependencies, so this can be passed to the Dokka Generator Worker classpath) */
+    val dokkaPluginsClasspath = "dokkatooPlugin".appendFormat()
+
+    /**
+     * Dokka Plugins (excluding transitive dependencies) will be used to create Dokka Generator Parameters
+     *
+     * Generally, this configuration should not be invoked manually. Instead, use [dokkaPluginsClasspath].
+     */
+    val dokkaPluginsIntransitiveClasspath = "dokkatooPluginIntransitive".appendFormat()
+  }
+
+  class TaskNames(override val formatName: String?) : HasFormatName() {
+    val generate = "dokkatooGenerate".appendFormat()
+    val generatePublication = "dokkatooGeneratePublication".appendFormat()
+    val generateModule = "dokkatooGenerateModule".appendFormat()
+    val prepareParameters = "prepareDokkatooParameters".appendFormat()
+    val prepareModuleDescriptor = "prepareDokkatooModuleDescriptor".appendFormat()
+  }
+
 }
