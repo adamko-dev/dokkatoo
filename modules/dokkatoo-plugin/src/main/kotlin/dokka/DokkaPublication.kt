@@ -10,6 +10,7 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
+import org.gradle.api.tasks.PathSensitivity.RELATIVE
 
 /**
  * A [DokkaPublication] describes a single Dokka output.
@@ -90,7 +91,7 @@ abstract class DokkaPublication @Inject constructor(
   abstract val suppressObviousFunctions: Property<Boolean>
 
   @get:InputFiles
-  @get:PathSensitive(PathSensitivity.NAME_ONLY)
+  @get:PathSensitive(RELATIVE)
   abstract val includes: ConfigurableFileCollection
 
   @get:Input

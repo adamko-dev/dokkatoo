@@ -91,6 +91,13 @@ abstract class DokkatooBasePlugin @Inject constructor(
     target.tasks.withType<DokkatooPrepareParametersTask>().configureEach task@{
       onlyIf("publication must be enabled") { publicationEnabled.getOrElse(true) }
     }
+
+    target.tasks.withType<DokkatooTask.WithSourceSets>().configureEach task@{
+      addAllDokkaSourceSets(providers.provider { dokkatooExtension.dokkatooSourceSets })
+      dokkaSourceSets.configureEach {
+        sourceSetScope.convention(this@task.path)
+      }
+    }
   }
 
   private fun createExtension(project: Project): DokkatooExtension {

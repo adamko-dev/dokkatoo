@@ -16,16 +16,14 @@ import io.kotest.matchers.should
 import io.kotest.matchers.string.shouldContain
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.decodeFromStream
-import org.gradle.testkit.runner.TaskOutcome.FROM_CACHE
-import org.gradle.testkit.runner.TaskOutcome.UP_TO_DATE
+import org.gradle.testkit.runner.TaskOutcome.*
 
 class MultiModuleFunctionalTest : FunSpec({
 
-  val project = initDokkatooProject()
-
-
   context("when dokkatoo generates all formats") {
-    val build = project.runner
+    val project = initDokkatooProject("all-formats")
+
+    project.runner
       .withArguments(
         "clean",
         ":dokkatooGenerate",
@@ -33,16 +31,14 @@ class MultiModuleFunctionalTest : FunSpec({
         "--info",
       )
       .forwardOutput()
-      .build()
-
-
-    test("expect build is successful") {
-      build.output shouldContain "BUILD SUCCESSFUL"
-    }
+      .build {
+        test("expect build is successful") {
+          output shouldContain "BUILD SUCCESSFUL"
+        }
+      }
 
     test("expect all dokka workers are successful") {
       val dokkaWorkerLogs = project.findFiles { it.name == "dokka-worker.log" }
-//      dokkaWorkerLogs shouldHaveCount 1
       dokkaWorkerLogs.firstOrNull().shouldNotBeNull().should { dokkaWorkerLog ->
         dokkaWorkerLog.shouldBeAFile()
         dokkaWorkerLog.readText().shouldNotContainAnyOf(
@@ -68,8 +64,7 @@ class MultiModuleFunctionalTest : FunSpec({
       test("with element-list") {
         project.projectDir.resolve("build/dokka/html/package-list").shouldBeAFile()
         project.projectDir.resolve("build/dokka/html/package-list").toFile().readText()
-          .shouldContain( // language=text
-            """
+          .shouldContain( /* language=text */ """
               |${'$'}dokka.format:html-v1
               |${'$'}dokka.linkExtension:html
               |
@@ -81,7 +76,6 @@ class MultiModuleFunctionalTest : FunSpec({
           )
       }
     }
-
 
 //        project.projectDir.toFile().walk().forEach { println(it) }
 
@@ -135,11 +129,17 @@ class MultiModuleFunctionalTest : FunSpec({
   }
 
   context("Gradle caching") {
-    context("expect Dokkatoo is compatible with Gradle Build Cache") {
-      // for some weird reason Gradle can't run clean and dokkatooGenerate together
-      project.runner.withArguments("clean")
 
-      val build = project.runner
+    context("expect Dokkatoo is compatible with Gradle Build Cache") {
+      val project = initDokkatooProject("build-cache")
+
+      test("expect clean is successful") {
+        project.runner.withArguments("clean").build {
+          output shouldContain "BUILD SUCCESSFUL"
+        }
+      }
+
+      project.runner
         .withArguments(
           //"clean",
           ":dokkatooGenerate",
@@ -148,22 +148,22 @@ class MultiModuleFunctionalTest : FunSpec({
           "--build-cache",
         )
         .forwardOutput()
-        .build()
+        .build {
+          test("expect build is successful") {
+            output shouldContain "BUILD SUCCESSFUL"
+          }
 
-      test("expect build is successful") {
-        build.output shouldContain "BUILD SUCCESSFUL"
-      }
-
-      test("expect all dokka workers are successful") {
-        val dokkaWorkerLogs = project.findFiles { it.name == "dokka-worker.log" }
-        dokkaWorkerLogs.forAll { dokkaWorkerLog ->
-          dokkaWorkerLog.shouldBeAFile()
-          dokkaWorkerLog.readText().shouldNotContainAnyOf(
-            "[ERROR]",
-            "[WARN]",
-          )
+          test("expect all dokka workers are successful") {
+            val dokkaWorkerLogs = project.findFiles { it.name == "dokka-worker.log" }
+            dokkaWorkerLogs.forAll { dokkaWorkerLog ->
+              dokkaWorkerLog.shouldBeAFile()
+              dokkaWorkerLog.readText().shouldNotContainAnyOf(
+                "[ERROR]",
+                "[WARN]",
+              )
+            }
+          }
         }
-      }
 
       context("when build cache is enabled") {
         project.runner
@@ -174,17 +174,16 @@ class MultiModuleFunctionalTest : FunSpec({
             "--build-cache",
           )
           .forwardOutput()
-          .build().let { dokkatooBuildCache ->
-
+          .build {
             test("expect build is successful") {
-              dokkatooBuildCache.output shouldContainAll listOf(
+              output shouldContainAll listOf(
                 "BUILD SUCCESSFUL",
                 "36 actionable tasks: 36 up-to-date",
               )
             }
 
             test("expect all dokkatoo tasks are up-to-date") {
-              build.tasks.filter {
+              tasks.filter {
                 "dokkatoo" in it.path.substringAfterLast(':').toLowerCase()
               }.shouldForAll {
                 it.outcome.shouldBeIn(FROM_CACHE, UP_TO_DATE)
@@ -195,10 +194,15 @@ class MultiModuleFunctionalTest : FunSpec({
     }
 
     context("Gradle Configuration Cache") {
-      // for some weird reason Gradle can't run clean and dokkatooGenerate together
-      project.runner.withArguments("clean")
+      val project = initDokkatooProject("config-cache")
 
-      val build = project.runner
+      test("expect clean is successful") {
+        project.runner.withArguments("clean").build {
+          output shouldContain "BUILD SUCCESSFUL"
+        }
+      }
+
+      project.runner
         .withArguments(
           //"clean",
           ":dokkatooGenerate",
@@ -208,11 +212,11 @@ class MultiModuleFunctionalTest : FunSpec({
           "--configuration-cache",
         )
         .forwardOutput()
-        .build()
-
-      test("expect build is successful") {
-        build.output shouldContain "BUILD SUCCESSFUL"
-      }
+        .build {
+          test("expect build is successful") {
+            output shouldContain "BUILD SUCCESSFUL"
+          }
+        }
 
       test("expect all dokka workers are successful") {
         val dokkaWorkerLogs = project.findFiles { it.name == "dokka-worker.log" }
@@ -225,11 +229,105 @@ class MultiModuleFunctionalTest : FunSpec({
         }
       }
     }
+
+
+    context("expect updates in subprojects re-run tasks") {
+
+      val project = initDokkatooProject("submodule-update")
+
+      test("expect clean is successful") {
+        project.runner.withArguments("clean").build {
+          output shouldContain "BUILD SUCCESSFUL"
+        }
+      }
+
+      test("expect first build is successful") {
+        project.runner
+          .withArguments(
+            //"clean",
+            ":dokkatooGeneratePublicationHtml",
+            "--stacktrace",
+            "--info",
+            "--build-cache",
+          )
+          .forwardOutput()
+          .build {
+            output shouldContain "BUILD SUCCESSFUL"
+          }
+      }
+
+      context("and when a file in a subproject changes") {
+        project.dir("subproject-hello") {
+          @Suppress("KDocUnresolvedReference")
+          createKotlinFile(
+            "src/main/kotlin/HelloAgain.kt",
+            """
+              |package com.project.hello
+              |
+              |/** Like [Hello], but again */
+              |class HelloAgain {
+              |    /** prints `Hello Again` to the console */  
+              |    fun sayHelloAgain() = println("Hello Again")
+              |}
+              |
+            """.trimMargin()
+          )
+        }
+
+        context("expect Dokka re-generates the publication") {
+          project.runner
+            .withArguments(
+              ":dokkatooGeneratePublicationHtml",
+              "--stacktrace",
+              "--info",
+              "--build-cache",
+            )
+            .forwardOutput()
+            .build {
+
+              test("expect :subproject-goodbye tasks are up-to-date, because no files changed") {
+                shouldHaveTasksWithOutcome(
+                  ":subproject-goodbye:prepareDokkatooParametersHtml" to UP_TO_DATE,
+                  ":subproject-goodbye:dokkatooGenerateModuleHtml" to UP_TO_DATE,
+                  ":subproject-goodbye:prepareDokkatooModuleDescriptorHtml" to UP_TO_DATE,
+                )
+              }
+
+              val successfulOutcomes = listOf(SUCCESS, FROM_CACHE)
+              test("expect :subproject-hello tasks should be re-run, since a file changed") {
+                shouldHaveTasksWithAnyOutcome(
+                  ":subproject-hello:prepareDokkatooParametersHtml" to successfulOutcomes,
+                  ":subproject-hello:dokkatooGenerateModuleHtml" to successfulOutcomes,
+                  ":subproject-hello:prepareDokkatooModuleDescriptorHtml" to successfulOutcomes,
+                )
+              }
+
+              test("expect aggregating tasks should re-run because the :subproject-hello Dokka Module changed") {
+                shouldHaveTasksWithAnyOutcome(
+                  ":prepareDokkatooParametersHtml" to successfulOutcomes,
+                  ":dokkatooGeneratePublicationHtml" to successfulOutcomes,
+                )
+              }
+
+              test("expect build is be successful") {
+                output shouldContain "BUILD SUCCESSFUL"
+              }
+
+              test("expect 8 tasks are run") {
+                output shouldContain "8 actionable tasks"
+              }
+            }
+        }
+      }
+    }
   }
 })
 
-private fun initDokkatooProject(): GradleProjectTest {
-  return gradleKtsProjectTest("multi-module-hello-goodbye") {
+private fun initDokkatooProject(
+  testName: String,
+  config: GradleProjectTest.() -> Unit = {},
+): GradleProjectTest {
+  return gradleKtsProjectTest("multi-module-hello-goodbye/$testName") {
 
     settingsGradleKts += """
       |
@@ -276,6 +374,8 @@ private fun initDokkatooProject(): GradleProjectTest {
           |
         """.trimMargin()
       )
+
+      createKotlinFile("src/main/kotlin/HelloAgain.kt", "")
     }
 
     dir("subproject-goodbye") {
@@ -302,5 +402,7 @@ private fun initDokkatooProject(): GradleProjectTest {
         """.trimMargin()
       )
     }
+
+    config()
   }
 }
