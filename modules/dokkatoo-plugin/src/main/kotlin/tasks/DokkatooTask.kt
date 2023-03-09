@@ -22,6 +22,7 @@ abstract class DokkatooTask : DefaultTask() {
    * Any task that implements [WithSourceSets] doesn't have to use the sources, but it will use
    * them as part of Gradle up-to-date checks.
    */
+  @CacheableTask
   abstract class WithSourceSets : DokkatooTask() {
 
     /**
