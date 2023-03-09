@@ -15,7 +15,8 @@ import org.jetbrains.dokka.DokkaGenerator
 /**
  * Gradle Worker Daemon for running [DokkaGenerator].
  *
- * The worker requires [DokkaGenerator] is present on the classpath.
+ * The worker requires [DokkaGenerator] is present on its classpath, as well as any Dokka plugins
+ * that are used to generate the Dokka files. Transitive dependencies are also required.
  */
 @DokkatooInternalApi
 @OptIn(ExperimentalTime::class)

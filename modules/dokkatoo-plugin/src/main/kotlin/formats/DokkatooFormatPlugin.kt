@@ -10,11 +10,7 @@ import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes.Companio
 import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes.Companion.DOKKA_FORMAT_ATTRIBUTE
 import dev.adamko.dokkatoo.dokka.DokkaPublication
 import dev.adamko.dokkatoo.dokka.parameters.DokkaPluginConfigurationSpec
-import dev.adamko.dokkatoo.internal.DokkatooInternalApi
-import dev.adamko.dokkatoo.internal.LocalProjectOnlyFilter
-import dev.adamko.dokkatoo.internal.asConsumer
-import dev.adamko.dokkatoo.internal.asProvider
-import dev.adamko.dokkatoo.internal.versions
+import dev.adamko.dokkatoo.internal.*
 import dev.adamko.dokkatoo.tasks.DokkatooGenerateTask
 import dev.adamko.dokkatoo.tasks.DokkatooPrepareModuleDescriptorTask
 import dev.adamko.dokkatoo.tasks.DokkatooPrepareParametersTask
@@ -36,17 +32,12 @@ import org.gradle.api.attributes.Usage.JAVA_RUNTIME
 import org.gradle.api.attributes.Usage.USAGE_ATTRIBUTE
 import org.gradle.api.attributes.java.TargetJvmEnvironment.STANDARD_JVM
 import org.gradle.api.attributes.java.TargetJvmEnvironment.TARGET_JVM_ENVIRONMENT_ATTRIBUTE
+import org.gradle.api.file.FileSystemOperations
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
-import org.gradle.kotlin.dsl.apply
-import org.gradle.kotlin.dsl.dependencies
-import org.gradle.kotlin.dsl.getByType
-import org.gradle.kotlin.dsl.named
-import org.gradle.kotlin.dsl.newInstance
-import org.gradle.kotlin.dsl.register
-import org.gradle.kotlin.dsl.withType
+import org.gradle.kotlin.dsl.*
 import org.jetbrains.dokka.DokkaConfiguration
 
 /**
@@ -62,6 +53,8 @@ abstract class DokkatooFormatPlugin @Inject constructor(
   protected abstract val objects: ObjectFactory
   @get:Inject
   protected abstract val providers: ProviderFactory
+  @get:Inject
+  protected abstract val files: FileSystemOperations
 
 
   override fun apply(target: Project) {
@@ -387,14 +380,11 @@ abstract class DokkatooFormatPlugin @Inject constructor(
       // depend on Dokka Module Descriptors from other subprojects
       dokkaModuleFiles.from(
         dependencyContainers.dokkaModuleConsumer.map { elements ->
-          elements.incoming.artifactView {
-            componentFilter(LocalProjectOnlyFilter)
-            lenient(true)
-          }.artifacts.artifactFiles
+          elements.incoming
+            .artifactView { componentFilter(LocalProjectOnlyFilter) }
+            .artifacts.artifactFiles
         }
       )
-
-      dokkaSourceSets.addAllLater(providers.provider { dokkatooExtension.dokkatooSourceSets })
 
       publicationEnabled.convention(publication.enabled)
 
@@ -407,7 +397,11 @@ abstract class DokkatooFormatPlugin @Inject constructor(
       moduleVersion.convention(publication.moduleVersion)
       offlineMode.convention(publication.offlineMode)
       outputDir.convention(publication.outputDir)
-      pluginsClasspath.from(dependencyContainers.dokkaPluginsIntransitiveClasspath)
+      pluginsClasspath.from(
+        dependencyContainers.dokkaPluginsIntransitiveClasspath.map { classpath ->
+          classpath.incoming.artifacts.artifactFiles
+        }
+      )
 
       pluginsConfiguration.addAllLater(providers.provider { publication.pluginsConfiguration })
 
@@ -429,44 +423,59 @@ abstract class DokkatooFormatPlugin @Inject constructor(
 
       suppressInheritedMembers.convention(publication.suppressInheritedMembers)
       suppressObviousFunctions.convention(publication.suppressObviousFunctions)
-
-      dokkaSourceSets.configureEach dss@{
-        sourceSetScope.convention(this@task.path)
-      }
     }
 
     val generatePublication = project.tasks.register<DokkatooGenerateTask>(
       taskNames.generatePublication
-    ) {
+    ) task@{
       description = "Executes the Dokka Generator, generating the $formatName publication"
       generationType.set(DokkatooGenerateTask.GenerationType.PUBLICATION)
 
       outputDirectory.convention(dokkatooExtension.dokkatooPublicationDirectory.dir(formatName))
       dokkaParametersJson.convention(prepareParameters.flatMap { it.dokkaConfigurationJson })
-      runtimeClasspath.from(dependencyContainers.dokkaGeneratorClasspath)
-      dokkaModuleFiles.from(dependencyContainers.dokkaModuleConsumer)
+      runtimeClasspath.from(
+        dependencyContainers.dokkaGeneratorClasspath.map { classpath ->
+          classpath.incoming.artifacts.artifactFiles
+        }
+      )
+      dokkaModuleFiles.from(
+        dependencyContainers.dokkaModuleConsumer.map { modules ->
+          modules.incoming
+            .artifactView { componentFilter(LocalProjectOnlyFilter) }
+            .artifacts.artifactFiles
+        }
+      )
     }
 
     val generateModule = project.tasks.register<DokkatooGenerateTask>(
       taskNames.generateModule
-    ) {
+    ) task@{
       description = "Executes the Dokka Generator, generating a $formatName module"
       generationType.set(DokkatooGenerateTask.GenerationType.MODULE)
 
       outputDirectory.convention(dokkatooExtension.dokkatooModuleDirectory.dir(formatName))
       dokkaParametersJson.convention(prepareParameters.flatMap { it.dokkaConfigurationJson })
-      runtimeClasspath.from(dependencyContainers.dokkaGeneratorClasspath)
+      runtimeClasspath.from(
+        dependencyContainers.dokkaGeneratorClasspath.map { classpath ->
+          classpath.incoming.artifacts.artifactFiles
+        }
+      )
     }
 
     val prepareModuleDescriptor = project.tasks.register<DokkatooPrepareModuleDescriptorTask>(
       taskNames.prepareModuleDescriptor
-    ) {
+    ) task@{
       description = "Prepares the Dokka Module Descriptor for $formatName"
       includes.from(publication.includes)
       dokkaModuleDescriptorJson.convention(
         dokkatooExtension.dokkatooConfigurationsDirectory.file("$formatName/module_descriptor.json")
       )
-      sourceOutputDirectory(generateModule.flatMap { it.outputDirectory })
+      moduleDirectory.set(generateModule.flatMap { it.outputDirectory })
+
+//      dokkaSourceSets.addAllLater(providers.provider { dokkatooExtension.dokkatooSourceSets })
+//      dokkaSourceSets.configureEach {
+//        sourceSetScope.convention(this@task.path)
+//      }
     }
   }
 

@@ -14,7 +14,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import org.gradle.api.tasks.PathSensitivity.NAME_ONLY
 import org.gradle.api.tasks.PathSensitivity.RELATIVE
-import org.gradle.kotlin.dsl.submit
+import org.gradle.kotlin.dsl.*
 import org.gradle.process.JavaForkOptions
 import org.gradle.workers.WorkerExecutor
 
@@ -26,7 +26,7 @@ import org.gradle.workers.WorkerExecutor
 @CacheableTask
 abstract class DokkatooGenerateTask @Inject constructor(
   private val workers: WorkerExecutor,
-) : DokkatooTask() {
+) : DokkatooTask.WithSourceSets() {
 
   @get:InputFile
   @get:PathSensitive(NAME_ONLY)

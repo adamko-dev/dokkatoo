@@ -86,30 +86,30 @@ fun gradleKtsProjectTest(
   return GradleProjectTest(baseDir = baseDir, testProjectName = testProjectName).apply {
 
     settingsGradleKts = """
-            |rootProject.name = "test"
-            |
-            |@Suppress("UnstableApiUsage") // Central declaration of repositories is an incubating feature
-            |dependencyResolutionManagement {
-            |    repositories {
-            |        mavenCentral()
-            |        maven(file("$testMavenRepoRelativePath"))
-            |    }
-            |}
-            |
-            |pluginManagement {
-            |    repositories {
-            |        gradlePluginPortal()
-            |        mavenCentral()
-            |        maven(file("$testMavenRepoRelativePath"))
-            |    }
-            |}
-            |
-        """.trimMargin()
+      |rootProject.name = "test"
+      |
+      |@Suppress("UnstableApiUsage") // Central declaration of repositories is an incubating feature
+      |dependencyResolutionManagement {
+      |    repositories {
+      |        mavenCentral()
+      |        maven(file("$testMavenRepoRelativePath"))
+      |    }
+      |}
+      |
+      |pluginManagement {
+      |    repositories {
+      |        gradlePluginPortal()
+      |        mavenCentral()
+      |        maven(file("$testMavenRepoRelativePath"))
+      |    }
+      |}
+      |
+    """.trimMargin()
 
     gradleProperties = """
-            |kotlin.mpp.stability.nowarn=true
-            |org.gradle.cache=true
-       """.trimMargin()
+      |kotlin.mpp.stability.nowarn=true
+      |org.gradle.cache=true
+    """.trimMargin()
 
     build()
   }
@@ -129,29 +129,29 @@ fun gradleGroovyProjectTest(
   return GradleProjectTest(baseDir = baseDir, testProjectName = testProjectName).apply {
 
     settingsGradle = """
-            |rootProject.name = "test"
-            |
-            |dependencyResolutionManagement {
-            |    repositories {
-            |        mavenCentral()
-            |        maven { url = file("$testMavenRepoRelativePath") }
-            |    }
-            |}
-            |
-            |pluginManagement {
-            |    repositories {
-            |        gradlePluginPortal()
-            |        mavenCentral()
-            |        maven { url = file("$testMavenRepoRelativePath") }
-            |    }
-            |}
-            |
-        """.trimMargin()
+      |rootProject.name = "test"
+      |
+      |dependencyResolutionManagement {
+      |    repositories {
+      |        mavenCentral()
+      |        maven { url = file("$testMavenRepoRelativePath") }
+      |    }
+      |}
+      |
+      |pluginManagement {
+      |    repositories {
+      |        gradlePluginPortal()
+      |        mavenCentral()
+      |        maven { url = file("$testMavenRepoRelativePath") }
+      |    }
+      |}
+      |
+    """.trimMargin()
 
     gradleProperties = """
-            |kotlin.mpp.stability.nowarn=true
-            |org.gradle.cache=true
-       """.trimMargin()
+      |kotlin.mpp.stability.nowarn=true
+      |org.gradle.cache=true
+    """.trimMargin()
 
     build()
   }
@@ -213,6 +213,7 @@ fun ProjectDirectoryScope.createFile(filePath: String, contents: String): File =
     writeText(contents)
   }
 
+
 @ProjectDirectoryDsl
 fun ProjectDirectoryScope.dir(
   path: String,
@@ -255,12 +256,10 @@ var ProjectDirectoryScope.buildGradle: String by TestProjectFileDelegate("build.
 @delegate:Language("properties")
 var ProjectDirectoryScope.gradleProperties: String by TestProjectFileDelegate("gradle.properties")
 
+
 fun ProjectDirectoryScope.createKotlinFile(filePath: String, @Language("kotlin") contents: String) =
   createFile(filePath, contents)
 
+
 fun ProjectDirectoryScope.createKtsFile(filePath: String, @Language("kts") contents: String) =
   createFile(filePath, contents)
-
-
-fun GradleRunner.withEnvironment(vararg map: Pair<String, String>): GradleRunner =
-  withEnvironment(map.toMap())

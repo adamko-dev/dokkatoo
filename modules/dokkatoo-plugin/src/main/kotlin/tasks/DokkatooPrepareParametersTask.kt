@@ -27,7 +27,7 @@ import org.gradle.api.tasks.PathSensitivity.RELATIVE
 @CacheableTask
 abstract class DokkatooPrepareParametersTask @Inject constructor(
   objects: ObjectFactory,
-) : DokkatooTask() {
+) : DokkatooTask.WithSourceSets() {
 
   @get:OutputFile
   abstract val dokkaConfigurationJson: RegularFileProperty
@@ -51,9 +51,6 @@ abstract class DokkatooPrepareParametersTask @Inject constructor(
 
   @get:Input
   abstract val delayTemplateSubstitution: Property<Boolean>
-
-  @get:Nested
-  abstract val dokkaSourceSets: NamedDomainObjectContainer<DokkaSourceSetSpec>
 
   @get:Input
   abstract val failOnWarning: Property<Boolean>

@@ -2,11 +2,8 @@ package dev.adamko.dokkatoo.tasks
 
 import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.jsonMapper
 import dev.adamko.dokkatoo.dokka.parameters.DokkaParametersKxs
-import javax.inject.Inject
 import kotlinx.serialization.encodeToString
-import org.gradle.api.file.ConfigurableFileCollection
-import org.gradle.api.file.ProjectLayout
-import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.file.*
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import org.gradle.api.tasks.PathSensitivity.RELATIVE
@@ -17,21 +14,14 @@ import org.gradle.api.tasks.PathSensitivity.RELATIVE
  * @see dev.adamko.dokkatoo.dokka.parameters.DokkaParametersKxs.DokkaModuleDescriptionKxs
  */
 @CacheableTask
-abstract class DokkatooPrepareModuleDescriptorTask @Inject constructor(
-  private val layout: ProjectLayout,
-) : DokkatooTask() {
+abstract class DokkatooPrepareModuleDescriptorTask : DokkatooTask.WithSourceSets() {
 
   @get:Input
   abstract val moduleName: Property<String>
 
-  @get:Input
-  protected abstract val sourceOutputDirectory: Property<String>
-
-  fun sourceOutputDirectory(path: Any) {
-    sourceOutputDirectory.set(
-      layout.files(path).singleFile.invariantSeparatorsPath
-    )
-  }
+  @get:InputDirectory
+  @get:PathSensitive(RELATIVE)
+  abstract val moduleDirectory: DirectoryProperty
 
   @get:InputFiles
   @get:Optional
@@ -47,13 +37,13 @@ abstract class DokkatooPrepareModuleDescriptorTask @Inject constructor(
   @TaskAction
   fun generateModuleConfiguration() {
     val moduleName = moduleName.get()
-    val sourceOutputDirectory = layout.files(sourceOutputDirectory).singleFile
+    val moduleDirectory = moduleDirectory.asFile.get()
     val includes = includes.files
     val modulePath = modulePath.get()
 
     val moduleDesc = DokkaParametersKxs.DokkaModuleDescriptionKxs(
       name = moduleName,
-      sourceOutputDirectory = sourceOutputDirectory,
+      sourceOutputDirectory = moduleDirectory,
       includes = includes,
       modulePath = modulePath,
     )

@@ -119,6 +119,11 @@ data class DokkaParametersKxs(
 
 
   /**
+   * Any subproject can be merged into a single Dokka Publication. To do this, first it must create
+   * a Dokka Module. A [DokkaModuleDescriptionKxs] describes a config file for the Dokka Module that
+   * describes its content. This config file will be used by any aggregating project to produce
+   * a Dokka Publication with multiple modules.
+   *
    * Note: this class implements [java.io.Serializable] because it is used as a
    * [Gradle Property][org.gradle.api.provider.Property], and Gradle must be able to fingerprint
    * property values classes using Java Serialization.
@@ -130,7 +135,11 @@ data class DokkaParametersKxs(
   data class DokkaModuleDescriptionKxs(
     /** @see DokkaConfiguration.DokkaModuleDescription.name */
     override val name: String,
-    /** @see DokkaConfiguration.DokkaModuleDescription.sourceOutputDirectory */
+    /**
+     * Location of the Dokka Module directory for a subproject.
+     *
+     * @see DokkaConfiguration.DokkaModuleDescription.sourceOutputDirectory
+     */
     override val sourceOutputDirectory: File,
     /** @see DokkaConfiguration.DokkaModuleDescription.includes */
     override val includes: Set<File>,
