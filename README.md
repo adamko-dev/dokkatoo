@@ -21,7 +21,6 @@ Dokkatoo has a number of improvements over the existing Dokka Gradle Plugin:
 * Compatible with [Gradle Build Cache](https://docs.gradle.org/current/userguide/build_cache.html)
 * Compatible with
   [Gradle Configuration Cache](https://docs.gradle.org/current/userguide/configuration_cache.html)
-  ([soon!](https://github.com/adamko-dev/dokkatoo/issues/11))
 * Safe cross-project sharing and aggregation
 * Parallel execution
 
