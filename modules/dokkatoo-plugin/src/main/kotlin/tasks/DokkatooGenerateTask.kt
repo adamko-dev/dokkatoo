@@ -2,6 +2,7 @@ package dev.adamko.dokkatoo.tasks
 
 import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.jsonMapper
 import dev.adamko.dokkatoo.dokka.parameters.DokkaParametersKxs
+import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import dev.adamko.dokkatoo.workers.DokkaGeneratorWorker
 import javax.inject.Inject
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -24,7 +25,10 @@ import org.gradle.workers.WorkerExecutor
  * The type of documentation generated is determined by the supplied Dokka Plugins in [dokkaParametersJson].
  */
 @CacheableTask
-abstract class DokkatooGenerateTask @Inject constructor(
+abstract class DokkatooGenerateTask
+@DokkatooInternalApi
+@Inject
+constructor(
   private val workers: WorkerExecutor,
 ) : DokkatooTask.WithSourceSets() {
 

@@ -7,5 +7,5 @@ import kotlin.RequiresOptIn.Level
   level = Level.WARNING
 )
 @Retention(AnnotationRetention.BINARY)
-@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
-annotation class DokkatooInternalApi
+@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.CONSTRUCTOR)
+internal annotation class DokkatooInternalApi

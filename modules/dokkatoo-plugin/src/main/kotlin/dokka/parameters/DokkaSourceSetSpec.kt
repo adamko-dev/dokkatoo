@@ -1,5 +1,6 @@
 package dev.adamko.dokkatoo.dokka.parameters
 
+import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import java.io.Serializable
 import java.net.URL
 import javax.inject.Inject
@@ -411,6 +412,7 @@ abstract class DokkaSourceSetSpec(
     )
   }
 
+  @DokkatooInternalApi
   override fun build(): DokkaParametersKxs.DokkaSourceSetKxs {
     val externalDocumentationLinks = externalDocumentationLinks
       .mapNotNull(DokkaExternalDocumentationLinkSpec::build)

@@ -1,5 +1,6 @@
 package dev.adamko.dokkatoo.dokka.parameters
 
+import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import org.gradle.api.Named
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
@@ -24,6 +25,7 @@ abstract class DokkaSourceSetIDSpec(
   @get:Input
   abstract var sourceSetName: String
 
+  @DokkatooInternalApi
   override fun build(): DokkaSourceSetID = DokkaSourceSetID(scopeId, sourceSetName)
 
   @Internal

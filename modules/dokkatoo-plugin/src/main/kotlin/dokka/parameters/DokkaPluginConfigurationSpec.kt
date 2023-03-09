@@ -1,5 +1,6 @@
 package dev.adamko.dokkatoo.dokka.parameters
 
+import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import java.io.Serializable
 import javax.inject.Inject
 import org.gradle.api.Named
@@ -26,6 +27,7 @@ abstract class DokkaPluginConfigurationSpec @Inject constructor(
   @get:Input
   abstract val values: Property<String>
 
+  @DokkatooInternalApi
   override fun build() = DokkaParametersKxs.PluginConfigurationKxs(
     fqPluginName = pluginFqn,
     serializationFormat = serializationFormat.get(),

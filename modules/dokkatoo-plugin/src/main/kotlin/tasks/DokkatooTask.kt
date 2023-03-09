@@ -2,6 +2,7 @@ package dev.adamko.dokkatoo.tasks
 
 import dev.adamko.dokkatoo.DokkatooBasePlugin
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec
+import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import org.gradle.api.DefaultTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.provider.Provider
@@ -10,7 +11,9 @@ import org.gradle.api.tasks.Nested
 
 /** Base Dokkatoo task */
 @CacheableTask
-abstract class DokkatooTask : DefaultTask() {
+abstract class DokkatooTask
+@DokkatooInternalApi
+constructor() : DefaultTask() {
 
   init {
     group = DokkatooBasePlugin.TASK_GROUP
@@ -23,7 +26,9 @@ abstract class DokkatooTask : DefaultTask() {
    * them as part of Gradle up-to-date checks.
    */
   @CacheableTask
-  abstract class WithSourceSets : DokkatooTask() {
+  abstract class WithSourceSets
+  @DokkatooInternalApi
+  constructor() : DokkatooTask() {
 
     /**
      * Source sets used to generate a Dokka Module.

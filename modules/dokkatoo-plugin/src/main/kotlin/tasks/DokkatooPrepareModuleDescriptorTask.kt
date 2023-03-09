@@ -2,6 +2,7 @@ package dev.adamko.dokkatoo.tasks
 
 import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.jsonMapper
 import dev.adamko.dokkatoo.dokka.parameters.DokkaParametersKxs
+import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import kotlinx.serialization.encodeToString
 import org.gradle.api.file.*
 import org.gradle.api.provider.Property
@@ -14,7 +15,9 @@ import org.gradle.api.tasks.PathSensitivity.RELATIVE
  * @see dev.adamko.dokkatoo.dokka.parameters.DokkaParametersKxs.DokkaModuleDescriptionKxs
  */
 @CacheableTask
-abstract class DokkatooPrepareModuleDescriptorTask : DokkatooTask.WithSourceSets() {
+abstract class DokkatooPrepareModuleDescriptorTask
+@DokkatooInternalApi
+constructor() : DokkatooTask.WithSourceSets() {
 
   @get:Input
   abstract val moduleName: Property<String>

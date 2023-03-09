@@ -81,6 +81,9 @@ data class DokkaParametersKxs(
 
     @Deprecated("see DokkaConfiguration.DokkaSourceSet.includeNonPublic")
     override val includeNonPublic: Boolean = DokkaDefaults.includeNonPublic
+
+    @DokkatooInternalApi
+    companion object
   }
 
 
@@ -90,7 +93,10 @@ data class DokkaParametersKxs(
     override val localDirectory: String,
     override val remoteUrl: URL,
     override val remoteLineSuffix: String? = null,
-  ) : DokkaConfiguration.SourceLinkDefinition
+  ) : DokkaConfiguration.SourceLinkDefinition {
+    @DokkatooInternalApi
+    companion object
+  }
 
 
   @Serializable
@@ -105,6 +111,13 @@ data class DokkaParametersKxs(
 
     @Deprecated("see DokkaConfiguration.PackageOptions.includeNonPublic")
     override val includeNonPublic: Boolean = DokkaDefaults.includeNonPublic
+
+    @DokkatooInternalApi
+    companion object {
+      init {
+        PackageOptionsKxs.serializer()
+      }
+    }
   }
 
 
@@ -115,7 +128,10 @@ data class DokkaParametersKxs(
     override val serializationFormat: DokkaConfiguration.SerializationFormat,
     // a string that might contain escaped JSON/XML
     override val values: String,
-  ) : DokkaConfiguration.PluginConfiguration
+  ) : DokkaConfiguration.PluginConfiguration {
+    @DokkatooInternalApi
+    companion object
+  }
 
 
   /**
@@ -150,6 +166,9 @@ data class DokkaParametersKxs(
 
     override val relativePathToOutputDirectory =
       File(modulePath.removePrefix(":").replace(':', '/'))
+
+    @DokkatooInternalApi
+    companion object
   }
 
 
@@ -158,7 +177,13 @@ data class DokkaParametersKxs(
   data class ExternalDocumentationLinkKxs(
     override val url: URL,
     override val packageListUrl: URL,
-  ) : DokkaConfiguration.ExternalDocumentationLink
+  ) : DokkaConfiguration.ExternalDocumentationLink {
+    @DokkatooInternalApi
+    companion object
+  }
+
+  @DokkatooInternalApi
+  companion object
 }
 
 

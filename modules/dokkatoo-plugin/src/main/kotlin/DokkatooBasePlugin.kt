@@ -31,7 +31,10 @@ import org.jetbrains.dokka.Platform
  * The base plugin for Dokkatoo. Sets up Dokkatoo and configures default values, but does not
  * add any specific config (specifically, it does not create Dokka Publications).
  */
-abstract class DokkatooBasePlugin @Inject constructor(
+abstract class DokkatooBasePlugin
+@DokkatooInternalApi
+@Inject
+constructor(
   private val providers: ProviderFactory,
   private val layout: ProjectLayout,
   private val objects: ObjectFactory,

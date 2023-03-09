@@ -22,6 +22,7 @@ import org.jetbrains.dokka.DokkaGenerator
 @OptIn(ExperimentalTime::class)
 abstract class DokkaGeneratorWorker : WorkAction<DokkaGeneratorWorker.Parameters> {
 
+  @DokkatooInternalApi
   interface Parameters : WorkParameters {
     val dokkaParameters: Property<DokkaConfiguration>
     val logFile: RegularFileProperty
@@ -41,6 +42,7 @@ abstract class DokkaGeneratorWorker : WorkAction<DokkaGeneratorWorker.Parameters
     }
   }
 
+  @DokkatooInternalApi
   companion object {
     // can't use kotlin.time.measureTime {} because the implementation isn't stable across Kotlin versions
     private fun measureTime(block: () -> Unit): Duration =

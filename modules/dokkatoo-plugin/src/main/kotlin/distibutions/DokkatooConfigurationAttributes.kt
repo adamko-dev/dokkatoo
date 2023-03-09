@@ -7,7 +7,7 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.attributes.Attribute
 import org.gradle.api.attributes.Usage
 import org.gradle.api.model.ObjectFactory
-import org.gradle.kotlin.dsl.named
+import org.gradle.kotlin.dsl.*
 
 /**
  * Gradle Configuration Attributes for sharing Dokkatoo files across subprojects.
@@ -34,12 +34,16 @@ abstract class DokkatooConfigurationAttributes @Inject constructor(
 
   val dokkaPluginsClasspath: DokkatooCategoryAttribute = objects.named("plugins-classpath")
 
+  @DokkatooInternalApi
   interface DokkatooBaseAttribute : Usage
 
+  @DokkatooInternalApi
   interface DokkatooCategoryAttribute : Named
 
+  @DokkatooInternalApi
   interface DokkaFormatAttribute : Named
 
+  @DokkatooInternalApi
   companion object {
     val DOKKATOO_BASE_ATTRIBUTE =
       Attribute<DokkatooBaseAttribute>("dev.adamko.dokkatoo.base")
