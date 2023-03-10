@@ -24,7 +24,7 @@ class GradleProjectTest(
 
   val runner: GradleRunner = GradleRunner.create()
     .withProjectDir(projectDir.toFile())
-    .withJvmArguments("-XX:MaxMetaspaceSize=1g")
+    .withJvmArguments("-XX:MaxMetaspaceSize=512m")
     .withEnvironment {
       GRADLE_RO_DEP_CACHE?.let { put("GRADLE_RO_DEP_CACHE", it) }
     }
