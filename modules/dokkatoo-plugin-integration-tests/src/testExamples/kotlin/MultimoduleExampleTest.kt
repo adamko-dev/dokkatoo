@@ -57,6 +57,7 @@ class MultimoduleExampleTest : FunSpec({
           "clean",
           ":parentProject:dokkatooGeneratePublicationHtml",
           "--stacktrace",
+          "--info",
         )
         .forwardOutput()
         .build()

@@ -1,14 +1,6 @@
 package dev.adamko.dokkatoo.tests.examples
 
-import dev.adamko.dokkatoo.utils.GradleProjectTest
-import dev.adamko.dokkatoo.utils.buildGradleKts
-import dev.adamko.dokkatoo.utils.copyExampleProject
-import dev.adamko.dokkatoo.utils.file
-import dev.adamko.dokkatoo.utils.findFiles
-import dev.adamko.dokkatoo.utils.settingsGradleKts
-import dev.adamko.dokkatoo.utils.shouldContainAll
-import dev.adamko.dokkatoo.utils.sideBySide
-import dev.adamko.dokkatoo.utils.toTreeString
+import dev.adamko.dokkatoo.utils.*
 import io.kotest.assertions.withClue
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.file.shouldBeAFile
@@ -53,6 +45,7 @@ class CustomFormatExampleTest : FunSpec({
           "clean",
           ":dokkatooGeneratePublicationHtml",
           "--stacktrace",
+          "--info",
         )
         .forwardOutput()
         .build()

@@ -54,6 +54,7 @@ class GradleExampleTest : FunSpec({
           "clean",
           ":dokkatooGeneratePublicationHtml",
           "--stacktrace",
+          "--info",
         )
         .forwardOutput()
         .build()
