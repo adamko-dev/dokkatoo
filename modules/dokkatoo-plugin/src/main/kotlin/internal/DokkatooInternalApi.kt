@@ -30,5 +30,7 @@ import kotlin.annotation.AnnotationTarget.*
   CLASS,
   FUNCTION,
   CONSTRUCTOR,
+  PROPERTY,
+  PROPERTY_GETTER,
 )
 internal annotation class DokkatooInternalApi

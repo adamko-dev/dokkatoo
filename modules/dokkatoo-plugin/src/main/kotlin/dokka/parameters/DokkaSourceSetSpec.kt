@@ -6,7 +6,6 @@ import java.net.URL
 import javax.inject.Inject
 import org.gradle.api.*
 import org.gradle.api.file.ConfigurableFileCollection
-import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.*
 import org.gradle.api.tasks.*
@@ -40,7 +39,8 @@ abstract class DokkaSourceSetSpec
 @DokkatooInternalApi
 @Inject
 constructor(
-  private val name: String
+  private val name: String,
+  private val objects: ObjectFactory,
 ) :
   DokkaConfigurationBuilder<DokkaParametersKxs.DokkaSourceSetKxs>,
   Named,
@@ -48,12 +48,6 @@ constructor(
 
   @Internal
   override fun getName(): String = name
-
-  @get:Inject
-  protected abstract val objects: ObjectFactory
-
-  @get:Inject
-  protected abstract val layout: ProjectLayout
 
   @get:Input
   val sourceSetID: Provider<DokkaSourceSetID>

@@ -52,10 +52,13 @@ abstract class DokkatooFormatPlugin(
 ) : Plugin<Project> {
 
   @get:Inject
+  @DokkatooInternalApi
   protected abstract val objects: ObjectFactory
   @get:Inject
+  @DokkatooInternalApi
   protected abstract val providers: ProviderFactory
   @get:Inject
+  @DokkatooInternalApi
   protected abstract val files: FileSystemOperations
 
 
