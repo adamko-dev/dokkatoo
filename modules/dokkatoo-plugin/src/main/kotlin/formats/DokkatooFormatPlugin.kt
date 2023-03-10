@@ -45,7 +45,10 @@ import org.jetbrains.dokka.DokkaConfiguration
  *
  * [DokkatooBasePlugin] must be applied for this plugin (or any subclass) to have an effect.
  */
-abstract class DokkatooFormatPlugin @Inject constructor(
+abstract class DokkatooFormatPlugin
+@DokkatooInternalApi
+@Inject
+constructor(
   val formatName: String,
 ) : Plugin<Project> {
 
@@ -479,5 +482,6 @@ abstract class DokkatooFormatPlugin @Inject constructor(
     }
   }
 
+  @DokkatooInternalApi
   companion object
 }

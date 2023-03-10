@@ -1,6 +1,7 @@
 package dev.adamko.dokkatoo.dokka
 
 import dev.adamko.dokkatoo.dokka.parameters.DokkaPluginConfigurationSpec
+import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import java.io.Serializable
 import javax.inject.Inject
 import org.gradle.api.Named
@@ -20,7 +21,10 @@ import org.gradle.api.tasks.PathSensitivity.RELATIVE
  * The type of site is determined by the Dokka Plugins. By default, an HTML site will be generated.
  * By default, Dokka will create publications for HTML, Jekyll, and GitHub Flavoured Markdown.
  */
-abstract class DokkaPublication @Inject constructor(
+abstract class DokkaPublication
+@DokkatooInternalApi
+@Inject
+constructor(
   @get:Internal
   val formatName: String,
 ) : Named, Serializable {

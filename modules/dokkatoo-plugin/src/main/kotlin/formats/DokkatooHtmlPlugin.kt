@@ -1,5 +1,9 @@
 package dev.adamko.dokkatoo.formats
 
-abstract class DokkatooHtmlPlugin : DokkatooFormatPlugin(formatName = "html") {
+import dev.adamko.dokkatoo.internal.DokkatooInternalApi
+
+abstract class DokkatooHtmlPlugin
+@DokkatooInternalApi
+constructor() : DokkatooFormatPlugin(formatName = "html") {
   // HTML is the default - no special config needed!
 }

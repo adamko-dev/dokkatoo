@@ -281,6 +281,7 @@ constructor(
    * - [Gradle Configurations][org.gradle.api.artifacts.Configuration] - share files between subprojects. Each has a name.
    * - [DokkaConfiguration][org.jetbrains.dokka.DokkaConfiguration] - parameters for executing the Dokka Generator
    */
+  @DokkatooInternalApi
   class DependencyContainerNames(override val formatName: String?) : HasFormatName() {
 
     val dokkatoo = "dokkatoo".appendFormat()
@@ -315,6 +316,7 @@ constructor(
     val dokkaPluginsIntransitiveClasspath = "dokkatooPluginIntransitive".appendFormat()
   }
 
+  @DokkatooInternalApi
   class TaskNames(override val formatName: String?) : HasFormatName() {
     val generate = "dokkatooGenerate".appendFormat()
     val generatePublication = "dokkatooGeneratePublication".appendFormat()

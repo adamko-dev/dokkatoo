@@ -1,13 +1,17 @@
 package dev.adamko.dokkatoo.dokka.parameters
 
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
+import javax.inject.Inject
 import org.gradle.api.Named
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.jetbrains.dokka.DokkaConfigurationBuilder
 import org.jetbrains.dokka.DokkaSourceSetID
 
-abstract class DokkaSourceSetIDSpec(
+abstract class DokkaSourceSetIDSpec
+@DokkatooInternalApi
+@Inject
+constructor(
   /**
    * Unique identifier of the scope that this source set is placed in.
    * Each scope provide only unique source set names.

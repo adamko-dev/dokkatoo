@@ -10,7 +10,7 @@ import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.*
 import org.gradle.api.tasks.*
-import org.gradle.kotlin.dsl.newInstance
+import org.gradle.kotlin.dsl.*
 import org.jetbrains.dokka.*
 
 /**
@@ -36,7 +36,10 @@ import org.jetbrains.dokka.*
  * }
  * ```
  */
-abstract class DokkaSourceSetSpec(
+abstract class DokkaSourceSetSpec
+@DokkatooInternalApi
+@Inject
+constructor(
   private val name: String
 ) :
   DokkaConfigurationBuilder<DokkaParametersKxs.DokkaSourceSetKxs>,

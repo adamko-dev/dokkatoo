@@ -11,29 +11,6 @@ public final class dev/adamko/dokkatoo/DokkatooBasePlugin$Companion {
 	public final fun getTaskNames ()Ldev/adamko/dokkatoo/DokkatooBasePlugin$TaskNames;
 }
 
-public final class dev/adamko/dokkatoo/DokkatooBasePlugin$DependencyContainerNames : dev/adamko/dokkatoo/DokkatooBasePlugin$HasFormatName {
-	public fun <init> (Ljava/lang/String;)V
-	public final fun getDokkaGeneratorClasspath ()Ljava/lang/String;
-	public final fun getDokkaPluginsClasspath ()Ljava/lang/String;
-	public final fun getDokkaPluginsIntransitiveClasspath ()Ljava/lang/String;
-	public final fun getDokkatoo ()Ljava/lang/String;
-	public final fun getDokkatooModuleFilesConsumer ()Ljava/lang/String;
-	public final fun getDokkatooModuleFilesProvider ()Ljava/lang/String;
-	public final fun getDokkatooParametersConsumer ()Ljava/lang/String;
-	public final fun getDokkatooParametersOutgoing ()Ljava/lang/String;
-	public fun getFormatName ()Ljava/lang/String;
-}
-
-public final class dev/adamko/dokkatoo/DokkatooBasePlugin$TaskNames : dev/adamko/dokkatoo/DokkatooBasePlugin$HasFormatName {
-	public fun <init> (Ljava/lang/String;)V
-	public fun getFormatName ()Ljava/lang/String;
-	public final fun getGenerate ()Ljava/lang/String;
-	public final fun getGenerateModule ()Ljava/lang/String;
-	public final fun getGeneratePublication ()Ljava/lang/String;
-	public final fun getPrepareModuleDescriptor ()Ljava/lang/String;
-	public final fun getPrepareParameters ()Ljava/lang/String;
-}
-
 public abstract class dev/adamko/dokkatoo/DokkatooExtension : java/io/Serializable, org/gradle/api/plugins/ExtensionAware {
 	public abstract fun getDokkatooCacheDirectory ()Lorg/gradle/api/file/DirectoryProperty;
 	public abstract fun getDokkatooConfigurationsDirectory ()Lorg/gradle/api/file/DirectoryProperty;
@@ -60,7 +37,6 @@ public abstract class dev/adamko/dokkatoo/DokkatooPlugin : org/gradle/api/Plugin
 }
 
 public abstract class dev/adamko/dokkatoo/dokka/DokkaPublication : java/io/Serializable, org/gradle/api/Named {
-	public fun <init> (Ljava/lang/String;)V
 	public abstract fun getCacheRoot ()Lorg/gradle/api/file/DirectoryProperty;
 	protected final fun getCacheRootPath ()Lorg/gradle/api/provider/Provider;
 	public abstract fun getDelayTemplateSubstitution ()Lorg/gradle/api/provider/Property;
@@ -112,7 +88,6 @@ public final class dev/adamko/dokkatoo/dokka/parameters/DokkaParametersKxs$$seri
 }
 
 public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaPluginConfigurationSpec : java/io/Serializable, org/gradle/api/Named, org/jetbrains/dokka/DokkaConfigurationBuilder {
-	public fun <init> (Ljava/lang/String;)V
 	public synthetic fun build ()Ljava/lang/Object;
 	public fun getName ()Ljava/lang/String;
 	public final fun getPluginFqn ()Ljava/lang/String;
@@ -121,7 +96,6 @@ public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaPluginConfigurat
 }
 
 public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceLinkSpec : java/io/Serializable, org/jetbrains/dokka/DokkaConfigurationBuilder {
-	public fun <init> ()V
 	public synthetic fun build ()Ljava/lang/Object;
 	public abstract fun getLocalDirectory ()Lorg/gradle/api/file/DirectoryProperty;
 	protected final fun getLocalDirectoryPath ()Lorg/gradle/api/provider/Provider;
@@ -132,7 +106,6 @@ public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceLinkSpec :
 }
 
 public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceSetIDSpec : org/gradle/api/Named, org/jetbrains/dokka/DokkaConfigurationBuilder {
-	public fun <init> (Ljava/lang/String;)V
 	public synthetic fun build ()Ljava/lang/Object;
 	public fun getName ()Ljava/lang/String;
 	public final fun getScopeId ()Ljava/lang/String;
@@ -141,7 +114,6 @@ public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceSetIDSpec 
 }
 
 public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceSetSpec : java/io/Serializable, org/gradle/api/Named, org/jetbrains/dokka/DokkaConfigurationBuilder {
-	public fun <init> (Ljava/lang/String;)V
 	public synthetic fun build ()Ljava/lang/Object;
 	public final fun documentedVisibilities ([Lorg/jetbrains/dokka/DokkaConfiguration$Visibility;)V
 	public final fun externalDocumentationLink (Ljava/lang/String;Ljava/lang/String;)V
@@ -159,12 +131,10 @@ public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceSetSpec : 
 	public abstract fun getIncludes ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public abstract fun getJdkVersion ()Lorg/gradle/api/provider/Property;
 	public abstract fun getLanguageVersion ()Lorg/gradle/api/provider/Property;
-	protected abstract fun getLayout ()Lorg/gradle/api/file/ProjectLayout;
 	public fun getName ()Ljava/lang/String;
 	public abstract fun getNoAndroidSdkLink ()Lorg/gradle/api/provider/Property;
 	public abstract fun getNoJdkLink ()Lorg/gradle/api/provider/Property;
 	public abstract fun getNoStdlibLink ()Lorg/gradle/api/provider/Property;
-	protected abstract fun getObjects ()Lorg/gradle/api/model/ObjectFactory;
 	public abstract fun getPerPackageOptions ()Lorg/gradle/api/DomainObjectSet;
 	public abstract fun getReportUndocumented ()Lorg/gradle/api/provider/Property;
 	public abstract fun getSamples ()Lorg/gradle/api/file/ConfigurableFileCollection;
@@ -183,40 +153,28 @@ public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceSetSpec : 
 
 public abstract class dev/adamko/dokkatoo/formats/DokkatooFormatPlugin : org/gradle/api/Plugin {
 	public static final field Companion Ldev/adamko/dokkatoo/formats/DokkatooFormatPlugin$Companion;
-	public fun <init> (Ljava/lang/String;)V
 	public synthetic fun apply (Ljava/lang/Object;)V
 	public fun apply (Lorg/gradle/api/Project;)V
 	public fun configure (Ldev/adamko/dokkatoo/formats/DokkatooFormatPlugin$DokkatooFormatPluginContext;)V
-	protected abstract fun getFiles ()Lorg/gradle/api/file/FileSystemOperations;
 	public final fun getFormatName ()Ljava/lang/String;
-	protected abstract fun getObjects ()Lorg/gradle/api/model/ObjectFactory;
-	protected abstract fun getProviders ()Lorg/gradle/api/provider/ProviderFactory;
-}
-
-public final class dev/adamko/dokkatoo/formats/DokkatooFormatPlugin$Companion {
 }
 
 public abstract class dev/adamko/dokkatoo/formats/DokkatooGfmPlugin : dev/adamko/dokkatoo/formats/DokkatooFormatPlugin {
-	public fun <init> ()V
 	public fun configure (Ldev/adamko/dokkatoo/formats/DokkatooFormatPlugin$DokkatooFormatPluginContext;)V
 }
 
 public abstract class dev/adamko/dokkatoo/formats/DokkatooHtmlPlugin : dev/adamko/dokkatoo/formats/DokkatooFormatPlugin {
-	public fun <init> ()V
 }
 
 public abstract class dev/adamko/dokkatoo/formats/DokkatooJavadocPlugin : dev/adamko/dokkatoo/formats/DokkatooFormatPlugin {
-	public fun <init> ()V
 	public fun configure (Ldev/adamko/dokkatoo/formats/DokkatooFormatPlugin$DokkatooFormatPluginContext;)V
 }
 
 public abstract class dev/adamko/dokkatoo/formats/DokkatooJekyllPlugin : dev/adamko/dokkatoo/formats/DokkatooFormatPlugin {
-	public fun <init> ()V
 	public fun configure (Ldev/adamko/dokkatoo/formats/DokkatooFormatPlugin$DokkatooFormatPluginContext;)V
 }
 
 public abstract class dev/adamko/dokkatoo/tasks/DokkatooGenerateTask : dev/adamko/dokkatoo/tasks/DokkatooTask$WithSourceSets {
-	public final fun generateDocumentation ()V
 	public abstract fun getCacheDirectory ()Lorg/gradle/api/file/DirectoryProperty;
 	public abstract fun getDokkaModuleFiles ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public abstract fun getDokkaParametersJson ()Lorg/gradle/api/file/RegularFileProperty;
@@ -238,7 +196,6 @@ public final class dev/adamko/dokkatoo/tasks/DokkatooGenerateTask$GenerationType
 }
 
 public abstract class dev/adamko/dokkatoo/tasks/DokkatooPrepareModuleDescriptorTask : dev/adamko/dokkatoo/tasks/DokkatooTask$WithSourceSets {
-	public final fun generateModuleConfiguration ()V
 	public abstract fun getDokkaModuleDescriptorJson ()Lorg/gradle/api/file/RegularFileProperty;
 	public abstract fun getIncludes ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public abstract fun getModuleDirectory ()Lorg/gradle/api/file/DirectoryProperty;
@@ -247,7 +204,6 @@ public abstract class dev/adamko/dokkatoo/tasks/DokkatooPrepareModuleDescriptorT
 }
 
 public abstract class dev/adamko/dokkatoo/tasks/DokkatooPrepareParametersTask : dev/adamko/dokkatoo/tasks/DokkatooTask$WithSourceSets {
-	public final fun generateConfiguration ()V
 	public abstract fun getCacheRoot ()Lorg/gradle/api/file/DirectoryProperty;
 	public abstract fun getDelayTemplateSubstitution ()Lorg/gradle/api/provider/Property;
 	public abstract fun getDokkaConfigurationJson ()Lorg/gradle/api/file/RegularFileProperty;

@@ -11,7 +11,9 @@ import org.gradle.api.tasks.Internal
 import org.jetbrains.dokka.DokkaConfigurationBuilder
 
 @DokkatooInternalApi
-abstract class DokkaModuleDescriptionSpec @Inject constructor(
+abstract class DokkaModuleDescriptionSpec
+@DokkatooInternalApi
+@Inject constructor(
   @get:Input
   val moduleName: String,
 ) : DokkaConfigurationBuilder<DokkaParametersKxs.DokkaModuleDescriptionKxs>, Named {
