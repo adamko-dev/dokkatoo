@@ -85,7 +85,7 @@ constructor(
 
   @TaskAction
   @OptIn(ExperimentalSerializationApi::class) // jsonMapper.decodeFromStream
-  fun generateDocumentation() {
+  internal fun generateDocumentation() {
     val dokkaParametersJsonFile = dokkaParametersJson.get().asFile
     val generationType: GenerationType = generationType.get()
 

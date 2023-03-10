@@ -113,7 +113,7 @@ constructor(
   }
 
   @TaskAction
-  fun generateConfiguration() {
+  internal fun generateConfiguration() {
     val dokkaConfiguration = buildDokkaConfiguration()
 
     val encodedModuleDesc = jsonMapper.encodeToString(dokkaConfiguration)

@@ -38,7 +38,7 @@ constructor() : DokkatooTask.WithSourceSets() {
   abstract val modulePath: Property<String>
 
   @TaskAction
-  fun generateModuleConfiguration() {
+  internal fun generateModuleConfiguration() {
     val moduleName = moduleName.get()
     val moduleDirectory = moduleDirectory.asFile.get()
     val includes = includes.files
