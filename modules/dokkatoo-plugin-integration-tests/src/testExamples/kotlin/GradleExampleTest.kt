@@ -40,7 +40,6 @@ class GradleExampleTest : FunSpec({
           "clean",
           "dokkaHtml",
           "--stacktrace",
-          "--info",
         )
         .forwardOutput()
         .build()
@@ -55,7 +54,6 @@ class GradleExampleTest : FunSpec({
           "clean",
           ":dokkatooGeneratePublicationHtml",
           "--stacktrace",
-          "--info",
         )
         .forwardOutput()
         .build()
@@ -95,7 +93,6 @@ class GradleExampleTest : FunSpec({
         .withArguments(
           "clean",
           ":dokkatooGeneratePublicationHtml",
-          "--info",
           "--stacktrace",
         )
         .forwardOutput()
@@ -113,7 +110,6 @@ class GradleExampleTest : FunSpec({
         .withArguments(
           ":dokkatooGeneratePublicationHtml",
           "--stacktrace",
-          "--info",
           "--build-cache",
         )
         .forwardOutput()

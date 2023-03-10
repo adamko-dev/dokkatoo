@@ -39,7 +39,6 @@ class CustomFormatExampleTest : FunSpec({
           "clean",
           "dokkaCustomFormat",
           "--stacktrace",
-          "--info",
         )
         .forwardOutput()
         .build()
@@ -54,7 +53,6 @@ class CustomFormatExampleTest : FunSpec({
           "clean",
           ":dokkatooGeneratePublicationHtml",
           "--stacktrace",
-          "--info",
         )
         .forwardOutput()
         .build()
@@ -94,7 +92,6 @@ class CustomFormatExampleTest : FunSpec({
         .withArguments(
           "clean",
           ":dokkatooGeneratePublicationHtml",
-          "--info",
           "--stacktrace",
         )
         .forwardOutput()
@@ -112,7 +109,6 @@ class CustomFormatExampleTest : FunSpec({
         .withArguments(
           ":dokkatooGeneratePublicationHtml",
           "--stacktrace",
-          "--info",
           "--build-cache",
         )
         .forwardOutput()

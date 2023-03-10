@@ -1,19 +1,7 @@
 package dev.adamko.dokkatoo.tests.integration
 
-import dev.adamko.dokkatoo.utils.GradleProjectTest
+import dev.adamko.dokkatoo.utils.*
 import dev.adamko.dokkatoo.utils.GradleProjectTest.Companion.projectTestTempDir
-import dev.adamko.dokkatoo.utils.NotWindowsCondition
-import dev.adamko.dokkatoo.utils.buildGradleKts
-import dev.adamko.dokkatoo.utils.copyIntegrationTestProject
-import dev.adamko.dokkatoo.utils.file
-import dev.adamko.dokkatoo.utils.findFiles
-import dev.adamko.dokkatoo.utils.projectFile
-import dev.adamko.dokkatoo.utils.settingsGradleKts
-import dev.adamko.dokkatoo.utils.shouldContainAll
-import dev.adamko.dokkatoo.utils.shouldNotContainAnyOf
-import dev.adamko.dokkatoo.utils.sideBySide
-import dev.adamko.dokkatoo.utils.toTreeString
-import dev.adamko.dokkatoo.utils.withEnvironment
 import io.kotest.core.annotation.EnabledIf
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.file.shouldBeAFile
@@ -44,7 +32,6 @@ class BasicProjectIntegrationTest : FunSpec({
         "clean",
         "dokkaHtml",
         "--stacktrace",
-        "--info",
       )
       .forwardOutput()
       .withEnvironment(
@@ -57,7 +44,6 @@ class BasicProjectIntegrationTest : FunSpec({
         "clean",
         "dokkatooGeneratePublicationHtml",
         "--stacktrace",
-        "--info",
       )
       .forwardOutput()
       .build()
@@ -121,7 +107,6 @@ class BasicProjectIntegrationTest : FunSpec({
         .withArguments(
           "dokkatooGeneratePublicationHtml",
           "--stacktrace",
-          "--info",
           "--build-cache",
         )
         .forwardOutput()

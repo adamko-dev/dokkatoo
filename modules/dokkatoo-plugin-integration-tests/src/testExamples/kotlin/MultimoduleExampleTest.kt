@@ -43,7 +43,6 @@ class MultimoduleExampleTest : FunSpec({
           "clean",
           "dokkaHtmlMultiModule",
           "--stacktrace",
-          "--info",
         )
         .forwardOutput()
         .build()
@@ -58,7 +57,6 @@ class MultimoduleExampleTest : FunSpec({
           "clean",
           ":parentProject:dokkatooGeneratePublicationHtml",
           "--stacktrace",
-          "--info",
         )
         .forwardOutput()
         .build()
@@ -108,7 +106,6 @@ class MultimoduleExampleTest : FunSpec({
         .withArguments(
           "clean",
           ":parentProject:dokkatooGeneratePublicationHtml",
-          "--info",
           "--stacktrace",
         )
         .forwardOutput()
@@ -137,7 +134,6 @@ class MultimoduleExampleTest : FunSpec({
           .withArguments(
             ":parentProject:dokkatooGeneratePublicationHtml",
             "--stacktrace",
-            "--info",
             "--build-cache",
           )
           .forwardOutput()
