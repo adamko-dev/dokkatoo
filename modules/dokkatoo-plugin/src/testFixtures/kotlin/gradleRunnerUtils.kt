@@ -4,9 +4,13 @@ import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.internal.DefaultGradleRunner
 
-/** Append environment variables to the existing environment variables set in the runner. */
-fun GradleRunner.addEnvironment(vararg map: Pair<String, String?>): GradleRunner =
-  withEnvironment((environment ?: emptyMap()) + map.toMap())
+
+/** Edit environment variables in the Gradle Runner */
+fun GradleRunner.withEnvironment(build: MutableMap<String, String?>.() -> Unit): GradleRunner {
+  val env = environment ?: mutableMapOf()
+  env.build()
+  return withEnvironment(env)
+}
 
 
 inline fun GradleRunner.build(

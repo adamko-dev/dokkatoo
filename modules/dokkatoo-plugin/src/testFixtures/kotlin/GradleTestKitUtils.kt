@@ -25,7 +25,9 @@ class GradleProjectTest(
   val runner: GradleRunner = GradleRunner.create()
     .withProjectDir(projectDir.toFile())
     .withJvmArguments("-XX:MaxMetaspaceSize=1g")
-    .addEnvironment("GRADLE_RO_DEP_CACHE" to GRADLE_RO_DEP_CACHE)
+    .withEnvironment {
+      GRADLE_RO_DEP_CACHE?.let { put("GRADLE_RO_DEP_CACHE", it) }
+    }
 
   val testMavenRepoRelativePath: String =
     projectDir.relativize(testMavenRepoDir).toFile().invariantSeparatorsPath

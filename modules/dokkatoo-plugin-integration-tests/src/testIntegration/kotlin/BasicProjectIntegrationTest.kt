@@ -34,9 +34,9 @@ class BasicProjectIntegrationTest : FunSpec({
         "--stacktrace",
       )
       .forwardOutput()
-      .addEnvironment(
-        "DOKKA_VERSION" to "1.7.20",
-      )
+      .withEnvironment {
+        set("DOKKA_VERSION", "1.7.20")
+      }
       .build()
 
     val dokkatooBuild = dokkatooProject.runner
