@@ -44,11 +44,10 @@ import org.jetbrains.dokka.DokkaConfiguration
  * Base Gradle Plugin for setting up a Dokka Publication for a specific format.
  *
  * [DokkatooBasePlugin] must be applied for this plugin (or any subclass) to have an effect.
+ *
+ * Anyone can use this class as a basis for a generating a Dokka Publication in a custom format.
  */
-abstract class DokkatooFormatPlugin
-@DokkatooInternalApi
-@Inject
-constructor(
+abstract class DokkatooFormatPlugin(
   val formatName: String,
 ) : Plugin<Project> {
 
