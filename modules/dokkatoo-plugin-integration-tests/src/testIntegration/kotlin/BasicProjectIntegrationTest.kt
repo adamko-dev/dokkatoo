@@ -34,7 +34,7 @@ class BasicProjectIntegrationTest : FunSpec({
         "--stacktrace",
       )
       .forwardOutput()
-      .withEnvironment(
+      .addEnvironment(
         "DOKKA_VERSION" to "1.7.20",
       )
       .build()

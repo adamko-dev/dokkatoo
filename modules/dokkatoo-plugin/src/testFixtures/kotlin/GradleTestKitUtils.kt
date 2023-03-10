@@ -4,7 +4,6 @@ import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.properties.PropertyDelegateProvider
-import kotlin.properties.ReadOnlyProperty
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 import org.gradle.testkit.runner.GradleRunner
@@ -26,10 +25,10 @@ class GradleProjectTest(
   val runner: GradleRunner = GradleRunner.create()
     .withProjectDir(projectDir.toFile())
     .withJvmArguments("-XX:MaxMetaspaceSize=1g")
+    .addEnvironment("GRADLE_RO_DEP_CACHE" to GRADLE_RO_DEP_CACHE)
 
   val testMavenRepoRelativePath: String =
     projectDir.relativize(testMavenRepoDir).toFile().invariantSeparatorsPath
-
 
   companion object {
 
@@ -43,20 +42,12 @@ class GradleProjectTest(
       projectTestTempDir.resolve("functional-tests")
     }
 
-    private val dokkaSourceDir: Path by systemProperty(Paths::get)
     /** Dokka Source directory that contains Gradle projects used for integration tests */
     val integrationTestProjectsDir: Path by systemProperty(Paths::get)
     /** Dokka Source directory that contains example Gradle projects */
     val exampleProjectsDir: Path by systemProperty(Paths::get)
 
-    private fun <T> systemProperty(
-      convert: (String) -> T,
-    ) = ReadOnlyProperty<Any, T> { _, property ->
-      val value = requireNotNull(System.getProperty(property.name)) {
-        "system property ${property.name} is unavailable"
-      }
-      convert(value)
-    }
+    val GRADLE_RO_DEP_CACHE: String? by optionalEnvironmentVariable()
   }
 }
 
