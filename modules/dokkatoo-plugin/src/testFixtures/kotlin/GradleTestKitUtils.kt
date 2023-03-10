@@ -23,7 +23,9 @@ class GradleProjectTest(
     baseDir: Path = funcTestTempDir,
   ) : this(projectDir = baseDir.resolve(testProjectName))
 
-  val runner: GradleRunner = GradleRunner.create().withProjectDir(projectDir.toFile())
+  val runner: GradleRunner = GradleRunner.create()
+    .withProjectDir(projectDir.toFile())
+    .withJvmArguments("-XX:MaxMetaspaceSize=1g")
 
   val testMavenRepoRelativePath: String =
     projectDir.relativize(testMavenRepoDir).toFile().invariantSeparatorsPath
