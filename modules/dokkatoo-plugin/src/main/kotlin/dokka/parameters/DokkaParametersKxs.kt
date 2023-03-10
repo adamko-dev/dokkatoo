@@ -114,11 +114,7 @@ data class DokkaParametersKxs(
     override val includeNonPublic: Boolean = DokkaDefaults.includeNonPublic
 
     @DokkatooInternalApi
-    companion object {
-      init {
-        PackageOptionsKxs.serializer()
-      }
-    }
+    companion object
   }
 
 
