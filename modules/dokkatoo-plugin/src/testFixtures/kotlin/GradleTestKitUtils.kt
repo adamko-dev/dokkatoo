@@ -83,7 +83,7 @@ fun gradleKtsProjectTest(
     settingsGradleKts = """
       |rootProject.name = "test"
       |
-      |@Suppress("UnstableApiUsage") // Central declaration of repositories is an incubating feature
+      |@Suppress("UnstableApiUsage")
       |dependencyResolutionManagement {
       |    repositories {
       |        mavenCentral()
