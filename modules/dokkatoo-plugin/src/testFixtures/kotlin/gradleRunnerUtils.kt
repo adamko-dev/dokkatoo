@@ -6,6 +6,7 @@ import org.gradle.testkit.runner.internal.DefaultGradleRunner
 
 
 /** Edit environment variables in the Gradle Runner */
+@Deprecated("Windows does not support withEnvironment - https://github.com/gradle/gradle/issues/23959")
 fun GradleRunner.withEnvironment(build: MutableMap<String, String?>.() -> Unit): GradleRunner {
   val env = environment ?: mutableMapOf()
   env.build()

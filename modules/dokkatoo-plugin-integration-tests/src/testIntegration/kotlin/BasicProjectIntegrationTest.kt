@@ -34,9 +34,6 @@ class BasicProjectIntegrationTest : FunSpec({
         "--stacktrace",
       )
       .forwardOutput()
-      .withEnvironment {
-        set("DOKKA_VERSION", "1.7.20")
-      }
       .build()
 
     val dokkatooBuild = dokkatooProject.runner
@@ -168,6 +165,7 @@ private fun initDokkaProject(
         """../template.root.gradle.kts""",
         """./template.root.gradle.kts""",
       )
+      .replace("""${'$'}{System.getenv("DOKKA_VERSION")}""", "1.7.20")
 
     // update relative paths to the template files - they're now in the same directory
     settingsGradleKts = settingsGradleKts

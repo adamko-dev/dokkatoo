@@ -151,14 +151,3 @@ tasks.matching { it.name == "validatePlugins" }.configureEach {
   // Task ':validatePlugins' uses this output of task ':updateTestReportCss' without declaring an explicit or implicit dependency.
   mustRunAfter(updateTestReportCss)
 }
-
-tasks.withType<Test>().configureEach {
-  // Help speed up TestKit tests by re-using dependencies cache (this helps on CI/CD)
-  // https://docs.gradle.org/current/userguide/dependency_resolution.html#sub:shared-readonly-cache
-
-  doFirst("GRADLE_RO_DEP_CACHE on CI - lazy setup workaround for https://github.com/gradle/gradle/issues/24267") {
-    if (providers.environmentVariable("CI").isPresent) {
-      environment("GRADLE_RO_DEP_CACHE", "${gradle.gradleUserHomeDir}/caches")
-    }
-  }
-}
