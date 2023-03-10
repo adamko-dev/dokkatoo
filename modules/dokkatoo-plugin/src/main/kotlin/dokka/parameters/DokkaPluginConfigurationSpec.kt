@@ -1,5 +1,6 @@
 package dev.adamko.dokkatoo.dokka.parameters
 
+import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import java.io.Serializable
 import javax.inject.Inject
 import org.gradle.api.Named
@@ -12,7 +13,10 @@ import org.jetbrains.dokka.DokkaConfigurationBuilder
 /**
  * @param[pluginFqn] Fully qualified classname of the Dokka Plugin
  */
-abstract class DokkaPluginConfigurationSpec @Inject constructor(
+abstract class DokkaPluginConfigurationSpec
+@DokkatooInternalApi
+@Inject
+constructor(
   @get:Input
   val pluginFqn: String
 ) :
@@ -26,6 +30,7 @@ abstract class DokkaPluginConfigurationSpec @Inject constructor(
   @get:Input
   abstract val values: Property<String>
 
+  @DokkatooInternalApi
   override fun build() = DokkaParametersKxs.PluginConfigurationKxs(
     fqPluginName = pluginFqn,
     serializationFormat = serializationFormat.get(),

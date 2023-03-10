@@ -15,6 +15,8 @@ plugins {
   buildsrc.conventions.`github-maven-publish`
 
   buildsrc.conventions.`maven-publish-test`
+
+  dev.adamko.kotlin.`binary-compatibility-validator`
 }
 
 description = "Generates documentation for Kotlin projects (using Dokka)"
@@ -176,6 +178,20 @@ val aggregateTestReports by tasks.registering(TestReport::class) {
     logger.lifecycle("Aggregated test report: file://${destinationDirectory.asFile.get()}/index.html")
   }
 }
-tasks.withType<KotlinCompile>().configureEach {
-  kotlinOptions.freeCompilerArgs += "-Xsam-conversions=class" // https://docs.gradle.org/current/userguide/configuration_cache.html#config_cache:not_yet_implemented:storing_lambdas
+
+binaryCompatibilityValidator {
+  ignoredMarkers.add("dev.adamko.dokkatoo.internal.DokkatooInternalApi")
+
+  // manually ignore all KxS serializers
+  ignoredClasses.addAll(
+    listOf(
+      "DokkaModuleDescriptionKxs",
+      "DokkaSourceSetKxs",
+      "ExternalDocumentationLinkKxs",
+      "PackageOptionsKxs",
+      "PluginConfigurationKxs",
+      "SourceLinkDefinitionKxs",
+    ).map {
+      "dev.adamko.dokkatoo.dokka.parameters.DokkaParametersKxs\$$it\$\$serializer"
+    })
 }

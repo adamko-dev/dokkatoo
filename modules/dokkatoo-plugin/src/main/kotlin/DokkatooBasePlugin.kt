@@ -31,7 +31,10 @@ import org.jetbrains.dokka.Platform
  * The base plugin for Dokkatoo. Sets up Dokkatoo and configures default values, but does not
  * add any specific config (specifically, it does not create Dokka Publications).
  */
-abstract class DokkatooBasePlugin @Inject constructor(
+abstract class DokkatooBasePlugin
+@DokkatooInternalApi
+@Inject
+constructor(
   private val providers: ProviderFactory,
   private val layout: ProjectLayout,
   private val objects: ObjectFactory,
@@ -278,6 +281,7 @@ abstract class DokkatooBasePlugin @Inject constructor(
    * - [Gradle Configurations][org.gradle.api.artifacts.Configuration] - share files between subprojects. Each has a name.
    * - [DokkaConfiguration][org.jetbrains.dokka.DokkaConfiguration] - parameters for executing the Dokka Generator
    */
+  @DokkatooInternalApi
   class DependencyContainerNames(override val formatName: String?) : HasFormatName() {
 
     val dokkatoo = "dokkatoo".appendFormat()
@@ -312,6 +316,7 @@ abstract class DokkatooBasePlugin @Inject constructor(
     val dokkaPluginsIntransitiveClasspath = "dokkatooPluginIntransitive".appendFormat()
   }
 
+  @DokkatooInternalApi
   class TaskNames(override val formatName: String?) : HasFormatName() {
     val generate = "dokkatooGenerate".appendFormat()
     val generatePublication = "dokkatooGeneratePublication".appendFormat()

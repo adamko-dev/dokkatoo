@@ -36,7 +36,7 @@ abstract class SetupDokkaProjects @Inject constructor(
   }
 
   @TaskAction
-  fun action() {
+  internal fun action() {
     val destinationToSources = destinationToSources.get()
     val dokkaSourceDir = dokkaSourceDir.get()
 

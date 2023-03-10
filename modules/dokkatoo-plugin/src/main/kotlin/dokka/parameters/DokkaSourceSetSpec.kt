@@ -1,15 +1,15 @@
 package dev.adamko.dokkatoo.dokka.parameters
 
+import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import java.io.Serializable
 import java.net.URL
 import javax.inject.Inject
 import org.gradle.api.*
 import org.gradle.api.file.ConfigurableFileCollection
-import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.*
 import org.gradle.api.tasks.*
-import org.gradle.kotlin.dsl.newInstance
+import org.gradle.kotlin.dsl.*
 import org.jetbrains.dokka.*
 
 /**
@@ -35,8 +35,12 @@ import org.jetbrains.dokka.*
  * }
  * ```
  */
-abstract class DokkaSourceSetSpec(
-  private val name: String
+abstract class DokkaSourceSetSpec
+@DokkatooInternalApi
+@Inject
+constructor(
+  private val name: String,
+  private val objects: ObjectFactory,
 ) :
   DokkaConfigurationBuilder<DokkaParametersKxs.DokkaSourceSetKxs>,
   Named,
@@ -44,12 +48,6 @@ abstract class DokkaSourceSetSpec(
 
   @Internal
   override fun getName(): String = name
-
-  @get:Inject
-  protected abstract val objects: ObjectFactory
-
-  @get:Inject
-  protected abstract val layout: ProjectLayout
 
   @get:Input
   val sourceSetID: Provider<DokkaSourceSetID>
@@ -411,6 +409,7 @@ abstract class DokkaSourceSetSpec(
     )
   }
 
+  @DokkatooInternalApi
   override fun build(): DokkaParametersKxs.DokkaSourceSetKxs {
     val externalDocumentationLinks = externalDocumentationLinks
       .mapNotNull(DokkaExternalDocumentationLinkSpec::build)

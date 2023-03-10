@@ -1,5 +1,6 @@
 package dev.adamko.dokkatoo.dokka.parameters
 
+import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import java.io.Serializable
 import java.net.URL
 import javax.inject.Inject
@@ -31,7 +32,10 @@ import org.gradle.api.tasks.Internal
  * }
  * ```
  */
-abstract class DokkaExternalDocumentationLinkSpec @Inject constructor(
+abstract class DokkaExternalDocumentationLinkSpec
+@DokkatooInternalApi
+@Inject
+constructor(
   private val name: String
 ) : Serializable, Named {
 

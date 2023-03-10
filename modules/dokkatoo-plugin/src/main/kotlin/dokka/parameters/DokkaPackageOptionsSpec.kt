@@ -2,6 +2,7 @@
 
 package dev.adamko.dokkatoo.dokka.parameters
 
+import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import java.io.Serializable
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
@@ -27,7 +28,9 @@ import org.jetbrains.dokka.DokkaConfigurationBuilder
  * }
  * ```
  */
-abstract class DokkaPackageOptionsSpec :
+abstract class DokkaPackageOptionsSpec
+@DokkatooInternalApi
+constructor() :
   DokkaConfigurationBuilder<DokkaParametersKxs.PackageOptionsKxs>,
   Serializable {
 
@@ -84,6 +87,7 @@ abstract class DokkaPackageOptionsSpec :
   abstract val reportUndocumented: Property<Boolean>
 
 
+  @DokkatooInternalApi
   override fun build() = DokkaParametersKxs.PackageOptionsKxs(
     matchingRegex = matchingRegex.get(),
     documentedVisibilities = documentedVisibilities.get(),

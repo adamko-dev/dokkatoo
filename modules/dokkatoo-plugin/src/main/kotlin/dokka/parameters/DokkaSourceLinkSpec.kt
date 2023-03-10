@@ -1,5 +1,6 @@
 package dev.adamko.dokkatoo.dokka.parameters
 
+import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import java.io.Serializable
 import java.net.URL
 import org.gradle.api.file.DirectoryProperty
@@ -25,7 +26,9 @@ import org.jetbrains.dokka.DokkaConfigurationBuilder
  * }
  * ```
  */
-abstract class DokkaSourceLinkSpec :
+abstract class DokkaSourceLinkSpec
+@DokkatooInternalApi
+constructor() :
   DokkaConfigurationBuilder<DokkaParametersKxs.SourceLinkDefinitionKxs>,
   Serializable {
 
@@ -100,6 +103,7 @@ abstract class DokkaSourceLinkSpec :
   @get:Input
   abstract val remoteLineSuffix: Property<String>
 
+  @DokkatooInternalApi
   override fun build(): DokkaParametersKxs.SourceLinkDefinitionKxs {
     return DokkaParametersKxs.SourceLinkDefinitionKxs(
       localDirectory = localDirectory.get().asFile.invariantSeparatorsPath,

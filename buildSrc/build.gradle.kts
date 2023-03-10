@@ -6,8 +6,8 @@ plugins {
 
 dependencies {
   implementation("org.gradle.kotlin:gradle-kotlin-dsl-plugins:$expectedKotlinDslPluginsVersion")
-
   implementation("com.gradle.publish:plugin-publish-plugin:1.1.0")
+  implementation("dev.adamko.kotlin.binary_compatibility_validator:bcv-gradle-plugin:0.0.3")
 }
 
 java {

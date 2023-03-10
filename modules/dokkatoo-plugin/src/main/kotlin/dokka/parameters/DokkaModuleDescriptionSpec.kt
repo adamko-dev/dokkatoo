@@ -1,5 +1,6 @@
 package dev.adamko.dokkatoo.dokka.parameters
 
+import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import javax.inject.Inject
 import org.gradle.api.Named
 import org.gradle.api.file.ConfigurableFileCollection
@@ -9,7 +10,10 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.jetbrains.dokka.DokkaConfigurationBuilder
 
-abstract class DokkaModuleDescriptionSpec @Inject constructor(
+@DokkatooInternalApi
+abstract class DokkaModuleDescriptionSpec
+@DokkatooInternalApi
+@Inject constructor(
   @get:Input
   val moduleName: String,
 ) : DokkaConfigurationBuilder<DokkaParametersKxs.DokkaModuleDescriptionKxs>, Named {

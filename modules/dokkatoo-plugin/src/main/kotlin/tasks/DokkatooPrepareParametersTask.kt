@@ -4,6 +4,7 @@ import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.jsonMapper
 import dev.adamko.dokkatoo.dokka.parameters.DokkaParametersKxs
 import dev.adamko.dokkatoo.dokka.parameters.DokkaPluginConfigurationSpec
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec
+import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import java.io.IOException
 import javax.inject.Inject
 import kotlinx.serialization.encodeToString
@@ -25,7 +26,10 @@ import org.gradle.api.tasks.PathSensitivity.RELATIVE
  * via ... TODO explain how to include other subprojects/modules
  */
 @CacheableTask
-abstract class DokkatooPrepareParametersTask @Inject constructor(
+abstract class DokkatooPrepareParametersTask
+@DokkatooInternalApi
+@Inject
+constructor(
   objects: ObjectFactory,
 ) : DokkatooTask.WithSourceSets() {
 
@@ -109,7 +113,7 @@ abstract class DokkatooPrepareParametersTask @Inject constructor(
   }
 
   @TaskAction
-  fun generateConfiguration() {
+  internal fun generateConfiguration() {
     val dokkaConfiguration = buildDokkaConfiguration()
 
     val encodedModuleDesc = jsonMapper.encodeToString(dokkaConfiguration)
