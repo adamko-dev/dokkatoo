@@ -206,6 +206,6 @@ tasks.withType<Test>().configureEach {
   //setForkEvery(1)
   jvmArgs(
     "-Xmx1g",
-    "-XX:MaxMetaspaceSize=512g",
+    "-XX:MaxMetaspaceSize=512m",
   )
 }
