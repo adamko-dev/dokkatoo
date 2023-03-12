@@ -40,7 +40,7 @@ abstract class SetupDokkaProjects @Inject constructor(
     val destinationToSources = destinationToSources.get()
     val dokkaSourceDir = dokkaSourceDir.get()
 
-    println("destinationToSources: $destinationToSources")
+    logger.info("destinationToSources: $destinationToSources")
 
     destinationToSources.forEach { (dest: File, sources: List<String>) ->
       fs.sync {

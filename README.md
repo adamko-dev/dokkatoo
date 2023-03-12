@@ -29,7 +29,7 @@ Dokkatoo has a number of improvements over the existing Dokka Gradle Plugin:
 Dokkatoo has basic functionality, and can generate documentation for single-projects and
 multimodule projects.
 
-Be aware that many of things are untested, broken, and undocumented. Please
+Be aware that many things are untested, broken, and undocumented. Please
 [create an issue](https://github.com/adamko-dev/dokkatoo/issues)
 if something is not as you'd expect, or like.
 

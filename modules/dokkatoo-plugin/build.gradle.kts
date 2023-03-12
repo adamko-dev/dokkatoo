@@ -21,8 +21,10 @@ plugins {
 
 description = "Generates documentation for Kotlin projects (using Dokka)"
 
+val dokkaVersion = provider { "1.7.20" }
+
 dependencies {
-  implementation("org.jetbrains.dokka:dokka-core:1.7.20")
+  implementation(dokkaVersion.map { "org.jetbrains.dokka:dokka-core:$it" })
 
   compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.20")
   compileOnly("com.android.tools.build:gradle:4.0.1")
@@ -31,7 +33,7 @@ dependencies {
 
   testFixturesImplementation(gradleApi())
   testFixturesImplementation(gradleTestKit())
-  testFixturesCompileOnly("org.jetbrains.dokka:dokka-core:1.7.20")
+  testFixturesCompileOnly(dokkaVersion.map { "org.jetbrains.dokka:dokka-core:$it" })
   testFixturesImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
   testFixturesApi(platform("io.kotest:kotest-bom:5.5.5"))
   testFixturesApi("io.kotest:kotest-runner-junit5")
@@ -194,4 +196,51 @@ binaryCompatibilityValidator {
     ).map {
       "dev.adamko.dokkatoo.dokka.parameters.DokkaParametersKxs\$$it\$\$serializer"
     })
+}
+
+val dokkatooVersion = provider { project.version.toString() }
+
+val generateDokkatooConstants by tasks.registering(Sync::class) {
+
+  val textResources = resources.text
+  val dokkatooVersion = dokkatooVersion
+  val dokkaVersion = dokkaVersion
+
+  val properties = objects.mapProperty<String, String>().apply {
+    put("DOKKATOO_VERSION", dokkatooVersion)
+    put("DOKKA_VERSION", dokkaVersion)
+  }
+
+  val buildConfigFileContents: Provider<TextResource> =
+    properties.map { props ->
+
+      val vals = props.entries
+        .sortedBy { it.key }
+        .joinToString("\n") { (k, v) ->
+          """const val $k = "$v""""
+        }.prependIndent("  ")
+
+      textResources.fromString(
+        """
+          |package dev.adamko.dokkatoo.internal
+          |
+          |@DokkatooInternalApi
+          |object DokkatooConstants {
+          |$vals
+          |}
+          |
+        """.trimMargin()
+      )
+    }
+
+  from(buildConfigFileContents) {
+    rename { "DokkatooConstants.kt" }
+    into("dev/adamko/dokkatoo/internal/")
+  }
+
+  into(layout.buildDirectory.dir("generated-source/main/kotlin/"))
+}
+
+kotlin.sourceSets.main {
+  kotlin.srcDir(generateDokkatooConstants.map { it.destinationDir })
 }

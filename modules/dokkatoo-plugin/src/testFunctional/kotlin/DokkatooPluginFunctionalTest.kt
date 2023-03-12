@@ -1,10 +1,7 @@
 package dev.adamko.dokkatoo
 
-import dev.adamko.dokkatoo.utils.buildGradleKts
-import dev.adamko.dokkatoo.utils.gradleKtsProjectTest
-import dev.adamko.dokkatoo.utils.invariantNewlines
-import dev.adamko.dokkatoo.utils.shouldContainExactly
-import dev.adamko.dokkatoo.utils.splitToPair
+import dev.adamko.dokkatoo.internal.DokkatooConstants.DOKKATOO_VERSION
+import dev.adamko.dokkatoo.utils.*
 import io.kotest.assertions.asClue
 import io.kotest.assertions.withClue
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
@@ -15,7 +12,7 @@ class DokkatooPluginFunctionalTest {
   private val testProject = gradleKtsProjectTest("DokkatooPluginFunctionalTest") {
     buildGradleKts = """
       |plugins {
-      |    id("dev.adamko.dokkatoo") version "0.0.4-SNAPSHOT"
+      |    id("dev.adamko.dokkatoo") version "$DOKKATOO_VERSION"
       |}
       |
     """.trimMargin()
