@@ -21,25 +21,30 @@ plugins {
 
 description = "Generates documentation for Kotlin projects (using Dokka)"
 
-val dokkaVersion = provider { "1.7.20" }
-
 dependencies {
-  implementation(dokkaVersion.map { "org.jetbrains.dokka:dokka-core:$it" })
 
-  compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.20")
-  compileOnly("com.android.tools.build:gradle:4.0.1")
+  implementation(libs.kotlin.dokkaCore)
 
-  implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
+  compileOnly(libs.gradlePlugin.kotlin)
+  compileOnly(libs.gradlePlugin.android)
+
+  implementation(platform(libs.kotlinxSerialization.bom))
+  implementation(libs.kotlinxSerialization.json)
 
   testFixturesImplementation(gradleApi())
   testFixturesImplementation(gradleTestKit())
-  testFixturesCompileOnly(dokkaVersion.map { "org.jetbrains.dokka:dokka-core:$it" })
-  testFixturesImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
-  testFixturesApi(platform("io.kotest:kotest-bom:5.5.5"))
-  testFixturesApi("io.kotest:kotest-runner-junit5")
-  testFixturesApi("io.kotest:kotest-assertions-core")
-  testFixturesApi("io.kotest:kotest-assertions-json")
-  testFixturesApi("io.kotest:kotest-framework-datatest")
+
+  testFixturesCompileOnly(libs.kotlin.dokkaCore)
+  testFixturesImplementation(platform(libs.kotlinxSerialization.bom))
+  testFixturesImplementation(libs.kotlinxSerialization.json)
+
+  testFixturesCompileOnly(libs.kotlin.dokkaCore)
+
+  testFixturesApi(platform(libs.kotest.bom))
+  testFixturesApi(libs.kotest.junit5Runner)
+  testFixturesApi(libs.kotest.assertionsCore)
+  testFixturesApi(libs.kotest.assertionsJson)
+  testFixturesApi(libs.kotest.datatest)
 
   // don't define test dependencies here, instead define them in the testing.suites {} configuration below
 }
@@ -107,14 +112,12 @@ testing.suites {
     dependencies {
       implementation(project.dependencies.gradleTestKit())
 
-      implementation("org.jetbrains.kotlin:kotlin-test:1.7.20")
+      implementation(project.dependencies.testFixtures(project()))
 
-      implementation(project.dependencies.testFixtures(project))
+      compileOnly(libs.kotlin.dokkaCore)
 
-      implementation("org.jetbrains.dokka:dokka-core:1.7.20")
-      implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
-
-      runtimeOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:$embeddedKotlinVersion")
+      implementation(project.dependencies.platform(libs.kotlinxSerialization.bom))
+      implementation(libs.kotlinxSerialization.json)
     }
 
     targets.configureEach {
@@ -204,7 +207,7 @@ val generateDokkatooConstants by tasks.registering(Sync::class) {
 
   val textResources = resources.text
   val dokkatooVersion = dokkatooVersion
-  val dokkaVersion = dokkaVersion
+  val dokkaVersion = libs.versions.kotlin.dokka
 
   val properties = objects.mapProperty<String, String>().apply {
     put("DOKKATOO_VERSION", dokkatooVersion)

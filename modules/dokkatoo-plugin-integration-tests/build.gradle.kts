@@ -18,26 +18,21 @@ plugins {
   buildsrc.conventions.`dokkatoo-example-projects`
 }
 
-description = "Integration tests for Dokkatoo Gradle Plugin. The tests use Gradle TestKit to run the template projects that are committed in the repo."
+description =
+  "Integration tests for Dokkatoo Gradle Plugin. The tests use Gradle TestKit to run the template projects that are committed in the repo."
 
 dependencies {
   testMavenPublication(projects.modules.dokkatooPlugin)
   exampleProjects(projects.examples)
 
-  implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
-
   testFixturesApi(testFixtures(projects.modules.dokkatooPlugin))
+
   testFixturesImplementation(gradleTestKit())
-  testFixturesImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
-  testFixturesImplementation(platform("io.kotest:kotest-bom:5.5.5"))
-  testFixturesImplementation("io.kotest:kotest-runner-junit5")
-  testFixturesImplementation("io.kotest:kotest-assertions-core")
-  testFixturesImplementation("io.kotest:kotest-assertions-json")
 
-  val jacksonVersion = "2.12.7"
-  testFixturesImplementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
+  testFixturesImplementation(platform(libs.kotlinxSerialization.bom))
+  testFixturesImplementation(libs.kotlinxSerialization.json)
 
-//  kotlinDokkaSource(projects.externals)
+  testFixturesCompileOnly(libs.kotlin.dokkaCore)
 
   // don't define test dependencies here, instead define them in the testing.suites {} configuration below
 }
@@ -45,9 +40,8 @@ dependencies {
 
 tasks.withType<KotlinCompile>().configureEach {
   kotlinOptions {
-    this.freeCompilerArgs += listOf(
+    freeCompilerArgs += listOf(
       "-opt-in=kotlin.RequiresOptIn",
-      //"-opt-in=dev.adamko.dokkatoo.internal.DokkatooInternalApi",
     )
   }
 }
@@ -59,18 +53,12 @@ testing.suites {
 
     dependencies {
       implementation(project.dependencies.gradleTestKit())
-
-      implementation("org.jetbrains.kotlin:kotlin-test:1.7.20")
-
-      implementation(project.dependencies.platform("io.kotest:kotest-bom:5.5.5"))
-      implementation("io.kotest:kotest-runner-junit5")
-      implementation("io.kotest:kotest-assertions-core")
-      implementation("io.kotest:kotest-assertions-json")
-
       implementation(project.dependencies.testFixtures(project()))
 
-      implementation("org.jetbrains.dokka:dokka-core:1.7.20")
-      implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
+      compileOnly(libs.kotlin.dokkaCore)
+
+      implementation(project.dependencies.platform(libs.kotlinxSerialization.bom))
+      implementation(libs.kotlinxSerialization.json)
     }
 
     targets.configureEach {
@@ -104,45 +92,14 @@ testing.suites {
 
   /** Examples tests suite */
   val testExamples by registering(JvmTestSuite::class) {
-//    testType.set(TestSuiteType.FUNCTIONAL_TEST)
-
-    targets.all {
-      testTask.configure {
-//        dependsOn(project.configurations.kotlinDokkaSource)
-
-//        inputs.property("dokkaSourceDir",
-//          project.configurations.kotlinDokkaSource.map { dokkaSrcConf ->
-//            val files = dokkaSrcConf.incoming.artifactView { lenient(true) }.files
-//            files.singleOrNull()?.absolutePath
-//              ?: error("could not get Dokka source code directory from kotlinDokkaSource configuration. Got ${files.count()} files: $files")
-//          }
-//        )
-//
-//        systemProperty("dokkaSourceDir", inputs.properties["dokkaSourceDir"]!!)
-      }
-    }
+    description = "Test the example projects, from the 'examples' directory in the project root"
   }
 
 
   /** Integration tests suite */
   val testIntegration by registering(JvmTestSuite::class) {
-//    testType.set(TestSuiteType.INTEGRATION_TEST)
-
-    targets.all {
-      testTask.configure {
-//        dependsOn(project.configurations.kotlinDokkaSource)
-
-//        inputs.property("dokkaSourceDir",
-//          project.configurations.kotlinDokkaSource.map { dokkaSrcConf ->
-//            val files = dokkaSrcConf.incoming.artifactView { lenient(true) }.files
-//            files.singleOrNull()?.absolutePath
-//              ?: error("could not get Dokka source code directory from kotlinDokkaSource configuration. Got ${files.count()} files: $files")
-//          }
-//        )
-//
-//        systemProperty("dokkaSourceDir", inputs.properties["dokkaSourceDir"]!!)
-      }
-    }
+    description =
+      "Test the integration template projects, in the dokkatoo-plugin-integration-tests/projects directory"
   }
 
   tasks.check { dependsOn(testExamples, testIntegration) }
