@@ -115,12 +115,9 @@ testing.suites {
       implementation(project.dependencies.testFixtures(project()))
 
       compileOnly(libs.kotlin.dokkaCore)
-//      runtimeOnly(libs.kotlin.dokkaCore)
 
       implementation(project.dependencies.platform(libs.kotlinxSerialization.bom))
       implementation(libs.kotlinxSerialization.json)
-
-//      compileOnly(libs.kotlin.dokkaCore)
     }
 
     targets.configureEach {
@@ -158,10 +155,6 @@ testing.suites {
   val testFunctional by registering(JvmTestSuite::class) {
     description = "Tests that use Gradle TestKit to test functionality"
     testType.set(TestSuiteType.FUNCTIONAL_TEST)
-
-//    dependencies {
-//      implementation(libs.kotlinxSerialization.json)
-//    }
 
     targets.all {
       testTask.configure {
