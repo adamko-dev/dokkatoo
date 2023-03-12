@@ -5,8 +5,6 @@ plugins {
   buildsrc.conventions.base
 
   idea
-
-  //id("org.jetbrains.kotlinx.binary-compatibility-validator") version "0.12.1"
 }
 
 group = "dev.adamko.dokkatoo"
