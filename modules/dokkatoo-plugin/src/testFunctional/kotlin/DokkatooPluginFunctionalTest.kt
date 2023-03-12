@@ -15,7 +15,7 @@ class DokkatooPluginFunctionalTest {
   private val testProject = gradleKtsProjectTest("DokkatooPluginFunctionalTest") {
     buildGradleKts = """
       |plugins {
-      |    id("dev.adamko.dokkatoo") version "0.0.3-SNAPSHOT"
+      |    id("dev.adamko.dokkatoo") version "0.0.3"
       |}
       |
     """.trimMargin()
