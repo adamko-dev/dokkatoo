@@ -1,5 +1,4 @@
 import org.jetbrains.dokka.DokkaConfiguration
-import org.jetbrains.dokka.gradle.kotlinSourceSet
 
 plugins {
   kotlin("jvm") version "1.7.20"

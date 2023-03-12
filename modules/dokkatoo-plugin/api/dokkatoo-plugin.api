@@ -234,7 +234,3 @@ public abstract class dev/adamko/dokkatoo/tasks/DokkatooTask$WithSourceSets : de
 	public abstract fun getDokkaSourceSets ()Lorg/gradle/api/NamedDomainObjectContainer;
 }
 
-public final class org/jetbrains/dokka/gradle/DokkaGradleKt {
-	public static final fun kotlinSourceSet (Ldev/adamko/dokkatoo/dokka/parameters/DokkaSourceSetSpec;Lorg/jetbrains/kotlin/gradle/plugin/KotlinSourceSet;)V
-}
-
