@@ -115,15 +115,14 @@ class MultiModuleFunctionalTest : FunSpec({
 
       test("contains the default Dokka plugins") {
         pluginClasspathJars.shouldContainExactlyInAnyOrder(
-//        "markdown-jvm-0.3.1.jar",
-          "kotlin-analysis-intellij-1.7.20.jar",
-          "dokka-base-1.7.20.jar",
-          "templating-plugin-1.7.20.jar",
-          "dokka-analysis-1.7.20.jar",
-          "kotlin-analysis-compiler-1.7.20.jar",
-          "kotlinx-html-jvm-0.8.0.jar",
-          "freemarker-2.3.31.jar",
           "all-modules-page-plugin-1.7.20.jar",
+          "dokka-analysis-1.8.10.jar",
+          "dokka-base-1.8.10.jar",
+          "freemarker-2.3.31.jar",
+          "kotlin-analysis-compiler-1.8.10.jar",
+          "kotlin-analysis-intellij-1.8.10.jar",
+          "kotlinx-html-jvm-0.8.0.jar",
+          "templating-plugin-1.8.10.jar",
         )
       }
     }

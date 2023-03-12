@@ -1,4 +1,4 @@
-package demo
+package org.kotlintest.jdk9
 
 /**
  * This class demonstrates custom dokka source sets

@@ -2,6 +2,7 @@ package buildsrc.conventions
 
 import buildsrc.conventions.Maven_publish_test_gradle.MavenPublishTest
 import buildsrc.tasks.SetupDokkaProjects
+import org.gradle.kotlin.dsl.support.serviceOf
 
 plugins {
   id("buildsrc.conventions.base")
@@ -18,12 +19,19 @@ val setupDokkaTemplateProjects by tasks.registering(SetupDokkaProjects::class) {
   group = TASK_GROUP
 
   dependsOn(prepareDokkaSourceTask)
+
+  // complicated workaround for https://github.com/gradle/gradle/issues/23708
+  val layout = serviceOf<ProjectLayout>()
+  val providers = serviceOf<ProviderFactory>()
+
+  val dokkaSrcDir = prepareDokkaSourceTask.flatMap {
+    layout.dir(providers.provider {
+      it.destinationDir
+    })
+  }
+  dokkaSourceDir.set(dokkaSrcDir)
+
   destinationToSources.convention(emptyMap())
-  dokkaSourceDir.set(
-    layout.dir(
-      prepareDokkaSourceTask.map { it.destinationDir }
-    )
-  )
 }
 
 val mavenPublishTestExtension = extensions.getByType<MavenPublishTest>()

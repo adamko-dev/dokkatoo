@@ -18,7 +18,8 @@ dokkatoo {
             ],
             "customAssets": [
               "${file("ktor-logo.png").invariantSeparatorsPath}"
-            ]
+            ],
+            "footerMessage": "(c) Custom Format Dokka example"
           }
         """.trimIndent()
       )

@@ -9,3 +9,7 @@ dependencies {
   dokkatooPluginHtml("org.jetbrains.dokka:all-modules-page-plugin:1.7.20")
   dokkatooPluginHtml("org.jetbrains.dokka:templating-plugin:1.7.20")
 }
+
+dokkatoo {
+  moduleName.set("Dokka MultiModule Example")
+}

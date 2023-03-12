@@ -1,5 +1,6 @@
 package dev.adamko.dokkatoo.tests.examples
 
+import dev.adamko.dokkatoo.internal.DokkatooConstants.DOKKA_VERSION
 import dev.adamko.dokkatoo.utils.*
 import io.kotest.assertions.withClue
 import io.kotest.core.spec.style.FunSpec
@@ -29,7 +30,7 @@ class CustomFormatExampleTest : FunSpec({
       val dokkaBuild = dokkaProject.runner
         .withArguments(
           "clean",
-          "dokkaCustomFormat",
+          "dokkaHtml",
           "--stacktrace",
           "--info",
         )
@@ -61,7 +62,7 @@ class CustomFormatExampleTest : FunSpec({
     }
 
     context("expect dokka and dokkatoo HTML is the same") {
-      val dokkaHtmlDir = dokkaProject.projectDir.resolve("build/dokka/customFormat")
+      val dokkaHtmlDir = dokkaProject.projectDir.resolve("build/dokka/html")
       val dokkatooHtmlDir = dokkatooProject.projectDir.resolve("build/dokka/html")
 
       test("expect file trees are the same") {
@@ -160,11 +161,10 @@ private fun initDokkaProject(
   return GradleProjectTest(destinationDir.toPath()).apply {
     copyExampleProject("custom-format-example/dokka")
 
-    val dokkaVersion = "1.7.20"
     buildGradleKts = buildGradleKts
       .replace(
         Regex("""id\("org\.jetbrains\.dokka"\) version \("[\d.]+"\)"""),
-        Regex.escapeReplacement("""id("org.jetbrains.dokka") version "$dokkaVersion""""),
+        Regex.escapeReplacement("""id("org.jetbrains.dokka") version "$DOKKA_VERSION""""),
       )
       .replace(
         "org.jetbrains.dokka:dokka-base:1.7.10",
@@ -189,7 +189,7 @@ private fun initDokkatooProject(
       |
       |tasks.withType<dev.adamko.dokkatoo.tasks.DokkatooPrepareParametersTask>().configureEach {
       |  dokkaSourceSets.configureEach {
-      |    sourceSetScope.set(":dokkaCustomFormat") // only necessary for testing
+      |    sourceSetScope.set(":dokkaHtml") // only necessary for testing
       |  }
       |}
       |

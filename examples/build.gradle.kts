@@ -27,3 +27,7 @@ configurations.exampleProjectsElements.configure {
     }
   }
 }
+
+dokkaSourceDownload {
+  dokkaVersion.set(libs.versions.kotlin.dokka)
+}
