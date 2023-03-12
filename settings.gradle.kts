@@ -7,7 +7,7 @@ pluginManagement {
   }
 }
 
-@Suppress("UnstableApiUsage") // Central declaration of repositories is an incubating feature
+@Suppress("UnstableApiUsage")
 dependencyResolutionManagement {
 
   repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)

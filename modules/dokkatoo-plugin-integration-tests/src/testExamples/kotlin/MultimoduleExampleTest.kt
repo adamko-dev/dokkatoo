@@ -1,18 +1,7 @@
 package dev.adamko.dokkatoo.tests.examples
 
-import dev.adamko.dokkatoo.utils.GradleProjectTest
+import dev.adamko.dokkatoo.utils.*
 import dev.adamko.dokkatoo.utils.GradleProjectTest.Companion.projectTestTempDir
-import dev.adamko.dokkatoo.utils.buildGradleKts
-import dev.adamko.dokkatoo.utils.copyExampleProject
-import dev.adamko.dokkatoo.utils.dir
-import dev.adamko.dokkatoo.utils.file
-import dev.adamko.dokkatoo.utils.findFiles
-import dev.adamko.dokkatoo.utils.invariantNewlines
-import dev.adamko.dokkatoo.utils.settingsGradleKts
-import dev.adamko.dokkatoo.utils.shouldContainAll
-import dev.adamko.dokkatoo.utils.shouldNotContainAnyOf
-import dev.adamko.dokkatoo.utils.sideBySide
-import dev.adamko.dokkatoo.utils.toTreeString
 import io.kotest.assertions.withClue
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.file.shouldBeAFile
@@ -108,7 +97,6 @@ class MultimoduleExampleTest : FunSpec({
         .withArguments(
           "clean",
           ":parentProject:dokkatooGeneratePublicationHtml",
-          "--info",
           "--stacktrace",
         )
         .forwardOutput()
