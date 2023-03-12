@@ -95,8 +95,8 @@ class GradleExampleTest : FunSpec({
         .withArguments(
           "clean",
           ":dokkatooGeneratePublicationHtml",
-          "--info",
           "--stacktrace",
+          "--info",
         )
         .forwardOutput()
         .build()
