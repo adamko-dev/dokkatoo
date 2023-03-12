@@ -368,7 +368,7 @@ private fun initDokkatooProject(
       |  // Kotlin plugin shouldn't be necessary here, but without it Dokka errors
       |  // with ClassNotFound KotlinPluginExtension... very weird
       |  kotlin("jvm") version "1.7.20" apply false
-      |  id("dev.adamko.dokkatoo") version "0.0.3"
+      |  id("dev.adamko.dokkatoo") version "0.0.4-SNAPSHOT"
       |}
       |
       |dependencies {
@@ -383,7 +383,7 @@ private fun initDokkatooProject(
       buildGradleKts = """
           |plugins {
           |    kotlin("jvm") version "1.7.20"
-          |    id("dev.adamko.dokkatoo") version "0.0.3"
+          |    id("dev.adamko.dokkatoo") version "0.0.4-SNAPSHOT"
           |}
           |
         """.trimMargin()
@@ -410,7 +410,7 @@ private fun initDokkatooProject(
       buildGradleKts = """
           |plugins {
           |    kotlin("jvm") version "1.7.20"
-          |    id("dev.adamko.dokkatoo") version "0.0.3"
+          |    id("dev.adamko.dokkatoo") version "0.0.4-SNAPSHOT"
           |}
           |
         """.trimMargin()
