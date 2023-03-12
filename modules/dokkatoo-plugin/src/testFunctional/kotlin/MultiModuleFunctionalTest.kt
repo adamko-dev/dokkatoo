@@ -12,6 +12,7 @@ import io.kotest.matchers.file.shouldBeAFile
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.paths.shouldBeAFile
 import io.kotest.matchers.paths.shouldExist
+import io.kotest.matchers.paths.shouldNotExist
 import io.kotest.matchers.should
 import io.kotest.matchers.string.shouldContain
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -279,6 +280,14 @@ class MultiModuleFunctionalTest : FunSpec({
             .forwardOutput()
             .build {
 
+              test("expect HelloAgain HTML file exists") {
+                val helloAgainIndexHtml = project.projectDir.resolve(
+                  "build/dokka/html/subproject-hello/com.project.hello/-hello-again/index.html"
+                )
+
+                helloAgainIndexHtml.shouldBeAFile()
+              }
+
               test("expect :subproject-goodbye tasks are up-to-date, because no files changed") {
                 shouldHaveTasksWithOutcome(
                   ":subproject-goodbye:prepareDokkatooParametersHtml" to UP_TO_DATE,
@@ -311,6 +320,30 @@ class MultiModuleFunctionalTest : FunSpec({
                 output shouldContain "8 actionable tasks"
               }
             }
+
+          context("and when the class is deleted") {
+            project.dir("subproject-hello") {
+              createKotlinFile("src/main/kotlin/HelloAgain.kt", "")
+            }
+
+            project.runner
+              .withArguments(
+                ":dokkatooGeneratePublicationHtml",
+                "--stacktrace",
+                "--info",
+                "--build-cache",
+              )
+              .forwardOutput()
+              .build {
+                test("expect the generated HTML file is deleted") {
+                  val helloAgainIndexHtml = project.projectDir.resolve(
+                    "build/dokka/html/subproject-hello/com.project.hello/-hello-again/index.html"
+                  )
+
+                  helloAgainIndexHtml.shouldNotExist()
+                }
+              }
+          }
         }
       }
     }
