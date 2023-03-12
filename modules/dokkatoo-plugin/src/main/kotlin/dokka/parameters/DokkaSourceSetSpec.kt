@@ -344,17 +344,6 @@ constructor(
     )
   }
 
-//    /**
-//     * Closure for configuring package options, appending to [perPackageOptions].
-//     *
-//     * @see [DokkaPackageOptionsGradleBuilder] for details.
-//     */
-//    @Suppress("DEPRECATION") // TODO [beresnev] ConfigureUtil will be removed in Gradle 8
-//    fun perPackageOption(c: Closure<in DokkaPackageOptionsGradleBuilder>) {
-//        val configured = org.gradle.util.ConfigureUtil.configure(c, DokkaPackageOptionsGradleBuilder())
-//        perPackageOptions.add(configured)
-//    }
-
   /**
    * Action for configuring package options, appending to [perPackageOptions].
    *
@@ -367,17 +356,6 @@ constructor(
       }
     )
   }
-
-//    /**
-//     * Closure for configuring external documentation links, appending to [externalDocumentationLinks].
-//     *
-//     * @see [GradleExternalDocumentationLinkBuilder] for details.
-//     */
-//    @Suppress("DEPRECATION") // TODO [beresnev] ConfigureUtil will be removed in Gradle 8
-//    fun externalDocumentationLink(c: Closure<in GradleExternalDocumentationLinkBuilder>) {
-//         val link = org.gradle.util.ConfigureUtil.configure(c, GradleExternalDocumentationLinkBuilder(project))
-//        externalDocumentationLinks.add(link)
-//    }
 
   /**
    * Action for configuring external documentation links, appending to [externalDocumentationLinks].
