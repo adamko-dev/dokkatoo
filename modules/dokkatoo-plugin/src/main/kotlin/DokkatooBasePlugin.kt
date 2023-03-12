@@ -115,7 +115,7 @@ constructor(
       dokkatooConfigurationsDirectory.convention(layout.buildDirectory.dir("dokka-config"))
 
       extensions.create<DokkatooExtension.Versions>("versions").apply {
-        jetbrainsDokka.convention("1.7.20")
+        jetbrainsDokka.convention(DokkatooConstants.DOKKA_VERSION)
         jetbrainsMarkdown.convention("0.3.1")
         freemarker.convention("2.3.31")
         kotlinxHtml.convention("0.8.0")
