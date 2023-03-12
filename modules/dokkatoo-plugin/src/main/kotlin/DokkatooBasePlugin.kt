@@ -74,7 +74,7 @@ constructor(
       workerLogFile.set(temporaryDir.resolve("dokka-worker.log"))
       // increase memory - DokkaGenerator is hungry https://github.com/Kotlin/dokka/issues/1405
       workerMinHeapSize.convention("512m")
-      workerMaxHeapSize.convention("2g")
+      workerMaxHeapSize.convention("1g")
       workerJvmArgs.set(
         listOf(
           //"-XX:MaxMetaspaceSize=512m",
