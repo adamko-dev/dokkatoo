@@ -85,8 +85,7 @@ testing.suites {
 
         // depend on example & integration-test projects setup
         dependsOn(configurations.exampleProjects)
-        dependsOn(tasks.setupDokkaTemplateProjects)
-        dependsOn(tasks.updateGradlePropertiesInDokkatooExamples)
+        dependsOn(tasks.updateDokkatooExamples)
 
         val dokkatooExamplesDir = configurations.exampleProjects.map {
           it.incoming.artifactView { lenient(true) }.files.singleFile.absolutePath
