@@ -137,7 +137,7 @@ To do this, apply the Dokkatoo plugin in all subprojects that should be document
 In the aggregating project, depend on the other subprojects.
 
 ```kts
-// ./build.gradle.kts
+// build.gradle.kts
 
 plugins {
   id("dev.adamko.dokkatoo-html") version "$dokkatooVersion"
