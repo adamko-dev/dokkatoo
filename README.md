@@ -7,7 +7,7 @@
 [Dokkatoo](https://github.com/adamko-dev/dokkatoo) is a Gradle plugin that generates documentation
 for your Kotlin projects.
 
-Under the hood it uses [Dokka](https://kotlinlang.org/docs/dokka-introduction.html),
+Under the hood it uses [Dokka](https://github.com/Kotlin/dokka/),
 the API documentation engine for Kotlin.
 
 ###### Why Dokkatoo?
