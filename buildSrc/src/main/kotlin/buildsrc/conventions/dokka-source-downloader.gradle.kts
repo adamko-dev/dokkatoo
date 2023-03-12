@@ -3,10 +3,17 @@ package buildsrc.conventions
 import buildsrc.conventions.utils.asConsumer
 import buildsrc.conventions.utils.asProvider
 import buildsrc.conventions.utils.dropDirectories
+import org.gradle.kotlin.dsl.support.serviceOf
 
 plugins {
   id("buildsrc.conventions.base")
 }
+
+interface DokkaSourceDownloaderExtension {
+  val dokkaVersion: Property<String>
+}
+
+val dsdExt = extensions.create<DokkaSourceDownloaderExtension>("dokkaSourceDownload")
 
 val kotlinDokkaSource by configurations.creating {
   asConsumer()
@@ -23,18 +30,23 @@ val kotlinDokkaSourceElements by configurations.registering {
 }
 
 dependencies {
-  kotlinDokkaSource("kotlin:dokka:1.7.20@zip")
+  kotlinDokkaSource(dsdExt.dokkaVersion.map { "kotlin:dokka:$it@zip" })
 }
 
 val prepareDokkaSource by tasks.registering(Sync::class) {
   group = "dokka setup"
   description = "Download & unpack Kotlin Dokka source code"
+
+  inputs.property("dokkaVersion", dsdExt.dokkaVersion).optional(false)
+
+  val archives = serviceOf<ArchiveOperations>()
+
   from(
     kotlinDokkaSource.incoming
-      .artifactView { lenient(true) }
       .artifacts
-      .resolvedArtifacts.map { artifacts ->
-        artifacts.map { zipTree(it.file) }
+      .resolvedArtifacts
+      .map { artifacts ->
+        artifacts.map { archives.zipTree(it.file) }
       }
   ) {
     // drop the first dir (dokka-$version)
@@ -42,7 +54,9 @@ val prepareDokkaSource by tasks.registering(Sync::class) {
       relativePath = relativePath.dropDirectories(1)
     }
   }
+
   into(temporaryDir)
+
   exclude(
     "*.github",
     "*.gradle",

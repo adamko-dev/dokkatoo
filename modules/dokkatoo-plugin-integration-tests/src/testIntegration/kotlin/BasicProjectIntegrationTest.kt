@@ -1,5 +1,6 @@
 package dev.adamko.dokkatoo.tests.integration
 
+import dev.adamko.dokkatoo.internal.DokkatooConstants.DOKKA_VERSION
 import dev.adamko.dokkatoo.utils.*
 import dev.adamko.dokkatoo.utils.GradleProjectTest.Companion.projectTestTempDir
 import io.kotest.core.annotation.EnabledIf
@@ -165,7 +166,7 @@ private fun initDokkaProject(
         """../template.root.gradle.kts""",
         """./template.root.gradle.kts""",
       )
-      .replace("""${'$'}{System.getenv("DOKKA_VERSION")}""", "1.7.20")
+      .replace("""${'$'}{System.getenv("DOKKA_VERSION")}""", DOKKA_VERSION)
 
     // update relative paths to the template files - they're now in the same directory
     settingsGradleKts = settingsGradleKts
@@ -176,7 +177,7 @@ private fun initDokkaProject(
 
     var templateGradleSettings: String by projectFile("template.settings.gradle.kts")
     templateGradleSettings = templateGradleSettings
-      .replace("for-integration-tests-SNAPSHOT", "1.7.20")
+      .replace("for-integration-tests-SNAPSHOT", DOKKA_VERSION)
   }
 }
 

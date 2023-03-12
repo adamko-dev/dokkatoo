@@ -5,7 +5,7 @@ plugins {
 
 dokkatoo {
   dokkatooSourceSets.configureEach {
-    includes.from("Module.md")
+    includes.from("ModuleA.md")
   }
   modulePath.set("childProjectA") // match the original dokka default
 }

@@ -13,13 +13,14 @@ plugins {
   `test-report-aggregation`
 
   buildsrc.conventions.`java-base`
-  buildsrc.conventions.`dokka-source-downloader`
   buildsrc.conventions.`maven-publish-test`
   buildsrc.conventions.`dokkatoo-example-projects`
 }
 
-description =
-  "Integration tests for Dokkatoo Gradle Plugin. The tests use Gradle TestKit to run the template projects that are committed in the repo."
+description = """
+    Integration tests for Dokkatoo Gradle Plugin. 
+    The tests use Gradle TestKit to run the template projects that are committed in the repo.
+  """.trimIndent()
 
 dependencies {
   testMavenPublication(projects.modules.dokkatooPlugin)
@@ -42,6 +43,7 @@ tasks.withType<KotlinCompile>().configureEach {
   kotlinOptions {
     freeCompilerArgs += listOf(
       "-opt-in=kotlin.RequiresOptIn",
+      "-opt-in=dev.adamko.dokkatoo.internal.DokkatooInternalApi",
     )
   }
 }
@@ -76,7 +78,7 @@ testing.suites {
         dependsOn(tasks.updateDokkatooExamples)
 
         val dokkatooExamplesDir = configurations.exampleProjects.map {
-          it.incoming.artifactView { lenient(true) }.files.singleFile.absolutePath
+          it.incoming.files.singleFile.absolutePath
         }
 
         systemProperty("integrationTestProjectsDir", "$projectDir/projects")
@@ -132,24 +134,23 @@ tasks.setupDokkaTemplateProjects {
   destinationToSources.set(
     mapOf(
       //@formatter:off
-      "projects/it-android-0/dokka"                to listOf("integration-tests/gradle/projects/it-android-0"),
-      "projects/it-basic/dokka"                    to listOf("integration-tests/gradle/projects/it-basic"),
-      "projects/it-basic-groovy/dokka"             to listOf("integration-tests/gradle/projects/it-basic-groovy"),
-      "projects/it-collector-0/dokka"              to listOf("integration-tests/gradle/projects/it-collector-0"),
-      "projects/it-js-ir-0/dokka"                  to listOf("integration-tests/gradle/projects/it-js-ir-0"),
-      "projects/it-multimodule-0/dokka"            to listOf("integration-tests/gradle/projects/it-multimodule-0"),
-      "projects/it-multimodule-1/dokka"            to listOf("integration-tests/gradle/projects/it-multimodule-1"),
-      "projects/it-multimodule-versioning-0/dokka" to listOf("integration-tests/gradle/projects/it-multimodule-versioning-0"),
-      "projects/it-multiplatform-0/dokka"          to listOf("integration-tests/gradle/projects/it-multiplatform-0"),
+      "projects/it-android-0/dokka"                to "integration-tests/gradle/projects/it-android-0",
+      "projects/it-basic/dokka"                    to "integration-tests/gradle/projects/it-basic",
+      "projects/it-basic-groovy/dokka"             to "integration-tests/gradle/projects/it-basic-groovy",
+      "projects/it-collector-0/dokka"              to "integration-tests/gradle/projects/it-collector-0",
+      "projects/it-js-ir-0/dokka"                  to "integration-tests/gradle/projects/it-js-ir-0",
+      "projects/it-multimodule-0/dokka"            to "integration-tests/gradle/projects/it-multimodule-0",
+      "projects/it-multimodule-1/dokka"            to "integration-tests/gradle/projects/it-multimodule-1",
+      "projects/it-multimodule-versioning-0/dokka" to "integration-tests/gradle/projects/it-multimodule-versioning-0",
+      "projects/it-multiplatform-0/dokka"          to "integration-tests/gradle/projects/it-multiplatform-0",
 
       //"integration-tests/gradle/projects/coroutines"                  to "projects/coroutines/dokka",
       //"integration-tests/gradle/projects/serialization"               to "projects/serialization/dokka",
       //"integration-tests/gradle/projects/stdlib"                      to "projects/stdlib/dokka",
       //@formatter:on
-    ).mapKeys { (dest, _) ->
-      projectDir.resolve(dest)
-    }.mapValues { (_, sources) ->
-      sources + listOf(
+    ).entries.associate { (dest, rootDir) ->
+      projectDir.resolve(dest) to listOf(
+        rootDir,
         "integration-tests/gradle/projects/template.root.gradle.kts",
         "integration-tests/gradle/projects/template.settings.gradle.kts",
       )
@@ -164,4 +165,8 @@ tasks.withType<Test>().configureEach {
     "-Xmx1g",
     "-XX:MaxMetaspaceSize=512m",
   )
+}
+
+dokkaSourceDownload {
+  dokkaVersion.set(libs.versions.kotlin.dokka)
 }

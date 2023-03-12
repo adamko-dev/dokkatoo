@@ -1,10 +1,9 @@
 [versions]
 kotlin = "1.7.20"
-kotlin-dokka = "1.7.20"
-kotlinx-serialization = "1.4.1"
+kotlin-dokka = "1.8.10"
+kotlinx-serialization = "1.5.0"
 
 kotest = "5.5.5"
-junit = "5.8.2"
 
 gradlePlugin-android = "4.0.1"
 
@@ -24,9 +23,6 @@ kotlinxSerialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializat
 ### Test libraries ###
 
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
-
-junit-bom = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
-junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
 
 kotest-bom = { module = "io.kotest:kotest-bom", version.ref = "kotest" }
 kotest-datatest = { module = "io.kotest:kotest-framework-datatest" }

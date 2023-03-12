@@ -3,3 +3,5 @@
 gradlew.bat
 gradlew
 gradle.properties
+
+versioning-multimodule-example/dokka/previousDocVersions
