@@ -2,7 +2,7 @@
 [![Gradle Plugin Portal](https://img.shields.io/gradle-plugin-portal/v/dev.adamko.dokkatoo?style=for-the-badge)](https://plugins.gradle.org/search?term=dokkatoo)
 [![Maven metadata URL](https://img.shields.io/maven-metadata/v?label=MAVEN%20SNAPSHOT&metadataUrl=https%3A%2F%2Fraw.githubusercontent.com%2Fadamko-dev%2Fdokkatoo%2Fartifacts%2Fm2%2Fdev%2Fadamko%2Fdokkatoo%2Fdokkatoo-plugin%2Fmaven-metadata.xml&style=for-the-badge)](https://github.com/adamko-dev/dokkatoo/tree/artifacts#readme)
 
-[![Dokkatoo Banner](./media/img/banner.svg)](https://github.com/adamko-dev/dokkatoo)
+[![Dokkatoo Banner](docs/images/banner.svg)](https://github.com/adamko-dev/dokkatoo)
 
 [Dokkatoo](https://github.com/adamko-dev/dokkatoo) is a Gradle plugin that generates documentation
 for your Kotlin projects.

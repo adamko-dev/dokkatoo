@@ -15,6 +15,8 @@ gradlePlugin-bcvMu = "0.0.3"
 
 ## Dokka
 kotlin-dokkaCore = { module = "org.jetbrains.dokka:dokka-core", version.ref = "kotlin-dokka" }
+kotlin-dokkaPlugin-allModulesPage = { module = "org.jetbrains.dokka:all-modules-page-plugin", version.ref = "kotlin-dokka" }
+kotlin-dokkaPlugin-templating = { module = "org.jetbrains.dokka:templating-plugin", version.ref = "kotlin-dokka" }
 
 ## Kotlinx Serialization
 kotlinxSerialization-bom = { module = "org.jetbrains.kotlinx:kotlinx-serialization-bom", version.ref = "kotlinx-serialization" }

@@ -1,6 +1,7 @@
 @file:Suppress("UnstableApiUsage") // jvm test suites & test report aggregation are incubating
 
 import buildsrc.conventions.utils.skipTestFixturesPublications
+import org.jetbrains.dokka.DokkaConfiguration
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -17,6 +18,8 @@ plugins {
   buildsrc.conventions.`maven-publish-test`
 
   dev.adamko.kotlin.`binary-compatibility-validator`
+
+  dev.adamko.`dokkatoo-html`
 }
 
 description = "Generates documentation for Kotlin projects (using Dokka)"
@@ -203,28 +206,23 @@ binaryCompatibilityValidator {
 
 val dokkatooVersion = provider { project.version.toString() }
 
-val generateDokkatooConstants by tasks.registering(Sync::class) {
 
-  val textResources = resources.text
-  val dokkatooVersion = dokkatooVersion
-  val dokkaVersion = libs.versions.kotlin.dokka
+val dokkatooConstantsProperties = objects.mapProperty<String, String>().apply {
+  put("DOKKATOO_VERSION", dokkatooVersion)
+  put("DOKKA_VERSION", libs.versions.kotlin.dokka)
+}
 
-  val properties = objects.mapProperty<String, String>().apply {
-    put("DOKKATOO_VERSION", dokkatooVersion)
-    put("DOKKA_VERSION", dokkaVersion)
-  }
+val buildConfigFileContents: Provider<TextResource> =
+  dokkatooConstantsProperties.map { constants ->
 
-  val buildConfigFileContents: Provider<TextResource> =
-    properties.map { props ->
+    val vals = constants.entries
+      .sortedBy { it.key }
+      .joinToString("\n") { (k, v) ->
+        """const val $k = "$v""""
+      }.prependIndent("  ")
 
-      val vals = props.entries
-        .sortedBy { it.key }
-        .joinToString("\n") { (k, v) ->
-          """const val $k = "$v""""
-        }.prependIndent("  ")
-
-      textResources.fromString(
-        """
+    resources.text.fromString(
+      """
           |package dev.adamko.dokkatoo.internal
           |
           |@DokkatooInternalApi
@@ -233,8 +231,12 @@ val generateDokkatooConstants by tasks.registering(Sync::class) {
           |}
           |
         """.trimMargin()
-      )
-    }
+    )
+  }
+
+val generateDokkatooConstants by tasks.registering(Sync::class) {
+
+  val buildConfigFileContents = buildConfigFileContents
 
   from(buildConfigFileContents) {
     rename { "DokkatooConstants.kt" }
@@ -246,4 +248,15 @@ val generateDokkatooConstants by tasks.registering(Sync::class) {
 
 kotlin.sourceSets.main {
   kotlin.srcDir(generateDokkatooConstants.map { it.destinationDir })
+}
+
+dokkatoo {
+  // create a special source set just for documenting the internally visible DokkatooInternalApi
+  dokkatooSourceSets.create("DokkatooInternalApi") {
+    documentedVisibilities(DokkaConfiguration.Visibility.INTERNAL)
+    suppress.set(false)
+    sourceRoots.from(layout.projectDirectory.dir("src/main/kotlin").asFileTree.matching {
+      include("**/DokkatooInternalApi.kt")
+    })
+  }
 }
