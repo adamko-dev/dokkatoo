@@ -36,11 +36,13 @@ dependencyResolutionManagement {
 }
 
 include(
+  ":docs",
+  ":examples",
+
   ":modules:dokkatoo-plugin",
   ":modules:dokkatoo-plugin-integration-tests",
 
-  ":examples",
-)
+  )
 
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")

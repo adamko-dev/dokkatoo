@@ -6,13 +6,17 @@ kotlinx-serialization = "1.5.0"
 kotest = "5.5.5"
 
 gradlePlugin-android = "4.0.1"
+gradlePlugin-dokkatoo = "0.0.4"
+gradlePlugin-gradlePublishPlugin = "1.1.0"
+gradlePlugin-bcvMu = "0.0.3"
 
 
 [libraries]
 
 ## Dokka
-#kotlin-dokka = { module = "kotlin:dokka:1.7.20", version.ref = "kotlin-dokka" }
 kotlin-dokkaCore = { module = "org.jetbrains.dokka:dokka-core", version.ref = "kotlin-dokka" }
+kotlin-dokkaPlugin-allModulesPage = { module = "org.jetbrains.dokka:all-modules-page-plugin", version.ref = "kotlin-dokka" }
+kotlin-dokkaPlugin-templating = { module = "org.jetbrains.dokka:templating-plugin", version.ref = "kotlin-dokka" }
 
 ## Kotlinx Serialization
 kotlinxSerialization-bom = { module = "org.jetbrains.kotlinx:kotlinx-serialization-bom", version.ref = "kotlinx-serialization" }
@@ -32,7 +36,10 @@ kotest-assertionsJson = { module = "io.kotest:kotest-assertions-json" }
 
 ### Gradle plugins  ###
 
-gradlePlugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 gradlePlugin-android = { module = "com.android.tools.build:gradle", version.ref = "gradlePlugin-android" }
+gradlePlugin-dokkatoo = { module = "dev.adamko.dokkatoo:dokkatoo-plugin", version.ref = "gradlePlugin-dokkatoo" }
+gradlePlugin-bcvMu = { module = "dev.adamko.kotlin.binary_compatibility_validator:bcv-gradle-plugin", version.ref = "gradlePlugin-bcvMu" }
+gradlePlugin-gradlePublishPlugin = { module = "com.gradle.publish:plugin-publish-plugin", version.ref = "gradlePlugin-gradlePublishPlugin" }
+gradlePlugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 
 [plugins]
