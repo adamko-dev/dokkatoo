@@ -97,11 +97,9 @@ val updateDokkatooExamplesBuildFiles by tasks.registering {
     layout.projectDirectory.asFileTree
       .matching {
         include(
-          "**/*dokkatoo*/build.gradle.kts",
-          "**/*dokkatoo*/build.gradle",
+          "**/*dokkatoo*/**/build.gradle.kts",
+          "**/*dokkatoo*/**/build.gradle",
         )
-      }.filter {
-        dokkatooPluginVersionMatcher.containsMatchIn(it.readText())
       }.elements
 
   outputs.files(gradleBuildFiles)
