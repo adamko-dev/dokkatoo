@@ -31,7 +31,7 @@ jobs:
             task: "check --continue"
           - os: windows-latest
             # don't run integration tests on Windows because Gradle OOMs https://github.com/adamko-dev/dokkatoo/issues/10
-            task: "check --continue -x :modules:dokkatoo-plugin-integration-tests:check"
+            task: "check --continue -x :modules:dokkatoo-plugin-integration-tests:check --no-parallel --no-configuration-cache --no-daemon --max-workers=1"
       fail-fast: false
     uses: ./.github/workflows/gradle_task.yml
     with:
