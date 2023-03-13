@@ -29,6 +29,8 @@ jobs:
       - uses: gradle/gradle-build-action@v2
         with:
           gradle-home-cache-cleanup: true
+          arguments: | 
+            :docs:dokkatooGenerate
 
       - uses: actions/upload-pages-artifact@v1
         with:
