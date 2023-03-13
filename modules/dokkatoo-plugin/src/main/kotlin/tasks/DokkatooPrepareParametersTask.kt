@@ -177,7 +177,7 @@ constructor(
     }
 
     // now combine them:
-    return subprojectConfigs.fold(baseDokkaConfiguration) { acc, it: DokkaParametersKxs ->
+    return subprojectConfigs.fold(baseDokkaConfiguration) { acc, _: DokkaParametersKxs ->
       acc.copy(
 //        sourceSets = acc.sourceSets + it.sourceSets,
         // TODO remove plugin classpath aggregation, plugin classpath should be shared via Gradle Configuration
