@@ -204,7 +204,14 @@ pluginManagement {
     mavenCentral()
 
     // add the Dokkatoo snapshot repository
-    maven("https://raw.githubusercontent.com/adamko-dev/dokkatoo/artifacts/m2/")
+    maven("https://raw.githubusercontent.com/adamko-dev/dokkatoo/artifacts/m2/") {
+      name = "Dokkatoo Snapshots"
+      // only include Dokkatoo snapshots
+      mavenContent {
+        includeGroup("dev.adamko.dokkatoo")
+        snapshotsOnly()
+      }
+    }
   }
 }
 ```
