@@ -271,7 +271,7 @@ constructor(
     protected fun String.appendFormat(): String =
       when (val name = formatName) {
         null -> this
-        else -> this + name.capitalize()
+        else -> this + name.uppercaseFirstChar()
       }
   }
 

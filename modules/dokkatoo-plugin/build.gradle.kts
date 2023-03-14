@@ -1,6 +1,7 @@
 @file:Suppress("UnstableApiUsage") // jvm test suites & test report aggregation are incubating
 
 import buildsrc.conventions.utils.skipTestFixturesPublications
+import dev.adamko.kotlin.binary_compatibility_validator.tasks.BCVDefaultTask
 import org.jetbrains.dokka.DokkaConfiguration
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -259,4 +260,9 @@ dokkatoo {
       include("**/DokkatooInternalApi.kt")
     })
   }
+}
+
+tasks.withType<BCVDefaultTask>().configureEach {
+  // run unit tests first, because I care about them more, and it's annoying to get interrupted by BCV
+  shouldRunAfter(tasks.withType<Test>())
 }
