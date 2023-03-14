@@ -261,8 +261,3 @@ dokkatoo {
     })
   }
 }
-
-tasks.withType<BCVDefaultTask>().configureEach {
-  // run unit tests first, because I care about them more, and it's annoying to get interrupted by BCV
-  shouldRunAfter(tasks.withType<Test>())
-}

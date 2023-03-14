@@ -44,6 +44,7 @@ constructor(
   private val objects: ObjectFactory,
 ) :
   DokkaParameterBuilder<DokkaParametersKxs.DokkaSourceSetKxs>,
+  HasConfigurableVisibilityModifiers,
   Named,
   Serializable {
 
@@ -115,14 +116,10 @@ constructor(
    *
    * Can be configured on per-package basis, see [DokkaPackageOptionsSpec.documentedVisibilities].
    *
-   * Default is [DokkaConfiguration.Visibility.PUBLIC].
+   * Default is [VisibilityModifier.PUBLIC].
    */
   @get:Input
-  abstract val documentedVisibilities: SetProperty<VisibilityModifier>
-
-  /** Sets [documentedVisibilities] (overrides any previously set values). */
-  fun documentedVisibilities(vararg visibilities: VisibilityModifier): Unit =
-    documentedVisibilities.set(visibilities.asList())
+  abstract override val documentedVisibilities: SetProperty<VisibilityModifier>
 
   /**
    * Specifies source sets that current source set depends on.

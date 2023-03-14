@@ -31,6 +31,7 @@ abstract class DokkaPackageOptionsSpec
 @DokkatooInternalApi
 constructor() :
   DokkaParameterBuilder<DokkaParametersKxs.PackageOptionsKxs>,
+  HasConfigurableVisibilityModifiers,
   Serializable {
 
   /**
@@ -60,7 +61,7 @@ constructor() :
    * Default is [VisibilityModifier.PUBLIC].
    */
   @get:Input
-  abstract val documentedVisibilities: SetProperty<VisibilityModifier>
+  abstract override val documentedVisibilities: SetProperty<VisibilityModifier>
 
   /**
    * Whether to document declarations annotated with [Deprecated].

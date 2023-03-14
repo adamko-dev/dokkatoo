@@ -68,7 +68,7 @@ public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaExternalDocument
 	public final fun url (Lorg/gradle/api/provider/Provider;)V
 }
 
-public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaPackageOptionsSpec : dev/adamko/dokkatoo/dokka/parameters/DokkaParameterBuilder, java/io/Serializable {
+public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaPackageOptionsSpec : dev/adamko/dokkatoo/dokka/parameters/DokkaParameterBuilder, dev/adamko/dokkatoo/dokka/parameters/HasConfigurableVisibilityModifiers, java/io/Serializable {
 	public synthetic fun build ()Ljava/lang/Object;
 	public abstract fun getDocumentedVisibilities ()Lorg/gradle/api/provider/SetProperty;
 	public abstract fun getMatchingRegex ()Lorg/gradle/api/provider/Property;
@@ -114,9 +114,8 @@ public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceSetIDSpec 
 	public abstract fun setSourceSetName (Ljava/lang/String;)V
 }
 
-public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceSetSpec : dev/adamko/dokkatoo/dokka/parameters/DokkaParameterBuilder, java/io/Serializable, org/gradle/api/Named {
+public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceSetSpec : dev/adamko/dokkatoo/dokka/parameters/DokkaParameterBuilder, dev/adamko/dokkatoo/dokka/parameters/HasConfigurableVisibilityModifiers, java/io/Serializable, org/gradle/api/Named {
 	public synthetic fun build ()Ljava/lang/Object;
-	public final fun documentedVisibilities ([Ldev/adamko/dokkatoo/dokka/parameters/VisibilityModifier;)V
 	public final fun externalDocumentationLink (Ljava/lang/String;Ljava/lang/String;)V
 	public final fun externalDocumentationLink (Ljava/net/URL;Ljava/net/URL;)V
 	public final fun externalDocumentationLink (Lorg/gradle/api/Action;)V
