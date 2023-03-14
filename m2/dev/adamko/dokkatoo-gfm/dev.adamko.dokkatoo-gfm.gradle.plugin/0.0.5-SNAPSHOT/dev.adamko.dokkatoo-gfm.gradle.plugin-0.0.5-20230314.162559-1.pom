@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>dev.adamko.dokkatoo-gfm</groupId>
+  <artifactId>dev.adamko.dokkatoo-gfm.gradle.plugin</artifactId>
+  <version>0.0.5-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <name>Dokkatoo GFM</name>
+  <description>Generates GFM (GitHub Flavoured Markdown) documentation for Kotlin projects (using Dokka)</description>
+  <dependencies>
+    <dependency>
+      <groupId>dev.adamko.dokkatoo</groupId>
+      <artifactId>dokkatoo-plugin</artifactId>
+      <version>0.0.5-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
+</project>
