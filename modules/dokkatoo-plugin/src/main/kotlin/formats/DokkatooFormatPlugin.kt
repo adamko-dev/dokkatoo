@@ -10,6 +10,7 @@ import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes.Companio
 import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes.Companion.DOKKA_FORMAT_ATTRIBUTE
 import dev.adamko.dokkatoo.dokka.DokkaPublication
 import dev.adamko.dokkatoo.dokka.parameters.DokkaPluginConfigurationSpec
+import dev.adamko.dokkatoo.dokka.parameters.DokkaPluginConfigurationSpec.EncodedFormat
 import dev.adamko.dokkatoo.internal.*
 import dev.adamko.dokkatoo.tasks.DokkatooGenerateTask
 import dev.adamko.dokkatoo.tasks.DokkatooPrepareModuleDescriptorTask
@@ -422,7 +423,7 @@ abstract class DokkatooFormatPlugin(
         }
       )
       pluginsConfiguration.configureEach {
-        serializationFormat.convention(DokkaConfiguration.SerializationFormat.JSON)
+        serializationFormat.convention(EncodedFormat.JSON)
       }
       //</editor-fold>
 

@@ -108,7 +108,7 @@ dokkatoo {
   dokkatooPublications.configureEach {
     suppressObviousFunctions.set(true)
     pluginsConfiguration.create("org.jetbrains.dokka.base.DokkaBase") {
-      serializationFormat.set(DokkaConfiguration.SerializationFormat.JSON)
+      serializationFormat.set(DokkaPluginConfigurationSpec.EncodedFormat.JSON)
       values.set(
         """
           { 

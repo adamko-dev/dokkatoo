@@ -4,6 +4,7 @@ import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes
 import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes.Companion.DOKKATOO_BASE_ATTRIBUTE
 import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes.Companion.DOKKATOO_CATEGORY_ATTRIBUTE
 import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes.Companion.DOKKA_FORMAT_ATTRIBUTE
+import dev.adamko.dokkatoo.dokka.parameters.DokkaPluginConfigurationSpec.EncodedFormat
 import dev.adamko.dokkatoo.dokka.parameters.VisibilityModifier
 import dev.adamko.dokkatoo.formats.*
 import dev.adamko.dokkatoo.internal.*
@@ -25,7 +26,6 @@ import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.kotlin.dsl.*
 import org.gradle.language.base.plugins.LifecycleBasePlugin
-import org.jetbrains.dokka.DokkaConfiguration
 import org.jetbrains.dokka.Platform
 
 /**
@@ -143,7 +143,7 @@ constructor(
       suppressObviousFunctions.convention(true)
 
       pluginsConfiguration.configureEach {
-        serializationFormat.convention(DokkaConfiguration.SerializationFormat.JSON)
+        serializationFormat.convention(EncodedFormat.JSON)
       }
     }
   }

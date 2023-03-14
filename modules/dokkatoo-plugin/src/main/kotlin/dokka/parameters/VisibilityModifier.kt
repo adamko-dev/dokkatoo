@@ -2,6 +2,13 @@ package dev.adamko.dokkatoo.dokka.parameters
 
 import org.jetbrains.dokka.DokkaConfiguration
 
+/**
+ * Denotes the
+ * [visibility modifier](https://kotlinlang.org/docs/visibility-modifiers.html)
+ * of a source code elements.
+ *
+ * @see org.jetbrains.dokka.DokkaConfiguration.Visibility
+ */
 enum class VisibilityModifier(
   internal val dokkaType: DokkaConfiguration.Visibility
 ) {

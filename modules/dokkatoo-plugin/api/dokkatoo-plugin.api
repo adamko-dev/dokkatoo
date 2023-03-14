@@ -96,6 +96,13 @@ public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaPluginConfigurat
 	public abstract fun getValues ()Lorg/gradle/api/provider/Property;
 }
 
+public final class dev/adamko/dokkatoo/dokka/parameters/DokkaPluginConfigurationSpec$EncodedFormat : java/lang/Enum {
+	public static final field JSON Ldev/adamko/dokkatoo/dokka/parameters/DokkaPluginConfigurationSpec$EncodedFormat;
+	public static final field XML Ldev/adamko/dokkatoo/dokka/parameters/DokkaPluginConfigurationSpec$EncodedFormat;
+	public static fun valueOf (Ljava/lang/String;)Ldev/adamko/dokkatoo/dokka/parameters/DokkaPluginConfigurationSpec$EncodedFormat;
+	public static fun values ()[Ldev/adamko/dokkatoo/dokka/parameters/DokkaPluginConfigurationSpec$EncodedFormat;
+}
+
 public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceLinkSpec : dev/adamko/dokkatoo/dokka/parameters/DokkaParameterBuilder, java/io/Serializable {
 	public synthetic fun build ()Ljava/lang/Object;
 	public abstract fun getLocalDirectory ()Lorg/gradle/api/file/DirectoryProperty;
