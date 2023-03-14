@@ -2,14 +2,13 @@
 
 package dev.adamko.dokkatoo.dokka.parameters
 
+import dev.adamko.dokkatoo.dokka.parameters.VisibilityModifier.Companion.convertToDokkaType
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import java.io.Serializable
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 import org.gradle.kotlin.dsl.*
-import org.jetbrains.dokka.DokkaConfiguration
-import org.jetbrains.dokka.DokkaConfigurationBuilder
 
 /**
  * Configuration builder that allows setting some options for specific packages
@@ -31,7 +30,7 @@ import org.jetbrains.dokka.DokkaConfigurationBuilder
 abstract class DokkaPackageOptionsSpec
 @DokkatooInternalApi
 constructor() :
-  DokkaConfigurationBuilder<DokkaParametersKxs.PackageOptionsKxs>,
+  DokkaParameterBuilder<DokkaParametersKxs.PackageOptionsKxs>,
   Serializable {
 
   /**
@@ -58,10 +57,10 @@ constructor() :
    *
    * Can be configured for a whole source set, see [DokkaSourceSetSpec.documentedVisibilities].
    *
-   * Default is [DokkaConfiguration.Visibility.PUBLIC].
+   * Default is [VisibilityModifier.PUBLIC].
    */
   @get:Input
-  abstract val documentedVisibilities: SetProperty<DokkaConfiguration.Visibility>
+  abstract val documentedVisibilities: SetProperty<VisibilityModifier>
 
   /**
    * Whether to document declarations annotated with [Deprecated].
@@ -88,11 +87,12 @@ constructor() :
 
 
   @DokkatooInternalApi
-  override fun build() = DokkaParametersKxs.PackageOptionsKxs(
-    matchingRegex = matchingRegex.get(),
-    documentedVisibilities = documentedVisibilities.get(),
-    reportUndocumented = reportUndocumented.get(),
-    skipDeprecated = skipDeprecated.get(),
-    suppress = suppress.get()
-  )
+  override fun build(): DokkaParametersKxs.PackageOptionsKxs =
+    DokkaParametersKxs.PackageOptionsKxs(
+      matchingRegex = matchingRegex.get(),
+      documentedVisibilities = documentedVisibilities.get().convertToDokkaType(),
+      reportUndocumented = reportUndocumented.get(),
+      skipDeprecated = skipDeprecated.get(),
+      suppress = suppress.get()
+    )
 }

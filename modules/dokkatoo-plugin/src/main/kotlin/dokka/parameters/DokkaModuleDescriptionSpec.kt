@@ -8,7 +8,6 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
-import org.jetbrains.dokka.DokkaConfigurationBuilder
 
 @DokkatooInternalApi
 abstract class DokkaModuleDescriptionSpec
@@ -16,7 +15,7 @@ abstract class DokkaModuleDescriptionSpec
 @Inject constructor(
   @get:Input
   val moduleName: String,
-) : DokkaConfigurationBuilder<DokkaParametersKxs.DokkaModuleDescriptionKxs>, Named {
+) : DokkaParameterBuilder<DokkaParametersKxs.DokkaModuleDescriptionKxs>, Named {
 
   @get:Input
   abstract val sourceOutputDirectory: RegularFileProperty

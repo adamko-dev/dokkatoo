@@ -8,7 +8,6 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.jetbrains.dokka.DokkaConfiguration
-import org.jetbrains.dokka.DokkaConfigurationBuilder
 
 /**
  * @param[pluginFqn] Fully qualified classname of the Dokka Plugin
@@ -20,7 +19,7 @@ constructor(
   @get:Input
   val pluginFqn: String
 ) :
-  DokkaConfigurationBuilder<DokkaParametersKxs.PluginConfigurationKxs>,
+  DokkaParameterBuilder<DokkaParametersKxs.PluginConfigurationKxs>,
   Serializable,
   Named {
 

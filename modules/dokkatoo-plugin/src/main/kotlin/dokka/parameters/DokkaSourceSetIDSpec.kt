@@ -5,7 +5,6 @@ import javax.inject.Inject
 import org.gradle.api.Named
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
-import org.jetbrains.dokka.DokkaConfigurationBuilder
 import org.jetbrains.dokka.DokkaSourceSetID
 
 abstract class DokkaSourceSetIDSpec
@@ -24,7 +23,7 @@ constructor(
    */
   @get:Input
   val scopeId: String
-) : DokkaConfigurationBuilder<DokkaSourceSetID>, Named {
+) : DokkaParameterBuilder<DokkaSourceSetID>, Named {
 
   @get:Input
   abstract var sourceSetName: String
