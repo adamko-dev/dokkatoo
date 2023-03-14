@@ -1,6 +1,6 @@
 package dev.adamko.dokkatoo.dokka.parameters
 
-import dev.adamko.dokkatoo.dokka.parameters.VisibilityModifier.Companion.convertToDokkaType
+import dev.adamko.dokkatoo.dokka.parameters.VisibilityModifier.Companion.convertToDokkaTypes
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import java.io.Serializable
 import java.net.URL
@@ -405,7 +405,7 @@ constructor(
       noJdkLink = noJdkLink.get(),
       suppressedFiles = suppressedFiles.files,
       analysisPlatform = analysisPlatform.get(),
-      documentedVisibilities = documentedVisibilities.get().convertToDokkaType(),
+      documentedVisibilities = documentedVisibilities.get().convertToDokkaTypes(),
     )
   }
 }

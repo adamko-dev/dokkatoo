@@ -2,7 +2,7 @@
 
 package dev.adamko.dokkatoo.dokka.parameters
 
-import dev.adamko.dokkatoo.dokka.parameters.VisibilityModifier.Companion.convertToDokkaType
+import dev.adamko.dokkatoo.dokka.parameters.VisibilityModifier.Companion.convertToDokkaTypes
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import java.io.Serializable
 import org.gradle.api.provider.Property
@@ -91,7 +91,7 @@ constructor() :
   override fun build(): DokkaParametersKxs.PackageOptionsKxs =
     DokkaParametersKxs.PackageOptionsKxs(
       matchingRegex = matchingRegex.get(),
-      documentedVisibilities = documentedVisibilities.get().convertToDokkaType(),
+      documentedVisibilities = documentedVisibilities.get().convertToDokkaTypes(),
       reportUndocumented = reportUndocumented.get(),
       skipDeprecated = skipDeprecated.get(),
       suppress = suppress.get()
