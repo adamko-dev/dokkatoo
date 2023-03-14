@@ -107,12 +107,13 @@ val updateDokkatooExamplesBuildFiles by tasks.registering {
   doLast {
     gradleBuildFiles.get().forEach {
       val file = it.asFile
-
-      file.writeText(
-        file.readText().replace(dokkatooPluginVersionMatcher) {
-          val oldVersion = it.groupValues[1]
-          it.value.replace(oldVersion, dokkatooVersion.get())
-        })
+      if (file.exists()) {
+        file.writeText(
+          file.readText().replace(dokkatooPluginVersionMatcher) {
+            val oldVersion = it.groupValues[1]
+            it.value.replace(oldVersion, dokkatooVersion.get())
+          })
+      }
     }
   }
 }
