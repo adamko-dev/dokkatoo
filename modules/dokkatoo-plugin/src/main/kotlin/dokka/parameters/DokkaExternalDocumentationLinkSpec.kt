@@ -37,7 +37,10 @@ abstract class DokkaExternalDocumentationLinkSpec
 @Inject
 constructor(
   private val name: String
-) : Serializable, Named {
+) :
+  DokkaParameterBuilder<DokkaParametersKxs.ExternalDocumentationLinkKxs?>,
+  Serializable,
+  Named {
 
   /**
    * Root URL of documentation to link with. **Must** contain a trailing slash.
@@ -108,7 +111,8 @@ constructor(
   @get:Input
   abstract val enabled: Property<Boolean>
 
-  internal fun build(): DokkaParametersKxs.ExternalDocumentationLinkKxs? =
+  @DokkatooInternalApi
+  override fun build(): DokkaParametersKxs.ExternalDocumentationLinkKxs? =
     if (enabled.getOrElse(true)) {
       DokkaParametersKxs.ExternalDocumentationLinkKxs(
         url = url.get(),

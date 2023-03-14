@@ -56,7 +56,8 @@ public abstract class dev/adamko/dokkatoo/dokka/DokkaPublication : java/io/Seria
 	public abstract fun getSuppressObviousFunctions ()Lorg/gradle/api/provider/Property;
 }
 
-public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaExternalDocumentationLinkSpec : java/io/Serializable, org/gradle/api/Named {
+public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaExternalDocumentationLinkSpec : dev/adamko/dokkatoo/dokka/parameters/DokkaParameterBuilder, java/io/Serializable, org/gradle/api/Named {
+	public synthetic fun build ()Ljava/lang/Object;
 	public abstract fun getEnabled ()Lorg/gradle/api/provider/Property;
 	public fun getName ()Ljava/lang/String;
 	public abstract fun getPackageListUrl ()Lorg/gradle/api/provider/Property;
@@ -67,7 +68,7 @@ public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaExternalDocument
 	public final fun url (Lorg/gradle/api/provider/Provider;)V
 }
 
-public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaPackageOptionsSpec : java/io/Serializable, org/jetbrains/dokka/DokkaConfigurationBuilder {
+public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaPackageOptionsSpec : dev/adamko/dokkatoo/dokka/parameters/DokkaParameterBuilder, dev/adamko/dokkatoo/dokka/parameters/HasConfigurableVisibilityModifiers, java/io/Serializable {
 	public synthetic fun build ()Ljava/lang/Object;
 	public abstract fun getDocumentedVisibilities ()Lorg/gradle/api/provider/SetProperty;
 	public abstract fun getMatchingRegex ()Lorg/gradle/api/provider/Property;
@@ -87,7 +88,7 @@ public final class dev/adamko/dokkatoo/dokka/parameters/DokkaParametersKxs$$seri
 	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
-public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaPluginConfigurationSpec : java/io/Serializable, org/gradle/api/Named, org/jetbrains/dokka/DokkaConfigurationBuilder {
+public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaPluginConfigurationSpec : dev/adamko/dokkatoo/dokka/parameters/DokkaParameterBuilder, java/io/Serializable, org/gradle/api/Named {
 	public synthetic fun build ()Ljava/lang/Object;
 	public fun getName ()Ljava/lang/String;
 	public final fun getPluginFqn ()Ljava/lang/String;
@@ -95,7 +96,14 @@ public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaPluginConfigurat
 	public abstract fun getValues ()Lorg/gradle/api/provider/Property;
 }
 
-public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceLinkSpec : java/io/Serializable, org/jetbrains/dokka/DokkaConfigurationBuilder {
+public final class dev/adamko/dokkatoo/dokka/parameters/DokkaPluginConfigurationSpec$EncodedFormat : java/lang/Enum {
+	public static final field JSON Ldev/adamko/dokkatoo/dokka/parameters/DokkaPluginConfigurationSpec$EncodedFormat;
+	public static final field XML Ldev/adamko/dokkatoo/dokka/parameters/DokkaPluginConfigurationSpec$EncodedFormat;
+	public static fun valueOf (Ljava/lang/String;)Ldev/adamko/dokkatoo/dokka/parameters/DokkaPluginConfigurationSpec$EncodedFormat;
+	public static fun values ()[Ldev/adamko/dokkatoo/dokka/parameters/DokkaPluginConfigurationSpec$EncodedFormat;
+}
+
+public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceLinkSpec : dev/adamko/dokkatoo/dokka/parameters/DokkaParameterBuilder, java/io/Serializable {
 	public synthetic fun build ()Ljava/lang/Object;
 	public abstract fun getLocalDirectory ()Lorg/gradle/api/file/DirectoryProperty;
 	protected final fun getLocalDirectoryPath ()Lorg/gradle/api/provider/Provider;
@@ -105,7 +113,7 @@ public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceLinkSpec :
 	public final fun remoteUrl (Lorg/gradle/api/provider/Provider;)V
 }
 
-public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceSetIDSpec : org/gradle/api/Named, org/jetbrains/dokka/DokkaConfigurationBuilder {
+public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceSetIDSpec : dev/adamko/dokkatoo/dokka/parameters/DokkaParameterBuilder, org/gradle/api/Named {
 	public synthetic fun build ()Ljava/lang/Object;
 	public fun getName ()Ljava/lang/String;
 	public final fun getScopeId ()Ljava/lang/String;
@@ -113,9 +121,8 @@ public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceSetIDSpec 
 	public abstract fun setSourceSetName (Ljava/lang/String;)V
 }
 
-public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceSetSpec : java/io/Serializable, org/gradle/api/Named, org/jetbrains/dokka/DokkaConfigurationBuilder {
+public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceSetSpec : dev/adamko/dokkatoo/dokka/parameters/DokkaParameterBuilder, dev/adamko/dokkatoo/dokka/parameters/HasConfigurableVisibilityModifiers, java/io/Serializable, org/gradle/api/Named {
 	public synthetic fun build ()Ljava/lang/Object;
-	public final fun documentedVisibilities ([Lorg/jetbrains/dokka/DokkaConfiguration$Visibility;)V
 	public final fun externalDocumentationLink (Ljava/lang/String;Ljava/lang/String;)V
 	public final fun externalDocumentationLink (Ljava/net/URL;Ljava/net/URL;)V
 	public final fun externalDocumentationLink (Lorg/gradle/api/Action;)V
@@ -149,6 +156,20 @@ public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceSetSpec : 
 	public abstract fun getSuppressedFiles ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public final fun perPackageOption (Lorg/gradle/api/Action;)V
 	public final fun sourceLink (Lorg/gradle/api/Action;)V
+}
+
+public final class dev/adamko/dokkatoo/dokka/parameters/VisibilityModifier : java/lang/Enum {
+	public static final field Companion Ldev/adamko/dokkatoo/dokka/parameters/VisibilityModifier$Companion;
+	public static final field INTERNAL Ldev/adamko/dokkatoo/dokka/parameters/VisibilityModifier;
+	public static final field PACKAGE Ldev/adamko/dokkatoo/dokka/parameters/VisibilityModifier;
+	public static final field PRIVATE Ldev/adamko/dokkatoo/dokka/parameters/VisibilityModifier;
+	public static final field PROTECTED Ldev/adamko/dokkatoo/dokka/parameters/VisibilityModifier;
+	public static final field PUBLIC Ldev/adamko/dokkatoo/dokka/parameters/VisibilityModifier;
+	public static fun valueOf (Ljava/lang/String;)Ldev/adamko/dokkatoo/dokka/parameters/VisibilityModifier;
+	public static fun values ()[Ldev/adamko/dokkatoo/dokka/parameters/VisibilityModifier;
+}
+
+public final class dev/adamko/dokkatoo/dokka/parameters/VisibilityModifier$Companion {
 }
 
 public abstract class dev/adamko/dokkatoo/formats/DokkatooFormatPlugin : org/gradle/api/Plugin {

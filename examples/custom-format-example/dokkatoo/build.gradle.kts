@@ -8,7 +8,6 @@ dokkatoo {
   dokkatooPublications.named("html") {
 //  dokkatooPublications.configureEach {
     pluginsConfiguration.create("org.jetbrains.dokka.base.DokkaBase") {
-      serializationFormat.set(org.jetbrains.dokka.DokkaConfiguration.SerializationFormat.JSON)
       /** Custom format adds a custom logo */
       values.set(
         """

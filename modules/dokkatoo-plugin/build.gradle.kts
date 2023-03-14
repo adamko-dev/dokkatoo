@@ -1,6 +1,7 @@
 @file:Suppress("UnstableApiUsage") // jvm test suites & test report aggregation are incubating
 
 import buildsrc.conventions.utils.skipTestFixturesPublications
+import dev.adamko.kotlin.binary_compatibility_validator.tasks.BCVDefaultTask
 import org.jetbrains.dokka.DokkaConfiguration
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 

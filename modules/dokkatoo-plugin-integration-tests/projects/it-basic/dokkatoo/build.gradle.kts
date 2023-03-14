@@ -1,4 +1,4 @@
-import org.jetbrains.dokka.DokkaConfiguration
+import dev.adamko.dokkatoo.dokka.parameters.VisibilityModifier
 
 plugins {
   kotlin("jvm") version "1.7.20"
@@ -16,8 +16,8 @@ dokkatoo {
   moduleName.set("Basic Project")
   dokkatooSourceSets.configureEach {
     documentedVisibilities(
-      DokkaConfiguration.Visibility.PUBLIC,
-      DokkaConfiguration.Visibility.PROTECTED,
+      VisibilityModifier.PUBLIC,
+      VisibilityModifier.PROTECTED,
     )
     suppressedFiles.from(file("src/main/kotlin/it/suppressedByPath"))
     perPackageOption {
@@ -26,8 +26,8 @@ dokkatoo {
     }
     perPackageOption {
       matchingRegex.set("it.overriddenVisibility.*")
-      documentedVisibilities.set(
-        setOf(DokkaConfiguration.Visibility.PRIVATE)
+      documentedVisibilities(
+        VisibilityModifier.PRIVATE,
       )
     }
     sourceLink {
@@ -42,7 +42,6 @@ dokkatoo {
   dokkatooPublications.configureEach {
     suppressObviousFunctions.set(true)
     pluginsConfiguration.create("org.jetbrains.dokka.base.DokkaBase") {
-      serializationFormat.set(DokkaConfiguration.SerializationFormat.JSON)
       values.set(
         """
           { 

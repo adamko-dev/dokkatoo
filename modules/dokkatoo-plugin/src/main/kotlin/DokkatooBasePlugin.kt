@@ -4,6 +4,8 @@ import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes
 import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes.Companion.DOKKATOO_BASE_ATTRIBUTE
 import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes.Companion.DOKKATOO_CATEGORY_ATTRIBUTE
 import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes.Companion.DOKKA_FORMAT_ATTRIBUTE
+import dev.adamko.dokkatoo.dokka.parameters.DokkaPluginConfigurationSpec.EncodedFormat
+import dev.adamko.dokkatoo.dokka.parameters.VisibilityModifier
 import dev.adamko.dokkatoo.formats.*
 import dev.adamko.dokkatoo.internal.*
 import dev.adamko.dokkatoo.tasks.DokkatooGenerateTask
@@ -24,7 +26,6 @@ import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.kotlin.dsl.*
 import org.gradle.language.base.plugins.LifecycleBasePlugin
-import org.jetbrains.dokka.DokkaConfiguration
 import org.jetbrains.dokka.Platform
 
 /**
@@ -142,7 +143,7 @@ constructor(
       suppressObviousFunctions.convention(true)
 
       pluginsConfiguration.configureEach {
-        serializationFormat.convention(DokkaConfiguration.SerializationFormat.JSON)
+        serializationFormat.convention(EncodedFormat.JSON)
       }
     }
   }
@@ -163,7 +164,7 @@ constructor(
           )
         }
       )
-      documentedVisibilities.convention(listOf(DokkaConfiguration.Visibility.PUBLIC))
+      documentedVisibilities.convention(listOf(VisibilityModifier.DEFAULT))
       jdkVersion.convention(8)
       noAndroidSdkLink.convention(true)
       noJdkLink.convention(false)
@@ -270,7 +271,7 @@ constructor(
     protected fun String.appendFormat(): String =
       when (val name = formatName) {
         null -> this
-        else -> this + name.capitalize()
+        else -> this + name.uppercaseFirstChar()
       }
   }
 

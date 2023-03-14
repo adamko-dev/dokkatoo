@@ -2,9 +2,7 @@ package dev.adamko.dokkatoo.workers
 
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import dev.adamko.dokkatoo.internal.LoggerAdapter
-import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
-import kotlin.time.nanoseconds
+import java.time.Duration
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.workers.WorkAction
@@ -19,7 +17,6 @@ import org.jetbrains.dokka.DokkaGenerator
  * that are used to generate the Dokka files. Transitive dependencies are also required.
  */
 @DokkatooInternalApi
-@OptIn(ExperimentalTime::class)
 abstract class DokkaGeneratorWorker : WorkAction<DokkaGeneratorWorker.Parameters> {
 
   @DokkatooInternalApi
@@ -44,11 +41,12 @@ abstract class DokkaGeneratorWorker : WorkAction<DokkaGeneratorWorker.Parameters
 
   @DokkatooInternalApi
   companion object {
-    // can't use kotlin.time.measureTime {} because the implementation isn't stable across Kotlin versions
+    // can't use kotlin.Duration or kotlin.time.measureTime {} because
+    // the implementation isn't stable across Kotlin versions
     private fun measureTime(block: () -> Unit): Duration =
       System.nanoTime().let { startTime ->
         block()
-        (System.nanoTime() - startTime).nanoseconds
+        Duration.ofNanos(System.nanoTime() - startTime)
       }
   }
 }

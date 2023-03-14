@@ -1,5 +1,6 @@
 package dev.adamko.dokkatoo.dokka.parameters
 
+import dev.adamko.dokkatoo.dokka.parameters.VisibilityModifier.Companion.convertToDokkaTypes
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import java.io.Serializable
 import java.net.URL
@@ -42,7 +43,8 @@ constructor(
   private val name: String,
   private val objects: ObjectFactory,
 ) :
-  DokkaConfigurationBuilder<DokkaParametersKxs.DokkaSourceSetKxs>,
+  DokkaParameterBuilder<DokkaParametersKxs.DokkaSourceSetKxs>,
+  HasConfigurableVisibilityModifiers,
   Named,
   Serializable {
 
@@ -114,14 +116,10 @@ constructor(
    *
    * Can be configured on per-package basis, see [DokkaPackageOptionsSpec.documentedVisibilities].
    *
-   * Default is [DokkaConfiguration.Visibility.PUBLIC].
+   * Default is [VisibilityModifier.PUBLIC].
    */
   @get:Input
-  abstract val documentedVisibilities: SetProperty<DokkaConfiguration.Visibility>
-
-  /** Sets [documentedVisibilities] (overrides any previously set values). */
-  fun documentedVisibilities(vararg visibilities: DokkaConfiguration.Visibility): Unit =
-    documentedVisibilities.set(visibilities.asList())
+  abstract override val documentedVisibilities: SetProperty<VisibilityModifier>
 
   /**
    * Specifies source sets that current source set depends on.
@@ -407,7 +405,7 @@ constructor(
       noJdkLink = noJdkLink.get(),
       suppressedFiles = suppressedFiles.files,
       analysisPlatform = analysisPlatform.get(),
-      documentedVisibilities = documentedVisibilities.get(),
+      documentedVisibilities = documentedVisibilities.get().convertToDokkaTypes(),
     )
   }
 }
