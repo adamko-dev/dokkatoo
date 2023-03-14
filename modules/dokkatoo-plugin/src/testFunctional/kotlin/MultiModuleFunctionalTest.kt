@@ -15,6 +15,7 @@ import io.kotest.matchers.paths.shouldBeAFile
 import io.kotest.matchers.paths.shouldExist
 import io.kotest.matchers.paths.shouldNotExist
 import io.kotest.matchers.should
+import io.kotest.matchers.string.shouldBeEmpty
 import io.kotest.matchers.string.shouldContain
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.decodeFromStream
@@ -346,6 +347,97 @@ class MultiModuleFunctionalTest : FunSpec({
           }
         }
       }
+    }
+  }
+
+  context("logging -> ") {
+    val project = initDokkatooProject("logging")
+
+    test("expect no logs when built using --quiet log level") {
+
+      project.runner
+        .withArguments(
+          "clean",
+          ":dokkatooGenerate",
+          "--no-configuration-cache",
+          "--no-build-cache",
+          "--quiet",
+        )
+        .forwardOutput()
+        .build {
+          output.shouldBeEmpty()
+        }
+    }
+
+    test("expect no Dokkatoo logs when built using lifecycle log level") {
+
+      project.runner
+        .withArguments(
+          "clean",
+          ":dokkatooGenerate",
+          "--no-configuration-cache",
+          "--no-build-cache",
+          "--no-parallel",
+          // no logging option => lifecycle log level
+        )
+        .forwardOutput()
+        .build {
+
+          // projects are only configured the first time TestKit runs, and annoyingly there's no
+          // easy way to force Gradle to re-configure the projects - so only check conditionally.
+          if ("Configure project" in output) {
+            output shouldContain /*language=text*/ """
+              ¦> Configure project :
+              ¦> Configure project :subproject-goodbye
+              ¦> Configure project :subproject-hello
+              ¦> Task :clean
+            """.trimMargin("¦")
+          }
+
+          output.lines().sorted().joinToString("\n") shouldContain /*language=text*/ """
+            ¦> Task :clean
+            ¦> Task :dokkatooGenerate
+            ¦> Task :dokkatooGenerateModuleGfm
+            ¦> Task :dokkatooGenerateModuleHtml
+            ¦> Task :dokkatooGenerateModuleJavadoc
+            ¦> Task :dokkatooGenerateModuleJekyll
+            ¦> Task :dokkatooGeneratePublicationGfm
+            ¦> Task :dokkatooGeneratePublicationHtml
+            ¦> Task :dokkatooGeneratePublicationJavadoc
+            ¦> Task :dokkatooGeneratePublicationJekyll
+            ¦> Task :prepareDokkatooParameters
+            ¦> Task :prepareDokkatooParametersGfm
+            ¦> Task :prepareDokkatooParametersHtml
+            ¦> Task :prepareDokkatooParametersJavadoc
+            ¦> Task :prepareDokkatooParametersJekyll
+            ¦> Task :subproject-goodbye:clean
+            ¦> Task :subproject-goodbye:dokkatooGenerateModuleGfm
+            ¦> Task :subproject-goodbye:dokkatooGenerateModuleHtml
+            ¦> Task :subproject-goodbye:dokkatooGenerateModuleJavadoc
+            ¦> Task :subproject-goodbye:dokkatooGenerateModuleJekyll
+            ¦> Task :subproject-goodbye:prepareDokkatooModuleDescriptorGfm
+            ¦> Task :subproject-goodbye:prepareDokkatooModuleDescriptorHtml
+            ¦> Task :subproject-goodbye:prepareDokkatooModuleDescriptorJavadoc
+            ¦> Task :subproject-goodbye:prepareDokkatooModuleDescriptorJekyll
+            ¦> Task :subproject-goodbye:prepareDokkatooParametersGfm
+            ¦> Task :subproject-goodbye:prepareDokkatooParametersHtml
+            ¦> Task :subproject-goodbye:prepareDokkatooParametersJavadoc
+            ¦> Task :subproject-goodbye:prepareDokkatooParametersJekyll
+            ¦> Task :subproject-hello:clean
+            ¦> Task :subproject-hello:dokkatooGenerateModuleGfm
+            ¦> Task :subproject-hello:dokkatooGenerateModuleHtml
+            ¦> Task :subproject-hello:dokkatooGenerateModuleJavadoc
+            ¦> Task :subproject-hello:dokkatooGenerateModuleJekyll
+            ¦> Task :subproject-hello:prepareDokkatooModuleDescriptorGfm
+            ¦> Task :subproject-hello:prepareDokkatooModuleDescriptorHtml
+            ¦> Task :subproject-hello:prepareDokkatooModuleDescriptorJavadoc
+            ¦> Task :subproject-hello:prepareDokkatooModuleDescriptorJekyll
+            ¦> Task :subproject-hello:prepareDokkatooParametersGfm
+            ¦> Task :subproject-hello:prepareDokkatooParametersHtml
+            ¦> Task :subproject-hello:prepareDokkatooParametersJavadoc
+            ¦> Task :subproject-hello:prepareDokkatooParametersJekyll
+          """.trimMargin("¦")
+        }
     }
   }
 })

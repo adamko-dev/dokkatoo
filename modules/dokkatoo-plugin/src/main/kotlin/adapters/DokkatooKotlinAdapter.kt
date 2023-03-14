@@ -40,7 +40,7 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
   private val logger = Logging.getLogger(this::class.java)
 
   override fun apply(project: Project) {
-    logger.lifecycle("applied DokkaKotlinAdapter to ${project.path}")
+    logger.info("applied DokkaKotlinAdapter to ${project.path}")
 
     project.plugins.withType<DokkatooBasePlugin>().configureEach {
       project.pluginManager.apply {
@@ -54,11 +54,11 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
 
   private fun exec(project: Project) {
     val kotlinExtension = project.extensions.findKotlinExtension() ?: run {
-      logger.lifecycle("could not find Kotlin Extension")
+      logger.info("could not find Kotlin Extension")
       return
     }
 
-    logger.lifecycle("Configuring Dokka in Gradle Kotlin Project ${project.path}")
+    logger.info("Configuring Dokka in Gradle Kotlin Project ${project.path}")
 
     val dokkatooExtension = project.extensions.getByType<DokkatooExtension>()
 
@@ -109,7 +109,7 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
           }
       }
 
-      logger.lifecycle("kotlin source set ${this@kss.name} has source roots: ${extantKotlinSourceRoots.map { it.invariantSeparatorsPath }}")
+      logger.info("kotlin source set ${this@kss.name} has source roots: ${extantKotlinSourceRoots.map { it.invariantSeparatorsPath }}")
 
       dokkatooExtension.dokkatooSourceSets.create(this@kss.name) {
         displayName.convention(
