@@ -4,12 +4,12 @@ import dev.adamko.dokkatoo.internal.DokkatooConstants.DOKKATOO_VERSION
 import dev.adamko.dokkatoo.utils.*
 import io.kotest.assertions.asClue
 import io.kotest.assertions.withClue
+import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.string.shouldContain
-import org.junit.jupiter.api.Test
 
-class DokkatooPluginFunctionalTest {
-  private val testProject = gradleKtsProjectTest("DokkatooPluginFunctionalTest") {
+class DokkatooPluginFunctionalTest : FunSpec({
+  val testProject = gradleKtsProjectTest("DokkatooPluginFunctionalTest") {
     buildGradleKts = """
       |plugins {
       |    id("dev.adamko.dokkatoo") version "$DOKKATOO_VERSION"
@@ -18,8 +18,7 @@ class DokkatooPluginFunctionalTest {
     """.trimMargin()
   }
 
-  @Test
-  fun `expect Dokka Plugin creates Dokka tasks`() {
+  test("expect Dokka Plugin creates Dokka tasks") {
     val build = testProject.runner
       .withArguments("tasks", "--group=dokkatoo", "-q")
       .build()
@@ -56,8 +55,7 @@ class DokkatooPluginFunctionalTest {
     }
   }
 
-  @Test
-  fun `expect Dokka Plugin creates Dokka outgoing variants`() {
+  test("expect Dokka Plugin creates Dokka outgoing variants") {
     val build = testProject.runner
       .withArguments("outgoingVariants", "-q")
       .build()
@@ -124,8 +122,7 @@ class DokkatooPluginFunctionalTest {
     checkVariant("jekyll")
   }
 
-  @Test
-  fun `expect Dokka Plugin creates Dokka resolvable configurations`() {
+  test("expect Dokka Plugin creates Dokka resolvable configurations") {
 
     val expectedFormats = listOf("Gfm", "Html", "Javadoc", "Jekyll")
 
@@ -247,4 +244,4 @@ class DokkatooPluginFunctionalTest {
       }
     }
   }
-}
+})
