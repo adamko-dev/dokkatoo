@@ -1,4 +1,3 @@
-import org.jetbrains.dokka.DokkaConfiguration
 import dev.adamko.dokkatoo.dokka.parameters.VisibilityModifier
 
 plugins {
@@ -43,7 +42,6 @@ dokkatoo {
   dokkatooPublications.configureEach {
     suppressObviousFunctions.set(true)
     pluginsConfiguration.create("org.jetbrains.dokka.base.DokkaBase") {
-      serializationFormat.set(DokkaConfiguration.SerializationFormat.JSON)
       values.set(
         """
           { 
