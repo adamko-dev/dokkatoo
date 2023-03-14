@@ -51,7 +51,7 @@ public abstract class dev/adamko/dokkatoo/dokka/DokkaPublication : java/io/Seria
 	public abstract fun getOfflineMode ()Lorg/gradle/api/provider/Property;
 	public abstract fun getOutputDir ()Lorg/gradle/api/file/DirectoryProperty;
 	protected final fun getOutputDirPath ()Lorg/gradle/api/provider/Provider;
-	public final fun getPluginsConfiguration ()Lorg/gradle/api/ExtensiblePolymorphicDomainObjectContainer;
+	public abstract fun getPluginsConfiguration ()Lorg/gradle/api/NamedDomainObjectContainer;
 	public abstract fun getSuppressInheritedMembers ()Lorg/gradle/api/provider/Property;
 	public abstract fun getSuppressObviousFunctions ()Lorg/gradle/api/provider/Property;
 }
