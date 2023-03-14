@@ -4,6 +4,7 @@ import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes
 import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes.Companion.DOKKATOO_BASE_ATTRIBUTE
 import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes.Companion.DOKKATOO_CATEGORY_ATTRIBUTE
 import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes.Companion.DOKKA_FORMAT_ATTRIBUTE
+import dev.adamko.dokkatoo.dokka.parameters.VisibilityModifier
 import dev.adamko.dokkatoo.formats.*
 import dev.adamko.dokkatoo.internal.*
 import dev.adamko.dokkatoo.tasks.DokkatooGenerateTask
@@ -163,7 +164,7 @@ constructor(
           )
         }
       )
-      documentedVisibilities.convention(listOf(DokkaConfiguration.Visibility.PUBLIC))
+      documentedVisibilities.convention(listOf(VisibilityModifier.DEFAULT))
       jdkVersion.convention(8)
       noAndroidSdkLink.convention(true)
       noJdkLink.convention(false)

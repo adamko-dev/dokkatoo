@@ -18,6 +18,9 @@ enum class VisibilityModifier(
   ;
 
   companion object {
+
+    internal val DEFAULT = PUBLIC
+
     internal fun Set<VisibilityModifier>.convertToDokkaType() =
       mapTo(mutableSetOf(), VisibilityModifier::dokkaType)
   }

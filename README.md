@@ -90,8 +90,8 @@ dokkatoo {
   moduleName.set("Basic Project")
   dokkatooSourceSets.configureEach {
     documentedVisibilities(
-      DokkaConfiguration.Visibility.PUBLIC,
-      DokkaConfiguration.Visibility.PROTECTED,
+      VisibilityModifier.PUBLIC,
+       VisibilityModifier.PROTECTED,
     )
     suppressedFiles.from(file("src/main/kotlin/it/suppressedByPath"))
     perPackageOption {
