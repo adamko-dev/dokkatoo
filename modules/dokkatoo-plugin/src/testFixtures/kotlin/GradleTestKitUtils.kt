@@ -24,7 +24,10 @@ class GradleProjectTest(
 
   val runner: GradleRunner = GradleRunner.create()
     .withProjectDir(projectDir.toFile())
-    .withJvmArguments("-XX:MaxMetaspaceSize=512m")
+    .withJvmArguments(
+      "-XX:MaxMetaspaceSize=512m",
+      "-XX:+AlwaysPreTouch", // https://github.com/gradle/gradle/issues/3093#issuecomment-387259298
+    )
 
   val testMavenRepoRelativePath: String =
     projectDir.relativize(testMavenRepoDir).toFile().invariantSeparatorsPath
