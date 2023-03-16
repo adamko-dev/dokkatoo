@@ -2,20 +2,25 @@ package dev.adamko.dokkatoo
 
 import dev.adamko.dokkatoo.dokka.DokkaPublication
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec
+import dev.adamko.dokkatoo.dokka.plugins.DokkaPluginParametersBaseSpec
+import dev.adamko.dokkatoo.internal.DokkaPluginParametersContainer
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import java.io.Serializable
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.Property
+import org.gradle.kotlin.dsl.*
 
 /**
  * Configure the behaviour of the [DokkatooBasePlugin].
  */
 abstract class DokkatooExtension
 @DokkatooInternalApi
-constructor() :
-  ExtensionAware, Serializable {
+constructor(
+  objects: ObjectFactory,
+) : ExtensionAware, Serializable {
 
   /** Directory into which [DokkaPublication]s will be produced */
   abstract val dokkatooPublicationDirectory: DirectoryProperty
@@ -46,7 +51,10 @@ constructor() :
    *
    * The type of site is determined by the Dokka Plugins. By default, an HTML site will be generated.
    */
-  abstract val dokkatooPublications: NamedDomainObjectContainer<DokkaPublication>
+  val dokkatooPublications: NamedDomainObjectContainer<DokkaPublication> =
+    objects.domainObjectContainer(DokkaPublication::class) { named ->
+      objects.newInstance(named, pluginsConfiguration)
+    }
 
   /**
    * Dokka Source Sets describe the source code that should be included in a Dokka Publication.
@@ -77,6 +85,14 @@ constructor() :
    * Dokka will merge Dokka Source Sets from other subprojects if...
    */
   abstract val dokkatooSourceSets: NamedDomainObjectContainer<DokkaSourceSetSpec>
+
+  /**
+   * Dokka Plugin are used to configure the way Dokka generates a format.
+   * Some plugins can be configured via parameters, and those parameters are stored in this
+   * container.
+   */
+  val pluginsConfiguration: DokkaPluginParametersContainer =
+    objects.polymorphicDomainObjectContainer(DokkaPluginParametersBaseSpec::class)
 
   interface Versions {
 

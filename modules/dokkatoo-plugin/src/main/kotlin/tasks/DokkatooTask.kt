@@ -43,5 +43,4 @@ constructor() : DefaultTask() {
       dokkaSourceSets.addAllLater(sourceSets)
     }
   }
-
 }

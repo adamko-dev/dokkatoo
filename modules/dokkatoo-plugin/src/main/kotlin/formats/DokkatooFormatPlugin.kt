@@ -9,8 +9,6 @@ import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes.Companio
 import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes.Companion.DOKKATOO_CATEGORY_ATTRIBUTE
 import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes.Companion.DOKKA_FORMAT_ATTRIBUTE
 import dev.adamko.dokkatoo.dokka.DokkaPublication
-import dev.adamko.dokkatoo.dokka.parameters.DokkaPluginConfigurationSpec
-import dev.adamko.dokkatoo.dokka.parameters.DokkaPluginConfigurationSpec.EncodedFormat
 import dev.adamko.dokkatoo.internal.*
 import dev.adamko.dokkatoo.tasks.DokkatooGenerateTask
 import dev.adamko.dokkatoo.tasks.DokkatooPrepareModuleDescriptorTask
@@ -39,7 +37,6 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.kotlin.dsl.*
-import org.jetbrains.dokka.DokkaConfiguration
 
 /**
  * Base Gradle Plugin for setting up a Dokka Publication for a specific format.
@@ -91,7 +88,6 @@ abstract class DokkatooFormatPlugin(
         publication = publication,
         dokkatooExtension = dokkatooExtension,
         dependencyContainers = dependencyContainers,
-        objects = objects,
         providers = providers,
       )
 
@@ -366,7 +362,6 @@ abstract class DokkatooFormatPlugin(
     private val dokkatooExtension: DokkatooExtension,
     private val dependencyContainers: DependencyContainers,
 
-    private val objects: ObjectFactory,
     private val providers: ProviderFactory,
   ) {
     private val formatName: String get() = publication.formatName
@@ -374,8 +369,9 @@ abstract class DokkatooFormatPlugin(
     private val taskNames = DokkatooBasePlugin.TaskNames(formatName)
 
     val prepareParameters = project.tasks.register<DokkatooPrepareParametersTask>(
-      taskNames.prepareParameters
-    ) task@{
+      taskNames.prepareParameters,
+      publication.pluginsConfiguration,
+    ).configuring task@{
       description =
         "Prepares Dokka parameters for generating the $formatName publication"
 
@@ -410,22 +406,6 @@ abstract class DokkatooFormatPlugin(
       )
 
       pluginsConfiguration.addAllLater(providers.provider { publication.pluginsConfiguration })
-
-      //<editor-fold desc="adapter for old DSL - to be removed">
-      pluginsConfiguration.addAllLater(
-        @Suppress("DEPRECATION")
-        pluginsMapConfiguration.map { pluginConfig ->
-          pluginConfig.map { (pluginId, pluginConfiguration) ->
-            objects.newInstance<DokkaPluginConfigurationSpec>(pluginId).apply {
-              values.set(pluginConfiguration)
-            }
-          }
-        }
-      )
-      pluginsConfiguration.configureEach {
-        serializationFormat.convention(EncodedFormat.JSON)
-      }
-      //</editor-fold>
 
       suppressInheritedMembers.convention(publication.suppressInheritedMembers)
       suppressObviousFunctions.convention(publication.suppressObviousFunctions)
