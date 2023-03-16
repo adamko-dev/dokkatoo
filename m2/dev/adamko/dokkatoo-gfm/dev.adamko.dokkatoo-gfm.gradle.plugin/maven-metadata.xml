@@ -3,10 +3,10 @@
   <groupId>dev.adamko.dokkatoo-gfm</groupId>
   <artifactId>dev.adamko.dokkatoo-gfm.gradle.plugin</artifactId>
   <versioning>
-    <latest>0.0.5-SNAPSHOT</latest>
+    <latest>1.0.1-SNAPSHOT</latest>
     <versions>
-      <version>0.0.5-SNAPSHOT</version>
+      <version>1.0.1-SNAPSHOT</version>
     </versions>
-    <lastUpdated>20230316214604</lastUpdated>
+    <lastUpdated>20230316225602</lastUpdated>
   </versioning>
 </metadata>
