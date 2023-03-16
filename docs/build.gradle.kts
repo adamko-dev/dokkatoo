@@ -1,3 +1,5 @@
+import dev.adamko.dokkatoo.dokka.plugins.DokkaHtmlPluginParameters
+
 plugins {
   buildsrc.conventions.base
   dev.adamko.`dokkatoo-html`
@@ -11,30 +13,18 @@ dependencies {
 
 dokkatoo {
   moduleName.set("Dokkatoo Gradle Plugin")
-  dokkatooPublications.named("html") {
 
-    pluginsConfiguration.create("org.jetbrains.dokka.base.DokkaBase") {
-      serializationFormat.set(org.jetbrains.dokka.DokkaConfiguration.SerializationFormat.JSON)
-      values.set(
-        """
-          {
-            "customStyleSheets": [
-              "${file("style/logo-styles.css").invariantSeparatorsPath}"
-            ],
-            "customAssets": [
-              "${file("images/logo-icon.svg").invariantSeparatorsPath}"
-            ]
-          }
-        """.trimIndent()
-      )
-    }
+  pluginsConfiguration.named<DokkaHtmlPluginParameters>("html") {
+    customStyleSheets.from(
+      "./style/logo-styles.css",
+    )
+    customAssets.from(
+      "./images/logo-icon.svg",
+    )
   }
 }
 
 tasks.dokkatooGeneratePublicationHtml {
-  inputs.dir("images")
-  inputs.dir("style")
-
   doLast {
     outputDirectory.get().asFile.walk()
       .filter { it.isFile && it.extension == "html" }

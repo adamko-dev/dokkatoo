@@ -1,8 +1,7 @@
 @file:Suppress("UnstableApiUsage") // jvm test suites & test report aggregation are incubating
 
 import buildsrc.conventions.utils.skipTestFixturesPublications
-import dev.adamko.kotlin.binary_compatibility_validator.tasks.BCVDefaultTask
-import org.jetbrains.dokka.DokkaConfiguration
+import dev.adamko.dokkatoo.dokka.parameters.VisibilityModifier.INTERNAL
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -254,7 +253,7 @@ kotlin.sourceSets.main {
 dokkatoo {
   // create a special source set just for documenting the internally visible DokkatooInternalApi
   dokkatooSourceSets.create("DokkatooInternalApi") {
-    documentedVisibilities(DokkaConfiguration.Visibility.INTERNAL)
+    documentedVisibilities(INTERNAL)
     suppress.set(false)
     sourceRoots.from(layout.projectDirectory.dir("src/main/kotlin").asFileTree.matching {
       include("**/DokkatooInternalApi.kt")

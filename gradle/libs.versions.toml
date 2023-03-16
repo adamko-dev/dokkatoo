@@ -6,7 +6,7 @@ kotlinx-serialization = "1.5.0"
 kotest = "5.5.5"
 
 gradlePlugin-android = "4.0.1"
-gradlePlugin-dokkatoo = "0.0.4"
+gradlePlugin-dokkatoo = "1.0.0"
 gradlePlugin-gradlePublishPlugin = "1.1.0"
 gradlePlugin-bcvMu = "0.0.3"
 
