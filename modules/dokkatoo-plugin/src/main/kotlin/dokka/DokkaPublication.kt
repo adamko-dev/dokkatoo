@@ -1,17 +1,17 @@
 package dev.adamko.dokkatoo.dokka
 
-import dev.adamko.dokkatoo.dokka.parameters.DokkaPluginConfigurationSpec
+import dev.adamko.dokkatoo.internal.DokkaPluginParametersContainer
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import java.io.Serializable
 import javax.inject.Inject
 import org.gradle.api.Named
-import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
 import org.gradle.api.tasks.PathSensitivity.RELATIVE
+import org.gradle.kotlin.dsl.*
 
 /**
  * A [DokkaPublication] describes a single Dokka output.
@@ -27,6 +27,13 @@ abstract class DokkaPublication
 constructor(
   @get:Internal
   val formatName: String,
+
+  /**
+   * Configurations for Dokka Generator Plugins. Must be provided from
+   * [dev.adamko.dokkatoo.DokkatooExtension.pluginsConfiguration].
+   */
+  @get:Nested
+  val pluginsConfiguration: DokkaPluginParametersContainer,
 ) : Named, Serializable {
 
   @Internal
@@ -51,6 +58,8 @@ constructor(
    * [outputDirPath] is required so Gradle can determine if the task is up-to-date.
    */
   @get:Input
+  // marked as an Input because a DokkaPublication is used to configure the appropriate
+  // DokkatooTasks, which will then
   protected val outputDirPath: Provider<String>
     get() = outputDir.map { it.asFile.invariantSeparatorsPath }
 
@@ -69,9 +78,6 @@ constructor(
 
   @get:Input
   abstract val offlineMode: Property<Boolean>
-
-  @get:Nested
-  abstract val pluginsConfiguration: NamedDomainObjectContainer<DokkaPluginConfigurationSpec>
 
 //    /** Dokka Configuration files from other subprojects that will be merged into this Dokka Configuration */
 //    @get:InputFiles

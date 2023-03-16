@@ -2,22 +2,22 @@ package dev.adamko.dokkatoo.tasks
 
 import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.jsonMapper
 import dev.adamko.dokkatoo.dokka.parameters.DokkaParametersKxs
-import dev.adamko.dokkatoo.dokka.parameters.DokkaPluginConfigurationSpec
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec
+import dev.adamko.dokkatoo.dokka.plugins.DokkaPluginParametersBaseSpec
+import dev.adamko.dokkatoo.internal.DokkaPluginParametersContainer
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import java.io.IOException
 import javax.inject.Inject
 import kotlinx.serialization.encodeToString
-import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
 import org.gradle.api.tasks.PathSensitivity.RELATIVE
+import org.gradle.kotlin.dsl.*
 
 /**
  * Builds the Dokka Parameters that the Dokka Generator will use to produce a Dokka Publication for this project.
@@ -31,6 +31,13 @@ abstract class DokkatooPrepareParametersTask
 @Inject
 constructor(
   objects: ObjectFactory,
+
+  /**
+   * Configurations for Dokka Generator Plugins. Must be provided from
+   * [dev.adamko.dokkatoo.dokka.DokkaPublication.pluginsConfiguration].
+   */
+  @get:Nested
+  val pluginsConfiguration: DokkaPluginParametersContainer,
 ) : DokkatooTask.WithSourceSets() {
 
   @get:OutputFile
@@ -90,12 +97,14 @@ constructor(
   @get:Input
   abstract val offlineMode: Property<Boolean>
 
+  /**
+   * Classpath that contains the Dokka Generator Plugins used to modify this publication.
+   *
+   * The plugins should be configured in [dev.adamko.dokkatoo.dokka.DokkaPublication.pluginsConfiguration].
+   */
   @get:InputFiles
   @get:Classpath
   abstract val pluginsClasspath: ConfigurableFileCollection
-
-  @get:Nested
-  abstract val pluginsConfiguration: NamedDomainObjectContainer<DokkaPluginConfigurationSpec>
 
   @get:Input
   abstract val suppressObviousFunctions: Property<Boolean>
@@ -140,7 +149,7 @@ constructor(
     val pluginsClasspath = pluginsClasspath.files.toList()
 
     val pluginsConfiguration =
-      pluginsConfiguration.map(DokkaPluginConfigurationSpec::build)
+      pluginsConfiguration.map(DokkaPluginParametersBaseSpec::build)
     val failOnWarning = failOnWarning.get()
     val delayTemplateSubstitution = delayTemplateSubstitution.get()
     val suppressObviousFunctions = suppressObviousFunctions.get()
@@ -204,8 +213,4 @@ constructor(
         }
       }
   }
-
-  @get:Input
-  @Deprecated("TODO write adapter to the new DSL")
-  abstract val pluginsMapConfiguration: MapProperty<String, String>
 }

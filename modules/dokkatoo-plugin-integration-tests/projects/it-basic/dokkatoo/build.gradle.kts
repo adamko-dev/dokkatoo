@@ -1,4 +1,5 @@
 import dev.adamko.dokkatoo.dokka.parameters.VisibilityModifier
+import dev.adamko.dokkatoo.dokka.plugins.DokkaHtmlPluginParameters
 
 plugins {
   kotlin("jvm") version "1.7.20"
@@ -39,23 +40,19 @@ dokkatoo {
       )
     }
   }
+
+  pluginsConfiguration.named<DokkaHtmlPluginParameters>("html") {
+    customStyleSheets.from(
+      "./customResources/logo-styles.css",
+      "./customResources/custom-style-to-add.css",
+    )
+    customAssets.from(
+      "./customResources/custom-resource.svg",
+    )
+  }
+
   dokkatooPublications.configureEach {
     suppressObviousFunctions.set(true)
-    pluginsConfiguration.create("org.jetbrains.dokka.base.DokkaBase") {
-      values.set(
-        """
-          { 
-            "customStyleSheets": [
-              "${file("./customResources/logo-styles.css").invariantSeparatorsPath}", 
-              "${file("./customResources/custom-style-to-add.css").invariantSeparatorsPath}"
-            ], 
-            "customAssets": [
-              "${file("./customResources/custom-resource.svg").invariantSeparatorsPath}"
-            ] 
-          }
-        """.trimIndent()
-      )
-    }
     suppressObviousFunctions.set(false)
   }
 }

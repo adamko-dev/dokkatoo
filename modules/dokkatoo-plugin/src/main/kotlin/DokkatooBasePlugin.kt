@@ -4,7 +4,6 @@ import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes
 import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes.Companion.DOKKATOO_BASE_ATTRIBUTE
 import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes.Companion.DOKKATOO_CATEGORY_ATTRIBUTE
 import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes.Companion.DOKKA_FORMAT_ATTRIBUTE
-import dev.adamko.dokkatoo.dokka.parameters.DokkaPluginConfigurationSpec.EncodedFormat
 import dev.adamko.dokkatoo.dokka.parameters.VisibilityModifier
 import dev.adamko.dokkatoo.formats.*
 import dev.adamko.dokkatoo.internal.*
@@ -130,7 +129,6 @@ constructor(
   ) {
     dokkatooExtension.dokkatooPublications.all {
       enabled.convention(true)
-
       cacheRoot.convention(dokkatooExtension.dokkatooCacheDirectory)
       delayTemplateSubstitution.convention(false)
       failOnWarning.convention(false)
@@ -141,10 +139,6 @@ constructor(
       outputDir.convention(dokkatooExtension.dokkatooPublicationDirectory)
       suppressInheritedMembers.convention(false)
       suppressObviousFunctions.convention(true)
-
-      pluginsConfiguration.configureEach {
-        serializationFormat.convention(EncodedFormat.JSON)
-      }
     }
   }
 
