@@ -81,6 +81,7 @@ Here is an example - it is not exhaustive and does not cover all functionality.
 
 ```kotlin
 // build.gradle.kts
+import dev.adamko.dokkatoo.dokka.plugins.DokkaHtmlPluginParameters
 
 plugins {
   id("dev.adamko.dokkatoo-html") version "$dokkatooVersion"
@@ -105,24 +106,19 @@ dokkatoo {
       )
     }
   }
+
+  pluginsConfiguration.named<DokkaHtmlPluginParameters>("html") {
+    customStyleSheets.from(
+      "./customResources/logo-styles.css",
+      "./customResources/custom-style-to-add.css",
+    )
+    customAssets.from(
+      "./customResources/custom-resource.svg",
+    )
+    footerMessage.set("(C) The Owner")
+  }
   dokkatooPublications.configureEach {
     suppressObviousFunctions.set(true)
-    pluginsConfiguration.create("org.jetbrains.dokka.base.DokkaBase") {
-      serializationFormat.set(DokkaPluginConfigurationSpec.EncodedFormat.JSON)
-      values.set(
-        """
-          { 
-            "customStyleSheets": [
-              "${file("./customResources/logo-styles.css").invariantSeparatorsPath}", 
-              "${file("./customResources/custom-style-to-add.css").invariantSeparatorsPath}"
-            ], 
-            "customAssets": [
-              "${file("./customResources/custom-resource.svg").invariantSeparatorsPath}"
-            ] 
-          }
-        """.trimIndent()
-      )
-    }
     suppressObviousFunctions.set(false)
   }
 }
