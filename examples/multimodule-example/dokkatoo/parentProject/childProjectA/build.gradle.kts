@@ -1,6 +1,6 @@
 plugins {
   kotlin("jvm")
-  id("dev.adamko.dokkatoo") version "0.0.5-SNAPSHOT"
+  id("dev.adamko.dokkatoo") version "1.0.1-SNAPSHOT"
 }
 
 dokkatoo {
