@@ -8,6 +8,7 @@ plugins {
 dokkatoo {
   moduleName.set("customFormat-example")
   pluginsConfiguration.named<DokkaHtmlPluginParameters>("html") {
+    // Custom format adds a custom logo
     customStyleSheets.from("logo-styles.css")
     customAssets.from("ktor-logo.png")
     footerMessage.set("(c) Custom Format Dokka example")
