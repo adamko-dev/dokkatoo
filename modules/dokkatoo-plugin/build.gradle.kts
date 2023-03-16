@@ -85,6 +85,7 @@ pluginBundle {
   vcsUrl = "https://github.com/adamko-dev/dokkatoo.git"
   tags = listOf(
     "dokka",
+    "dokkatoo",
     "kotlin",
     "kdoc",
     "android",
@@ -93,7 +94,7 @@ pluginBundle {
     "html",
     "markdown",
     "gfm",
-    "website"
+    "website",
   )
 }
 
