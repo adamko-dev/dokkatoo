@@ -1,5 +1,6 @@
 package dev.adamko.dokkatoo.dokka.parameters
 
+import dev.adamko.dokkatoo.dokka.parameters.VisibilityModifier.Companion.convertToDokkaTypes
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import java.io.Serializable
 import java.net.URL
@@ -42,7 +43,8 @@ constructor(
   private val name: String,
   private val objects: ObjectFactory,
 ) :
-  DokkaConfigurationBuilder<DokkaParametersKxs.DokkaSourceSetKxs>,
+  DokkaParameterBuilder<DokkaParametersKxs.DokkaSourceSetKxs>,
+  HasConfigurableVisibilityModifiers,
   Named,
   Serializable {
 
@@ -55,13 +57,6 @@ constructor(
 
   @get:Input
   abstract val sourceSetScope: Property<String>
-
-  // Name of KotlinSourceSet to automagically configure later
-  // Adapter for the old DSL, because the old DSL had task-based configuration that I want to remove.
-  // This property should be used to lazily set conventions for the source set properties.
-  @get:Internal
-  @Deprecated("hack for adapting the old DSL - replacement TBD")
-  internal abstract val todoSourceSetName: Property<String>
 
   /**
    * Whether this source set should be skipped when generating documentation.
@@ -121,14 +116,10 @@ constructor(
    *
    * Can be configured on per-package basis, see [DokkaPackageOptionsSpec.documentedVisibilities].
    *
-   * Default is [DokkaConfiguration.Visibility.PUBLIC].
+   * Default is [VisibilityModifier.PUBLIC].
    */
   @get:Input
-  abstract val documentedVisibilities: SetProperty<DokkaConfiguration.Visibility>
-
-  /** Sets [documentedVisibilities] (overrides any previously set values). */
-  fun documentedVisibilities(vararg visibilities: DokkaConfiguration.Visibility): Unit =
-    documentedVisibilities.set(visibilities.asList())
+  abstract override val documentedVisibilities: SetProperty<VisibilityModifier>
 
   /**
    * Specifies source sets that current source set depends on.
@@ -344,17 +335,6 @@ constructor(
     )
   }
 
-//    /**
-//     * Closure for configuring package options, appending to [perPackageOptions].
-//     *
-//     * @see [DokkaPackageOptionsGradleBuilder] for details.
-//     */
-//    @Suppress("DEPRECATION") // TODO [beresnev] ConfigureUtil will be removed in Gradle 8
-//    fun perPackageOption(c: Closure<in DokkaPackageOptionsGradleBuilder>) {
-//        val configured = org.gradle.util.ConfigureUtil.configure(c, DokkaPackageOptionsGradleBuilder())
-//        perPackageOptions.add(configured)
-//    }
-
   /**
    * Action for configuring package options, appending to [perPackageOptions].
    *
@@ -367,17 +347,6 @@ constructor(
       }
     )
   }
-
-//    /**
-//     * Closure for configuring external documentation links, appending to [externalDocumentationLinks].
-//     *
-//     * @see [GradleExternalDocumentationLinkBuilder] for details.
-//     */
-//    @Suppress("DEPRECATION") // TODO [beresnev] ConfigureUtil will be removed in Gradle 8
-//    fun externalDocumentationLink(c: Closure<in GradleExternalDocumentationLinkBuilder>) {
-//         val link = org.gradle.util.ConfigureUtil.configure(c, GradleExternalDocumentationLinkBuilder(project))
-//        externalDocumentationLinks.add(link)
-//    }
 
   /**
    * Action for configuring external documentation links, appending to [externalDocumentationLinks].
@@ -436,7 +405,7 @@ constructor(
       noJdkLink = noJdkLink.get(),
       suppressedFiles = suppressedFiles.files,
       analysisPlatform = analysisPlatform.get(),
-      documentedVisibilities = documentedVisibilities.get(),
+      documentedVisibilities = documentedVisibilities.get().convertToDokkaTypes(),
     )
   }
 }

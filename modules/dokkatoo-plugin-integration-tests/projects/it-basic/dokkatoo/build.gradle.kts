@@ -1,9 +1,9 @@
-import org.jetbrains.dokka.DokkaConfiguration
-import org.jetbrains.dokka.gradle.kotlinSourceSet
+import dev.adamko.dokkatoo.dokka.parameters.VisibilityModifier
+import dev.adamko.dokkatoo.dokka.plugins.DokkaHtmlPluginParameters
 
 plugins {
   kotlin("jvm") version "1.7.20"
-  id("dev.adamko.dokkatoo") version "0.0.3-SNAPSHOT"
+  id("dev.adamko.dokkatoo") version "1.0.1-SNAPSHOT"
 }
 
 version = "1.7.20-SNAPSHOT"
@@ -17,8 +17,8 @@ dokkatoo {
   moduleName.set("Basic Project")
   dokkatooSourceSets.configureEach {
     documentedVisibilities(
-      DokkaConfiguration.Visibility.PUBLIC,
-      DokkaConfiguration.Visibility.PROTECTED,
+      VisibilityModifier.PUBLIC,
+      VisibilityModifier.PROTECTED,
     )
     suppressedFiles.from(file("src/main/kotlin/it/suppressedByPath"))
     perPackageOption {
@@ -27,8 +27,8 @@ dokkatoo {
     }
     perPackageOption {
       matchingRegex.set("it.overriddenVisibility.*")
-      documentedVisibilities.set(
-        setOf(DokkaConfiguration.Visibility.PRIVATE)
+      documentedVisibilities(
+        VisibilityModifier.PRIVATE,
       )
     }
     sourceLink {
@@ -40,24 +40,19 @@ dokkatoo {
       )
     }
   }
+
+  pluginsConfiguration.named<DokkaHtmlPluginParameters>("html") {
+    customStyleSheets.from(
+      "./customResources/logo-styles.css",
+      "./customResources/custom-style-to-add.css",
+    )
+    customAssets.from(
+      "./customResources/custom-resource.svg",
+    )
+  }
+
   dokkatooPublications.configureEach {
     suppressObviousFunctions.set(true)
-    pluginsConfiguration.create("org.jetbrains.dokka.base.DokkaBase") {
-      serializationFormat.set(DokkaConfiguration.SerializationFormat.JSON)
-      values.set(
-        """
-          { 
-            "customStyleSheets": [
-              "${file("./customResources/logo-styles.css").invariantSeparatorsPath}", 
-              "${file("./customResources/custom-style-to-add.css").invariantSeparatorsPath}"
-            ], 
-            "customAssets": [
-              "${file("./customResources/custom-resource.svg").invariantSeparatorsPath}"
-            ] 
-          }
-        """.trimIndent()
-      )
-    }
     suppressObviousFunctions.set(false)
   }
 }

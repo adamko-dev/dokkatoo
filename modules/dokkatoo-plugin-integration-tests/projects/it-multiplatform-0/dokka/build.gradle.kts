@@ -12,7 +12,8 @@ kotlin {
     jvm()
     linuxX64("linux")
     macosX64("macos")
-    js()
+    js(BOTH)
+    //TODO Add wasm when kx.coroutines will be supported and published into the main repo
     sourceSets {
         val commonMain by sourceSets.getting
         val linuxMain by sourceSets.getting

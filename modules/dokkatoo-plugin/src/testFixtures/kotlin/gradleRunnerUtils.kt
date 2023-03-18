@@ -2,14 +2,28 @@ package dev.adamko.dokkatoo.utils
 
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
+import org.gradle.testkit.runner.internal.DefaultGradleRunner
 
-fun GradleRunner.withEnvironment(vararg map: Pair<String, String>): GradleRunner =
-  withEnvironment(map.toMap())
+
+/** Edit environment variables in the Gradle Runner */
+@Deprecated("Windows does not support withEnvironment - https://github.com/gradle/gradle/issues/23959")
+fun GradleRunner.withEnvironment(build: MutableMap<String, String?>.() -> Unit): GradleRunner {
+  val env = environment ?: mutableMapOf()
+  env.build()
+  return withEnvironment(env)
+}
+
 
 inline fun GradleRunner.build(
   handleResult: BuildResult.() -> Unit
 ): Unit = build().let(handleResult)
 
+
 inline fun GradleRunner.buildAndFail(
-  handleResult: BuildResult.( ) -> Unit
+  handleResult: BuildResult.() -> Unit
 ): Unit = buildAndFail().let(handleResult)
+
+
+fun GradleRunner.withJvmArguments(
+  vararg jvmArguments: String
+): GradleRunner = (this as DefaultGradleRunner).withJvmArguments(*jvmArguments)

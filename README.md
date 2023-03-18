@@ -2,12 +2,12 @@
 [![Gradle Plugin Portal](https://img.shields.io/gradle-plugin-portal/v/dev.adamko.dokkatoo?style=for-the-badge)](https://plugins.gradle.org/search?term=dokkatoo)
 [![Maven metadata URL](https://img.shields.io/maven-metadata/v?label=MAVEN%20SNAPSHOT&metadataUrl=https%3A%2F%2Fraw.githubusercontent.com%2Fadamko-dev%2Fdokkatoo%2Fartifacts%2Fm2%2Fdev%2Fadamko%2Fdokkatoo%2Fdokkatoo-plugin%2Fmaven-metadata.xml&style=for-the-badge)](https://github.com/adamko-dev/dokkatoo/tree/artifacts#readme)
 
-[![Dokkatoo Banner](./media/img/banner.svg)](https://github.com/adamko-dev/dokkatoo)
+[![Dokkatoo Banner](docs/images/banner.svg)](https://github.com/adamko-dev/dokkatoo)
 
 [Dokkatoo](https://github.com/adamko-dev/dokkatoo) is a Gradle plugin that generates documentation
 for your Kotlin projects.
 
-Under the hood it uses [Dokka](https://kotlinlang.org/docs/dokka-introduction.html),
+Under the hood it uses [Dokka](https://github.com/Kotlin/dokka/),
 the API documentation engine for Kotlin.
 
 ###### Why Dokkatoo?
@@ -29,7 +29,7 @@ Dokkatoo has a number of improvements over the existing Dokka Gradle Plugin:
 Dokkatoo has basic functionality, and can generate documentation for single-projects and
 multimodule projects.
 
-Be aware that many of things are untested, broken, and undocumented. Please
+Be aware that many things are untested, broken, and undocumented. Please
 [create an issue](https://github.com/adamko-dev/dokkatoo/issues)
 if something is not as you'd expect, or like.
 
@@ -81,6 +81,7 @@ Here is an example - it is not exhaustive and does not cover all functionality.
 
 ```kotlin
 // build.gradle.kts
+import dev.adamko.dokkatoo.dokka.plugins.DokkaHtmlPluginParameters
 
 plugins {
   id("dev.adamko.dokkatoo-html") version "$dokkatooVersion"
@@ -90,8 +91,8 @@ dokkatoo {
   moduleName.set("Basic Project")
   dokkatooSourceSets.configureEach {
     documentedVisibilities(
-      DokkaConfiguration.Visibility.PUBLIC,
-      DokkaConfiguration.Visibility.PROTECTED,
+      VisibilityModifier.PUBLIC,
+      VisibilityModifier.PROTECTED,
     )
     suppressedFiles.from(file("src/main/kotlin/it/suppressedByPath"))
     perPackageOption {
@@ -105,24 +106,19 @@ dokkatoo {
       )
     }
   }
+
+  pluginsConfiguration.named<DokkaHtmlPluginParameters>("html") {
+    customStyleSheets.from(
+      "./customResources/logo-styles.css",
+      "./customResources/custom-style-to-add.css",
+    )
+    customAssets.from(
+      "./customResources/custom-resource.svg",
+    )
+    footerMessage.set("(C) The Owner")
+  }
   dokkatooPublications.configureEach {
     suppressObviousFunctions.set(true)
-    pluginsConfiguration.create("org.jetbrains.dokka.base.DokkaBase") {
-      serializationFormat.set(DokkaConfiguration.SerializationFormat.JSON)
-      values.set(
-        """
-          { 
-            "customStyleSheets": [
-              "${file("./customResources/logo-styles.css").invariantSeparatorsPath}", 
-              "${file("./customResources/custom-style-to-add.css").invariantSeparatorsPath}"
-            ], 
-            "customAssets": [
-              "${file("./customResources/custom-resource.svg").invariantSeparatorsPath}"
-            ] 
-          }
-        """.trimIndent()
-      )
-    }
     suppressObviousFunctions.set(false)
   }
 }
@@ -137,7 +133,7 @@ To do this, apply the Dokkatoo plugin in all subprojects that should be document
 In the aggregating project, depend on the other subprojects.
 
 ```kts
-// ./build.gradle.kts
+// build.gradle.kts
 
 plugins {
   id("dev.adamko.dokkatoo-html") version "$dokkatooVersion"
@@ -204,7 +200,14 @@ pluginManagement {
     mavenCentral()
 
     // add the Dokkatoo snapshot repository
-    maven("https://raw.githubusercontent.com/adamko-dev/dokkatoo/artifacts/m2/")
+    maven("https://raw.githubusercontent.com/adamko-dev/dokkatoo/artifacts/m2/") {
+      name = "Dokkatoo Snapshots"
+      // only include Dokkatoo snapshots
+      mavenContent {
+        includeGroup("dev.adamko.dokkatoo")
+        snapshotsOnly()
+      }
+    }
   }
 }
 ```

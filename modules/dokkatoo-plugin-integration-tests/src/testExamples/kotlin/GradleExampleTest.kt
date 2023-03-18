@@ -1,14 +1,8 @@
 package dev.adamko.dokkatoo.tests.examples
 
-import dev.adamko.dokkatoo.utils.GradleProjectTest
+import dev.adamko.dokkatoo.internal.DokkatooConstants.DOKKA_VERSION
+import dev.adamko.dokkatoo.utils.*
 import dev.adamko.dokkatoo.utils.GradleProjectTest.Companion.projectTestTempDir
-import dev.adamko.dokkatoo.utils.buildGradleKts
-import dev.adamko.dokkatoo.utils.copyExampleProject
-import dev.adamko.dokkatoo.utils.file
-import dev.adamko.dokkatoo.utils.findFiles
-import dev.adamko.dokkatoo.utils.shouldContainAll
-import dev.adamko.dokkatoo.utils.sideBySide
-import dev.adamko.dokkatoo.utils.toTreeString
 import io.kotest.assertions.withClue
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.file.shouldBeAFile
@@ -95,8 +89,8 @@ class GradleExampleTest : FunSpec({
         .withArguments(
           "clean",
           ":dokkatooGeneratePublicationHtml",
-          "--info",
           "--stacktrace",
+          "--info",
         )
         .forwardOutput()
         .build()
@@ -170,11 +164,10 @@ private fun initDokkaProject(
   return GradleProjectTest(destinationDir.toPath()).apply {
     copyExampleProject("gradle-example/dokka")
 
-    val dokkaVersion = "1.7.20"
     buildGradleKts = buildGradleKts
       .replace(
         Regex("""id\("org\.jetbrains\.dokka"\) version \("[\d.]+"\)"""),
-        escapeReplacement("""id("org.jetbrains.dokka") version "$dokkaVersion""""),
+        escapeReplacement("""id("org.jetbrains.dokka") version "$DOKKA_VERSION""""),
       )
   }
 }
@@ -184,5 +177,15 @@ private fun initDokkatooProject(
 ): GradleProjectTest {
   return GradleProjectTest(destinationDir.toPath()).apply {
     copyExampleProject("gradle-example/dokkatoo")
+
+    buildGradleKts += """
+      |
+      |tasks.withType<dev.adamko.dokkatoo.tasks.DokkatooPrepareParametersTask>().configureEach {
+      |  dokkaSourceSets.configureEach {
+      |    sourceSetScope.set(":dokkaHtml") // only necessary for testing
+      |  }
+      |}
+      |
+    """.trimMargin()
   }
 }

@@ -22,7 +22,7 @@ abstract class DokkatooJavaAdapter @Inject constructor() : Plugin<Project> {
   private val logger = Logging.getLogger(this::class.java)
 
   override fun apply(project: Project) {
-    logger.lifecycle("applied DokkatooJavaAdapter to ${project.path}")
+    logger.info("applied DokkatooJavaAdapter to ${project.path}")
 
     // wait for the Java plugin to be applied
     project.plugins.withType<JavaBasePlugin>().configureEach {

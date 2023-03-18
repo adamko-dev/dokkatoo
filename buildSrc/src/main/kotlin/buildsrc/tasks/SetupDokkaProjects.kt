@@ -15,7 +15,7 @@ import org.gradle.api.tasks.OutputDirectories
 import org.gradle.api.tasks.TaskAction
 
 abstract class SetupDokkaProjects @Inject constructor(
-  private val fs: FileSystemOperations,
+  private val files: FileSystemOperations,
   private val layout: ProjectLayout,
   private val objects: ObjectFactory,
 ) : DefaultTask() {
@@ -40,12 +40,12 @@ abstract class SetupDokkaProjects @Inject constructor(
     val destinationToSources = destinationToSources.get()
     val dokkaSourceDir = dokkaSourceDir.get()
 
-    println("destinationToSources: $destinationToSources")
+    logger.info("destinationToSources: $destinationToSources")
 
     destinationToSources.forEach { (dest: File, sources: List<String>) ->
-      fs.sync {
+      files.sync {
         sources.forEach { src ->
-          from("$dokkaSourceDir/$src")
+          from(dokkaSourceDir.dir(src))
         }
         into(dest)
       }

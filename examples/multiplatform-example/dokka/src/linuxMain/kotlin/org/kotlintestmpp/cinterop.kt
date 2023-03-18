@@ -5,6 +5,9 @@ package org.kotlintestmpp
 import kotlinx.cinterop.CPointed
 import kotlinx.cinterop.CPointer
 
-fun<T: CPointed> printPointerRawValue(pointer: CPointer<T>) {
+/**
+ * Low-level Linux function
+ */
+fun <T : CPointed> printPointerRawValue(pointer: CPointer<T>) {
     println(pointer.rawValue)
 }

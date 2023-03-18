@@ -5,12 +5,10 @@ plugins {
   buildsrc.conventions.base
 
   idea
-
-  //id("org.jetbrains.kotlinx.binary-compatibility-validator") version "0.12.1"
 }
 
 group = "dev.adamko.dokkatoo"
-version = "0.0.3-SNAPSHOT"
+version = "1.0.1-SNAPSHOT"
 
 
 idea {

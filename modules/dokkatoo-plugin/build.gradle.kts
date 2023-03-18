@@ -2,6 +2,7 @@
 
 import buildsrc.conventions.utils.skipTestFixturesPublications
 import org.gradle.kotlin.dsl.support.serviceOf
+import dev.adamko.dokkatoo.dokka.parameters.VisibilityModifier.INTERNAL
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -18,6 +19,8 @@ plugins {
   buildsrc.conventions.`maven-publish-test`
 
   dev.adamko.kotlin.`binary-compatibility-validator`
+
+  dev.adamko.`dokkatoo-html`
 }
 
 description = "Generates documentation for Kotlin projects (using Dokka)"
@@ -54,26 +57,31 @@ val downloadGradleApi by tasks.registering(Sync::class) {
 }
 
 dependencies {
-  implementation("org.jetbrains.dokka:dokka-core:1.7.20")
+  implementation(libs.kotlin.dokkaCore)
 
   compileOnly(libDir.files("gradle-core-api.jar"))
-  implementation(kotlin("stdlib"))
 
-  compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.20")
-  compileOnly("com.android.tools.build:gradle:4.0.1")
+  compileOnly(libs.gradlePlugin.kotlin)
+  compileOnly(libs.gradlePlugin.android)
 
-  implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
+  implementation(platform(libs.kotlinxSerialization.bom))
+  implementation(libs.kotlinxSerialization.json)
 
   testFixturesImplementation(libDir.files("gradle-core-api.jar"))
 //  testFixturesImplementation(gradleApi())
   testFixturesImplementation(gradleTestKit())
-  testFixturesCompileOnly("org.jetbrains.dokka:dokka-core:1.7.20")
-  testFixturesImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
-  testFixturesApi(platform("io.kotest:kotest-bom:5.5.5"))
-  testFixturesApi("io.kotest:kotest-runner-junit5")
-  testFixturesApi("io.kotest:kotest-assertions-core")
-  testFixturesApi("io.kotest:kotest-assertions-json")
-  testFixturesApi("io.kotest:kotest-framework-datatest")
+
+  testFixturesCompileOnly(libs.kotlin.dokkaCore)
+  testFixturesImplementation(platform(libs.kotlinxSerialization.bom))
+  testFixturesImplementation(libs.kotlinxSerialization.json)
+
+  testFixturesCompileOnly(libs.kotlin.dokkaCore)
+
+  testFixturesApi(platform(libs.kotest.bom))
+  testFixturesApi(libs.kotest.junit5Runner)
+  testFixturesApi(libs.kotest.assertionsCore)
+  testFixturesApi(libs.kotest.assertionsJson)
+  testFixturesApi(libs.kotest.datatest)
 
   // don't define test dependencies here, instead define them in the testing.suites {} configuration below
 }
@@ -111,6 +119,7 @@ pluginBundle {
   vcsUrl = "https://github.com/adamko-dev/dokkatoo.git"
   tags = listOf(
     "dokka",
+    "dokkatoo",
     "kotlin",
     "kdoc",
     "android",
@@ -119,7 +128,7 @@ pluginBundle {
     "html",
     "markdown",
     "gfm",
-    "website"
+    "website",
   )
 }
 
@@ -141,14 +150,12 @@ testing.suites {
     dependencies {
       implementation(project.dependencies.gradleTestKit())
 
-      implementation("org.jetbrains.kotlin:kotlin-test:1.7.20")
-
       implementation(project.dependencies.testFixtures(project()))
 
-      implementation("org.jetbrains.dokka:dokka-core:1.7.20")
-      implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
+      compileOnly(libs.kotlin.dokkaCore)
 
-      runtimeOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:$embeddedKotlinVersion")
+      implementation(project.dependencies.platform(libs.kotlinxSerialization.bom))
+      implementation(libs.kotlinxSerialization.json)
     }
 
     targets.configureEach {
@@ -230,4 +237,61 @@ binaryCompatibilityValidator {
     ).map {
       "dev.adamko.dokkatoo.dokka.parameters.DokkaParametersKxs\$$it\$\$serializer"
     })
+}
+
+val dokkatooVersion = provider { project.version.toString() }
+
+
+val dokkatooConstantsProperties = objects.mapProperty<String, String>().apply {
+  put("DOKKATOO_VERSION", dokkatooVersion)
+  put("DOKKA_VERSION", libs.versions.kotlin.dokka)
+}
+
+val buildConfigFileContents: Provider<TextResource> =
+  dokkatooConstantsProperties.map { constants ->
+
+    val vals = constants.entries
+      .sortedBy { it.key }
+      .joinToString("\n") { (k, v) ->
+        """const val $k = "$v""""
+      }.prependIndent("  ")
+
+    resources.text.fromString(
+      """
+          |package dev.adamko.dokkatoo.internal
+          |
+          |@DokkatooInternalApi
+          |object DokkatooConstants {
+          |$vals
+          |}
+          |
+        """.trimMargin()
+    )
+  }
+
+val generateDokkatooConstants by tasks.registering(Sync::class) {
+
+  val buildConfigFileContents = buildConfigFileContents
+
+  from(buildConfigFileContents) {
+    rename { "DokkatooConstants.kt" }
+    into("dev/adamko/dokkatoo/internal/")
+  }
+
+  into(layout.buildDirectory.dir("generated-source/main/kotlin/"))
+}
+
+kotlin.sourceSets.main {
+  kotlin.srcDir(generateDokkatooConstants.map { it.destinationDir })
+}
+
+dokkatoo {
+  // create a special source set just for documenting the internally visible DokkatooInternalApi
+  dokkatooSourceSets.create("DokkatooInternalApi") {
+    documentedVisibilities(INTERNAL)
+    suppress.set(false)
+    sourceRoots.from(layout.projectDirectory.dir("src/main/kotlin").asFileTree.matching {
+      include("**/DokkatooInternalApi.kt")
+    })
+  }
 }

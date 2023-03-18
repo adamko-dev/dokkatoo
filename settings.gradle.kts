@@ -7,7 +7,7 @@ pluginManagement {
   }
 }
 
-@Suppress("UnstableApiUsage") // Central declaration of repositories is an incubating feature
+@Suppress("UnstableApiUsage")
 dependencyResolutionManagement {
 
   repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
@@ -45,11 +45,13 @@ dependencyResolutionManagement {
 }
 
 include(
+  ":docs",
+  ":examples",
+
   ":modules:dokkatoo-plugin",
   ":modules:dokkatoo-plugin-integration-tests",
 
-  ":examples",
-)
+  )
 
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")

@@ -3,11 +3,6 @@ plugins {
   buildsrc.conventions.`dokkatoo-example-projects`
 }
 
-
-dependencies {
-//  testMavenPublication(projects.modules.dokkatooPlugin)
-}
-
 tasks.setupDokkaTemplateProjects {
   destinationToSources.set(
     mapOf(
@@ -27,26 +22,12 @@ tasks.setupDokkaTemplateProjects {
 configurations.exampleProjectsElements.configure {
   outgoing {
     artifact(projectDir) {
-      builtBy(tasks.setupDokkaTemplateProjects, tasks.updateGradlePropertiesInDokkatooExamples)
+      builtBy(tasks.updateDokkatooExamples)
       type = "directory"
     }
   }
-//  outgoing {
-//    listOf(
-//      "custom-format-example",
-//      "gradle-example",
-//      "kotlin-as-java-example",
-//      "library-publishing-example",
-//      "multimodule-example",
-//      "multiplatform-example",
-//      "versioning-multimodule-example",
-//    ).forEach { exampleDir ->
-//      artifact(layout.projectDirectory.dir("$exampleDir/dokka")) {
-//        builtBy(tasks.setupDokkaTemplateProjects)
-//      }
-//      artifact(layout.projectDirectory.dir("$exampleDir/dokkatoo")) {
-//        builtBy(tasks.setupDokkaTemplateProjects, tasks.updateGradlePropertiesInDokkatooExamples)
-//      }
-//    }
-//  }
+}
+
+dokkaSourceDownload {
+  dokkaVersion.set(libs.versions.kotlin.dokka)
 }

@@ -13,32 +13,28 @@ plugins {
   `test-report-aggregation`
 
   buildsrc.conventions.`java-base`
-  buildsrc.conventions.`dokka-source-downloader`
   buildsrc.conventions.`maven-publish-test`
   buildsrc.conventions.`dokkatoo-example-projects`
 }
 
 description =
-  "Integration tests for Dokkatoo Gradle Plugin. The tests use Gradle TestKit to run the template projects that are committed in the repo."
+  """
+    Integration tests for Dokkatoo Gradle Plugin. 
+    The tests use Gradle TestKit to run the template projects that are committed in the repo.
+  """.trimIndent()
 
 dependencies {
   testMavenPublication(projects.modules.dokkatooPlugin)
   exampleProjects(projects.examples)
 
-  implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
-
   testFixturesApi(testFixtures(projects.modules.dokkatooPlugin))
+
   testFixturesImplementation(gradleTestKit())
-  testFixturesImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
-  testFixturesImplementation(platform("io.kotest:kotest-bom:5.5.5"))
-  testFixturesImplementation("io.kotest:kotest-runner-junit5")
-  testFixturesImplementation("io.kotest:kotest-assertions-core")
-  testFixturesImplementation("io.kotest:kotest-assertions-json")
 
-  val jacksonVersion = "2.12.7"
-  testFixturesImplementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
+  testFixturesImplementation(platform(libs.kotlinxSerialization.bom))
+  testFixturesImplementation(libs.kotlinxSerialization.json)
 
-//  kotlinDokkaSource(projects.externals)
+  testFixturesCompileOnly(libs.kotlin.dokkaCore)
 
   // don't define test dependencies here, instead define them in the testing.suites {} configuration below
 }
@@ -46,9 +42,9 @@ dependencies {
 
 tasks.withType<KotlinCompile>().configureEach {
   kotlinOptions {
-    this.freeCompilerArgs += listOf(
+    freeCompilerArgs += listOf(
       "-opt-in=kotlin.RequiresOptIn",
-      //"-opt-in=dev.adamko.dokkatoo.internal.DokkatooInternalApi",
+      "-opt-in=dev.adamko.dokkatoo.internal.DokkatooInternalApi",
     )
   }
 }
@@ -60,16 +56,12 @@ testing.suites {
 
     dependencies {
       implementation(project.dependencies.gradleTestKit())
-
-      implementation(project.dependencies.platform("io.kotest:kotest-bom:5.5.5"))
-      implementation("io.kotest:kotest-runner-junit5")
-      implementation("io.kotest:kotest-assertions-core")
-      implementation("io.kotest:kotest-assertions-json")
-
       implementation(project.dependencies.testFixtures(project()))
 
-      implementation("org.jetbrains.dokka:dokka-core:1.7.20")
-      implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
+      compileOnly(libs.kotlin.dokkaCore)
+
+      implementation(project.dependencies.platform(libs.kotlinxSerialization.bom))
+      implementation(libs.kotlinxSerialization.json)
     }
 
     targets.configureEach {
@@ -84,11 +76,10 @@ testing.suites {
 
         // depend on example & integration-test projects setup
         dependsOn(configurations.exampleProjects)
-        dependsOn(tasks.setupDokkaTemplateProjects)
-        dependsOn(tasks.updateGradlePropertiesInDokkatooExamples)
+        dependsOn(tasks.updateDokkatooExamples)
 
         val dokkatooExamplesDir = configurations.exampleProjects.map {
-          it.incoming.artifactView { lenient(true) }.files.singleFile.absolutePath
+          it.incoming.files.singleFile.absolutePath
         }
 
         systemProperty("integrationTestProjectsDir", "$projectDir/projects")
@@ -102,10 +93,16 @@ testing.suites {
   }
 
   /** Examples tests suite */
-  val testExamples by registering(JvmTestSuite::class)
+  val testExamples by registering(JvmTestSuite::class) {
+    description = "Test the example projects, from the 'examples' directory in the project root"
+  }
+
 
   /** Integration tests suite */
-  val testIntegration by registering(JvmTestSuite::class)
+  val testIntegration by registering(JvmTestSuite::class) {
+    description =
+      "Test the integration template projects, in the dokkatoo-plugin-integration-tests/projects directory"
+  }
 
   tasks.check { dependsOn(testExamples, testIntegration) }
 }
@@ -137,24 +134,23 @@ tasks.setupDokkaTemplateProjects {
   destinationToSources.set(
     mapOf(
       //@formatter:off
-      "projects/it-android-0/dokka"                to listOf("integration-tests/gradle/projects/it-android-0"),
-      "projects/it-basic/dokka"                    to listOf("integration-tests/gradle/projects/it-basic"),
-      "projects/it-basic-groovy/dokka"             to listOf("integration-tests/gradle/projects/it-basic-groovy"),
-      "projects/it-collector-0/dokka"              to listOf("integration-tests/gradle/projects/it-collector-0"),
-      "projects/it-js-ir-0/dokka"                  to listOf("integration-tests/gradle/projects/it-js-ir-0"),
-      "projects/it-multimodule-0/dokka"            to listOf("integration-tests/gradle/projects/it-multimodule-0"),
-      "projects/it-multimodule-1/dokka"            to listOf("integration-tests/gradle/projects/it-multimodule-1"),
-      "projects/it-multimodule-versioning-0/dokka" to listOf("integration-tests/gradle/projects/it-multimodule-versioning-0"),
-      "projects/it-multiplatform-0/dokka"          to listOf("integration-tests/gradle/projects/it-multiplatform-0"),
+      "projects/it-android-0/dokka"                to "integration-tests/gradle/projects/it-android-0",
+      "projects/it-basic/dokka"                    to "integration-tests/gradle/projects/it-basic",
+      "projects/it-basic-groovy/dokka"             to "integration-tests/gradle/projects/it-basic-groovy",
+      "projects/it-collector-0/dokka"              to "integration-tests/gradle/projects/it-collector-0",
+      "projects/it-js-ir-0/dokka"                  to "integration-tests/gradle/projects/it-js-ir-0",
+      "projects/it-multimodule-0/dokka"            to "integration-tests/gradle/projects/it-multimodule-0",
+      "projects/it-multimodule-1/dokka"            to "integration-tests/gradle/projects/it-multimodule-1",
+      "projects/it-multimodule-versioning-0/dokka" to "integration-tests/gradle/projects/it-multimodule-versioning-0",
+      "projects/it-multiplatform-0/dokka"          to "integration-tests/gradle/projects/it-multiplatform-0",
 
       //"integration-tests/gradle/projects/coroutines"                  to "projects/coroutines/dokka",
       //"integration-tests/gradle/projects/serialization"               to "projects/serialization/dokka",
       //"integration-tests/gradle/projects/stdlib"                      to "projects/stdlib/dokka",
       //@formatter:on
-    ).mapKeys { (dest, _) ->
-      projectDir.resolve(dest)
-    }.mapValues { (_, sources) ->
-      sources + listOf(
+    ).entries.associate { (dest, rootDir) ->
+      projectDir.resolve(dest) to listOf(
+        rootDir,
         "integration-tests/gradle/projects/template.root.gradle.kts",
         "integration-tests/gradle/projects/template.settings.gradle.kts",
       )
@@ -164,9 +160,13 @@ tasks.setupDokkaTemplateProjects {
 
 tasks.withType<Test>().configureEach {
   // this seems to help OOM errors in the Worker Daemons
-  setForkEvery(1)
+  //setForkEvery(1)
   jvmArgs(
     "-Xmx1g",
-    //"-XX:MaxMetaspaceSize=512m",
+    "-XX:MaxMetaspaceSize=512m",
   )
+}
+
+dokkaSourceDownload {
+  dokkaVersion.set(libs.versions.kotlin.dokka)
 }

@@ -33,4 +33,5 @@ import kotlin.annotation.AnnotationTarget.*
   PROPERTY,
   PROPERTY_GETTER,
 )
+@MustBeDocumented
 internal annotation class DokkatooInternalApi

@@ -1,6 +1,7 @@
 package dev.adamko.dokkatoo
 
 import dev.adamko.dokkatoo.dokka.parameters.DokkaParametersKxs
+import dev.adamko.dokkatoo.internal.DokkatooConstants.DOKKATOO_VERSION
 import dev.adamko.dokkatoo.utils.*
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.inspectors.forAll
@@ -12,7 +13,9 @@ import io.kotest.matchers.file.shouldBeAFile
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.paths.shouldBeAFile
 import io.kotest.matchers.paths.shouldExist
+import io.kotest.matchers.paths.shouldNotExist
 import io.kotest.matchers.should
+import io.kotest.matchers.string.shouldBeEmpty
 import io.kotest.matchers.string.shouldContain
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.decodeFromStream
@@ -28,7 +31,6 @@ class MultiModuleFunctionalTest : FunSpec({
         "clean",
         ":dokkatooGenerate",
         "--stacktrace",
-        "--info",
       )
       .forwardOutput()
       .build {
@@ -114,15 +116,14 @@ class MultiModuleFunctionalTest : FunSpec({
 
       test("contains the default Dokka plugins") {
         pluginClasspathJars.shouldContainExactlyInAnyOrder(
-//        "markdown-jvm-0.3.1.jar",
-          "kotlin-analysis-intellij-1.7.20.jar",
-          "dokka-base-1.7.20.jar",
-          "templating-plugin-1.7.20.jar",
-          "dokka-analysis-1.7.20.jar",
-          "kotlin-analysis-compiler-1.7.20.jar",
-          "kotlinx-html-jvm-0.8.0.jar",
-          "freemarker-2.3.31.jar",
           "all-modules-page-plugin-1.7.20.jar",
+          "dokka-analysis-1.8.10.jar",
+          "dokka-base-1.8.10.jar",
+          "freemarker-2.3.31.jar",
+          "kotlin-analysis-compiler-1.8.10.jar",
+          "kotlin-analysis-intellij-1.8.10.jar",
+          "kotlinx-html-jvm-0.8.0.jar",
+          "templating-plugin-1.8.10.jar",
         )
       }
     }
@@ -144,7 +145,6 @@ class MultiModuleFunctionalTest : FunSpec({
           //"clean",
           ":dokkatooGenerate",
           "--stacktrace",
-          "--info",
           "--build-cache",
         )
         .forwardOutput()
@@ -170,7 +170,6 @@ class MultiModuleFunctionalTest : FunSpec({
           .withArguments(
             ":dokkatooGenerate",
             "--stacktrace",
-            "--info",
             "--build-cache",
           )
           .forwardOutput()
@@ -207,7 +206,6 @@ class MultiModuleFunctionalTest : FunSpec({
           //"clean",
           ":dokkatooGenerate",
           "--stacktrace",
-          "--info",
           "--no-build-cache",
           "--configuration-cache",
         )
@@ -247,7 +245,6 @@ class MultiModuleFunctionalTest : FunSpec({
             //"clean",
             ":dokkatooGeneratePublicationHtml",
             "--stacktrace",
-            "--info",
             "--build-cache",
           )
           .forwardOutput()
@@ -279,11 +276,18 @@ class MultiModuleFunctionalTest : FunSpec({
             .withArguments(
               ":dokkatooGeneratePublicationHtml",
               "--stacktrace",
-              "--info",
               "--build-cache",
             )
             .forwardOutput()
             .build {
+
+              test("expect HelloAgain HTML file exists") {
+                val helloAgainIndexHtml = project.projectDir.resolve(
+                  "build/dokka/html/subproject-hello/com.project.hello/-hello-again/index.html"
+                )
+
+                helloAgainIndexHtml.shouldBeAFile()
+              }
 
               test("expect :subproject-goodbye tasks are up-to-date, because no files changed") {
                 shouldHaveTasksWithOutcome(
@@ -317,8 +321,123 @@ class MultiModuleFunctionalTest : FunSpec({
                 output shouldContain "8 actionable tasks"
               }
             }
+
+          context("and when the class is deleted") {
+            project.dir("subproject-hello") {
+              createKotlinFile("src/main/kotlin/HelloAgain.kt", "")
+            }
+
+            project.runner
+              .withArguments(
+                ":dokkatooGeneratePublicationHtml",
+                "--stacktrace",
+                "--info",
+                "--build-cache",
+              )
+              .forwardOutput()
+              .build {
+                test("expect the generated HTML file is deleted") {
+                  val helloAgainIndexHtml = project.projectDir.resolve(
+                    "build/dokka/html/subproject-hello/com.project.hello/-hello-again/index.html"
+                  )
+
+                  helloAgainIndexHtml.shouldNotExist()
+                }
+              }
+          }
         }
       }
+    }
+  }
+
+  context("logging -> ") {
+    val project = initDokkatooProject("logging")
+
+    test("expect no logs when built using --quiet log level") {
+
+      project.runner
+        .withArguments(
+          "clean",
+          ":dokkatooGenerate",
+          "--no-configuration-cache",
+          "--no-build-cache",
+          "--quiet",
+        )
+        .forwardOutput()
+        .build {
+          output.shouldBeEmpty()
+        }
+    }
+
+    test("expect no Dokkatoo logs when built using lifecycle log level") {
+
+      project.runner
+        .withArguments(
+          "clean",
+          ":dokkatooGenerate",
+          "--no-configuration-cache",
+          "--no-build-cache",
+          "--no-parallel",
+          // no logging option => lifecycle log level
+        )
+        .forwardOutput()
+        .build {
+
+          // projects are only configured the first time TestKit runs, and annoyingly there's no
+          // easy way to force Gradle to re-configure the projects - so only check conditionally.
+          if ("Configure project" in output) {
+            output shouldContain /*language=text*/ """
+              ¦> Configure project :
+              ¦> Configure project :subproject-goodbye
+              ¦> Configure project :subproject-hello
+              ¦> Task :clean
+            """.trimMargin("¦")
+          }
+
+          output.lines().sorted().joinToString("\n") shouldContain /*language=text*/ """
+            ¦> Task :clean
+            ¦> Task :dokkatooGenerate
+            ¦> Task :dokkatooGenerateModuleGfm
+            ¦> Task :dokkatooGenerateModuleHtml
+            ¦> Task :dokkatooGenerateModuleJavadoc
+            ¦> Task :dokkatooGenerateModuleJekyll
+            ¦> Task :dokkatooGeneratePublicationGfm
+            ¦> Task :dokkatooGeneratePublicationHtml
+            ¦> Task :dokkatooGeneratePublicationJavadoc
+            ¦> Task :dokkatooGeneratePublicationJekyll
+            ¦> Task :prepareDokkatooParameters
+            ¦> Task :prepareDokkatooParametersGfm
+            ¦> Task :prepareDokkatooParametersHtml
+            ¦> Task :prepareDokkatooParametersJavadoc
+            ¦> Task :prepareDokkatooParametersJekyll
+            ¦> Task :subproject-goodbye:clean
+            ¦> Task :subproject-goodbye:dokkatooGenerateModuleGfm
+            ¦> Task :subproject-goodbye:dokkatooGenerateModuleHtml
+            ¦> Task :subproject-goodbye:dokkatooGenerateModuleJavadoc
+            ¦> Task :subproject-goodbye:dokkatooGenerateModuleJekyll
+            ¦> Task :subproject-goodbye:prepareDokkatooModuleDescriptorGfm
+            ¦> Task :subproject-goodbye:prepareDokkatooModuleDescriptorHtml
+            ¦> Task :subproject-goodbye:prepareDokkatooModuleDescriptorJavadoc
+            ¦> Task :subproject-goodbye:prepareDokkatooModuleDescriptorJekyll
+            ¦> Task :subproject-goodbye:prepareDokkatooParametersGfm
+            ¦> Task :subproject-goodbye:prepareDokkatooParametersHtml
+            ¦> Task :subproject-goodbye:prepareDokkatooParametersJavadoc
+            ¦> Task :subproject-goodbye:prepareDokkatooParametersJekyll
+            ¦> Task :subproject-hello:clean
+            ¦> Task :subproject-hello:dokkatooGenerateModuleGfm
+            ¦> Task :subproject-hello:dokkatooGenerateModuleHtml
+            ¦> Task :subproject-hello:dokkatooGenerateModuleJavadoc
+            ¦> Task :subproject-hello:dokkatooGenerateModuleJekyll
+            ¦> Task :subproject-hello:prepareDokkatooModuleDescriptorGfm
+            ¦> Task :subproject-hello:prepareDokkatooModuleDescriptorHtml
+            ¦> Task :subproject-hello:prepareDokkatooModuleDescriptorJavadoc
+            ¦> Task :subproject-hello:prepareDokkatooModuleDescriptorJekyll
+            ¦> Task :subproject-hello:prepareDokkatooParametersGfm
+            ¦> Task :subproject-hello:prepareDokkatooParametersHtml
+            ¦> Task :subproject-hello:prepareDokkatooParametersJavadoc
+            ¦> Task :subproject-hello:prepareDokkatooParametersJekyll
+          """.trimMargin("¦")
+        }
     }
   }
 })
@@ -341,7 +460,7 @@ private fun initDokkatooProject(
       |  // Kotlin plugin shouldn't be necessary here, but without it Dokka errors
       |  // with ClassNotFound KotlinPluginExtension... very weird
       |  kotlin("jvm") version "1.7.20" apply false
-      |  id("dev.adamko.dokkatoo") version "0.0.3-SNAPSHOT"
+      |  id("dev.adamko.dokkatoo") version "$DOKKATOO_VERSION"
       |}
       |
       |dependencies {
@@ -356,7 +475,7 @@ private fun initDokkatooProject(
       buildGradleKts = """
           |plugins {
           |    kotlin("jvm") version "1.7.20"
-          |    id("dev.adamko.dokkatoo") version "0.0.3-SNAPSHOT"
+          |    id("dev.adamko.dokkatoo") version "$DOKKATOO_VERSION"
           |}
           |
         """.trimMargin()
@@ -383,7 +502,7 @@ private fun initDokkatooProject(
       buildGradleKts = """
           |plugins {
           |    kotlin("jvm") version "1.7.20"
-          |    id("dev.adamko.dokkatoo") version "0.0.3-SNAPSHOT"
+          |    id("dev.adamko.dokkatoo") version "$DOKKATOO_VERSION"
           |}
           |
         """.trimMargin()

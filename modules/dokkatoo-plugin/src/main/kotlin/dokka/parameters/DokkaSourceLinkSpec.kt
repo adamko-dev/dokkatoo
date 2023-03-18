@@ -9,7 +9,6 @@ import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
-import org.jetbrains.dokka.DokkaConfigurationBuilder
 
 /**
  * Configuration builder that allows adding a `source` link to each signature
@@ -29,7 +28,7 @@ import org.jetbrains.dokka.DokkaConfigurationBuilder
 abstract class DokkaSourceLinkSpec
 @DokkatooInternalApi
 constructor() :
-  DokkaConfigurationBuilder<DokkaParametersKxs.SourceLinkDefinitionKxs>,
+  DokkaParameterBuilder<DokkaParametersKxs.SourceLinkDefinitionKxs>,
   Serializable {
 
   /**

@@ -3,11 +3,13 @@ package buildsrc.conventions
 import java.time.Duration
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
+/**
+ * A convention plugin that sets up common config and sensible defaults for all subprojects.
+ */
+
 plugins {
   base
 }
-
-// common config for all projects
 
 if (project != rootProject) {
   project.version = rootProject.version
