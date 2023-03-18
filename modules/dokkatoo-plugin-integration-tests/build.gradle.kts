@@ -18,7 +18,8 @@ plugins {
   buildsrc.conventions.`dokkatoo-example-projects`
 }
 
-description = "Integration tests for Dokkatoo Gradle Plugin. The tests use Gradle TestKit to run the template projects that are committed in the repo."
+description =
+  "Integration tests for Dokkatoo Gradle Plugin. The tests use Gradle TestKit to run the template projects that are committed in the repo."
 
 dependencies {
   testMavenPublication(projects.modules.dokkatooPlugin)
@@ -60,8 +61,6 @@ testing.suites {
     dependencies {
       implementation(project.dependencies.gradleTestKit())
 
-      implementation("org.jetbrains.kotlin:kotlin-test:1.7.20")
-
       implementation(project.dependencies.platform("io.kotest:kotest-bom:5.5.5"))
       implementation("io.kotest:kotest-runner-junit5")
       implementation("io.kotest:kotest-assertions-core")
@@ -102,49 +101,11 @@ testing.suites {
     }
   }
 
-
   /** Examples tests suite */
-  val testExamples by registering(JvmTestSuite::class) {
-//    testType.set(TestSuiteType.FUNCTIONAL_TEST)
-
-    targets.all {
-      testTask.configure {
-//        dependsOn(project.configurations.kotlinDokkaSource)
-
-//        inputs.property("dokkaSourceDir",
-//          project.configurations.kotlinDokkaSource.map { dokkaSrcConf ->
-//            val files = dokkaSrcConf.incoming.artifactView { lenient(true) }.files
-//            files.singleOrNull()?.absolutePath
-//              ?: error("could not get Dokka source code directory from kotlinDokkaSource configuration. Got ${files.count()} files: $files")
-//          }
-//        )
-//
-//        systemProperty("dokkaSourceDir", inputs.properties["dokkaSourceDir"]!!)
-      }
-    }
-  }
-
+  val testExamples by registering(JvmTestSuite::class)
 
   /** Integration tests suite */
-  val testIntegration by registering(JvmTestSuite::class) {
-//    testType.set(TestSuiteType.INTEGRATION_TEST)
-
-    targets.all {
-      testTask.configure {
-//        dependsOn(project.configurations.kotlinDokkaSource)
-
-//        inputs.property("dokkaSourceDir",
-//          project.configurations.kotlinDokkaSource.map { dokkaSrcConf ->
-//            val files = dokkaSrcConf.incoming.artifactView { lenient(true) }.files
-//            files.singleOrNull()?.absolutePath
-//              ?: error("could not get Dokka source code directory from kotlinDokkaSource configuration. Got ${files.count()} files: $files")
-//          }
-//        )
-//
-//        systemProperty("dokkaSourceDir", inputs.properties["dokkaSourceDir"]!!)
-      }
-    }
-  }
+  val testIntegration by registering(JvmTestSuite::class)
 
   tasks.check { dependsOn(testExamples, testIntegration) }
 }

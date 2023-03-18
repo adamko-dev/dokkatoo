@@ -10,3 +10,9 @@ plugins {
 tasks.validatePlugins {
   enableStricterValidation.set(true)
 }
+
+sourceSets {
+  configureEach {
+    java.setSrcDirs(emptyList<File>())
+  }
+}
