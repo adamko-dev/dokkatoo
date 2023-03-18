@@ -4,6 +4,7 @@ import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes
 import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes.Companion.DOKKATOO_BASE_ATTRIBUTE
 import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes.Companion.DOKKATOO_CATEGORY_ATTRIBUTE
 import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes.Companion.DOKKA_FORMAT_ATTRIBUTE
+import dev.adamko.dokkatoo.dokka.parameters.KotlinPlatform
 import dev.adamko.dokkatoo.dokka.parameters.VisibilityModifier
 import dev.adamko.dokkatoo.formats.*
 import dev.adamko.dokkatoo.internal.*
@@ -25,7 +26,6 @@ import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.kotlin.dsl.*
 import org.gradle.language.base.plugins.LifecycleBasePlugin
-import org.jetbrains.dokka.Platform
 
 /**
  * The base plugin for Dokkatoo. Sets up Dokkatoo and configures default values, but does not
@@ -149,7 +149,7 @@ constructor(
     val sourceSetScopeConvention = dokkatooExtension.sourceSetScopeDefault
 
     dokkatooExtension.dokkatooSourceSets.all dss@{
-      analysisPlatform.convention(Platform.DEFAULT)
+      analysisPlatform.convention(KotlinPlatform.DEFAULT)
       displayName.convention(
         analysisPlatform.map { platform ->
           name.substringBeforeLast(

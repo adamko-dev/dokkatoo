@@ -211,7 +211,7 @@ constructor(
    * The default value is deduced from information provided by the Kotlin Gradle plugin.
    */
   @get:Input
-  abstract val analysisPlatform: Property<Platform>
+  abstract val analysisPlatform: Property<KotlinPlatform>
 
   /**
    * Whether to skip packages that contain no visible declarations after
@@ -404,7 +404,7 @@ constructor(
       noStdlibLink = noStdlibLink.get(),
       noJdkLink = noJdkLink.get(),
       suppressedFiles = suppressedFiles.files,
-      analysisPlatform = analysisPlatform.get(),
+      analysisPlatform = analysisPlatform.get().dokkaType,
       documentedVisibilities = documentedVisibilities.get().convertToDokkaTypes(),
     )
   }

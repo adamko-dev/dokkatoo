@@ -5,6 +5,7 @@ import com.android.build.gradle.api.LibraryVariant
 import dev.adamko.dokkatoo.DokkatooBasePlugin
 import dev.adamko.dokkatoo.DokkatooExtension
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetIDSpec
+import dev.adamko.dokkatoo.dokka.parameters.KotlinPlatform
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import javax.inject.Inject
 import org.gradle.api.Plugin
@@ -15,11 +16,7 @@ import org.gradle.api.file.FileCollection
 import org.gradle.api.logging.Logging
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.ExtensionContainer
-import org.gradle.kotlin.dsl.findByType
-import org.gradle.kotlin.dsl.getByType
-import org.gradle.kotlin.dsl.newInstance
-import org.gradle.kotlin.dsl.withType
-import org.jetbrains.dokka.Platform
+import org.gradle.kotlin.dsl.*
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinSingleTargetExtension
@@ -123,7 +120,7 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
         suppress.convention(!isMainSourceSet)
         sourceRoots.from(extantKotlinSourceRoots)
         classpath.from(getKSSClasspath(project, kotlinSourceSetConfigurationNames))
-        analysisPlatform.convention(Platform.fromString(kotlinPlatformType.name))
+        analysisPlatform.convention(KotlinPlatform.fromString(kotlinPlatformType.name))
         dependentSourceSets.addAll(dependentSourceSetIds)
       }
     }
