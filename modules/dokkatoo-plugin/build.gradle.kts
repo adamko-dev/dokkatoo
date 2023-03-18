@@ -1,6 +1,7 @@
 @file:Suppress("UnstableApiUsage") // jvm test suites & test report aggregation are incubating
 
 import buildsrc.conventions.utils.skipTestFixturesPublications
+import org.gradle.kotlin.dsl.support.serviceOf
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -21,15 +22,50 @@ plugins {
 
 description = "Generates documentation for Kotlin projects (using Dokka)"
 
+
+
+val gradleApiDl by configurations.creating {
+  isCanBeResolved = true
+  isCanBeConsumed = false
+  isVisible = true
+}
+
+dependencies {
+  gradleApiDl("distributions:gradle:8.0.2")
+}
+
+val libDir = layout.projectDirectory.dir("lib")
+
+val downloadGradleApi by tasks.registering(Sync::class) {
+  group = "plugin development"
+
+  val archives = serviceOf<ArchiveOperations>()
+
+  from(gradleApiDl.incoming.artifacts.resolvedArtifacts.map { artifacts ->
+    val gradleDistZip = artifacts.single().file
+    val gradleDist = archives.zipTree(gradleDistZip)
+    gradleDist
+      .matching { include("**/gradle-core-api*jar") }
+      .files
+  }) {
+    rename { "gradle-core-api.jar" }
+  }
+  into(libDir)
+}
+
 dependencies {
   implementation("org.jetbrains.dokka:dokka-core:1.7.20")
+
+  compileOnly(libDir.files("gradle-core-api.jar"))
+  implementation(kotlin("stdlib"))
 
   compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.20")
   compileOnly("com.android.tools.build:gradle:4.0.1")
 
   implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
 
-  testFixturesImplementation(gradleApi())
+  testFixturesImplementation(libDir.files("gradle-core-api.jar"))
+//  testFixturesImplementation(gradleApi())
   testFixturesImplementation(gradleTestKit())
   testFixturesCompileOnly("org.jetbrains.dokka:dokka-core:1.7.20")
   testFixturesImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
@@ -107,7 +143,7 @@ testing.suites {
 
       implementation("org.jetbrains.kotlin:kotlin-test:1.7.20")
 
-      implementation(project.dependencies.testFixtures(project))
+      implementation(project.dependencies.testFixtures(project()))
 
       implementation("org.jetbrains.dokka:dokka-core:1.7.20")
       implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")

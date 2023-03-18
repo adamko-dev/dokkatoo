@@ -32,6 +32,15 @@ dependencyResolutionManagement {
       }
       metadataSources { artifact() }
     }
+
+    ivy("https://services.gradle.org/") {
+      name = "Gradle Services"
+      patternLayout {
+        // https://services.gradle.org/distributions/gradle-8.0.2-bin.zip
+        artifact("[organisation]/[module]-[revision]-bin.zip")
+      }
+      metadataSources { artifact() }
+    }
   }
 }
 
