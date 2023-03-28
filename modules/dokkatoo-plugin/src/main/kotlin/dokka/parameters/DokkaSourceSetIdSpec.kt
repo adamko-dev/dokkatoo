@@ -1,13 +1,15 @@
 package dev.adamko.dokkatoo.dokka.parameters
 
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
+import java.io.Serializable
 import javax.inject.Inject
 import org.gradle.api.Named
+import org.gradle.api.model.ObjectFactory
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
-import org.jetbrains.dokka.DokkaSourceSetID
+import org.gradle.kotlin.dsl.*
 
-abstract class DokkaSourceSetIDSpec
+abstract class DokkaSourceSetIdSpec
 @DokkatooInternalApi
 @Inject
 constructor(
@@ -23,15 +25,29 @@ constructor(
    */
   @get:Input
   val scopeId: String
-) : DokkaParameterBuilder<DokkaSourceSetID>, Named {
+) : DokkaParameterBuilder<DokkaParametersKxs.SourceSetIdKxs>, Named, Serializable {
 
   @get:Input
   abstract var sourceSetName: String
 
   @DokkatooInternalApi
-  override fun build(): DokkaSourceSetID = DokkaSourceSetID(scopeId, sourceSetName)
+  override fun build(): DokkaParametersKxs.SourceSetIdKxs =
+    DokkaParametersKxs.SourceSetIdKxs(scopeId, sourceSetName)
 
   @Internal
   override fun getName(): String = scopeId
 
+  companion object {
+
+    /** Utility for creating a new [DokkaSourceSetIdSpec] instance using [ObjectFactory.newInstance] */
+    @DokkatooInternalApi
+    fun ObjectFactory.dokkaSourceSetIdSpec(
+      scopeId: String,
+      sourceSetName: String,
+    ): DokkaSourceSetIdSpec =
+      newInstance<DokkaSourceSetIdSpec>(scopeId).apply {
+        this.sourceSetName = sourceSetName
+      }
+
+  }
 }

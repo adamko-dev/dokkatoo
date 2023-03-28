@@ -26,7 +26,7 @@ jobs:
       matrix:
         os: [ macos-latest, ubuntu-latest, windows-latest ]
         task:
-          - check --continue
+          - "check --continue"
       fail-fast: false
     uses: ./.github/workflows/gradle_task.yml
     with:

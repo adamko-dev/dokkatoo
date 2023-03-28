@@ -81,17 +81,22 @@ constructor(
   abstract val moduleVersion: Property<String>
 
   /**
-   * The directory used by Dokka Generator as the output (not the output directory of this task).
+   * Deprecated: this value was never used, because it was overridden in
+   * [DokkatooGenerateTask].
+   *
+   * The output directory should instead be set using
+   * [dev.adamko.dokkatoo.DokkatooExtension.dokkatooPublicationDirectory]
+   * (or [dev.adamko.dokkatoo.DokkatooExtension.dokkatooModuleDirectory] for modules)
    */
-  @get:Internal // marked as Internal because this task does not use the directory contents, only the location
+  @Deprecated("This value was never used - see KDoc for alternative")
+  @get:Internal
   val outputDir: DirectoryProperty = objects.directoryProperty()
 
-  /**
-   * Because [outputDir] must be [Internal] (so Gradle doesn't check the directory contents),
-   * [outputDirPath] is required so Gradle can determine if the task is up-to-date.
-   */
-  @get:Input
+  /** @see [outputDir] */
+  @Deprecated("This value was never used - see outputDir")
+  @get:Internal
   protected val outputDirPath: Provider<String> =
+    @Suppress("DEPRECATION")
     outputDir.map { it.asFile.invariantSeparatorsPath }
 
   @get:Input
@@ -114,7 +119,6 @@ constructor(
 
   /** @see dev.adamko.dokkatoo.dokka.DokkaPublication.enabled */
   @get:Input
-//    @get:Optional
   abstract val publicationEnabled: Property<Boolean>
 
   init {
@@ -137,7 +141,6 @@ constructor(
 
     val moduleName = moduleName.get()
     val moduleVersion = moduleVersion.orNull?.takeIf { it != "unspecified" }
-    val outputDir = outputDir.asFile.get()
     val cacheRoot = cacheRoot.asFile.orNull
     val offlineMode = offlineMode.get()
     val sourceSets = dokkaSourceSets.filterNot {
@@ -159,9 +162,8 @@ constructor(
 
     val dokkaModuleDescriptors = dokkaModuleDescriptors()
 
-
     // construct the base configuration for THIS project
-    val baseDokkaConfiguration = DokkaParametersKxs(
+    val baseDokkaParams = DokkaParametersKxs(
       cacheRoot = cacheRoot,
       delayTemplateSubstitution = delayTemplateSubstitution,
       failOnWarning = failOnWarning,
@@ -169,9 +171,8 @@ constructor(
       includes = includes,
       moduleName = moduleName,
       moduleVersion = moduleVersion,
-      modulesKxs = dokkaModuleDescriptors,
+      modules = dokkaModuleDescriptors,
       offlineMode = offlineMode,
-      outputDir = outputDir,
       pluginsClasspath = pluginsClasspath,
       pluginsConfiguration = pluginsConfiguration,
       sourceSets = sourceSets,
@@ -179,23 +180,27 @@ constructor(
       suppressObviousFunctions = suppressObviousFunctions,
     )
 
-    // fetch parameters from OTHER subprojects
-    val subprojectConfigs = dokkaSubprojectParameters.files.map { file ->
-      val fileContent = file.readText()
-      jsonMapper.decodeFromString(DokkaParametersKxs.serializer(), fileContent)
-    }
+    logger.debug("Generated baseDokkaParams: $baseDokkaParams")
 
-    // now combine them:
-    return subprojectConfigs.fold(baseDokkaConfiguration) { acc, _: DokkaParametersKxs ->
-      acc.copy(
-//        sourceSets = acc.sourceSets + it.sourceSets,
-        // TODO remove plugin classpath aggregation, plugin classpath should be shared via Gradle Configuration
-        //      so Gradle can correctly de-duplicate jars
-//                pluginsClasspath = acc.pluginsClasspath + it.pluginsClasspath,
-      )
+    return baseDokkaParams
 
-    }
-//    return baseDokkaConfiguration
+    // TODO 'Dokka Collect' replacement - merge subprojects directly, not as modules
+    //// fetch parameters from OTHER subprojects
+    //val subprojectConfigs = dokkaSubprojectParameters.files.map { file ->
+    //  val fileContent = file.readText()
+    //  jsonMapper.decodeFromString(DokkaParametersKxs.serializer(), fileContent)
+    //}
+    //
+    //// now combine them:
+    //return subprojectConfigs.fold(baseDokkaParams) { acc, _: DokkaParametersKxs ->
+    //  acc.copy(
+    //    //sourceSets = acc.sourceSets + it.sourceSets,
+    //// TODO remove plugin classpath aggregation, plugin classpath should be shared via Gradle Configuration
+    //     //      so Gradle can correctly de-duplicate jars
+    //     pluginsClasspath = acc.pluginsClasspath + it.pluginsClasspath,
+    //  )
+    //
+    //}
   }
 
   private fun dokkaModuleDescriptors(): List<DokkaParametersKxs.DokkaModuleDescriptionKxs> {
