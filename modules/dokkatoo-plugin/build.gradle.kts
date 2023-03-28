@@ -25,7 +25,9 @@ plugins {
 description = "Generates documentation for Kotlin projects (using Dokka)"
 
 dependencies {
-
+  // ideally there should be a 'dokka-core-api' dependency (that is very thin and doesn't drag in loads of unnecessary code)
+  // that would be used as an implementation dependency, while dokka-core would be used as a compileOnly dependency
+  // https://github.com/Kotlin/dokka/issues/2933
   implementation(libs.kotlin.dokkaCore)
 
   compileOnly(libs.gradlePlugin.kotlin)
@@ -118,8 +120,6 @@ testing.suites {
 
       implementation(project.dependencies.testFixtures(project()))
 
-      compileOnly(libs.kotlin.dokkaCore)
-
       implementation(project.dependencies.platform(libs.kotlinxSerialization.bom))
       implementation(libs.kotlinxSerialization.json)
     }
@@ -191,7 +191,7 @@ val aggregateTestReports by tasks.registering(TestReport::class) {
 binaryCompatibilityValidator {
   ignoredMarkers.add("dev.adamko.dokkatoo.internal.DokkatooInternalApi")
 
-  // manually ignore all KxS serializers
+  // TODO remove manually ignored KxS serializers - it's not really correct to ignore them
   ignoredClasses.addAll(
     listOf(
       "DokkaModuleDescriptionKxs",
@@ -224,14 +224,14 @@ val buildConfigFileContents: Provider<TextResource> =
 
     resources.text.fromString(
       """
-          |package dev.adamko.dokkatoo.internal
-          |
-          |@DokkatooInternalApi
-          |object DokkatooConstants {
-          |$vals
-          |}
-          |
-        """.trimMargin()
+        |package dev.adamko.dokkatoo.internal
+        |
+        |@DokkatooInternalApi
+        |object DokkatooConstants {
+        |$vals
+        |}
+        |
+      """.trimMargin()
     )
   }
 

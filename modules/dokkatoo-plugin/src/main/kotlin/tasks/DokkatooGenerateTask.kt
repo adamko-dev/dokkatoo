@@ -88,12 +88,12 @@ constructor(
   internal fun generateDocumentation() {
     val dokkaParametersJsonFile = dokkaParametersJson.get().asFile
     val generationType: GenerationType = generationType.get()
+    val outputDir = outputDirectory.get().asFile
 
     val dokkaParameters = jsonMapper.decodeFromStream(
       DokkaParametersKxs.serializer(),
       dokkaParametersJsonFile.inputStream(),
     ).copy(
-      outputDir = outputDirectory.get().asFile,
       delayTemplateSubstitution = when (generationType) {
         GenerationType.MODULE      -> true
         GenerationType.PUBLICATION -> false
@@ -102,12 +102,12 @@ constructor(
 
     logger.info("dokkaParameters: $dokkaParameters")
 
-    dokkaParameters.modulesKxs.forEach {
-      // workaround https://github.com/Kotlin/dokka/issues/2866
+    dokkaParameters.modules.forEach {
+      // workaround until https://github.com/Kotlin/dokka/pull/2867 is released
       outputDirectory.dir(it.modulePath).get().asFile.mkdirs()
     }
 
-    logger.info("DokkaGeneratorWorker runtimeClasspath: ${runtimeClasspath.files.joinToString("\n") { it.name }}")
+    logger.info("DokkaGeneratorWorker runtimeClasspath: ${runtimeClasspath.asPath}")
 
     val workQueue = workers.processIsolation {
       classpath.from(runtimeClasspath)
@@ -121,8 +121,10 @@ constructor(
       }
     }
 
+    val dokkaParametersImpl = dokkaParameters.convert(outputDir)
+
     workQueue.submit(DokkaGeneratorWorker::class) worker@{
-      this@worker.dokkaParameters.set(dokkaParameters)
+      this@worker.dokkaParameters.set(dokkaParametersImpl)
       this@worker.logFile.set(workerLogFile)
     }
   }

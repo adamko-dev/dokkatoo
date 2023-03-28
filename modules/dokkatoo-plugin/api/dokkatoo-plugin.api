@@ -89,6 +89,17 @@ public final class dev/adamko/dokkatoo/dokka/parameters/DokkaParametersKxs$$seri
 	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
+public final class dev/adamko/dokkatoo/dokka/parameters/DokkaParametersKxs$SourceSetIdKxs$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Ldev/adamko/dokkatoo/dokka/parameters/DokkaParametersKxs$SourceSetIdKxs$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ldev/adamko/dokkatoo/dokka/parameters/DokkaParametersKxs$SourceSetIdKxs;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Ldev/adamko/dokkatoo/dokka/parameters/DokkaParametersKxs$SourceSetIdKxs;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceLinkSpec : dev/adamko/dokkatoo/dokka/parameters/DokkaParameterBuilder, java/io/Serializable {
 	public synthetic fun build ()Ljava/lang/Object;
 	public abstract fun getLocalDirectory ()Lorg/gradle/api/file/DirectoryProperty;
@@ -99,12 +110,16 @@ public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceLinkSpec :
 	public final fun remoteUrl (Lorg/gradle/api/provider/Provider;)V
 }
 
-public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceSetIDSpec : dev/adamko/dokkatoo/dokka/parameters/DokkaParameterBuilder, org/gradle/api/Named {
+public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceSetIdSpec : dev/adamko/dokkatoo/dokka/parameters/DokkaParameterBuilder, java/io/Serializable, org/gradle/api/Named {
+	public static final field Companion Ldev/adamko/dokkatoo/dokka/parameters/DokkaSourceSetIdSpec$Companion;
 	public synthetic fun build ()Ljava/lang/Object;
 	public fun getName ()Ljava/lang/String;
 	public final fun getScopeId ()Ljava/lang/String;
 	public abstract fun getSourceSetName ()Ljava/lang/String;
 	public abstract fun setSourceSetName (Ljava/lang/String;)V
+}
+
+public final class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceSetIdSpec$Companion {
 }
 
 public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceSetSpec : dev/adamko/dokkatoo/dokka/parameters/DokkaParameterBuilder, dev/adamko/dokkatoo/dokka/parameters/HasConfigurableVisibilityModifiers, java/io/Serializable, org/gradle/api/Named {
@@ -145,12 +160,12 @@ public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceSetSpec : 
 }
 
 public final class dev/adamko/dokkatoo/dokka/parameters/KotlinPlatform : java/lang/Enum {
+	public static final field Common Ldev/adamko/dokkatoo/dokka/parameters/KotlinPlatform;
 	public static final field Companion Ldev/adamko/dokkatoo/dokka/parameters/KotlinPlatform$Companion;
-	public static final field common Ldev/adamko/dokkatoo/dokka/parameters/KotlinPlatform;
-	public static final field js Ldev/adamko/dokkatoo/dokka/parameters/KotlinPlatform;
-	public static final field jvm Ldev/adamko/dokkatoo/dokka/parameters/KotlinPlatform;
-	public static final field native Ldev/adamko/dokkatoo/dokka/parameters/KotlinPlatform;
-	public static final field wasm Ldev/adamko/dokkatoo/dokka/parameters/KotlinPlatform;
+	public static final field JS Ldev/adamko/dokkatoo/dokka/parameters/KotlinPlatform;
+	public static final field JVM Ldev/adamko/dokkatoo/dokka/parameters/KotlinPlatform;
+	public static final field Native Ldev/adamko/dokkatoo/dokka/parameters/KotlinPlatform;
+	public static final field WASM Ldev/adamko/dokkatoo/dokka/parameters/KotlinPlatform;
 	public final fun getKey ()Ljava/lang/String;
 	public static fun valueOf (Ljava/lang/String;)Ldev/adamko/dokkatoo/dokka/parameters/KotlinPlatform;
 	public static fun values ()[Ldev/adamko/dokkatoo/dokka/parameters/KotlinPlatform;

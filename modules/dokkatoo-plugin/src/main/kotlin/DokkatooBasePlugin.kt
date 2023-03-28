@@ -158,7 +158,7 @@ constructor(
           )
         }
       )
-      documentedVisibilities.convention(listOf(VisibilityModifier.DEFAULT))
+      documentedVisibilities.convention(setOf(VisibilityModifier.PUBLIC))
       jdkVersion.convention(8)
       noAndroidSdkLink.convention(true)
       noJdkLink.convention(false)

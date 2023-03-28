@@ -398,7 +398,6 @@ abstract class DokkatooFormatPlugin(
       moduleName.convention(publication.moduleName)
       moduleVersion.convention(publication.moduleVersion)
       offlineMode.convention(publication.offlineMode)
-      outputDir.convention(publication.outputDir)
       pluginsClasspath.from(
         dependencyContainers.dokkaPluginsIntransitiveClasspath.map { classpath ->
           classpath.incoming.artifacts.artifactFiles

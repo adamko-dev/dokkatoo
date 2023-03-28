@@ -1,7 +1,10 @@
 package dev.adamko.dokkatoo.dokka.parameters
 
-import dev.adamko.dokkatoo.dokka.parameters.VisibilityModifier.Companion.convertToDokkaTypes
+import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetIdSpec.Companion.dokkaSourceSetIdSpec
+import dev.adamko.dokkatoo.dokka.parameters.KotlinPlatform.Companion.dokkaType
+import dev.adamko.dokkatoo.dokka.parameters.VisibilityModifier.Companion.dokkaType
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
+import dev.adamko.dokkatoo.internal.mapToSet
 import java.io.Serializable
 import java.net.URL
 import javax.inject.Inject
@@ -11,7 +14,6 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.*
 import org.gradle.api.tasks.*
 import org.gradle.kotlin.dsl.*
-import org.jetbrains.dokka.*
 
 /**
  * [Source set](https://kotlinlang.org/docs/multiplatform-discover-project.html#source-sets) level configuration.
@@ -52,8 +54,8 @@ constructor(
   override fun getName(): String = name
 
   @get:Input
-  val sourceSetID: Provider<DokkaSourceSetID>
-    get() = sourceSetScope.map { scope -> DokkaSourceSetID(scope, getName()) }
+  val sourceSetID: Provider<DokkaSourceSetIdSpec>
+    get() = sourceSetScope.map { scope -> objects.dokkaSourceSetIdSpec(scope, getName()) }
 
   @get:Input
   abstract val sourceSetScope: Property<String>
@@ -132,7 +134,7 @@ constructor(
    * By default, the values are deduced from information provided by the Kotlin Gradle plugin.
    */
   @get:Nested
-  abstract val dependentSourceSets: NamedDomainObjectContainer<DokkaSourceSetIDSpec>
+  abstract val dependentSourceSets: NamedDomainObjectContainer<DokkaSourceSetIdSpec>
 
   /**
    * Classpath for analysis and interactive samples.
@@ -385,11 +387,11 @@ constructor(
       .toSet()
 
     return DokkaParametersKxs.DokkaSourceSetKxs(
-      sourceSetID = sourceSetID.get(),
+      sourceSetId = sourceSetID.get().build(),
       displayName = displayName.get(),
       classpath = classpath.files.toList(),
       sourceRoots = sourceRoots.files,
-      dependentSourceSets = dependentSourceSets.map(DokkaSourceSetIDSpec::build).toSet(),
+      dependentSourceSetIds = dependentSourceSets.mapToSet(DokkaSourceSetIdSpec::build),
       samples = samples.files,
       includes = includes.files,
       reportUndocumented = reportUndocumented.get(),
@@ -405,7 +407,7 @@ constructor(
       noJdkLink = noJdkLink.get(),
       suppressedFiles = suppressedFiles.files,
       analysisPlatform = analysisPlatform.get().dokkaType,
-      documentedVisibilities = documentedVisibilities.get().convertToDokkaTypes(),
+      documentedVisibilities = documentedVisibilities.get().mapToSet { it.dokkaType },
     )
   }
 }

@@ -4,7 +4,7 @@ import com.android.build.gradle.api.ApplicationVariant
 import com.android.build.gradle.api.LibraryVariant
 import dev.adamko.dokkatoo.DokkatooBasePlugin
 import dev.adamko.dokkatoo.DokkatooExtension
-import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetIDSpec
+import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetIdSpec.Companion.dokkaSourceSetIdSpec
 import dev.adamko.dokkatoo.dokka.parameters.KotlinPlatform
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import javax.inject.Inject
@@ -100,10 +100,10 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
       val extantKotlinSourceRoots = this@kss.kotlin.sourceDirectories.filter { it.exists() }
 
       val dependentSourceSetIds = this@kss.dependsOn.map { dependedKss ->
-        objects.newInstance<DokkaSourceSetIDSpec>("${project.path}:${this@kss.name}:${dependedKss.name}")
-          .apply {
-            sourceSetName = dependedKss.name
-          }
+        objects.dokkaSourceSetIdSpec(
+          "${project.path}:${this@kss.name}:${dependedKss.name}",
+          dependedKss.name,
+        )
       }
 
       logger.info("kotlin source set ${this@kss.name} has source roots: ${extantKotlinSourceRoots.map { it.invariantSeparatorsPath }}")
@@ -113,7 +113,7 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
           analysisPlatform.map { platform ->
             name.substringBeforeLast(
               delimiter = "Main",
-              missingDelimiterValue = platform.name,
+              missingDelimiterValue = platform.key,
             )
           }
         )

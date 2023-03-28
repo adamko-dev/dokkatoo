@@ -9,27 +9,39 @@ import org.jetbrains.dokka.DokkaConfiguration
  *
  * @see org.jetbrains.dokka.DokkaConfiguration.Visibility
  */
-enum class VisibilityModifier(
-  internal val dokkaType: DokkaConfiguration.Visibility
-) {
+enum class VisibilityModifier {
   /** `public` modifier for Java, default visibility for Kotlin */
-  PUBLIC(DokkaConfiguration.Visibility.PUBLIC),
+  PUBLIC,
+
   /** `private` modifier for both Kotlin and Java */
-  PRIVATE(DokkaConfiguration.Visibility.PRIVATE),
+  PRIVATE,
+
   /** `protected` modifier for both Kotlin and Java */
-  PROTECTED(DokkaConfiguration.Visibility.PROTECTED),
+  PROTECTED,
+
   /** Kotlin-specific `internal` modifier */
-  INTERNAL(DokkaConfiguration.Visibility.INTERNAL),
+  INTERNAL,
+
   /** Java-specific package-private visibility (no modifier) */
-  PACKAGE(DokkaConfiguration.Visibility.PACKAGE),
+  PACKAGE,
   ;
 
   companion object {
     internal val entries: Set<VisibilityModifier> = values().toSet()
 
+    @Deprecated("internal value, no longer in use. The default value was moved to DokkaBasePlugin.configureDokkatooSourceSetsDefaults()")
+    @Suppress("unused")
     internal val DEFAULT: VisibilityModifier = PUBLIC
 
-    internal fun Set<VisibilityModifier>.convertToDokkaTypes() =
-      mapTo(mutableSetOf(), VisibilityModifier::dokkaType)
+    // Not defined as a property to try and minimize the dependency on Dokka Core types
+    internal val VisibilityModifier.dokkaType: DokkaConfiguration.Visibility
+      get() =
+        when (this) {
+          PUBLIC    -> DokkaConfiguration.Visibility.PUBLIC
+          PRIVATE   -> DokkaConfiguration.Visibility.PRIVATE
+          PROTECTED -> DokkaConfiguration.Visibility.PROTECTED
+          INTERNAL  -> DokkaConfiguration.Visibility.INTERNAL
+          PACKAGE   -> DokkaConfiguration.Visibility.PACKAGE
+        }
   }
 }
