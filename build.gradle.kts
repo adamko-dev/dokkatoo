@@ -16,12 +16,25 @@ idea {
     isDownloadSources = true
     isDownloadJavadoc = false
     excludeGeneratedGradleDsl(layout)
-    excludeDirs = excludeDirs + layout.files(
-      ".idea",
-      "gradle/kotlin-js-store",
-      "gradle/wrapper",
-      "externals/kotlin-dokka",
-    )
+
+    excludeDirs.apply {
+      addAll(
+        layout.files(
+          ".idea",
+          "gradle/kotlin-js-store",
+          "gradle/wrapper",
+          "externals/kotlin-dokka",
+        )
+      )
+      // exclude .gradle dirs from nested projects (e.g. example/template projects)
+      addAll(
+        layout.projectDirectory.asFile.walk()
+          .filter { it.isDirectory && it.name == ".gradle" }
+          .flatMap { file ->
+            file.walk().maxDepth(1).filter { it.isDirectory }.toList()
+          }
+      )
+    }
   }
 }
 
