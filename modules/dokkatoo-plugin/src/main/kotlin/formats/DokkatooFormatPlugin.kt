@@ -463,7 +463,4 @@ abstract class DokkatooFormatPlugin(
 //      }
     }
   }
-
-  @DokkatooInternalApi
-  companion object
 }

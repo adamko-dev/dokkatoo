@@ -151,7 +151,6 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
     return classpathCollector
   }
 
-  @DokkatooInternalApi
   companion object {
 
     private fun KotlinProjectExtension.kotlinPlatformType(): KotlinPlatformType {

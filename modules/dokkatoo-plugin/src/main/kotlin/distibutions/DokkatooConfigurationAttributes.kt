@@ -22,7 +22,6 @@ constructor(
 ) {
 
   /** A general attribute for all [Configuration]s that are used by the Dokka Gradle plugin */
-//    val dokkaBaseUsage: Usage = objects.named("org.jetbrains.dokka")
   val dokkatooBaseUsage: DokkatooBaseAttribute = objects.named("dokkatoo")
 
   /** for [Configuration]s that provide or consume Dokka parameter files */
