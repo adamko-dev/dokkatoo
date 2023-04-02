@@ -38,4 +38,4 @@ idea {
   }
 }
 
-initIdeProjectLogo()
+initIdeProjectLogo("media/img/logo.svg")
