@@ -123,9 +123,6 @@ data class DokkaParametersKxs(
         analysisPlatform = analysisPlatform,
         documentedVisibilities = documentedVisibilities,
       )
-
-    @DokkatooInternalApi
-    companion object
   }
 
 
@@ -143,9 +140,6 @@ data class DokkaParametersKxs(
         remoteUrl = remoteUrl,
         remoteLineSuffix = remoteLineSuffix,
       )
-
-    @DokkatooInternalApi
-    companion object
   }
 
 
@@ -166,9 +160,6 @@ data class DokkaParametersKxs(
       documentedVisibilities = documentedVisibilities,
       includeNonPublic = DokkaDefaults.includeNonPublic,
     )
-
-    @DokkatooInternalApi
-    companion object
   }
 
 
@@ -185,9 +176,6 @@ data class DokkaParametersKxs(
       serializationFormat = serializationFormat,
       values = values
     )
-
-    @DokkatooInternalApi
-    companion object
   }
 
 
@@ -227,9 +215,6 @@ data class DokkaParametersKxs(
       includes = includes,
       sourceOutputDirectory = sourceOutputDirectory,
     )
-
-    @DokkatooInternalApi
-    internal companion object
   }
 
 
@@ -244,9 +229,6 @@ data class DokkaParametersKxs(
         url = url,
         packageListUrl = packageListUrl,
       )
-
-    @DokkatooInternalApi
-    companion object
   }
 
   @Serializable
@@ -259,14 +241,7 @@ data class DokkaParametersKxs(
     val sourceSetName: String,
   ) {
     fun convert() = DokkaSourceSetID(scopeId, sourceSetName)
-
-    @DokkatooInternalApi
-    companion object
   }
-
-
-  @DokkatooInternalApi
-  companion object
 }
 
 

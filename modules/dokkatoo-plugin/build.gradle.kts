@@ -190,19 +190,6 @@ val aggregateTestReports by tasks.registering(TestReport::class) {
 
 binaryCompatibilityValidator {
   ignoredMarkers.add("dev.adamko.dokkatoo.internal.DokkatooInternalApi")
-
-  // TODO remove manually ignored KxS serializers - it's not really correct to ignore them
-  ignoredClasses.addAll(
-    listOf(
-      "DokkaModuleDescriptionKxs",
-      "DokkaSourceSetKxs",
-      "ExternalDocumentationLinkKxs",
-      "PackageOptionsKxs",
-      "PluginConfigurationKxs",
-      "SourceLinkDefinitionKxs",
-    ).map {
-      "dev.adamko.dokkatoo.dokka.parameters.DokkaParametersKxs\$$it\$\$serializer"
-    })
 }
 
 val dokkatooVersion = provider { project.version.toString() }

@@ -37,6 +37,9 @@ public abstract class dev/adamko/dokkatoo/DokkatooPlugin : org/gradle/api/Plugin
 	public fun apply (Lorg/gradle/api/Project;)V
 }
 
+public final class dev/adamko/dokkatoo/adapters/DokkatooKotlinAdapter$Companion {
+}
+
 public abstract class dev/adamko/dokkatoo/dokka/DokkaPublication : java/io/Serializable, org/gradle/api/Named {
 	public abstract fun getCacheRoot ()Lorg/gradle/api/file/DirectoryProperty;
 	protected final fun getCacheRootPath ()Lorg/gradle/api/provider/Provider;
@@ -89,6 +92,100 @@ public final class dev/adamko/dokkatoo/dokka/parameters/DokkaParametersKxs$$seri
 	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
+public final class dev/adamko/dokkatoo/dokka/parameters/DokkaParametersKxs$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class dev/adamko/dokkatoo/dokka/parameters/DokkaParametersKxs$DokkaModuleDescriptionKxs$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Ldev/adamko/dokkatoo/dokka/parameters/DokkaParametersKxs$DokkaModuleDescriptionKxs$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ldev/adamko/dokkatoo/dokka/parameters/DokkaParametersKxs$DokkaModuleDescriptionKxs;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Ldev/adamko/dokkatoo/dokka/parameters/DokkaParametersKxs$DokkaModuleDescriptionKxs;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class dev/adamko/dokkatoo/dokka/parameters/DokkaParametersKxs$DokkaModuleDescriptionKxs$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class dev/adamko/dokkatoo/dokka/parameters/DokkaParametersKxs$DokkaSourceSetKxs$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Ldev/adamko/dokkatoo/dokka/parameters/DokkaParametersKxs$DokkaSourceSetKxs$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ldev/adamko/dokkatoo/dokka/parameters/DokkaParametersKxs$DokkaSourceSetKxs;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Ldev/adamko/dokkatoo/dokka/parameters/DokkaParametersKxs$DokkaSourceSetKxs;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class dev/adamko/dokkatoo/dokka/parameters/DokkaParametersKxs$DokkaSourceSetKxs$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class dev/adamko/dokkatoo/dokka/parameters/DokkaParametersKxs$ExternalDocumentationLinkKxs$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Ldev/adamko/dokkatoo/dokka/parameters/DokkaParametersKxs$ExternalDocumentationLinkKxs$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ldev/adamko/dokkatoo/dokka/parameters/DokkaParametersKxs$ExternalDocumentationLinkKxs;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Ldev/adamko/dokkatoo/dokka/parameters/DokkaParametersKxs$ExternalDocumentationLinkKxs;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class dev/adamko/dokkatoo/dokka/parameters/DokkaParametersKxs$ExternalDocumentationLinkKxs$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class dev/adamko/dokkatoo/dokka/parameters/DokkaParametersKxs$PackageOptionsKxs$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Ldev/adamko/dokkatoo/dokka/parameters/DokkaParametersKxs$PackageOptionsKxs$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ldev/adamko/dokkatoo/dokka/parameters/DokkaParametersKxs$PackageOptionsKxs;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Ldev/adamko/dokkatoo/dokka/parameters/DokkaParametersKxs$PackageOptionsKxs;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class dev/adamko/dokkatoo/dokka/parameters/DokkaParametersKxs$PackageOptionsKxs$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class dev/adamko/dokkatoo/dokka/parameters/DokkaParametersKxs$PluginConfigurationKxs$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Ldev/adamko/dokkatoo/dokka/parameters/DokkaParametersKxs$PluginConfigurationKxs$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ldev/adamko/dokkatoo/dokka/parameters/DokkaParametersKxs$PluginConfigurationKxs;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Ldev/adamko/dokkatoo/dokka/parameters/DokkaParametersKxs$PluginConfigurationKxs;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class dev/adamko/dokkatoo/dokka/parameters/DokkaParametersKxs$PluginConfigurationKxs$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class dev/adamko/dokkatoo/dokka/parameters/DokkaParametersKxs$SourceLinkDefinitionKxs$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Ldev/adamko/dokkatoo/dokka/parameters/DokkaParametersKxs$SourceLinkDefinitionKxs$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ldev/adamko/dokkatoo/dokka/parameters/DokkaParametersKxs$SourceLinkDefinitionKxs;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Ldev/adamko/dokkatoo/dokka/parameters/DokkaParametersKxs$SourceLinkDefinitionKxs;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class dev/adamko/dokkatoo/dokka/parameters/DokkaParametersKxs$SourceLinkDefinitionKxs$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
 public final class dev/adamko/dokkatoo/dokka/parameters/DokkaParametersKxs$SourceSetIdKxs$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Ldev/adamko/dokkatoo/dokka/parameters/DokkaParametersKxs$SourceSetIdKxs$$serializer;
 	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
@@ -98,6 +195,10 @@ public final class dev/adamko/dokkatoo/dokka/parameters/DokkaParametersKxs$Sourc
 	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Ldev/adamko/dokkatoo/dokka/parameters/DokkaParametersKxs$SourceSetIdKxs;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class dev/adamko/dokkatoo/dokka/parameters/DokkaParametersKxs$SourceSetIdKxs$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceLinkSpec : dev/adamko/dokkatoo/dokka/parameters/DokkaParameterBuilder, java/io/Serializable {
@@ -309,7 +410,6 @@ public final class dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$Values : 
 }
 
 public abstract class dev/adamko/dokkatoo/formats/DokkatooFormatPlugin : org/gradle/api/Plugin {
-	public static final field Companion Ldev/adamko/dokkatoo/formats/DokkatooFormatPlugin$Companion;
 	public fun <init> (Ljava/lang/String;)V
 	public synthetic fun apply (Ljava/lang/Object;)V
 	public fun apply (Lorg/gradle/api/Project;)V
