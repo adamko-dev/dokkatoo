@@ -1,4 +1,4 @@
-package buildsrc.conventions.utils
+package buildsrc.utils
 
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration

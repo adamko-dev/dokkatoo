@@ -1,8 +1,8 @@
 package buildsrc.conventions
 
-import buildsrc.conventions.utils.asConsumer
-import buildsrc.conventions.utils.asProvider
-import buildsrc.conventions.utils.dropDirectories
+import buildsrc.utils.asConsumer
+import buildsrc.utils.asProvider
+import buildsrc.utils.dropDirectories
 import org.gradle.kotlin.dsl.support.serviceOf
 
 plugins {
