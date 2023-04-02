@@ -1,5 +1,6 @@
 package buildsrc.utils
 
+import org.gradle.api.Project
 import org.gradle.api.file.ProjectLayout
 import org.gradle.plugins.ide.idea.model.IdeaModule
 
@@ -20,4 +21,25 @@ fun IdeaModule.excludeGeneratedGradleDsl(layout: ProjectLayout) {
         file.walk().maxDepth(1).filter { it.isDirectory }.toList()
       }
   )
+}
+
+
+/** Sets a logo for project IDEs */
+fun Project.initIdeProjectLogo(
+  svgLogoPath: String
+) {
+  val logoSvg = rootProject.layout.projectDirectory.file(svgLogoPath)
+  val ideaDir = rootProject.layout.projectDirectory.dir(".idea")
+
+  if (
+    logoSvg.asFile.exists()
+    && ideaDir.asFile.exists()
+    && !ideaDir.file("icon.png").asFile.exists()
+    && !ideaDir.file("icon.svg").asFile.exists()
+  ) {
+    copy {
+      from(logoSvg) { rename { "icon.svg" } }
+      into(ideaDir)
+    }
+  }
 }
