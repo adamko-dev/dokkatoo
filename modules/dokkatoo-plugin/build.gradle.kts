@@ -239,12 +239,19 @@ kotlin.sourceSets.main {
 }
 
 dokkatoo {
-  // create a special source set just for documenting the internally visible DokkatooInternalApi
-  dokkatooSourceSets.create("DokkatooInternalApi") {
+  dokkatooSourceSets.register("DokkatooInternalApi") {
+    // create a special source set just for documenting the internally visible DokkatooInternalApi
     documentedVisibilities(INTERNAL)
-    suppress.set(false)
     sourceRoots.from(layout.projectDirectory.dir("src/main/kotlin").asFileTree.matching {
       include("**/DokkatooInternalApi.kt")
     })
+  }
+
+  dokkatooSourceSets.configureEach {
+    sourceLink {
+      localDirectory.set(file("src/main/kotlin"))
+      val relativeProjectPath = projectDir.relativeToOrNull(rootDir)?.invariantSeparatorsPath ?: ""
+      remoteUrl("https://github.com/adamko-dev/dokkatoo/tree/main/$relativeProjectPath/src/main/kotlin")
+    }
   }
 }
