@@ -2,8 +2,8 @@ rootProject.name = "dokkatoo"
 
 pluginManagement {
   repositories {
-    gradlePluginPortal()
     mavenCentral()
+    gradlePluginPortal()
   }
 }
 
@@ -32,6 +32,7 @@ dependencyResolutionManagement {
       }
       metadataSources { artifact() }
     }
+    gradlePluginPortal()
   }
 }
 
@@ -42,7 +43,8 @@ include(
   ":modules:dokkatoo-plugin",
   ":modules:dokkatoo-plugin-integration-tests",
 
-  )
+  ":test-modules:test-setup-plugins",
+)
 
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
