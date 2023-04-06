@@ -34,6 +34,13 @@ constructor(
    *
    * For more information, see
    * [Customizing assets](https://kotlinlang.org/docs/dokka-html.html#customize-assets).
+   *
+   * Be aware that files will be copied as-is to a specific directory inside the assembled Dokka
+   * publication. This means that any relative paths must be written in such a way that they will
+   * work _after_ the files are moved into the publication.
+   *
+   * It's best to try and mirror Dokka's directory structure in the source files, which can help
+   * IDE inspections.
    */
   @get:InputFiles
   @get:PathSensitive(RELATIVE)
@@ -45,6 +52,13 @@ constructor(
    *
    * For more information, see
    * [Customizing assets](https://kotlinlang.org/docs/dokka-html.html#customize-assets).
+   *
+   * Be aware that files will be copied as-is to a specific directory inside the assembled Dokka
+   * publication. This means that any relative paths must be written in such a way that they will
+   * work _after_ the files are moved into the publication.
+   *
+   * It's best to try and mirror Dokka's directory structure in the source files, which can help
+   * IDE inspections.
    */
   @get:InputFiles
   @get:PathSensitive(RELATIVE)
