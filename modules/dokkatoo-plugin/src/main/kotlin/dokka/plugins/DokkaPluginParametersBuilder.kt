@@ -20,7 +20,9 @@ import org.gradle.kotlin.dsl.*
 /**
  * Dynamically create some configuration to control the behaviour of a Dokka Plugin.
  *
- * @param[pluginFqn] The fully-qualified name of a Dokka Plugin. For example, the Dokka Base plugin's FQN is `org.jetbrains.dokka.base.DokkaBase`
+ * @param[pluginFqn] The fully-qualified name of a Dokka Plugin. For example, the FQN of the
+ * [Dokka Base plugin](https://github.com/Kotlin/dokka/tree/master/plugins/base#readme)
+ * is `org.jetbrains.dokka.base.DokkaBase`
  */
 fun DokkaPluginParametersContainer.pluginParameters(
   pluginFqn: String,
