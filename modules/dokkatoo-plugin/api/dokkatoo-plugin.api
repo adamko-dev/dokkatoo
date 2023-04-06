@@ -433,6 +433,9 @@ public abstract class dev/adamko/dokkatoo/formats/DokkatooJekyllPlugin : dev/ada
 	public fun configure (Ldev/adamko/dokkatoo/formats/DokkatooFormatPlugin$DokkatooFormatPluginContext;)V
 }
 
+public abstract interface annotation class dev/adamko/dokkatoo/internal/DokkatooInternalApi : java/lang/annotation/Annotation {
+}
+
 public abstract class dev/adamko/dokkatoo/tasks/DokkatooGenerateTask : dev/adamko/dokkatoo/tasks/DokkatooTask$WithSourceSets {
 	public abstract fun getCacheDirectory ()Lorg/gradle/api/file/DirectoryProperty;
 	public abstract fun getDokkaModuleFiles ()Lorg/gradle/api/file/ConfigurableFileCollection;

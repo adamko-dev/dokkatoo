@@ -239,14 +239,6 @@ kotlin.sourceSets.main {
 }
 
 dokkatoo {
-  dokkatooSourceSets.register("DokkatooInternalApi") {
-    // create a special source set just for documenting the internally visible DokkatooInternalApi
-    documentedVisibilities(INTERNAL)
-    sourceRoots.from(layout.projectDirectory.dir("src/main/kotlin").asFileTree.matching {
-      include("**/DokkatooInternalApi.kt")
-    })
-  }
-
   dokkatooSourceSets.configureEach {
     sourceLink {
       localDirectory.set(file("src/main/kotlin"))
