@@ -20,14 +20,17 @@ internal fun JsonArrayBuilder.addAll(values: Iterable<String>) {
 }
 
 internal fun JsonArrayBuilder.addAllIfNotNull(values: Iterable<String>?) {
-  values?.let(::addAll)
+  if (values != null) addAll(values)
 }
 
-internal fun JsonObjectBuilder.putIfNotNull(key: String, value: Boolean?) =
-  value?.let { put(key, JsonPrimitive(it)) }
+internal fun JsonObjectBuilder.putIfNotNull(key: String, value: Boolean?) {
+  if (value != null) put(key, JsonPrimitive(value))
+}
 
-internal fun JsonObjectBuilder.putIfNotNull(key: String, value: String?) =
-  value?.let { put(key, JsonPrimitive(it)) }
+internal fun JsonObjectBuilder.putIfNotNull(key: String, value: String?) {
+  if (value != null) put(key, JsonPrimitive(value))
+}
 
-internal fun JsonObjectBuilder.putIfNotNull(key: String, value: File?) =
-  value?.let { put(key, JsonPrimitive(it.canonicalFile.invariantSeparatorsPath)) }
+internal fun JsonObjectBuilder.putIfNotNull(key: String, value: File?) {
+  if (value != null) put(key, JsonPrimitive(value.canonicalFile.invariantSeparatorsPath))
+}
