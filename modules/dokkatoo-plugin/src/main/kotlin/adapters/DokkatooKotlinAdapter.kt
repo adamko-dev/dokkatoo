@@ -7,11 +7,11 @@ import dev.adamko.dokkatoo.DokkatooExtension
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetIdSpec.Companion.dokkaSourceSetIdSpec
 import dev.adamko.dokkatoo.dokka.parameters.KotlinPlatform
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
+import dev.adamko.dokkatoo.internal.LocalProjectOnlyFilter
+import dev.adamko.dokkatoo.internal.not
 import javax.inject.Inject
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.artifacts.component.ModuleComponentIdentifier
-import org.gradle.api.artifacts.component.ProjectComponentIdentifier
 import org.gradle.api.file.FileCollection
 import org.gradle.api.logging.Logging
 import org.gradle.api.model.ObjectFactory
@@ -81,6 +81,7 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
         kssCompilations.flatMap { compilationSourceSet ->
           with(compilationSourceSet) {
             sequence {
+              yield(compileDependencyConfigurationName)
               yield(implementationConfigurationName)
               yield(runtimeOnlyConfigurationName)
               yield(apiConfigurationName)
@@ -126,6 +127,7 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
     }
   }
 
+  /** Get the classpath used to build and run a Kotlin Source Set */
   private fun getKSSClasspath(
     project: Project,
     kotlinSourceSetConfigurationNames: List<String>,
@@ -138,13 +140,15 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
       conf.isCanBeResolved
     }.forEach { conf ->
       classpathCollector.from(
-        conf.incoming
+        @Suppress("UnstableApiUsage")
+        conf
+          .incoming
           .artifactView {
-            componentFilter {
-              it is ModuleComponentIdentifier && it !is ProjectComponentIdentifier
-            }
+            componentFilter(!LocalProjectOnlyFilter)
             lenient(true)
-          }.files
+          }.artifacts
+          .resolvedArtifacts
+          .map { artifacts -> artifacts.map { it.file } }
       )
     }
 

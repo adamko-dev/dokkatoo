@@ -43,7 +43,8 @@ tasks.dokkatooGeneratePublicationHtml {
                 <div id="github-link"><a href="https://github.com/adamko-dev/dokkatoo/"></a></div>
                 <button id="theme-toggle-button">
               """.trimIndent(),
-            ).replace(
+            )
+            .replace(
               """
                 href="https://github.com/Kotlin/dokka"><span>dokka</span>
               """.trimIndent(),
