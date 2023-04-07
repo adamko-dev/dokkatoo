@@ -79,8 +79,8 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
 
       val kotlinSourceSetConfigurationNames: List<String> =
         kssCompilations.flatMap { compilationSourceSet ->
-          with(compilationSourceSet) {
-            sequence {
+          sequence {
+            with(compilationSourceSet) {
               yield(compileDependencyConfigurationName)
               yield(implementationConfigurationName)
               yield(runtimeOnlyConfigurationName)
@@ -131,29 +131,23 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
   private fun getKSSClasspath(
     project: Project,
     kotlinSourceSetConfigurationNames: List<String>,
-  ): FileCollection {
-    val classpathCollector = objects.fileCollection()
-
-    kotlinSourceSetConfigurationNames.mapNotNull { kssConfName ->
-      project.configurations.findByName(kssConfName)
-    }.filter { conf ->
-      conf.isCanBeResolved
-    }.forEach { conf ->
-      classpathCollector.from(
-        @Suppress("UnstableApiUsage")
-        conf
-          .incoming
-          .artifactView {
-            componentFilter(!LocalProjectOnlyFilter)
-            lenient(true)
-          }.artifacts
-          .resolvedArtifacts
-          .map { artifacts -> artifacts.map { it.file } }
-      )
-    }
-
-    return classpathCollector
-  }
+  ): FileCollection =
+    kotlinSourceSetConfigurationNames
+      .mapNotNull { kssConfName -> project.configurations.findByName(kssConfName) }
+      .filter { conf -> conf.isCanBeResolved }
+      .fold(objects.fileCollection()) { classpathCollector, conf ->
+        classpathCollector.from(
+          @Suppress("UnstableApiUsage")
+          conf
+            .incoming
+            .artifactView {
+              componentFilter(!LocalProjectOnlyFilter)
+              lenient(true)
+            }.artifacts
+            .resolvedArtifacts
+            .map { artifacts -> artifacts.map { it.file } }
+        )
+      }
 
   companion object {
 
