@@ -35,9 +35,10 @@ class GradlePluginProjectIntegrationTest : FunSpec({
 
       htmlFiles.shouldNotBeEmpty()
 
-      htmlFiles.shouldForAll {
-        withClue("${it.relativeTo(project.projectDir.toFile())} should not contain Error class: unknown class") {
-          it.useLines { lines ->
+      htmlFiles.forEach { htmlFile ->
+        val relativePath = htmlFile.relativeTo(project.projectDir.toFile())
+        withClue("$relativePath should not contain Error class: unknown class") {
+          htmlFile.useLines { lines ->
             lines.shouldForAll { line -> line.shouldNotContain("Error class: unknown class") }
           }
         }
