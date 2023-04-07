@@ -78,22 +78,30 @@ fun gradleKtsProjectTest(
   return GradleProjectTest(baseDir = baseDir, testProjectName = testProjectName).apply {
 
     settingsGradleKts = """
-      |rootProject.name = "test"
+      |rootProject.name = "$testProjectName"
       |
       |@Suppress("UnstableApiUsage")
       |dependencyResolutionManagement {
-      |    repositories {
-      |        mavenCentral()
-      |        maven(file("$testMavenRepoRelativePath"))
+      |  repositories {
+      |    mavenCentral()
+      |    maven(file("$testMavenRepoRelativePath")) {
+      |      mavenContent {
+      |        includeGroup("dev.adamko.dokkatoo")
+      |      }
       |    }
+      |  }
       |}
       |
       |pluginManagement {
-      |    repositories {
-      |        gradlePluginPortal()
-      |        mavenCentral()
-      |        maven(file("$testMavenRepoRelativePath"))
+      |  repositories {
+      |    gradlePluginPortal()
+      |    mavenCentral()
+      |    maven(file("$testMavenRepoRelativePath")) {
+      |      mavenContent {
+      |        includeGroup("dev.adamko.dokkatoo")
+      |      }
       |    }
+      |  }
       |}
       |
     """.trimMargin()
