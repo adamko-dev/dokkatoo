@@ -325,9 +325,9 @@ constructor(
   abstract val jdkVersion: Property<Int>
 
   /**
-   * Action for configuring source links, appending to [sourceLinks].
+   * Configure and add a new source link to [sourceLinks].
    *
-   * @see [DokkaSourceLinkSpec] for details.
+   * @see DokkaSourceLinkSpec
    */
   fun sourceLink(action: Action<in DokkaSourceLinkSpec>) {
     sourceLinks.add(
@@ -340,7 +340,7 @@ constructor(
   /**
    * Action for configuring package options, appending to [perPackageOptions].
    *
-   * @see [DokkaPackageOptionsSpec] for details.
+   * @see DokkaPackageOptionsSpec
    */
   fun perPackageOption(action: Action<in DokkaPackageOptionsSpec>) {
     perPackageOptions.add(
@@ -353,7 +353,7 @@ constructor(
   /**
    * Action for configuring external documentation links, appending to [externalDocumentationLinks].
    *
-   * See [DokkaExternalDocumentationLinkSpec] for details.
+   * @see DokkaExternalDocumentationLinkSpec
    */
   fun externalDocumentationLink(action: Action<in DokkaExternalDocumentationLinkSpec>) {
     externalDocumentationLinks.add(

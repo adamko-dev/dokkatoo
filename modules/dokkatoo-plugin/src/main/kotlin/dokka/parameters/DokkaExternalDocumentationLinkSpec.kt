@@ -104,6 +104,8 @@ constructor(
   /**
    * If enabled this link will be passed to the Dokka Generator.
    *
+   * Defaults to `true`.
+   *
    * @see dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec.noStdlibLink
    * @see dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec.noJdkLink
    * @see dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec.noAndroidSdkLink
