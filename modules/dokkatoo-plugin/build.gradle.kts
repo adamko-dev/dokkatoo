@@ -1,7 +1,6 @@
 @file:Suppress("UnstableApiUsage") // jvm test suites & test report aggregation are incubating
 
 import buildsrc.utils.skipTestFixturesPublications
-import dev.adamko.dokkatoo.dokka.parameters.VisibilityModifier.INTERNAL
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -240,6 +239,10 @@ kotlin.sourceSets.main {
 
 dokkatoo {
   dokkatooSourceSets.configureEach {
+    externalDocumentationLinks.register("gradle") {
+      // https://docs.gradle.org/current/javadoc/index.html
+      url("https://docs.gradle.org/${gradle.gradleVersion}/javadoc/")
+    }
     sourceLink {
       localDirectory.set(file("src/main/kotlin"))
       val relativeProjectPath = projectDir.relativeToOrNull(rootDir)?.invariantSeparatorsPath ?: ""
