@@ -236,6 +236,9 @@ public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceSetSpec : 
 	public abstract fun getDependentSourceSets ()Lorg/gradle/api/NamedDomainObjectContainer;
 	public abstract fun getDisplayName ()Lorg/gradle/api/provider/Property;
 	public abstract fun getDocumentedVisibilities ()Lorg/gradle/api/provider/SetProperty;
+	public abstract fun getEnableAndroidDocumentationLink ()Lorg/gradle/api/provider/Property;
+	public abstract fun getEnableJdkDocumentationLink ()Lorg/gradle/api/provider/Property;
+	public abstract fun getEnableKotlinStdLibDocumentationLink ()Lorg/gradle/api/provider/Property;
 	public abstract fun getExternalDocumentationLinks ()Lorg/gradle/api/NamedDomainObjectContainer;
 	public abstract fun getIncludes ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public abstract fun getJdkVersion ()Lorg/gradle/api/provider/Property;

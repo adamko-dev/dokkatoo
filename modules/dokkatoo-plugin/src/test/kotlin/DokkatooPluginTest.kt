@@ -77,13 +77,13 @@ class DokkatooPluginTest : FunSpec({
       context("JDK external documentation link") {
         val jdkLink = testSourceSet.externalDocumentationLinks.getByName("jdk")
 
-        test("when noJdkLink is true, expect jdk link is disabled") {
-          testSourceSet.noJdkLink.set(true)
+        test("when enableJdkDocumentationLink is false, expect jdk link is disabled") {
+          testSourceSet.enableJdkDocumentationLink.set(false)
           jdkLink.enabled.get() shouldBe false
         }
 
-        test("when noJdkLink is false, expect jdk link is enabled") {
-          testSourceSet.noJdkLink.set(false)
+        test("when enableJdkDocumentationLink is true, expect jdk link is enabled") {
+          testSourceSet.enableJdkDocumentationLink.set(true)
           jdkLink.enabled.get() shouldBe true
         }
 
