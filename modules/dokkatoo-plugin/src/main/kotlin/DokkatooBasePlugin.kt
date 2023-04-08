@@ -186,6 +186,7 @@ constructor(
 
       externalDocumentationLinks {
         configureEach {
+          enabled.convention(true)
           packageListUrl.convention(url.map { URL(it, "package-list") })
         }
 
