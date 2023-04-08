@@ -158,7 +158,7 @@ constructor(
 
   /**
    * List of directories or files that contain sample functions which are referenced via
-   * [@sample](https://kotlinlang.org/docs/kotlin-doc.html#sample-identifier) KDoc tag.
+   * [`@sample`](https://kotlinlang.org/docs/kotlin-doc.html#sample-identifier) KDoc tag.
    */
   @get:InputFiles
   @get:Optional
@@ -309,7 +309,7 @@ constructor(
 
   /**
    * [Kotlin language version](https://kotlinlang.org/docs/compatibility-modes.html)
-   * used for setting up analysis and [@sample](https://kotlinlang.org/docs/kotlin-doc.html#sample-identifier)
+   * used for setting up analysis and [`@sample`](https://kotlinlang.org/docs/kotlin-doc.html#sample-identifier)
    * environment.
    *
    * By default, the latest language version available to Dokka's embedded compiler will be used.
@@ -320,7 +320,7 @@ constructor(
 
   /**
    * [Kotlin API version](https://kotlinlang.org/docs/compatibility-modes.html)
-   * used for setting up analysis and [@sample](https://kotlinlang.org/docs/kotlin-doc.html#sample-identifier)
+   * used for setting up analysis and [`@sample`](https://kotlinlang.org/docs/kotlin-doc.html#sample-identifier)
    * environment.
    *
    * By default, it will be deduced from [languageVersion].
@@ -388,9 +388,10 @@ constructor(
   )
   fun externalDocumentationLink(url: String, packageListUrl: String? = null) {
     externalDocumentationLinks.create("...") {
-      url(url); if (packageListUrl != null) packageListUrl(
-      packageListUrl
-    )
+      url(url)
+      if (packageListUrl != null) {
+        packageListUrl(packageListUrl)
+      }
     }
   }
 
