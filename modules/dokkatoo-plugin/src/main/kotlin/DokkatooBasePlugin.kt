@@ -187,7 +187,7 @@ constructor(
       externalDocumentationLinks {
         configureEach {
           enabled.convention(true)
-          packageListUrl.convention(url.map { URL(it, "package-list") })
+          packageListUrl.convention(url.map { it.appendPath("package-list") })
         }
 
         create("jdk") {
@@ -254,6 +254,9 @@ constructor(
       @OptIn(ExperimentalSerializationApi::class)
       prettyPrintIndent = "  "
     }
+
+    private fun URL.appendPath(value: String): URL =
+      toURI().resolve("$path/$value").normalize().toURL()
   }
 
   @DokkatooInternalApi
@@ -318,5 +321,4 @@ constructor(
     val prepareParameters = "prepareDokkatooParameters".appendFormat()
     val prepareModuleDescriptor = "prepareDokkatooModuleDescriptor".appendFormat()
   }
-
 }

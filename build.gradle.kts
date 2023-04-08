@@ -26,7 +26,7 @@ idea {
           "externals/kotlin-dokka",
         )
       )
-      // exclude .gradle dirs from nested projects (e.g. example/template projects)
+      // exclude .gradle dirs from nested projects (e.g. example & template projects)
       addAll(
         layout.projectDirectory.asFile.walk()
           .filter { it.isDirectory && it.name == ".gradle" }
