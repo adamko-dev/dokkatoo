@@ -82,18 +82,26 @@ fun gradleKtsProjectTest(
       |
       |@Suppress("UnstableApiUsage")
       |dependencyResolutionManagement {
-      |    repositories {
-      |        mavenCentral()
-      |        maven(file("$testMavenRepoRelativePath"))
+      |  repositories {
+      |    mavenCentral()
+      |    maven(file("$testMavenRepoRelativePath")) {
+      |      mavenContent {
+      |        includeGroup("dev.adamko.dokkatoo")
+      |      }
       |    }
+      |  }
       |}
       |
       |pluginManagement {
-      |    repositories {
-      |        gradlePluginPortal()
-      |        mavenCentral()
-      |        maven(file("$testMavenRepoRelativePath"))
+      |  repositories {
+      |    gradlePluginPortal()
+      |    mavenCentral()
+      |    maven(file("$testMavenRepoRelativePath")) {
+      |      mavenContent {
+      |        includeGroup("dev.adamko.dokkatoo")
+      |      }
       |    }
+      |  }
       |}
       |
     """.trimMargin()

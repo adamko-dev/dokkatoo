@@ -41,8 +41,7 @@ include(
 
   ":modules:dokkatoo-plugin",
   ":modules:dokkatoo-plugin-integration-tests",
-
-  )
+)
 
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")

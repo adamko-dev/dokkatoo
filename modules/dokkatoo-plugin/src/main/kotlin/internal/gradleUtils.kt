@@ -42,13 +42,14 @@ internal fun Configuration.asConsumer() {
 internal operator fun Provider<Boolean>.not(): Provider<Boolean> = map { !it }
 
 
-/**
- * Only matches components that come from subprojects
- */
+/** Only matches components that come from subprojects */
 internal object LocalProjectOnlyFilter : Spec<ComponentIdentifier> {
   override fun isSatisfiedBy(element: ComponentIdentifier?): Boolean =
     element is ProjectComponentIdentifier
 }
+
+/** Invert the result of a [Spec] predicate */
+internal operator fun <T> Spec<T>.not() = Spec<T> { !this@not.isSatisfiedBy(it) }
 
 
 internal fun Project.pathAsFilePath() = path
