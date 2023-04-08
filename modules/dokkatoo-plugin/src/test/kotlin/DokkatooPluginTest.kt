@@ -6,10 +6,7 @@ import dev.adamko.dokkatoo.utils.create_
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldEndWith
-import org.gradle.kotlin.dsl.apply
-import org.gradle.kotlin.dsl.getByType
-import org.gradle.kotlin.dsl.hasPlugin
-import org.gradle.kotlin.dsl.withType
+import org.gradle.kotlin.dsl.*
 import org.gradle.testfixtures.ProjectBuilder
 
 class DokkatooPluginTest : FunSpec({
@@ -71,7 +68,11 @@ class DokkatooPluginTest : FunSpec({
     val extension = project.extensions.getByType<DokkatooExtension>()
 
     context("DokkatooSourceSets") {
-      val testSourceSet = extension.dokkatooSourceSets.create("Test")
+      val testSourceSet = extension.dokkatooSourceSets.create_("Test") {
+        externalDocumentationLinks.create_("gradle") {
+          url("https://docs.gradle.org/7.6.1/javadoc")
+        }
+      }
 
       context("JDK external documentation link") {
         val jdkLink = testSourceSet.externalDocumentationLinks.getByName("jdk")
@@ -98,6 +99,14 @@ class DokkatooPluginTest : FunSpec({
             testSourceSet.jdkVersion.set(jdkVersion)
             jdkLink.packageListUrl.get().toString() shouldEndWith "element-list"
           }
+        }
+      }
+
+      context("external doc links") {
+        test("package-list url should be appended to Javadoc URL") {
+          val gradleDocLink = testSourceSet.externalDocumentationLinks.getByName("gradle")
+          gradleDocLink.packageListUrl.get()
+            .toString() shouldBe "https://docs.gradle.org/7.6.1/javadoc/package-list"
         }
       }
     }
