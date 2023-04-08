@@ -78,7 +78,7 @@ fun gradleKtsProjectTest(
   return GradleProjectTest(baseDir = baseDir, testProjectName = testProjectName).apply {
 
     settingsGradleKts = """
-      |rootProject.name = "$testProjectName"
+      |rootProject.name = "test"
       |
       |@Suppress("UnstableApiUsage")
       |dependencyResolutionManagement {
