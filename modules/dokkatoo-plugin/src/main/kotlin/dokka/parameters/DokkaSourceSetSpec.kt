@@ -129,8 +129,6 @@ constructor(
    * Among other things, this information is needed to resolve
    * [expect/actual](https://kotlinlang.org/docs/multiplatform-connect-to-apis.html) declarations.
    *
-   * Prefer using [dependsOn] function to append dependent source sets to this list.
-   *
    * By default, the values are deduced from information provided by the Kotlin Gradle plugin.
    */
   @get:Nested
@@ -170,8 +168,6 @@ constructor(
   /**
    * Whether to emit warnings about visible undocumented declarations, that is declarations without KDocs
    * after they have been filtered by [documentedVisibilities].
-   *
-   * This setting works well with [AbstractDokkaTask.failOnWarning].
    *
    * Can be overridden for a specific package by setting [DokkaPackageOptionsSpec.reportUndocumented].
    *
@@ -260,34 +256,55 @@ constructor(
   abstract val suppressGeneratedFiles: Property<Boolean>
 
   /**
-   * Whether to generate external documentation links that lead to API reference
-   * documentation for Kotlin's standard library when declarations from it are used.
+   * Whether to generate external documentation links that lead to API reference documentation for
+   * Kotlin's standard library when declarations from it are used.
    *
-   * Default is `false`, meaning links will be generated.
+   * Default is `true`, meaning links will be generated.
+   *
+   * @see externalDocumentationLinks
    */
   @get:Input
-  abstract val noStdlibLink: Property<Boolean>
+  abstract val enableKotlinStdLibDocumentationLink: Property<Boolean>
 
   /**
-   * Whether to generate external documentation links to JDK's Javadocs
-   * when declarations from it are used.
+   * Whether to generate external documentation links to JDK's Javadocs when declarations from it
+   * are used.
    *
    * The version of JDK Javadocs is determined by [jdkVersion] property.
    *
-   * Default is `false`, meaning links will be generated.
+   * Default is `true`, meaning links will be generated.
+   *
+   * @see externalDocumentationLinks
    */
   @get:Input
-  abstract val noJdkLink: Property<Boolean>
+  abstract val enableJdkDocumentationLink: Property<Boolean>
 
   /**
-   * Whether to generate external documentation links for Android SDK API reference
-   * when declarations from it are used.
+   * Whether to generate external documentation links for Android SDK API reference when
+   * declarations from it are used.
    *
    * Only relevant in Android projects, ignored otherwise.
    *
-   * Default is `false`, meaning links will be generated.
+   * Default is `false`, meaning links will not be generated.
+   *
+   * @see externalDocumentationLinks
    */
   @get:Input
+  abstract val enableAndroidDocumentationLink: Property<Boolean>
+
+  /** @see enableKotlinStdLibDocumentationLink */
+  @get:Internal
+  @Deprecated("Replaced with enableKotlinStdLibDocumentationLink to match naming conventions - note that the boolean is inverted")
+  abstract val noStdlibLink: Property<Boolean>
+
+  /** @see enableJdkDocumentationLink */
+  @get:Internal
+  @Deprecated("Replaced with enableJdkDocumentationLink to match naming conventions - note that the boolean is inverted")
+  abstract val noJdkLink: Property<Boolean>
+
+  /** @see enableAndroidDocumentationLink */
+  @get:Internal
+  @Deprecated("Replaced with enableAndroidDocumentationLink to match naming conventions - note that the boolean is inverted")
   abstract val noAndroidSdkLink: Property<Boolean>
 
   /**
@@ -350,25 +367,43 @@ constructor(
     )
   }
 
-  /**
-   * Action for configuring external documentation links, appending to [externalDocumentationLinks].
-   *
-   * @see DokkaExternalDocumentationLinkSpec
-   */
+  /** @see externalDocumentationLinks */
+  @Deprecated(
+    externalDocumentationLinkDeprecationMessage,
+    ReplaceWith("externalDocumentationLinks.create(\"...\", action)"),
+  )
   fun externalDocumentationLink(action: Action<in DokkaExternalDocumentationLinkSpec>) {
-    externalDocumentationLinks.add(
-      objects.newInstance(DokkaExternalDocumentationLinkSpec::class).also {
-        action.execute(it)
-      }
-    )
+    externalDocumentationLinks.create("...", action)
   }
 
-  /** Convenient override to **append** external documentation links to [externalDocumentationLinks]. */
+  /** @see externalDocumentationLinks */
+  @Deprecated(
+    externalDocumentationLinkDeprecationMessage,
+    ReplaceWith(
+      "externalDocumentationLinks.create(TODO(\"<unique name>\")) {\n" +
+          "  this.url(url)\n" +
+          "  if (packageListUrl != null) this.packageListUrl(packageListUrl)\n" +
+          "}"
+    ),
+  )
   fun externalDocumentationLink(url: String, packageListUrl: String? = null) {
-    externalDocumentationLink(URL(url), packageListUrl = packageListUrl?.let(::URL))
+    externalDocumentationLinks.create("...") {
+      url(url); if (packageListUrl != null) packageListUrl(
+      packageListUrl
+    )
+    }
   }
 
-  /** Convenient override to **append** external documentation links to [externalDocumentationLinks]. */
+  /** @see externalDocumentationLinks */
+  @Deprecated(
+    externalDocumentationLinkDeprecationMessage,
+    ReplaceWith(
+      "externalDocumentationLinks.create(TODO(\"<unique name>\")) {\n" +
+          "  this.url.set(url)\n" +
+          "  if (packageListUrl != null) this.packageListUrl.set(packageListUrl)\n" +
+          "}"
+    ),
+  )
   fun externalDocumentationLink(url: URL, packageListUrl: URL? = null) {
     externalDocumentationLinks.add(
       objects.newInstance(DokkaExternalDocumentationLinkSpec::class).also {
@@ -403,11 +438,16 @@ constructor(
       externalDocumentationLinks = externalDocumentationLinks,
       languageVersion = languageVersion.orNull,
       apiVersion = apiVersion.orNull,
-      noStdlibLink = noStdlibLink.get(),
-      noJdkLink = noJdkLink.get(),
+      enableKotlinStdLibDocumentationLink = enableKotlinStdLibDocumentationLink.get(),
+      enableJdkDocumentationLink = enableJdkDocumentationLink.get(),
       suppressedFiles = suppressedFiles.files,
       analysisPlatform = analysisPlatform.get().dokkaType,
       documentedVisibilities = documentedVisibilities.get().mapToSet { it.dokkaType },
     )
+  }
+
+  private companion object {
+    private const val externalDocumentationLinkDeprecationMessage =
+      "DokkaExternalDocumentationLinkSpecs require a unique name. Helper functions for creating an external doc link have been moved to DokkaExternalDocumentationLinkSpec. Use `externalDocumentationLinks.create(...) { ... } instead."
   }
 }

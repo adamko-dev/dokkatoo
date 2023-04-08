@@ -158,9 +158,18 @@ constructor(
       )
       documentedVisibilities.convention(setOf(VisibilityModifier.PUBLIC))
       jdkVersion.convention(8)
+
+      @Suppress("DEPRECATION")
       noAndroidSdkLink.convention(true)
+      @Suppress("DEPRECATION")
       noJdkLink.convention(false)
+      @Suppress("DEPRECATION")
       noStdlibLink.convention(false)
+
+      enableKotlinStdLibDocumentationLink.convention(true)
+      enableJdkDocumentationLink.convention(true)
+      enableAndroidDocumentationLink.convention(false)
+
       reportUndocumented.convention(false)
       skipDeprecated.convention(false)
       skipEmptyPackages.convention(true)
@@ -191,7 +200,7 @@ constructor(
         }
 
         create("jdk") {
-          enabled.convention(!this@dss.noJdkLink)
+          enabled.convention(this@dss.enableJdkDocumentationLink)
           url(this@dss.jdkVersion.map { jdkVersion ->
             when {
               jdkVersion < 11 -> "https://docs.oracle.com/javase/${jdkVersion}/docs/api/"
@@ -205,16 +214,19 @@ constructor(
             }
           })
         }
+
         create("kotlinStdlib") {
-          enabled.convention(!this@dss.noStdlibLink)
+          enabled.convention(this@dss.enableKotlinStdLibDocumentationLink)
           url("https://kotlinlang.org/api/latest/jvm/stdlib/")
         }
+
         create("androidSdk") {
-          enabled.convention(!this@dss.noAndroidSdkLink)
+          enabled.convention(this@dss.enableAndroidDocumentationLink)
           url("https://developer.android.com/reference/kotlin/")
         }
+
         create("androidX") {
-          enabled.convention(!this@dss.noAndroidSdkLink)
+          enabled.convention(this@dss.enableAndroidDocumentationLink)
           url("https://developer.android.com/reference/kotlin/")
           packageListUrl("https://developer.android.com/reference/kotlin/androidx/package-list")
         }
