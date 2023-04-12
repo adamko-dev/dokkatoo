@@ -54,8 +54,7 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
       logger.info("could not find Kotlin Extension")
       return
     }
-
-    logger.info("Configuring Dokka in Gradle Kotlin Project ${project.path}")
+    logger.info("Configuring Dokkatoo in Gradle Kotlin Project ${project.path}")
 
     val dokkatooExtension = project.extensions.getByType<DokkatooExtension>()
 
