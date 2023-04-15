@@ -145,7 +145,7 @@ constructor(
     val offlineMode = offlineMode.get()
     val sourceSets = dokkaSourceSets.filterNot {
       val suppressed = it.suppress.get()
-      logger.info("Dokka source set ${it.sourceSetID.get()} ${if (suppressed) "is" else "isn't"} suppressed")
+      logger.info("Dokka source set ${it.sourceSetId.get()} ${if (suppressed) "is" else "isn't"} suppressed")
       suppressed
     }.map(DokkaSourceSetSpec::build)
 
