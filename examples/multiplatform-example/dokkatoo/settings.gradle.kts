@@ -1,4 +1,4 @@
-rootProject.name = "multiplatform-example"
+rootProject.name = "dokka-multiplatform-example"
 
 pluginManagement {
   repositories {
