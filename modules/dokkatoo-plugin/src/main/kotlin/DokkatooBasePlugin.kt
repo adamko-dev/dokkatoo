@@ -83,20 +83,24 @@ constructor(
       )
     }
 
-    target.tasks.withType<DokkatooPrepareModuleDescriptorTask>().configureEach task@{
+    target.tasks.withType<DokkatooPrepareModuleDescriptorTask>().configureEach {
       moduleName.convention(dokkatooExtension.moduleName)
       includes.from(providers.provider { dokkatooExtension.dokkatooSourceSets.flatMap { it.includes } })
       modulePath.convention(dokkatooExtension.modulePath)
     }
 
-    target.tasks.withType<DokkatooPrepareParametersTask>().configureEach task@{
+    target.tasks.withType<DokkatooPrepareParametersTask>().configureEach {
       onlyIf("publication must be enabled") { publicationEnabled.getOrElse(true) }
     }
 
-    target.tasks.withType<DokkatooTask.WithSourceSets>().configureEach task@{
+    target.tasks.withType<DokkatooTask.WithSourceSets>().configureEach {
       addAllDokkaSourceSets(providers.provider { dokkatooExtension.dokkatooSourceSets })
+
+      // define a val, for config-cache compatibility
+      val sourceSetScopeConvention = dokkatooExtension.sourceSetScopeDefault
+
       dokkaSourceSets.configureEach {
-        sourceSetScope.convention(this@task.path)
+        sourceSetScope.convention(sourceSetScopeConvention)
       }
     }
   }
@@ -144,16 +148,25 @@ constructor(
   private fun configureDokkatooSourceSetsDefaults(
     dokkatooExtension: DokkatooExtension,
   ) {
+
+    // define a val, for config-cache compatibility
     val sourceSetScopeConvention = dokkatooExtension.sourceSetScopeDefault
 
-    dokkatooExtension.dokkatooSourceSets.all dss@{
+    dokkatooExtension.dokkatooSourceSets.configureEach dss@{
       analysisPlatform.convention(KotlinPlatform.DEFAULT)
       displayName.convention(
         analysisPlatform.map { platform ->
-          name.substringBeforeLast(
-            delimiter = "Main",
-            missingDelimiterValue = platform.name,
-          )
+          // Match existing Dokka naming conventions. (This should probably be simplified!)
+          when {
+            // JVM main source set should be called 'main'
+//            name == "main" -> name
+
+            // Multiplatform source sets (e.g. commonMain, jvmMain, macosMain)
+            name.endsWith("Main") -> name.substringBeforeLast("Main")
+
+            // indeterminate source sets should be named by the Kotlin platform
+            else -> platform.key
+          }
         }
       )
       documentedVisibilities.convention(setOf(VisibilityModifier.PUBLIC))
