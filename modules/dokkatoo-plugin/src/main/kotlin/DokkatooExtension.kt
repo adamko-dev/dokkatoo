@@ -38,7 +38,10 @@ constructor(
   abstract val modulePath: Property<String>
 
   /**
-   * String used to discriminate between source sets that originate from different Gradle subprojects
+   * An arbitrary string used to group source sets that originate from different Gradle subprojects.
+   *
+   * This is primarily used by Kotlin Multiplatform projects, which can have multiple source sets
+   * per subproject.
    *
    * Defaults to [the path of the subproject][org.gradle.api.Project.getPath].
    */

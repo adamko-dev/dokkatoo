@@ -50,15 +50,30 @@ constructor(
   Named,
   Serializable {
 
-  @Internal
+  @Internal // will be tracked by sourceSetID
   override fun getName(): String = name
 
+  /**
+   * An arbitrary string used to group source sets that originate from different Gradle subprojects.
+   * This is primarily used by Kotlin Multiplatform projects, which can have multiple source sets
+   * per subproject.
+   *
+   * The default is set from [DokkatooExtension.sourceSetScopeDefault][dev.adamko.dokkatoo.DokkatooExtension.sourceSetScopeDefault]
+   *
+   * It's unlikely that this value needs to be changed.
+   */
+  @get:Internal // will be tracked by sourceSetID
+  abstract val sourceSetScope: Property<String>
+
+  /**
+   * The identifier for this source set, across all Gradle subprojects.
+   *
+   * @see sourceSetScope
+   * @see getName
+   */
   @get:Input
   val sourceSetID: Provider<DokkaSourceSetIdSpec>
     get() = sourceSetScope.map { scope -> objects.dokkaSourceSetIdSpec(scope, getName()) }
-
-  @get:Input
-  abstract val sourceSetScope: Property<String>
 
   /**
    * Whether this source set should be skipped when generating documentation.
