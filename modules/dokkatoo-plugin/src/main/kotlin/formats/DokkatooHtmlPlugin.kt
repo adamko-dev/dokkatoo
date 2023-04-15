@@ -13,6 +13,14 @@ constructor() : DokkatooFormatPlugin(formatName = "html") {
 
   override fun DokkatooFormatPluginContext.configure() {
     configureDokkaHtmlPlugins()
+
+    dokkatooTasks.generatePublication.configure {
+      doLast {
+        val indexHtml =
+          outputDirectory.asFile.orNull?.resolve("index.html")?.invariantSeparatorsPath
+        logger.lifecycle("Generated Dokka HTML publication: file://$indexHtml")
+      }
+    }
   }
 
   private fun DokkatooFormatPluginContext.configureDokkaHtmlPlugins() {
