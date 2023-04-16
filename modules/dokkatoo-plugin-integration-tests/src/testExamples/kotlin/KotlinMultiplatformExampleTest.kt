@@ -187,9 +187,6 @@ private fun initDokkaProject(
   return GradleProjectTest(destinationDir.toPath()).apply {
     copyExampleProject("multiplatform-example/dokka")
 
-//    gradleProperties = gradleProperties
-//      .replace("dokkaVersion=1.7.20", "dokkaVersion=$DOKKA_VERSION")
-
     settingsGradleKts = settingsGradleKts
       .replace(
         """pluginManagement {""",
@@ -213,7 +210,6 @@ private fun initDokkaProject(
         |}
         |
       """.trimMargin()
-
 
     buildGradleKts += """
         |
