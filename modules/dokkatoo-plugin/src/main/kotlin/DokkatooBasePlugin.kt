@@ -4,6 +4,7 @@ import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes
 import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes.Companion.DOKKATOO_BASE_ATTRIBUTE
 import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes.Companion.DOKKATOO_CATEGORY_ATTRIBUTE
 import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes.Companion.DOKKA_FORMAT_ATTRIBUTE
+import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec
 import dev.adamko.dokkatoo.dokka.parameters.KotlinPlatform
 import dev.adamko.dokkatoo.dokka.parameters.VisibilityModifier
 import dev.adamko.dokkatoo.internal.*
@@ -15,11 +16,13 @@ import java.net.URL
 import javax.inject.Inject
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
+import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.Property
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.kotlin.dsl.*
@@ -64,7 +67,9 @@ constructor(
     }
 
     configureDokkaPublicationsDefaults(dokkatooExtension)
-    configureDokkatooSourceSetsDefaults(dokkatooExtension)
+    dokkatooExtension.dokkatooSourceSets.configureDefaults(
+      sourceSetScopeConvention = dokkatooExtension.sourceSetScopeDefault
+    )
 
     target.tasks.withType<DokkatooGenerateTask>().configureEach {
       cacheDirectory.convention(dokkatooExtension.dokkatooCacheDirectory)
@@ -96,12 +101,9 @@ constructor(
     target.tasks.withType<DokkatooTask.WithSourceSets>().configureEach {
       addAllDokkaSourceSets(providers.provider { dokkatooExtension.dokkatooSourceSets })
 
-      // define a val, for config-cache compatibility
-      val sourceSetScopeConvention = dokkatooExtension.sourceSetScopeDefault
-
-      dokkaSourceSets.configureEach {
-        sourceSetScope.convention(sourceSetScopeConvention)
-      }
+      dokkatooExtension.dokkatooSourceSets.configureDefaults(
+        sourceSetScopeConvention = dokkatooExtension.sourceSetScopeDefault
+      )
     }
   }
 
@@ -144,15 +146,11 @@ constructor(
     }
   }
 
-  /** Set defaults in all [DokkatooExtension.dokkatooSourceSets]s */
-  private fun configureDokkatooSourceSetsDefaults(
-    dokkatooExtension: DokkatooExtension,
+  /** Set conventions for all [DokkaSourceSetSpec] properties */
+  private fun NamedDomainObjectContainer<DokkaSourceSetSpec>.configureDefaults(
+    sourceSetScopeConvention: Property<String>,
   ) {
-
-    // define a val, for config-cache compatibility
-    val sourceSetScopeConvention = dokkatooExtension.sourceSetScopeDefault
-
-    dokkatooExtension.dokkatooSourceSets.configureEach dss@{
+    configureEach dss@{
       analysisPlatform.convention(KotlinPlatform.DEFAULT)
       displayName.convention(
         analysisPlatform.map { platform ->
@@ -209,7 +207,7 @@ constructor(
           packageListUrl.convention(url.map { it.appendPath("package-list") })
         }
 
-        create("jdk") {
+        maybeCreate("jdk") {
           enabled.convention(this@dss.enableJdkDocumentationLink)
           url(this@dss.jdkVersion.map { jdkVersion ->
             when {
@@ -225,17 +223,17 @@ constructor(
           })
         }
 
-        create("kotlinStdlib") {
+        maybeCreate("kotlinStdlib") {
           enabled.convention(this@dss.enableKotlinStdLibDocumentationLink)
           url("https://kotlinlang.org/api/latest/jvm/stdlib/")
         }
 
-        create("androidSdk") {
+        maybeCreate("androidSdk") {
           enabled.convention(this@dss.enableAndroidDocumentationLink)
           url("https://developer.android.com/reference/kotlin/")
         }
 
-        create("androidX") {
+        maybeCreate("androidX") {
           enabled.convention(this@dss.enableAndroidDocumentationLink)
           url("https://developer.android.com/reference/kotlin/")
           packageListUrl("https://developer.android.com/reference/kotlin/androidx/package-list")

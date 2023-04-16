@@ -1,6 +1,7 @@
 package dev.adamko.dokkatoo.internal
 
 import org.gradle.api.Action
+import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
@@ -65,3 +66,9 @@ internal fun Project.pathAsFilePath() = path
 internal fun <T : Task> TaskProvider<T>.configuring(
   block: Action<T>
 ): TaskProvider<T> = apply { configure(block) }
+
+
+internal fun <T> NamedDomainObjectContainer<T>.maybeCreate(
+  name: String,
+  configure: T.() -> Unit,
+): T = maybeCreate(name).apply(configure)
