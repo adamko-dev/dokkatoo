@@ -88,7 +88,7 @@ class KotlinMultiplatformExampleTest : FunSpec({
   }
 
 
-  xcontext("Gradle caching") {
+  context("Gradle caching") {
 
     context("expect Dokkatoo is compatible with Gradle Build Cache") {
       val build = dokkatooProject.runner
@@ -126,22 +126,29 @@ class KotlinMultiplatformExampleTest : FunSpec({
             "--build-cache",
           )
           .forwardOutput()
-          .build().should { dokkatooBuildCache ->
+          .build {
 
-            dokkatooBuildCache.output shouldContainAll listOf(
+            withClue("task :kotlinNpmCachesSetup should have caching disabled") {
+              output shouldContainAll listOf(
+                "Caching disabled for task ':kotlinNpmCachesSetup'",
+                "Task ':kotlinNpmCachesSetup' is not up-to-date",
+              )
+            }
+
+            output shouldContainAll listOf(
               "> Task :prepareDokkatooParametersHtml UP-TO-DATE",
               "> Task :dokkatooGeneratePublicationHtml UP-TO-DATE",
               "BUILD SUCCESSFUL",
-              "8 actionable tasks: 8 up-to-date",
+              "16 actionable tasks: 1 executed, 15 up-to-date",
             )
             withClue("Dokka Generator should not be triggered, so check it doesn't log anything") {
-              dokkatooBuildCache.output shouldNotContain "Generation completed successfully"
+              output shouldNotContain "Generation completed successfully"
             }
           }
       }
     }
 
-    xcontext("expect Dokkatoo is compatible with Gradle Configuration Cache") {
+    context("expect Dokkatoo is compatible with Gradle Configuration Cache") {
       dokkatooProject.file(".gradle/configuration-cache").toFile().deleteRecursively()
       dokkatooProject.file("build/reports/configuration-cache").toFile().deleteRecursively()
 
@@ -157,16 +164,16 @@ class KotlinMultiplatformExampleTest : FunSpec({
           .forwardOutput()
 
       test("first build should store the configuration cache") {
-        configCacheRunner.build().should { buildResult ->
-          buildResult.output shouldContain "BUILD SUCCESSFUL"
-          buildResult.output shouldContain "0 problems were found storing the configuration cache"
+        configCacheRunner.build {
+          output shouldContain "BUILD SUCCESSFUL"
+          output shouldContain "0 problems were found storing the configuration cache"
         }
       }
 
       test("second build should reuse the configuration cache") {
-        configCacheRunner.build().should { buildResult ->
-          buildResult.output shouldContain "BUILD SUCCESSFUL"
-          buildResult.output shouldContain "Configuration cache entry reused"
+        configCacheRunner.build {
+          output shouldContain "BUILD SUCCESSFUL"
+          output shouldContain "Configuration cache entry reused"
         }
       }
     }
