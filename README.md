@@ -205,6 +205,10 @@ pluginManagement {
       // only include Dokkatoo snapshots
       mavenContent {
         includeGroup("dev.adamko.dokkatoo")
+        includeGroup("dev.adamko.dokkatoo-html")
+        includeGroup("dev.adamko.dokkatoo-javadoc")
+        includeGroup("dev.adamko.dokkatoo-jekyll")
+        includeGroup("dev.adamko.dokkatoo-markdown")
         snapshotsOnly()
       }
     }
