@@ -7,11 +7,13 @@ on:
     branches:
       - main
 
-
 concurrency:
   group: "${{ github.workflow }}"
   cancel-in-progress: false
 
+env:
+  # https://stackoverflow.com/a/71158878/4161471
+  GIT_BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
 
 jobs:
 
@@ -25,6 +27,8 @@ jobs:
     steps:
       - name: checkout repo
         uses: actions/checkout@v3
+        with:
+          ref: ${{ env.GIT_BRANCH_NAME }}
 
       - name: setup JDK
         uses: actions/setup-java@v3
