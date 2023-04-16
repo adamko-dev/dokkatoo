@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata modelVersion="1.1.0">
+  <groupId>dev.adamko.dokkatoo-html</groupId>
+  <artifactId>dev.adamko.dokkatoo-html.gradle.plugin</artifactId>
+  <version>1.2.0-SNAPSHOT</version>
+  <versioning>
+    <snapshot>
+      <timestamp>20230416.135342</timestamp>
+      <buildNumber>1</buildNumber>
+    </snapshot>
+    <lastUpdated>20230416135342</lastUpdated>
+    <snapshotVersions>
+      <snapshotVersion>
+        <extension>pom</extension>
+        <value>1.2.0-20230416.135342-1</value>
+        <updated>20230416135342</updated>
+      </snapshotVersion>
+    </snapshotVersions>
+  </versioning>
+</metadata>
