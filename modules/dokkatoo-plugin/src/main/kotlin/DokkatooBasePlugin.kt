@@ -158,14 +158,11 @@ constructor(
         analysisPlatform.map { platform ->
           // Match existing Dokka naming conventions. (This should probably be simplified!)
           when {
-            // JVM main source set should be called 'main'
-//            name == "main" -> name
-
             // Multiplatform source sets (e.g. commonMain, jvmMain, macosMain)
             name.endsWith("Main") -> name.substringBeforeLast("Main")
 
             // indeterminate source sets should be named by the Kotlin platform
-            else -> platform.key
+            else                  -> platform.key
           }
         }
       )
