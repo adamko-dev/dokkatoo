@@ -1,7 +1,7 @@
 package dev.adamko.dokkatoo.internal
 
 import dev.adamko.dokkatoo.DokkatooExtension
-import org.gradle.kotlin.dsl.getByType
+import org.gradle.kotlin.dsl.*
 
 // When Dokkatoo is applied to a build script Gradle will auto-generate these accessors
 

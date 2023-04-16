@@ -255,6 +255,7 @@ public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceSetSpec : 
 	public abstract fun getSourceLinks ()Lorg/gradle/api/DomainObjectSet;
 	public abstract fun getSourceRoots ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public final fun getSourceSetID ()Lorg/gradle/api/provider/Provider;
+	public final fun getSourceSetId ()Lorg/gradle/api/provider/Provider;
 	public abstract fun getSourceSetScope ()Lorg/gradle/api/provider/Property;
 	public abstract fun getSuppress ()Lorg/gradle/api/provider/Property;
 	public abstract fun getSuppressGeneratedFiles ()Lorg/gradle/api/provider/Property;

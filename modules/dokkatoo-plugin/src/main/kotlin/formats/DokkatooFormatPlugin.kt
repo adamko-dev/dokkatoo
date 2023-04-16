@@ -117,6 +117,7 @@ abstract class DokkatooFormatPlugin(
       val context = DokkatooFormatPluginContext(
         project = target,
         dokkatooExtension = dokkatooExtension,
+        dokkatooTasks = dokkatooTasks,
         formatName = formatName,
       )
 
@@ -139,6 +140,7 @@ abstract class DokkatooFormatPlugin(
   class DokkatooFormatPluginContext(
     val project: Project,
     val dokkatooExtension: DokkatooExtension,
+    val dokkatooTasks: DokkatooTasks,
     formatName: String,
   ) {
     private val dependencyContainerNames = DokkatooBasePlugin.DependencyContainerNames(formatName)

@@ -59,7 +59,6 @@ class BasicProjectIntegrationTest : FunSpec({
       test("expect all dokka workers are successful") {
 
         val dokkaWorkerLogs = dokkatooProject.findFiles { it.name == "dokka-worker.log" }
-//      dokkaWorkerLogs shouldHaveCount 1
         dokkaWorkerLogs.firstOrNull().shouldNotBeNull().should { dokkaWorkerLog ->
           dokkaWorkerLog.shouldBeAFile()
           dokkaWorkerLog.readText().shouldNotContainAnyOf(
@@ -75,7 +74,6 @@ class BasicProjectIntegrationTest : FunSpec({
       test("expect all dokka workers are successful") {
 
         val dokkaWorkerLogs = dokkatooProject.findFiles { it.name == "dokka-worker.log" }
-//      dokkaWorkerLogs shouldHaveCount 1
         dokkaWorkerLogs.firstOrNull().shouldNotBeNull().should { dokkaWorkerLog ->
           dokkaWorkerLog.shouldBeAFile()
           dokkaWorkerLog.readText().shouldNotContainAnyOf(

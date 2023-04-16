@@ -1,6 +1,5 @@
 package dev.adamko.dokkatoo.tests.examples
 
-import dev.adamko.dokkatoo.internal.DokkatooConstants.DOKKA_VERSION
 import dev.adamko.dokkatoo.utils.*
 import dev.adamko.dokkatoo.utils.GradleProjectTest.Companion.projectTestTempDir
 import io.kotest.assertions.withClue
@@ -15,14 +14,14 @@ import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
 import java.io.File
 
-class MultimoduleExampleTest : FunSpec({
+class KotlinMultiplatformExampleTest : FunSpec({
 
   val dokkaProject = initDokkaProject(
-    projectTestTempDir.resolve("it/examples/multimodule-example/dokka").toFile()
+    projectTestTempDir.resolve("it/examples/multiplatform-example/dokka").toFile()
   )
 
   val dokkatooProject = initDokkatooProject(
-    projectTestTempDir.resolve("it/examples/multimodule-example/dokkatoo").toFile()
+    projectTestTempDir.resolve("it/examples/multiplatform-example/dokkatoo").toFile()
   )
 
   context("compare dokka and dokkatoo HTML generators") {
@@ -30,7 +29,7 @@ class MultimoduleExampleTest : FunSpec({
       val dokkaBuild = dokkaProject.runner
         .withArguments(
           "clean",
-          "dokkaHtmlMultiModule",
+          "dokkaHtml",
           "--stacktrace",
           "--info",
         )
@@ -45,7 +44,7 @@ class MultimoduleExampleTest : FunSpec({
       val build = dokkatooProject.runner
         .withArguments(
           "clean",
-          ":parentProject:dokkatooGeneratePublicationHtml",
+          ":dokkatooGeneratePublicationHtml",
           "--stacktrace",
           "--info",
         )
@@ -71,8 +70,8 @@ class MultimoduleExampleTest : FunSpec({
 
     context("expect dokka and dokkatoo HTML is the same") {
       val dokkaHtmlDir =
-        dokkaProject.projectDir.resolve("parentProject/build/dokka/html")
-      val dokkatooHtmlDir = dokkatooProject.projectDir.resolve("parentProject/build/dokka/html")
+        dokkaProject.projectDir.resolve("build/dokka/html")
+      val dokkatooHtmlDir = dokkatooProject.projectDir.resolve("build/dokka/html")
 
       test("expect file trees are the same") {
         val expectedFileTree = dokkaHtmlDir.toTreeString()
@@ -95,7 +94,7 @@ class MultimoduleExampleTest : FunSpec({
       val build = dokkatooProject.runner
         .withArguments(
           "clean",
-          ":parentProject:dokkatooGeneratePublicationHtml",
+          ":dokkatooGeneratePublicationHtml",
           "--stacktrace",
         )
         .forwardOutput()
@@ -121,22 +120,29 @@ class MultimoduleExampleTest : FunSpec({
       test("expect tasks are UP-TO-DATE") {
         dokkatooProject.runner
           .withArguments(
-            ":parentProject:dokkatooGeneratePublicationHtml",
+            ":dokkatooGeneratePublicationHtml",
             "--stacktrace",
             "--info",
             "--build-cache",
           )
           .forwardOutput()
-          .build().should { dokkatooBuildCache ->
+          .build {
 
-            dokkatooBuildCache.output shouldContainAll listOf(
-              "> Task :parentProject:prepareDokkatooParametersHtml UP-TO-DATE",
-              "> Task :parentProject:dokkatooGeneratePublicationHtml UP-TO-DATE",
+            withClue("task :kotlinNpmCachesSetup should have caching disabled") {
+              output shouldContainAll listOf(
+                "Caching disabled for task ':kotlinNpmCachesSetup'",
+                "Task ':kotlinNpmCachesSetup' is not up-to-date",
+              )
+            }
+
+            output shouldContainAll listOf(
+              "> Task :prepareDokkatooParametersHtml UP-TO-DATE",
+              "> Task :dokkatooGeneratePublicationHtml UP-TO-DATE",
               "BUILD SUCCESSFUL",
-              "8 actionable tasks: 8 up-to-date",
+              "16 actionable tasks: 1 executed, 15 up-to-date",
             )
             withClue("Dokka Generator should not be triggered, so check it doesn't log anything") {
-              dokkatooBuildCache.output shouldNotContain "Generation completed successfully"
+              output shouldNotContain "Generation completed successfully"
             }
           }
       }
@@ -150,7 +156,7 @@ class MultimoduleExampleTest : FunSpec({
         dokkatooProject.runner
           .withArguments(
             "clean",
-            ":parentProject:dokkatooGeneratePublicationHtml",
+            ":dokkatooGeneratePublicationHtml",
             "--stacktrace",
             "--no-build-cache",
             "--configuration-cache",
@@ -158,16 +164,16 @@ class MultimoduleExampleTest : FunSpec({
           .forwardOutput()
 
       test("first build should store the configuration cache") {
-        configCacheRunner.build().should { buildResult ->
-          buildResult.output shouldContain "BUILD SUCCESSFUL"
-          buildResult.output shouldContain "0 problems were found storing the configuration cache"
+        configCacheRunner.build {
+          output shouldContain "BUILD SUCCESSFUL"
+          output shouldContain "0 problems were found storing the configuration cache"
         }
       }
 
       test("second build should reuse the configuration cache") {
-        configCacheRunner.build().should { buildResult ->
-          buildResult.output shouldContain "BUILD SUCCESSFUL"
-          buildResult.output shouldContain "Configuration cache entry reused"
+        configCacheRunner.build {
+          output shouldContain "BUILD SUCCESSFUL"
+          output shouldContain "Configuration cache entry reused"
         }
       }
     }
@@ -179,10 +185,7 @@ private fun initDokkaProject(
   destinationDir: File,
 ): GradleProjectTest {
   return GradleProjectTest(destinationDir.toPath()).apply {
-    copyExampleProject("multimodule-example/dokka")
-
-    gradleProperties = gradleProperties
-      .replace("dokkaVersion=1.7.20", "dokkaVersion=$DOKKA_VERSION")
+    copyExampleProject("multiplatform-example/dokka")
 
     settingsGradleKts = settingsGradleKts
       .replace(
@@ -208,9 +211,7 @@ private fun initDokkaProject(
         |
       """.trimMargin()
 
-    dir("parentProject") {
-
-      buildGradleKts += """
+    buildGradleKts += """
         |
         |val hackDokkaHtmlDir by tasks.registering(Sync::class) {
         |  // sync directories so the dirs in both dokka and dokkatoo are the same
@@ -223,7 +224,6 @@ private fun initDokkaProject(
         |}
         |
       """.trimMargin()
-    }
   }
 }
 
@@ -231,6 +231,6 @@ private fun initDokkatooProject(
   destinationDir: File,
 ): GradleProjectTest {
   return GradleProjectTest(destinationDir.toPath()).apply {
-    copyExampleProject("multimodule-example/dokkatoo")
+    copyExampleProject("multiplatform-example/dokkatoo")
   }
 }

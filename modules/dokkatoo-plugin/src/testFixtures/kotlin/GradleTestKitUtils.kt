@@ -87,6 +87,7 @@ fun gradleKtsProjectTest(
       |    maven(file("$testMavenRepoRelativePath")) {
       |      mavenContent {
       |        includeGroup("dev.adamko.dokkatoo")
+      |        includeGroup("dev.adamko.dokkatoo-html")
       |      }
       |    }
       |  }
@@ -99,6 +100,7 @@ fun gradleKtsProjectTest(
       |    maven(file("$testMavenRepoRelativePath")) {
       |      mavenContent {
       |        includeGroup("dev.adamko.dokkatoo")
+      |        includeGroup("dev.adamko.dokkatoo-html")
       |      }
       |    }
       |  }

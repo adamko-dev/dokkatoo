@@ -11,6 +11,7 @@ import javax.inject.Inject
 import org.gradle.api.*
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.model.ReplacedBy
 import org.gradle.api.provider.*
 import org.gradle.api.tasks.*
 import org.gradle.kotlin.dsl.*
@@ -50,15 +51,35 @@ constructor(
   Named,
   Serializable {
 
-  @Internal
+  @Internal // will be tracked by sourceSetId
   override fun getName(): String = name
 
+  /**
+   * An arbitrary string used to group source sets that originate from different Gradle subprojects.
+   * This is primarily used by Kotlin Multiplatform projects, which can have multiple source sets
+   * per subproject.
+   *
+   * The default is set from [DokkatooExtension.sourceSetScopeDefault][dev.adamko.dokkatoo.DokkatooExtension.sourceSetScopeDefault]
+   *
+   * It's unlikely that this value needs to be changed.
+   */
+  @get:Internal // will be tracked by sourceSetId
+  abstract val sourceSetScope: Property<String>
+
+  /**
+   * The identifier for this source set, across all Gradle subprojects.
+   *
+   * @see sourceSetScope
+   * @see getName
+   */
   @get:Input
-  val sourceSetID: Provider<DokkaSourceSetIdSpec>
+  val sourceSetId: Provider<DokkaSourceSetIdSpec>
     get() = sourceSetScope.map { scope -> objects.dokkaSourceSetIdSpec(scope, getName()) }
 
-  @get:Input
-  abstract val sourceSetScope: Property<String>
+  @get:Deprecated("Renamed to meet naming conventions", ReplaceWith("sourceSetId"))
+  @get:ReplacedBy("sourceSetId")
+  @Suppress("unused")
+  val sourceSetID: Provider<DokkaSourceSetIdSpec> by ::sourceSetId
 
   /**
    * Whether this source set should be skipped when generating documentation.
@@ -423,7 +444,7 @@ constructor(
       .toSet()
 
     return DokkaParametersKxs.DokkaSourceSetKxs(
-      sourceSetId = sourceSetID.get().build(),
+      sourceSetId = sourceSetId.get().build(),
       displayName = displayName.get(),
       classpath = classpath.files.toList(),
       sourceRoots = sourceRoots.files,
