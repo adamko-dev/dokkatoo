@@ -9,7 +9,7 @@ import io.kotest.matchers.sequences.shouldNotBeEmpty
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
 
-class GradlePluginProjectIntegrationTest : FunSpec({
+class GradlePluginProjectFunctionalTest : FunSpec({
 
   context("given a gradle plugin project") {
     val project = initGradlePluginProject()
