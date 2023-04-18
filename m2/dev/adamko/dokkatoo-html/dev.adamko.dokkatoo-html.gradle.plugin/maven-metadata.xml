@@ -3,11 +3,10 @@
   <groupId>dev.adamko.dokkatoo-html</groupId>
   <artifactId>dev.adamko.dokkatoo-html.gradle.plugin</artifactId>
   <versioning>
-    <latest>1.2.0</latest>
-    <release>1.2.0</release>
+    <latest>1.2.1-SNAPSHOT</latest>
     <versions>
-      <version>1.2.0</version>
+      <version>1.2.1-SNAPSHOT</version>
     </versions>
-    <lastUpdated>20230418193908</lastUpdated>
+    <lastUpdated>20230418202715</lastUpdated>
   </versioning>
 </metadata>
