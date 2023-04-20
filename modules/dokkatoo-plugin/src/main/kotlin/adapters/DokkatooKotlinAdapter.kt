@@ -8,7 +8,6 @@ import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetIdSpec
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetIdSpec.Companion.dokkaSourceSetIdSpec
 import dev.adamko.dokkatoo.dokka.parameters.KotlinPlatform
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
-import dev.adamko.dokkatoo.internal.LocalProjectOnlyFilter
 import dev.adamko.dokkatoo.internal.not
 import javax.inject.Inject
 import org.gradle.api.Named
@@ -225,10 +224,8 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
             @Suppress("UnstableApiUsage")
             conf
               .incoming
-              .artifactView {
-                componentFilter(!LocalProjectOnlyFilter)
-                lenient(true)
-              }.artifacts
+              .artifactView { lenient(true) }
+              .artifacts
               .resolvedArtifacts
               .map { artifacts -> artifacts.map { it.file } }
           )
