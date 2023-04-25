@@ -326,6 +326,7 @@ private data class KotlinCompilationDetails(
           // will trigger a bunch of Gradle warnings about "using file outputs without task dependencies",
           // so K/N compilations need to explicitly depend on the compilation tasks
           // UPDATE: actually I think is wrong, it's a bug with the K/N 'commonize for IDE' tasks
+          // see: https://github.com/Kotlin/dokka/issues/2977
           collectConfiguration(
             named = kotlinCompilation.defaultSourceSet.implementationMetadataConfigurationName,
 //          builtBy = kotlinCompilation.compileKotlinTaskProvider
