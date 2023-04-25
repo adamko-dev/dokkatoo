@@ -35,7 +35,9 @@ constructor(
     DokkaParametersKxs.SourceSetIdKxs(scopeId, sourceSetName)
 
   @Internal
-  override fun getName(): String = scopeId
+  override fun getName(): String = "$scopeId/$sourceSetName"
+
+  override fun toString(): String = "DokkaSourceSetIdSpec($name)"
 
   companion object {
 
@@ -48,6 +50,5 @@ constructor(
       newInstance<DokkaSourceSetIdSpec>(scopeId).apply {
         this.sourceSetName = sourceSetName
       }
-
   }
 }
