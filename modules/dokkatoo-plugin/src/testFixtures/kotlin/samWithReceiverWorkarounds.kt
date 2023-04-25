@@ -2,11 +2,13 @@
 
 package dev.adamko.dokkatoo.utils
 
-import dev.adamko.dokkatoo.dokka.parameters.DokkaExternalDocumentationLinkSpec
 import dev.adamko.dokkatoo.dokka.parameters.DokkaPackageOptionsSpec
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceLinkSpec
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec
-import org.gradle.api.*
+import org.gradle.api.DomainObjectCollection
+import org.gradle.api.NamedDomainObjectContainer
+import org.gradle.api.NamedDomainObjectProvider
+import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.DependencySet
 
@@ -67,10 +69,6 @@ fun <T> NamedDomainObjectContainer<T>.register_(
 ): NamedDomainObjectProvider<T> =
   register(name, configure)
 
-
-fun DokkaSourceSetSpec.externalDocumentationLink_(
-  action: DokkaExternalDocumentationLinkSpec.() -> Unit
-) = externalDocumentationLink(action)
 
 fun DokkaSourceSetSpec.sourceLink_(
   action: DokkaSourceLinkSpec.() -> Unit
