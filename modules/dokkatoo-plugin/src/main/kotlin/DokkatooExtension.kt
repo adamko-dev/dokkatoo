@@ -104,5 +104,10 @@ constructor(
     val jetbrainsMarkdown: Property<String>
     val freemarker: Property<String>
     val kotlinxHtml: Property<String>
+    val kotlinxCoroutines: Property<String>
+
+    companion object {
+      const val VERSIONS_EXTENSION_NAME = "versions"
+    }
   }
 }
