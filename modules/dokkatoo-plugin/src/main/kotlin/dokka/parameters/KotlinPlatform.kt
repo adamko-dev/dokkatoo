@@ -7,31 +7,40 @@ import org.jetbrains.dokka.Platform
  * The Kotlin
  *
  * @see org.jetbrains.dokka.Platform
+ * @param[displayName] The display name, eventually used in the rendered Dokka publication.
  */
-enum class KotlinPlatform {
-  JVM,
-  JS,
-  WASM,
-  Native,
-  Common,
+enum class KotlinPlatform(
+  internal val displayName: String
+) {
+  JVM("jvm"),
+  AndroidJVM("androidJvm"),
+  JS("js"),
+  WASM("wasm"),
+  Native("native"),
+  Common("common"),
   ;
 
+  @Deprecated("Unused", ReplaceWith("name.toLowerCase()"))
+  @Suppress("unused")
   val key: String = name.toLowerCase()
 
   companion object {
-    internal val entries: Set<KotlinPlatform> = values().toSet()
+    internal val values: Set<KotlinPlatform> = values().toSet()
 
     val DEFAULT: KotlinPlatform = JVM
 
     fun fromString(key: String): KotlinPlatform {
+      val keyMatch = values.firstOrNull {
+        it.name.equals(key, ignoreCase = true) || it.displayName.equals(key, ignoreCase = true)
+      }
+      if (keyMatch != null) {
+        return keyMatch
+      }
 
       return when (key.toLowerCase()) {
-        JVM.key, "androidjvm", "android" -> JVM
-        JS.key                           -> JS
-        WASM.key                         -> WASM
-        Native.key                       -> Native
-        Common.key, "metadata"           -> Common
-        else                             -> error("Unrecognized platform: $key")
+        "android"  -> AndroidJVM
+        "metadata" -> Common
+        else       -> error("Unrecognized platform: $key")
       }
     }
 
@@ -39,11 +48,11 @@ enum class KotlinPlatform {
     internal val KotlinPlatform.dokkaType: Platform
       get() =
         when (this) {
-          JVM    -> Platform.jvm
-          JS     -> Platform.js
-          WASM   -> Platform.wasm
-          Native -> Platform.native
-          Common -> Platform.common
+          AndroidJVM, JVM -> Platform.jvm
+          JS              -> Platform.js
+          WASM            -> Platform.wasm
+          Native          -> Platform.native
+          Common          -> Platform.common
         }
   }
 }

@@ -160,7 +160,7 @@ constructor(
             name.endsWith("Main") -> name.substringBeforeLast("Main")
 
             // indeterminate source sets should be named by the Kotlin platform
-            else                  -> platform.key
+            else                  -> platform.displayName
           }
         }
       )
