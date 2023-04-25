@@ -3,7 +3,6 @@ import buildsrc.utils.initIdeProjectLogo
 
 plugins {
   buildsrc.conventions.base
-
   idea
 }
 
@@ -13,8 +12,6 @@ version = "1.2.1-SNAPSHOT"
 
 idea {
   module {
-    isDownloadSources = true
-    isDownloadJavadoc = false
     excludeGeneratedGradleDsl(layout)
 
     excludeDirs.apply {
