@@ -177,9 +177,7 @@ constructor(
       noStdlibLink.convention(false)
 
       enableKotlinStdLibDocumentationLink.convention(true)
-      enableJdkDocumentationLink.convention(
-        analysisPlatform.map { it == KotlinPlatform.JVM || it == KotlinPlatform.AndroidJVM }
-      )
+      enableJdkDocumentationLink.convention(true)
       enableAndroidDocumentationLink.convention(
         analysisPlatform.map { it == KotlinPlatform.AndroidJVM }
       )
