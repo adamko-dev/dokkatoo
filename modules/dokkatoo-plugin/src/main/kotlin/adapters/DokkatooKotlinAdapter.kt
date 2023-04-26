@@ -4,7 +4,6 @@ import com.android.build.gradle.api.ApplicationVariant
 import com.android.build.gradle.api.LibraryVariant
 import dev.adamko.dokkatoo.DokkatooBasePlugin
 import dev.adamko.dokkatoo.DokkatooExtension
-import dev.adamko.dokkatoo.adapters.KotlinCompilationDetails.Companion.extractKotlinCompilationDetails
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetIdSpec
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetIdSpec.Companion.dokkaSourceSetIdSpec
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec
@@ -71,23 +70,31 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
 
     val dokkatooExtension = project.extensions.getByType<DokkatooExtension>()
 
+    val compilationDetailsBuilder = KotlinCompilationDetailsBuilder(
+      providers = providers,
+      objects = objects,
+      configurations = project.configurations,
+      projectPath = project.path,
+    )
+
+    val sourceSetDetailsBuilder = KotlinSourceSetDetailsBuilder(
+      providers = providers,
+      objects = objects,
+      sourceSetScopeDefault = dokkatooExtension.sourceSetScopeDefault,
+      projectPath = project.path,
+    )
+
     // first fetch the relevant properties of all KotlinCompilations
     val allKotlinCompilationDetails: ListProperty<KotlinCompilationDetails> =
-      extractKotlinCompilationDetails(
+      compilationDetailsBuilder.createCompilationDetails(
         kotlinProjectExtension = kotlinExtension,
-        objects = objects,
-        providers = providers,
-        configurations = project.configurations,
       )
 
     // second, fetch the relevant properties of the Kotlin source sets
     val sourceSetDetails: NamedDomainObjectContainer<KotlinSourceSetDetails> =
-      KotlinSourceSetDetails.extractKotlinSourceSetDetails(
+      sourceSetDetailsBuilder.createSourceSetDetails(
         kotlinSourceSets = kotlinExtension.sourceSets,
-        sourceSetScopeDefault = dokkatooExtension.sourceSetScopeDefault,
         allKotlinCompilationDetails = allKotlinCompilationDetails,
-        objects = objects,
-        providers = providers,
       )
 
     // for each Kotlin source set, register a Dokkatoo source set
@@ -125,7 +132,6 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
       // (like displayName) are set in DokkatooBasePlugin
       suppress.set(!details.isMainSourceSet())
       sourceRoots.from(details.sourceDirectories)
-      //classpath.from(sourceDirectoriesOfDependents)
       classpath.from(kssClasspath)
       analysisPlatform.set(kssPlatform)
       dependentSourceSets.addAllLater(details.dependentSourceSetIds)
@@ -135,13 +141,13 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
   private fun determineClasspath(
     details: KotlinSourceSetDetails
   ): Provider<FileCollection> {
-
-    val classpath = objects.fileCollection()
-
     return details.compilations.map { compilations: List<KotlinCompilationDetails> ->
+      val classpath = objects.fileCollection()
+
       if (compilations.isNotEmpty()) {
-        compilations.fold(classpath) { acc, details ->
-          acc.from(details.compilationClasspath)
+        compilations.fold(classpath) { acc, compilation ->
+          acc.from(compilation.compilationClasspath)
+//          acc.from(compilation.compileDependencyFiles)
         }
       } else {
         classpath
@@ -187,163 +193,156 @@ private data class KotlinCompilationDetails(
   val kotlinPlatform: KotlinPlatform,
   val allKotlinSourceSetsNames: Set<String>,
   val mainCompilation: Boolean,
-  //val compileDependencyFiles: FileCollection,
+  val compileDependencyFiles: FileCollection,
   val dependentSourceSetNames: Set<String>,
   val compilationClasspath: FileCollection,
+)
+
+/** Utility class, encapsulating logic for building [KotlinCompilationDetails] */
+private class KotlinCompilationDetailsBuilder(
+  private val objects: ObjectFactory,
+  private val providers: ProviderFactory,
+  private val configurations: ConfigurationContainer,
+  /** Used for logging */
+  private val projectPath: String,
 ) {
+  private val logger = Logging.getLogger(KotlinCompilationDetails::class.java)
 
-  @DokkatooInternalApi
-  companion object {
+  fun createCompilationDetails(
+    kotlinProjectExtension: KotlinProjectExtension,
+  ): ListProperty<KotlinCompilationDetails> {
 
-    internal fun extractKotlinCompilationDetails(
-      kotlinProjectExtension: KotlinProjectExtension,
-      objects: ObjectFactory,
-      providers: ProviderFactory,
-      configurations: ConfigurationContainer,
-    ): ListProperty<KotlinCompilationDetails> {
+    val details = objects.listProperty<KotlinCompilationDetails>()
 
-      val details = objects.listProperty<KotlinCompilationDetails>()
+    details.addAll(
+      providers.provider {
+        kotlinProjectExtension
+          .allKotlinCompilations()
+          .map { compilation ->
+            createCompilationDetails(compilation = compilation)
+          }
+      })
 
-      details.addAll(
-        providers.provider {
-          kotlinProjectExtension
-            .allKotlinCompilations()
-            .map { compilation ->
-              createCompilationDetails(
-                compilation = compilation,
-                objects = objects,
-//                providers = providers,
-                configurations = configurations,
-              )
-            }
-        })
+    return details
+  }
 
-      return details
+  /** Create a single [KotlinCompilationDetails] for [compilation] */
+  private fun createCompilationDetails(
+    compilation: KotlinCompilation<*>,
+  ): KotlinCompilationDetails {
+    val allKotlinSourceSetsNames =
+      compilation.allKotlinSourceSets.map { it.name } + compilation.defaultSourceSet.name
+
+    val compileDependencyFiles = objects.fileCollection()
+      .from(providers.provider { compilation.compileDependencyFiles })
+
+    val dependentSourceSetNames =
+      compilation.defaultSourceSet.dependsOn.map { it.name }
+
+    val compilationClasspath: FileCollection =
+      collectKotlinCompilationClasspath(compilation = compilation)
+
+    return KotlinCompilationDetails(
+      target = compilation.target.name,
+      kotlinPlatform = KotlinPlatform.fromString(compilation.platformType.name),
+      allKotlinSourceSetsNames = allKotlinSourceSetsNames.toSet(),
+      mainCompilation = compilation.isMainCompilation(),
+      compileDependencyFiles = compileDependencyFiles,
+      dependentSourceSetNames = dependentSourceSetNames.toSet(),
+      compilationClasspath = compilationClasspath,
+    )
+  }
+
+  private fun KotlinProjectExtension.allKotlinCompilations(): Collection<KotlinCompilation<*>> =
+    when (this) {
+      is KotlinMultiplatformExtension -> targets.flatMap { it.compilations }
+      is KotlinSingleTargetExtension  -> target.compilations
+      else                            -> emptyList() // shouldn't happen?
     }
 
-    /** Create a single [KotlinCompilationDetails] for [compilation] */
-    private fun createCompilationDetails(
-      compilation: KotlinCompilation<*>,
-      objects: ObjectFactory,
-//      providers: ProviderFactory,
-      configurations: ConfigurationContainer,
-    ): KotlinCompilationDetails {
-      val allKotlinSourceSetsNames =
-        compilation.allKotlinSourceSets.map { it.name } + compilation.defaultSourceSet.name
+  /**
+   * Get the [Configuration][org.gradle.api.artifacts.Configuration] names of all configurations
+   * used to build this [KotlinCompilation] and
+   * [its source sets][KotlinCompilation.kotlinSourceSets].
+   */
+  private fun collectKotlinCompilationClasspath(
+    compilation: KotlinCompilation<*>,
+  ): FileCollection {
 
-//      val compileDependencyFiles = objects.fileCollection()
-//      if (!compilation.target.isAndroidTarget()) {
-//        compileDependencyFiles.from(providers.provider { compilation.compileDependencyFiles })
-////              .from(providers.provider { compilation.runtimeDependencyFiles })
-//      }
-
-      val dependentSourceSetNames =
-        compilation.defaultSourceSet.dependsOn.map { it.name }
-
-      val compilationClasspath: FileCollection =
-        collectKotlinCompilationClasspath(
-          kotlinCompilation = compilation,
-          objects = objects,
-          configurations = configurations,
-        )
-
-      return KotlinCompilationDetails(
-        target = compilation.target.name,
-        kotlinPlatform = KotlinPlatform.fromString(compilation.platformType.name),
-        allKotlinSourceSetsNames = allKotlinSourceSetsNames.toSet(),
-        mainCompilation = compilation.isMainCompilation(),
-        //compileDependencyFiles = compileDependencyFiles,
-        dependentSourceSetNames = dependentSourceSetNames.toSet(),
-        compilationClasspath = compilationClasspath,
-      )
-    }
-
-    private fun KotlinProjectExtension.allKotlinCompilations(): Collection<KotlinCompilation<*>> =
-      when (this) {
-        is KotlinMultiplatformExtension -> targets.flatMap { it.compilations }
-        is KotlinSingleTargetExtension  -> target.compilations
-        else                            -> emptyList() // shouldn't happen?
-      }
-
-    /**
-     * Get the [Configuration][org.gradle.api.artifacts.Configuration] names of all configurations
-     * used to build this [KotlinCompilation] and
-     * [its source sets][KotlinCompilation.kotlinSourceSets].
-     */
-    private fun collectKotlinCompilationClasspath(
-      kotlinCompilation: KotlinCompilation<*>,
-      objects: ObjectFactory,
-      configurations: ConfigurationContainer,
-    ): FileCollection {
-
-      val compilationClasspath = objects.fileCollection()
+    val compilationClasspath = objects.fileCollection()
 
 //      if (kotlinCompilation.target.isAndroidTarget()) {
 //        // Workaround for https://youtrack.jetbrains.com/issue/KT-33893
 //
 //      }
 
-      /**
-       * Aggregate the incoming files from a [Configuration][org.gradle.api.artifacts.Configuration]
-       * (with name [named]) into [compilationClasspath].
-       *
-       * Configurations that cannot be
-       * [resolved][org.gradle.api.artifacts.Configuration.isCanBeResolved]
-       * will be ignored.
-       */
-      fun collectConfiguration(named: String, builtBy: TaskProvider<*>? = null) {
-        val conf = configurations.findByName(named)
-        if (conf != null && conf.isCanBeResolved) {
+    val standardConfigurations = mutableListOf<String>().apply {
+      addAll(compilation.relatedConfigurationNames)
+      addAll(compilation.kotlinSourceSets.flatMap { it.relatedConfigurationNames })
+    }.toSet()
 
-          val incomingFiles =
-            @Suppress("UnstableApiUsage")
-            conf
-              .incoming
-              .artifactView { lenient(true) }
-              .artifacts
-              .resolvedArtifacts
-              .map { artifacts -> artifacts.map { it.file } }
+    logger.info("[$projectPath] compilation ${compilation.name} has ${standardConfigurations.size} standard configurations $standardConfigurations")
 
-          compilationClasspath.from(incomingFiles)
+    standardConfigurations.forEach { compilationClasspath.collectConfiguration(it) }
 
-          if (builtBy != null) {
-            compilationClasspath.builtBy(builtBy)
-          }
-        }
-      }
-
-      val standardConfigurations = mutableListOf<String>().apply {
-        addAll(kotlinCompilation.relatedConfigurationNames)
-        addAll(kotlinCompilation.kotlinSourceSets.flatMap { it.relatedConfigurationNames })
-      }.toSet()
-
-      standardConfigurations.forEach(::collectConfiguration)
-
-      if (!kotlinCompilation.target.isAndroidTarget()) {
-        if (kotlinCompilation is AbstractKotlinNativeCompilation) {
-          // K/N doesn't correctly set task dependencies, the configuration
-          // `defaultSourceSet.implementationMetadataConfigurationName`
-          // will trigger a bunch of Gradle warnings about "using file outputs without task dependencies",
-          // so K/N compilations need to explicitly depend on the compilation tasks
-          // UPDATE: actually I think is wrong, it's a bug with the K/N 'commonize for IDE' tasks
-          // see: https://github.com/Kotlin/dokka/issues/2977
-          collectConfiguration(
-            named = kotlinCompilation.defaultSourceSet.implementationMetadataConfigurationName,
+    if (!compilation.target.isAndroidTarget()) {
+      if (compilation is AbstractKotlinNativeCompilation) {
+        // K/N doesn't correctly set task dependencies, the configuration
+        // `defaultSourceSet.implementationMetadataConfigurationName`
+        // will trigger a bunch of Gradle warnings about "using file outputs without task dependencies",
+        // so K/N compilations need to explicitly depend on the compilation tasks
+        // UPDATE: actually I think is wrong, it's a bug with the K/N 'commonize for IDE' tasks
+        // see: https://github.com/Kotlin/dokka/issues/2977
+        compilationClasspath.collectConfiguration(
+          named = compilation.defaultSourceSet.implementationMetadataConfigurationName,
 //          builtBy = kotlinCompilation.compileKotlinTaskProvider
-          )
-        }
+        )
       }
-
-      return compilationClasspath
     }
 
+    return compilationClasspath
+  }
+
+  /**
+   * Aggregate the incoming files from a [Configuration][org.gradle.api.artifacts.Configuration]
+   * (with name [named]) into this [ConfigurableFileCollection].
+   *
+   * Configurations that cannot be
+   * [resolved][org.gradle.api.artifacts.Configuration.isCanBeResolved]
+   * will be ignored.
+   */
+  private fun ConfigurableFileCollection.collectConfiguration(
+    named: String,
+    builtBy: TaskProvider<*>? = null,
+  ) {
+    val conf = configurations.findByName(named)
+    if (conf != null && conf.isCanBeResolved) {
+
+      val incomingFiles =
+        conf
+          .incoming
+          // ignore failures: it's okay if fetching files is best-effort because maybe
+          // Dokka doesn't need _all_ dependencies
+          .artifactView { lenient(true) }
+          .artifacts
+          .artifactFiles
+
+      this@collectConfiguration.from(incomingFiles)
+
+      if (builtBy != null) {
+        this@collectConfiguration.builtBy(builtBy)
+      }
+    }
+  }
+
+  companion object {
     private fun KotlinCompilation<*>.isMainCompilation(): Boolean {
       return when (this) {
         is KotlinJvmAndroidCompilation ->
           androidVariant is LibraryVariant || androidVariant is ApplicationVariant
 
         else                           ->
-          name == KotlinCompilation.Companion.MAIN_COMPILATION_NAME//  "main"
+          name == KotlinCompilation.Companion.MAIN_COMPILATION_NAME
       }
     }
 
@@ -378,97 +377,97 @@ private abstract class KotlinSourceSetDetails @Inject constructor(
     }
 
   override fun getName(): String = named
+}
 
-  @DokkatooInternalApi
-  companion object {
+/** Utility class, encapsulating logic for building [KotlinCompilationDetails] */
+private class KotlinSourceSetDetailsBuilder(
+  private val sourceSetScopeDefault: Provider<String>,
+  private val objects: ObjectFactory,
+  private val providers: ProviderFactory,
+  /** Used for logging */
+  private val projectPath: String,
+) {
 
-    internal fun extractKotlinSourceSetDetails(
-      kotlinSourceSets: NamedDomainObjectContainer<KotlinSourceSet>,
-      sourceSetScopeDefault: Provider<String>,
-      allKotlinCompilationDetails: ListProperty<KotlinCompilationDetails>,
-      objects: ObjectFactory,
-      providers: ProviderFactory,
-    ): NamedDomainObjectContainer<KotlinSourceSetDetails> {
+  private val logger = Logging.getLogger(KotlinSourceSetDetails::class.java)
 
-      val sourceSetDetails = objects.domainObjectContainer(KotlinSourceSetDetails::class)
+  fun createSourceSetDetails(
+    kotlinSourceSets: NamedDomainObjectContainer<KotlinSourceSet>,
+    allKotlinCompilationDetails: ListProperty<KotlinCompilationDetails>,
+  ): NamedDomainObjectContainer<KotlinSourceSetDetails> {
 
-      kotlinSourceSets.configureEach kss@{
-        sourceSetDetails.register(
-          kotlinSourceSet = this,
-          allKotlinCompilationDetails = allKotlinCompilationDetails,
-          sourceSetScopeDefault = sourceSetScopeDefault,
-          providers = providers,
-          objects = objects,
-        )
-      }
+    val sourceSetDetails = objects.domainObjectContainer(KotlinSourceSetDetails::class)
 
-      return sourceSetDetails
-    }
-
-    private fun NamedDomainObjectContainer<KotlinSourceSetDetails>.register(
-      kotlinSourceSet: KotlinSourceSet,
-      allKotlinCompilationDetails: ListProperty<KotlinCompilationDetails>,
-      sourceSetScopeDefault: Provider<String>,
-      providers: ProviderFactory,
-      objects: ObjectFactory,
-    ) {
-
-      // TODO: Needs to respect filters.
-      //  We probably need to change from "sourceRoots" to support "sourceFiles"
-      //  https://github.com/Kotlin/dokka/issues/1215
-      val extantSourceDirectories = providers.provider {
-        kotlinSourceSet.kotlin.sourceDirectories.filter { it.exists() }
-      }
-
-      val compilations = allKotlinCompilationDetails.map { allCompilations ->
-        allCompilations.filter { compilation ->
-          kotlinSourceSet.name in compilation.allKotlinSourceSetsNames
-        }
-      }
-
-      // determine the source sets IDs of _other_ source sets that _this_ source depends on.
-      val dependentSourceSets = providers.provider { kotlinSourceSet.dependsOn }
-      val dependentSourceSetIds =
-        providers.zip(
-          dependentSourceSets,
-          sourceSetScopeDefault,
-        ) { sourceSets, sourceSetScope ->
-          sourceSets.map { dependedKss ->
-            objects.dokkaSourceSetIdSpec(sourceSetScope, dependedKss.name)
-          }
-        }
-
-      val sourceDirectoriesOfDependents = providers.provider {
-        kotlinSourceSet
-          .allDependentSourceSets()
-          .fold(objects.fileCollection()) { acc, sourceSet ->
-            acc.from(sourceSet.kotlin.sourceDirectories)
-          }
-      }
-
-      register(kotlinSourceSet.name) {
-        this.dependentSourceSetIds.addAll(dependentSourceSetIds)
-        this.sourceDirectories.from(extantSourceDirectories)
-        this.sourceDirectoriesOfDependents.from(sourceDirectoriesOfDependents)
-        this.compilations.addAll(compilations)
-      }
-    }
-
-    /**
-     * Return a list containing _all_ source sets that this source set depends on,
-     * searching recursively.
-     *
-     * @see KotlinSourceSet.dependsOn
-     */
-    private tailrec fun KotlinSourceSet.allDependentSourceSets(
-      queue: Set<KotlinSourceSet> = dependsOn.toSet(),
-      allDependents: List<KotlinSourceSet> = emptyList(),
-    ): List<KotlinSourceSet> {
-      val next = queue.firstOrNull() ?: return allDependents
-      return next.allDependentSourceSets(
-        queue = (queue - next) union next.dependsOn,
-        allDependents = allDependents + next,
+    kotlinSourceSets.configureEach kss@{
+      sourceSetDetails.register(
+        kotlinSourceSet = this,
+        allKotlinCompilationDetails = allKotlinCompilationDetails,
       )
     }
+
+    return sourceSetDetails
+  }
+
+  private fun NamedDomainObjectContainer<KotlinSourceSetDetails>.register(
+    kotlinSourceSet: KotlinSourceSet,
+    allKotlinCompilationDetails: ListProperty<KotlinCompilationDetails>,
+  ) {
+
+    // TODO: Needs to respect filters.
+    //  We probably need to change from "sourceRoots" to support "sourceFiles"
+    //  https://github.com/Kotlin/dokka/issues/1215
+    val extantSourceDirectories = providers.provider {
+      kotlinSourceSet.kotlin.sourceDirectories.filter { it.exists() }
+    }
+
+    val compilations = allKotlinCompilationDetails.map { allCompilations ->
+      allCompilations.filter { compilation ->
+        kotlinSourceSet.name in compilation.allKotlinSourceSetsNames
+      }
+    }
+
+    // determine the source sets IDs of _other_ source sets that _this_ source depends on.
+    val dependentSourceSets = providers.provider { kotlinSourceSet.dependsOn }
+    val dependentSourceSetIds =
+      providers.zip(
+        dependentSourceSets,
+        sourceSetScopeDefault,
+      ) { sourceSets, sourceSetScope ->
+        logger.info("[$projectPath] source set ${kotlinSourceSet.name} has ${sourceSets.size} dependents ${sourceSets.joinToString { it.name }}")
+        sourceSets.map { dependedKss ->
+          objects.dokkaSourceSetIdSpec(sourceSetScope, dependedKss.name)
+        }
+      }
+
+    val sourceDirectoriesOfDependents = providers.provider {
+      kotlinSourceSet
+        .allDependentSourceSets()
+        .fold(objects.fileCollection()) { acc, sourceSet ->
+          acc.from(sourceSet.kotlin.sourceDirectories)
+        }
+    }
+
+    register(kotlinSourceSet.name) {
+      this.dependentSourceSetIds.addAll(dependentSourceSetIds)
+      this.sourceDirectories.from(extantSourceDirectories)
+      this.sourceDirectoriesOfDependents.from(sourceDirectoriesOfDependents)
+      this.compilations.addAll(compilations)
+    }
+  }
+
+  /**
+   * Return a list containing _all_ source sets that this source set depends on,
+   * searching recursively.
+   *
+   * @see KotlinSourceSet.dependsOn
+   */
+  private tailrec fun KotlinSourceSet.allDependentSourceSets(
+    queue: Set<KotlinSourceSet> = dependsOn.toSet(),
+    allDependents: List<KotlinSourceSet> = emptyList(),
+  ): List<KotlinSourceSet> {
+    val next = queue.firstOrNull() ?: return allDependents
+    return next.allDependentSourceSets(
+      queue = (queue - next) union next.dependsOn,
+      allDependents = allDependents + next,
+    )
   }
 }
