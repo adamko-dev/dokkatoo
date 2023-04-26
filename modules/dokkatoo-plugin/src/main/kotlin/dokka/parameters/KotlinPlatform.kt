@@ -12,12 +12,12 @@ import org.jetbrains.dokka.Platform
 enum class KotlinPlatform(
   internal val displayName: String
 ) {
-  JVM("jvm"),
   AndroidJVM("androidJvm"),
-  JS("js"),
-  WASM("wasm"),
-  Native("native"),
   Common("common"),
+  JS("js"),
+  JVM("jvm"),
+  Native("native"),
+  WASM("wasm"),
   ;
 
   @Deprecated("Unused", ReplaceWith("name.toLowerCase()"))
