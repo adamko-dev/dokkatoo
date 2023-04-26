@@ -58,6 +58,7 @@ constructor(
   abstract val dokkaModuleFiles: ConfigurableFileCollection
 
   @get:LocalState
+  // cacheRoot is not used by Dokka, and will probably be deprecated
   abstract val cacheRoot: DirectoryProperty
 
   @get:Input

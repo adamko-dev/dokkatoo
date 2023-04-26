@@ -64,7 +64,8 @@ constructor(
     get() = outputDir.map { it.asFile.invariantSeparatorsPath }
 
   @get:Internal
-  // marked as Internal because this task does not use the directory contents, only the location
+  // Marked as Internal because this task does not use the directory contents, only the location.
+  // Note that `cacheRoot` is not used by Dokka, and will probably be deprecated.
   abstract val cacheRoot: DirectoryProperty
 
   /**
