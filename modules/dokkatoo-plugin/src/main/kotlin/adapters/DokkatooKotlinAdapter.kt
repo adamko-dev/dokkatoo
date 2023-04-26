@@ -9,6 +9,7 @@ import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetIdSpec.Companion.dokka
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec
 import dev.adamko.dokkatoo.dokka.parameters.KotlinPlatform
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
+import dev.adamko.dokkatoo.internal.collectIncomingFiles
 import dev.adamko.dokkatoo.internal.not
 import javax.inject.Inject
 import org.gradle.api.Named
@@ -16,6 +17,8 @@ import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ConfigurationContainer
+import org.gradle.api.attributes.Usage.JAVA_RUNTIME
+import org.gradle.api.attributes.Usage.USAGE_ATTRIBUTE
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
 import org.gradle.api.logging.Logging
@@ -25,15 +28,12 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.provider.SetProperty
-import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.*
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinSingleTargetExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
-import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
-import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.AbstractKotlinNativeCompilation
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinJvmAndroidCompilation
 
@@ -70,27 +70,25 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
 
     val dokkatooExtension = project.extensions.getByType<DokkatooExtension>()
 
+    // first fetch the relevant properties of all KotlinCompilations
     val compilationDetailsBuilder = KotlinCompilationDetailsBuilder(
       providers = providers,
       objects = objects,
       configurations = project.configurations,
       projectPath = project.path,
     )
-
-    val sourceSetDetailsBuilder = KotlinSourceSetDetailsBuilder(
-      providers = providers,
-      objects = objects,
-      sourceSetScopeDefault = dokkatooExtension.sourceSetScopeDefault,
-      projectPath = project.path,
-    )
-
-    // first fetch the relevant properties of all KotlinCompilations
     val allKotlinCompilationDetails: ListProperty<KotlinCompilationDetails> =
       compilationDetailsBuilder.createCompilationDetails(
         kotlinProjectExtension = kotlinExtension,
       )
 
     // second, fetch the relevant properties of the Kotlin source sets
+    val sourceSetDetailsBuilder = KotlinSourceSetDetailsBuilder(
+      providers = providers,
+      objects = objects,
+      sourceSetScopeDefault = dokkatooExtension.sourceSetScopeDefault,
+      projectPath = project.path,
+    )
     val sourceSetDetails: NamedDomainObjectContainer<KotlinSourceSetDetails> =
       sourceSetDetailsBuilder.createSourceSetDetails(
         kotlinSourceSets = kotlinExtension.sourceSets,
@@ -147,7 +145,8 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
       if (compilations.isNotEmpty()) {
         compilations.fold(classpath) { acc, compilation ->
           acc.from(compilation.compilationClasspath)
-//          acc.from(compilation.compileDependencyFiles)
+          // can't use compileDependencyFiles, it causes weird dependency resolution errors in Android projects
+          //acc.from(providers.provider { compilation.compileDependencyFiles })
         }
       } else {
         classpath
@@ -246,7 +245,7 @@ private class KotlinCompilationDetailsBuilder(
       target = compilation.target.name,
       kotlinPlatform = KotlinPlatform.fromString(compilation.platformType.name),
       allKotlinSourceSetsNames = allKotlinSourceSetsNames.toSet(),
-      mainCompilation = compilation.isMainCompilation(),
+      mainCompilation = compilation.isMain(),
       compileDependencyFiles = compileDependencyFiles,
       dependentSourceSetNames = dependentSourceSetNames.toSet(),
       compilationClasspath = compilationClasspath,
@@ -270,11 +269,20 @@ private class KotlinCompilationDetailsBuilder(
   ): FileCollection {
 
     val compilationClasspath = objects.fileCollection()
+    fun collectConfiguration(named: String) {
+      configurations.collectIncomingFiles(named = named, collector = compilationClasspath)
 
-//      if (kotlinCompilation.target.isAndroidTarget()) {
-//        // Workaround for https://youtrack.jetbrains.com/issue/KT-33893
-//
-//      }
+      // need to fetch JAVA_RUNTIME files explicitly, because Android Gradle Plugin is weird and
+      // doesn't seem to register the attributes explicitly on its configurations
+      @Suppress("UnstableApiUsage")
+      configurations.collectIncomingFiles(named = named, collector = compilationClasspath) {
+        withVariantReselection()
+        attributes {
+          attribute(USAGE_ATTRIBUTE, objects.named(JAVA_RUNTIME))
+        }
+        lenient(true)
+      }
+    }
 
     val standardConfigurations = mutableListOf<String>().apply {
       addAll(compilation.relatedConfigurationNames)
@@ -283,60 +291,26 @@ private class KotlinCompilationDetailsBuilder(
 
     logger.info("[$projectPath] compilation ${compilation.name} has ${standardConfigurations.size} standard configurations $standardConfigurations")
 
-    standardConfigurations.forEach { compilationClasspath.collectConfiguration(it) }
+    standardConfigurations.forEach { collectConfiguration(it) }
 
-    if (!compilation.target.isAndroidTarget()) {
-      if (compilation is AbstractKotlinNativeCompilation) {
-        // K/N doesn't correctly set task dependencies, the configuration
-        // `defaultSourceSet.implementationMetadataConfigurationName`
-        // will trigger a bunch of Gradle warnings about "using file outputs without task dependencies",
-        // so K/N compilations need to explicitly depend on the compilation tasks
-        // UPDATE: actually I think is wrong, it's a bug with the K/N 'commonize for IDE' tasks
-        // see: https://github.com/Kotlin/dokka/issues/2977
-        compilationClasspath.collectConfiguration(
-          named = compilation.defaultSourceSet.implementationMetadataConfigurationName,
+    if (compilation is AbstractKotlinNativeCompilation) {
+      // K/N doesn't correctly set task dependencies, the configuration
+      // `defaultSourceSet.implementationMetadataConfigurationName`
+      // will trigger a bunch of Gradle warnings about "using file outputs without task dependencies",
+      // so K/N compilations need to explicitly depend on the compilation tasks
+      // UPDATE: actually I think is wrong, it's a bug with the K/N 'commonize for IDE' tasks
+      // see: https://github.com/Kotlin/dokka/issues/2977
+      collectConfiguration(
+        named = compilation.defaultSourceSet.implementationMetadataConfigurationName,
 //          builtBy = kotlinCompilation.compileKotlinTaskProvider
-        )
-      }
+      )
     }
 
     return compilationClasspath
   }
 
-  /**
-   * Aggregate the incoming files from a [Configuration][org.gradle.api.artifacts.Configuration]
-   * (with name [named]) into this [ConfigurableFileCollection].
-   *
-   * Configurations that cannot be
-   * [resolved][org.gradle.api.artifacts.Configuration.isCanBeResolved]
-   * will be ignored.
-   */
-  private fun ConfigurableFileCollection.collectConfiguration(
-    named: String,
-    builtBy: TaskProvider<*>? = null,
-  ) {
-    val conf = configurations.findByName(named)
-    if (conf != null && conf.isCanBeResolved) {
-
-      val incomingFiles =
-        conf
-          .incoming
-          // ignore failures: it's okay if fetching files is best-effort because maybe
-          // Dokka doesn't need _all_ dependencies
-          .artifactView { lenient(true) }
-          .artifacts
-          .artifactFiles
-
-      this@collectConfiguration.from(incomingFiles)
-
-      if (builtBy != null) {
-        this@collectConfiguration.builtBy(builtBy)
-      }
-    }
-  }
-
   companion object {
-    private fun KotlinCompilation<*>.isMainCompilation(): Boolean {
+    private fun KotlinCompilation<*>.isMain(): Boolean {
       return when (this) {
         is KotlinJvmAndroidCompilation ->
           androidVariant is LibraryVariant || androidVariant is ApplicationVariant
@@ -345,9 +319,6 @@ private class KotlinCompilationDetailsBuilder(
           name == KotlinCompilation.Companion.MAIN_COMPILATION_NAME
       }
     }
-
-    private fun KotlinTarget.isAndroidTarget(): Boolean =
-      platformType == KotlinPlatformType.androidJvm
   }
 }
 
