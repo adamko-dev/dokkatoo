@@ -177,8 +177,12 @@ constructor(
       noStdlibLink.convention(false)
 
       enableKotlinStdLibDocumentationLink.convention(true)
-      enableJdkDocumentationLink.convention(true)
-      enableAndroidDocumentationLink.convention(false)
+      enableJdkDocumentationLink.convention(
+        analysisPlatform.map { it == KotlinPlatform.JVM || it == KotlinPlatform.AndroidJVM }
+      )
+      enableAndroidDocumentationLink.convention(
+        analysisPlatform.map { it == KotlinPlatform.AndroidJVM }
+      )
 
       reportUndocumented.convention(false)
       skipDeprecated.convention(false)
