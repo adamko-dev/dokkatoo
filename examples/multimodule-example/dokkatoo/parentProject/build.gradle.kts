@@ -1,6 +1,6 @@
 plugins {
   kotlin("jvm") version "1.7.20" apply false
-  id("dev.adamko.dokkatoo") version "1.3.0-SNAPSHOT"
+  id("dev.adamko.dokkatoo") version "1.3.0"
 }
 
 dependencies {
