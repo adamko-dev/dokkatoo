@@ -26,18 +26,22 @@ public abstract class dev/adamko/dokkatoo/DokkatooExtension : java/io/Serializab
 }
 
 public abstract interface class dev/adamko/dokkatoo/DokkatooExtension$Versions {
+	public static final field Companion Ldev/adamko/dokkatoo/DokkatooExtension$Versions$Companion;
+	public static final field VERSIONS_EXTENSION_NAME Ljava/lang/String;
 	public abstract fun getFreemarker ()Lorg/gradle/api/provider/Property;
 	public abstract fun getJetbrainsDokka ()Lorg/gradle/api/provider/Property;
 	public abstract fun getJetbrainsMarkdown ()Lorg/gradle/api/provider/Property;
+	public abstract fun getKotlinxCoroutines ()Lorg/gradle/api/provider/Property;
 	public abstract fun getKotlinxHtml ()Lorg/gradle/api/provider/Property;
+}
+
+public final class dev/adamko/dokkatoo/DokkatooExtension$Versions$Companion {
+	public static final field VERSIONS_EXTENSION_NAME Ljava/lang/String;
 }
 
 public abstract class dev/adamko/dokkatoo/DokkatooPlugin : org/gradle/api/Plugin {
 	public synthetic fun apply (Ljava/lang/Object;)V
 	public fun apply (Lorg/gradle/api/Project;)V
-}
-
-public final class dev/adamko/dokkatoo/adapters/DokkatooKotlinAdapter$Companion {
 }
 
 public abstract class dev/adamko/dokkatoo/dokka/DokkaPublication : java/io/Serializable, org/gradle/api/Named {
@@ -218,6 +222,7 @@ public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceSetIdSpec 
 	public final fun getScopeId ()Ljava/lang/String;
 	public abstract fun getSourceSetName ()Ljava/lang/String;
 	public abstract fun setSourceSetName (Ljava/lang/String;)V
+	public fun toString ()Ljava/lang/String;
 }
 
 public final class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceSetIdSpec$Companion {
@@ -265,6 +270,7 @@ public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceSetSpec : 
 }
 
 public final class dev/adamko/dokkatoo/dokka/parameters/KotlinPlatform : java/lang/Enum {
+	public static final field AndroidJVM Ldev/adamko/dokkatoo/dokka/parameters/KotlinPlatform;
 	public static final field Common Ldev/adamko/dokkatoo/dokka/parameters/KotlinPlatform;
 	public static final field Companion Ldev/adamko/dokkatoo/dokka/parameters/KotlinPlatform$Companion;
 	public static final field JS Ldev/adamko/dokkatoo/dokka/parameters/KotlinPlatform;

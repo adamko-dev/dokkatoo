@@ -3,18 +3,15 @@ import buildsrc.utils.initIdeProjectLogo
 
 plugins {
   buildsrc.conventions.base
-
   idea
 }
 
 group = "dev.adamko.dokkatoo"
-version = "1.2.1-SNAPSHOT"
+version = "1.3.0-SNAPSHOT"
 
 
 idea {
   module {
-    isDownloadSources = true
-    isDownloadJavadoc = false
     excludeGeneratedGradleDsl(layout)
 
     excludeDirs.apply {

@@ -16,7 +16,7 @@ class KotlinPlatformTest : FunSpec({
   test("Dokka platform should have equivalent KotlinPlatform") {
 
     Platform.values().shouldForAll { dokkaPlatform ->
-      dokkaPlatform shouldBeIn KotlinPlatform.entries.map { it.dokkaType }
+      dokkaPlatform shouldBeIn KotlinPlatform.values.map { it.dokkaType }
     }
   }
 

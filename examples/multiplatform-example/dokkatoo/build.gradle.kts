@@ -1,6 +1,6 @@
 plugins {
   kotlin("multiplatform") version "1.8.10"
-  id("dev.adamko.dokkatoo") version "1.2.1-SNAPSHOT"
+  id("dev.adamko.dokkatoo") version "1.3.0-SNAPSHOT"
 }
 
 group = "org.dokka.example"
@@ -23,7 +23,6 @@ kotlin {
 }
 
 dokkatoo {
-
   // Create a custom source set not known to the Kotlin Gradle Plugin
   dokkatooSourceSets.register("customSourceSet") {
     jdkVersion.set(9)

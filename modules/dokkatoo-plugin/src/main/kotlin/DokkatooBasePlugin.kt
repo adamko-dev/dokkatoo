@@ -1,5 +1,6 @@
 package dev.adamko.dokkatoo
 
+import dev.adamko.dokkatoo.DokkatooExtension.Versions.Companion.VERSIONS_EXTENSION_NAME
 import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes
 import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes.Companion.DOKKATOO_BASE_ATTRIBUTE
 import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes.Companion.DOKKATOO_CATEGORY_ATTRIBUTE
@@ -118,11 +119,12 @@ constructor(
       dokkatooModuleDirectory.convention(layout.buildDirectory.dir("dokka-module"))
       dokkatooConfigurationsDirectory.convention(layout.buildDirectory.dir("dokka-config"))
 
-      extensions.create<DokkatooExtension.Versions>("versions").apply {
+      extensions.create<DokkatooExtension.Versions>(VERSIONS_EXTENSION_NAME).apply {
         jetbrainsDokka.convention(DokkatooConstants.DOKKA_VERSION)
         jetbrainsMarkdown.convention("0.3.1")
         freemarker.convention("2.3.31")
         kotlinxHtml.convention("0.8.0")
+        kotlinxCoroutines.convention("1.6.4")
       }
     }
   }
@@ -160,7 +162,7 @@ constructor(
             name.endsWith("Main") -> name.substringBeforeLast("Main")
 
             // indeterminate source sets should be named by the Kotlin platform
-            else                  -> platform.key
+            else                  -> platform.displayName
           }
         }
       )
@@ -176,7 +178,9 @@ constructor(
 
       enableKotlinStdLibDocumentationLink.convention(true)
       enableJdkDocumentationLink.convention(true)
-      enableAndroidDocumentationLink.convention(false)
+      enableAndroidDocumentationLink.convention(
+        analysisPlatform.map { it == KotlinPlatform.AndroidJVM }
+      )
 
       reportUndocumented.convention(false)
       skipDeprecated.convention(false)
