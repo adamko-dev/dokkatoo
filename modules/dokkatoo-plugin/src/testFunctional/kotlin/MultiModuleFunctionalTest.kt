@@ -319,12 +319,17 @@ class MultiModuleFunctionalTest : FunSpec({
               )
               .forwardOutput()
               .build {
-                test("expect the generated HTML file is deleted") {
-                  val helloAgainIndexHtml = project.projectDir.resolve(
-                    "build/dokka/html/subproject-hello/com.project.hello/-hello-again/index.html"
-                  )
 
+                test("expect HelloAgain HTML file is now deleted") {
                   helloAgainIndexHtml.shouldNotExist()
+
+                  project.dir("build/dokka/html/") {
+                    projectDir.toTreeString().shouldNotContainAnyOf(
+                      "hello-again",
+                      "-hello-again/",
+                      "-hello-again.html",
+                    )
+                  }
                 }
               }
           }
