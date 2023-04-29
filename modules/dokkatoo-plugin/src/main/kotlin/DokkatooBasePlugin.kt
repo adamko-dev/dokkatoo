@@ -13,6 +13,7 @@ import dev.adamko.dokkatoo.tasks.DokkatooGenerateTask
 import dev.adamko.dokkatoo.tasks.DokkatooPrepareModuleDescriptorTask
 import dev.adamko.dokkatoo.tasks.DokkatooPrepareParametersTask
 import dev.adamko.dokkatoo.tasks.DokkatooTask
+import java.io.File
 import java.net.URL
 import javax.inject.Inject
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -22,6 +23,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.ProjectLayout
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.ProviderFactory
@@ -75,7 +77,7 @@ constructor(
     target.tasks.withType<DokkatooGenerateTask>().configureEach {
       cacheDirectory.convention(dokkatooExtension.dokkatooCacheDirectory)
       workerDebugEnabled.convention(false)
-      workerLogFile.set(temporaryDir.resolve("dokka-worker.log"))
+      workerLogFile.convention(temporaryDir.resolve("dokka-worker.log"))
       // increase memory - DokkaGenerator is hungry https://github.com/Kotlin/dokka/issues/1405
       workerMinHeapSize.convention("512m")
       workerMaxHeapSize.convention("1g")
@@ -258,6 +260,10 @@ constructor(
       dependsOn(withType<DokkatooGenerateTask>())
     }
   }
+
+  // workaround for https://github.com/gradle/gradle/issues/23708
+  private fun RegularFileProperty.convention(file: File): RegularFileProperty =
+    convention(objects.fileProperty().fileValue(file))
 
   companion object {
 
