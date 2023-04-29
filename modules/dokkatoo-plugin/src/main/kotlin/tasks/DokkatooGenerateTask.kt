@@ -75,7 +75,7 @@ constructor(
   @get:Input
   abstract val workerJvmArgs: ListProperty<String>
 
-  @get:LocalState
+  @get:Internal
   abstract val workerLogFile: RegularFileProperty
 
   enum class GenerationType {
@@ -88,7 +88,7 @@ constructor(
   internal fun generateDocumentation() {
     val dokkaParametersJsonFile = dokkaParametersJson.get().asFile
     val generationType: GenerationType = generationType.get()
-    val outputDir = outputDirectory.get().asFile
+    val outputDirectory = outputDirectory.get().asFile
 
     val dokkaParameters = jsonMapper.decodeFromStream(
       DokkaParametersKxs.serializer(),
@@ -104,7 +104,7 @@ constructor(
 
     dokkaParameters.modules.forEach {
       // workaround until https://github.com/Kotlin/dokka/pull/2867 is released
-      outputDirectory.dir(it.modulePath).get().asFile.mkdirs()
+      this.outputDirectory.dir(it.modulePath).get().asFile.mkdirs()
     }
 
     logger.info("DokkaGeneratorWorker runtimeClasspath: ${runtimeClasspath.asPath}")
@@ -121,33 +121,11 @@ constructor(
       }
     }
 
-    val dokkaParametersImpl = dokkaParameters.convert(outputDir)
+    val dokkaParametersImpl = dokkaParameters.convert(outputDirectory)
 
-    workQueue.submit(DokkaGeneratorWorker::class) worker@{
-      this@worker.dokkaParameters.set(dokkaParametersImpl)
-      this@worker.logFile.set(workerLogFile)
+    workQueue.submit(DokkaGeneratorWorker::class) {
+      this.dokkaParameters.set(dokkaParametersImpl)
+      this.logFile.set(workerLogFile)
     }
   }
-
-//    /**
-//     * Extract a property from [dokkaConfigurationJson] so it can be converted to a specific Gradle property type
-//     * (for example, a [DirectoryProperty]) and used as a task property.
-//     */
-//    internal inline fun <reified T : Any> dokkaConfigurationValue(
-//        crossinline property: DokkaConfigurationKxs.() -> T?
-//    ): Provider<T> {
-//        return providers.fileContents(dokkaConfigurationJson).asText.mapNotNull { dokkaConfigurationJson ->
-//
-//            val dokkaConfiguration = jsonMapper.decodeFromString(
-//                DokkaConfigurationKxs.serializer(),
-//                dokkaConfigurationJson,
-//            )
-//
-//            dokkaConfiguration.property()
-//        }
-//    }
-//
-//    // workaround for https://github.com/gradle/gradle/issues/12388
-//    private fun <T, R> Provider<T>.mapNotNull(map: (value: T) -> R?): Provider<R> =
-//        flatMap { value -> providers.provider { map(value) } }
 }
