@@ -53,19 +53,19 @@ class MultiModuleFunctionalTest : FunSpec({
     context("expect HTML site is generated") {
 
       test("with expected HTML files") {
-        project.projectDir.resolve("subproject/build/dokka/html/index.html").shouldBeAFile()
-        project.projectDir.resolve("subproject/build/dokka/html/com/project/hello/Hello.html")
+        project.file("subproject/build/dokka/html/index.html").shouldBeAFile()
+        project.file("subproject/build/dokka/html/com/project/hello/Hello.html")
           .shouldBeAFile()
       }
 
       test("and dokka_parameters.json is generated") {
-        project.projectDir.resolve("subproject/build/dokka/html/dokka_parameters.json")
+        project.file("subproject/build/dokka/html/dokka_parameters.json")
           .shouldBeAFile()
       }
 
       test("with element-list") {
-        project.projectDir.resolve("build/dokka/html/package-list").shouldBeAFile()
-        project.projectDir.resolve("build/dokka/html/package-list").toFile().readText()
+        project.file("build/dokka/html/package-list").shouldBeAFile()
+        project.file("build/dokka/html/package-list").toFile().readText()
           .shouldContain( /* language=text */ """
               |${'$'}dokka.format:html-v1
               |${'$'}dokka.linkExtension:html
@@ -79,23 +79,8 @@ class MultiModuleFunctionalTest : FunSpec({
       }
     }
 
-//        project.projectDir.toFile().walk().forEach { println(it) }
-
-//        project.projectDir.resolve("subproject/build/dokka-output/com/project/hello/Hello.html").shouldBeAFile()
-//        project.projectDir.resolve("subproject/build/dokka-output/index.html").shouldBeAFile()
-//        project.projectDir.resolve("subproject/build/dokka-config/dokka_parameters.json").shouldBeAFile()
-//        project.projectDir.resolve("subproject/build/dokka-output/element-list").shouldBeAFile()
-//        project.projectDir.resolve("subproject/build/dokka-output/element-list").toFile().readText().shouldContain(
-//            """
-//            ${'$'}dokka.format:javadoc-v1
-//            ${'$'}dokka.linkExtension:html
-//
-//            com.project.hello
-//        """.trimIndent()
-//        )
-
     val dokkaConfigurationFile =
-      project.projectDir.resolve("build/dokka-config/html/dokka_parameters.json")
+      project.file("build/dokka-config/html/dokka_parameters.json")
     dokkaConfigurationFile.shouldExist()
     dokkaConfigurationFile.shouldBeAFile()
     @OptIn(ExperimentalSerializationApi::class)
@@ -254,10 +239,11 @@ class MultiModuleFunctionalTest : FunSpec({
       }
 
       context("and when a file in a subproject changes") {
-        project.dir("subproject-hello") {
+
+        val helloAgainIndexHtml =
           @Suppress("KDocUnresolvedReference")
-          createKotlinFile(
-            "src/main/kotlin/HelloAgain.kt",
+          project.createKotlinFile(
+            "subproject-hello/src/main/kotlin/HelloAgain.kt",
             """
               |package com.project.hello
               |
@@ -268,8 +254,7 @@ class MultiModuleFunctionalTest : FunSpec({
               |}
               |
             """.trimMargin()
-          )
-        }
+          ).toPath()
 
         context("expect Dokka re-generates the publication") {
           project.runner
@@ -282,10 +267,6 @@ class MultiModuleFunctionalTest : FunSpec({
             .build {
 
               test("expect HelloAgain HTML file exists") {
-                val helloAgainIndexHtml = project.projectDir.resolve(
-                  "build/dokka/html/subproject-hello/com.project.hello/-hello-again/index.html"
-                )
-
                 helloAgainIndexHtml.shouldBeAFile()
               }
 
@@ -313,7 +294,7 @@ class MultiModuleFunctionalTest : FunSpec({
                 )
               }
 
-              test("expect build is be successful") {
+              test("expect build is successful") {
                 output shouldContain "BUILD SUCCESSFUL"
               }
 
@@ -324,7 +305,9 @@ class MultiModuleFunctionalTest : FunSpec({
 
           context("and when the class is deleted") {
             project.dir("subproject-hello") {
-              createKotlinFile("src/main/kotlin/HelloAgain.kt", "")
+              require(file("src/main/kotlin/HelloAgain.kt").toFile().delete()) {
+                "failed to delete HelloAgain.kt"
+              }
             }
 
             project.runner
@@ -350,7 +333,7 @@ class MultiModuleFunctionalTest : FunSpec({
     }
   }
 
-  context("logging -> ") {
+  context("logging") {
     val project = initDokkatooProject("logging")
 
     test("expect no logs when built using --quiet log level") {
