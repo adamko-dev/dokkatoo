@@ -26,9 +26,19 @@ abstract class DokkaGeneratorWorker : WorkAction<DokkaGeneratorWorker.Parameters
   }
 
   override fun execute() {
-    LoggerAdapter(parameters.logFile.get().asFile).use { logger ->
+    val dokkaParameters = parameters.dokkaParameters.get()
 
-      val dokkaParameters = parameters.dokkaParameters.get()
+    // Dokka Generator doesn't clean up old files, so we need to manually clean the output directory
+    dokkaParameters.outputDir.deleteRecursively()
+    dokkaParameters.outputDir.mkdirs()
+
+    executeDokkaGenerator(dokkaParameters)
+  }
+
+  private fun executeDokkaGenerator(
+    dokkaParameters: DokkaConfiguration
+  ) {
+    LoggerAdapter(parameters.logFile.get().asFile).use { logger ->
       logger.progress("Executing DokkaGeneratorWorker with dokkaParameters: $dokkaParameters")
 
       val generator = DokkaGenerator(dokkaParameters, logger)

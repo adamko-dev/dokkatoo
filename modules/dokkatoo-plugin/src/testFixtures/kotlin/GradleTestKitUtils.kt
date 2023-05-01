@@ -45,8 +45,6 @@ class GradleProjectTest(
     val integrationTestProjectsDir: Path by systemProperty(Paths::get)
     /** Dokka Source directory that contains example Gradle projects */
     val exampleProjectsDir: Path by systemProperty(Paths::get)
-
-    val GRADLE_RO_DEP_CACHE: String? by optionalEnvironmentVariable()
   }
 }
 
