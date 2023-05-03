@@ -12,7 +12,8 @@ abstract class DokkatooHtmlPlugin
 constructor() : DokkatooFormatPlugin(formatName = "html") {
 
   override fun DokkatooFormatPluginContext.configure() {
-    configureDokkaHtmlPlugins()
+    registerDokkaBasePluginConfiguration()
+    registerDokkaVersioningPlugin()
 
     dokkatooTasks.generatePublication.configure {
       doLast {
@@ -23,20 +24,24 @@ constructor() : DokkatooFormatPlugin(formatName = "html") {
     }
   }
 
-  private fun DokkatooFormatPluginContext.configureDokkaHtmlPlugins() {
+  private fun DokkatooFormatPluginContext.registerDokkaBasePluginConfiguration() {
     with(dokkatooExtension.pluginsConfiguration) {
-      registerFactory(DokkaHtmlPluginParameters::class.java) { named ->
-        objects.newInstance(named)
-      }
+      registerBinding(DokkaHtmlPluginParameters::class, DokkaHtmlPluginParameters::class)
       register<DokkaHtmlPluginParameters>(DOKKA_HTML_PARAMETERS_NAME)
       withType<DokkaHtmlPluginParameters>().configureEach {
         separateInheritedMembers.convention(false)
         mergeImplicitExpectActualDeclarations.convention(false)
       }
+    }
+  }
 
-      registerFactory(DokkaVersioningPluginParameters::class.java) { named ->
-        objects.newInstance(named)
-      }
+  private fun DokkatooFormatPluginContext.registerDokkaVersioningPlugin() {
+    // register and configure Dokka Versioning Plugin
+    with(dokkatooExtension.pluginsConfiguration) {
+      registerBinding(
+        DokkaVersioningPluginParameters::class,
+        DokkaVersioningPluginParameters::class,
+      )
       register<DokkaVersioningPluginParameters>(DOKKA_VERSIONING_PLUGIN_PARAMETERS_NAME)
       withType<DokkaVersioningPluginParameters>().configureEach {
         renderVersionsNavigationOnAllPages.convention(true)

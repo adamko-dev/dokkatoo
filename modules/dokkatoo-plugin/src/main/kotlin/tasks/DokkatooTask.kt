@@ -3,8 +3,12 @@ package dev.adamko.dokkatoo.tasks
 import dev.adamko.dokkatoo.DokkatooBasePlugin
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
+import dev.adamko.dokkatoo.internal.adding
+import dev.adamko.dokkatoo.internal.domainObjectContainer
+import javax.inject.Inject
 import org.gradle.api.DefaultTask
 import org.gradle.api.NamedDomainObjectContainer
+import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Nested
@@ -14,6 +18,9 @@ import org.gradle.api.tasks.Nested
 abstract class DokkatooTask
 @DokkatooInternalApi
 constructor() : DefaultTask() {
+
+  @get:Inject
+  abstract val objects: ObjectFactory
 
   init {
     group = DokkatooBasePlugin.TASK_GROUP
@@ -37,7 +44,8 @@ constructor() : DefaultTask() {
      * task input for up-to-date checks
      */
     @get:Nested
-    abstract val dokkaSourceSets: NamedDomainObjectContainer<DokkaSourceSetSpec>
+    val dokkaSourceSets: NamedDomainObjectContainer<DokkaSourceSetSpec> =
+      extensions.adding("dokkaSourceSets") { objects.domainObjectContainer() }
 
     fun addAllDokkaSourceSets(sourceSets: Provider<Iterable<DokkaSourceSetSpec>>) {
       dokkaSourceSets.addAllLater(sourceSets)

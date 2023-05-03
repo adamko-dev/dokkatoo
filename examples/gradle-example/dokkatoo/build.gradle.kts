@@ -7,7 +7,7 @@ dokkatoo {
   // used as project name in the header
   moduleName.set("Dokka Gradle Example")
 
-  dokkatooSourceSets.named("main") {
+  dokkatooSourceSets.main {
 
     // contains descriptions for the module and the packages
     includes.from("Module.md")

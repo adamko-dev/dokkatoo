@@ -1,6 +1,5 @@
 package dev.adamko.dokkatoo
 
-import dev.adamko.dokkatoo.DokkatooExtension.Versions.Companion.VERSIONS_EXTENSION_NAME
 import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes
 import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes.Companion.DOKKATOO_BASE_ATTRIBUTE
 import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes.Companion.DOKKATOO_CATEGORY_ATTRIBUTE
@@ -111,7 +110,7 @@ constructor(
   }
 
   private fun createExtension(project: Project): DokkatooExtension {
-    return project.extensions.create<DokkatooExtension>(EXTENSION_NAME).apply {
+    val dokkatooExtension = project.extensions.create<DokkatooExtension>(EXTENSION_NAME).apply {
       moduleName.convention(providers.provider { project.name })
       moduleVersion.convention(providers.provider { project.version.toString() })
       modulePath.convention(project.pathAsFilePath())
@@ -120,15 +119,17 @@ constructor(
       dokkatooPublicationDirectory.convention(layout.buildDirectory.dir("dokka"))
       dokkatooModuleDirectory.convention(layout.buildDirectory.dir("dokka-module"))
       dokkatooConfigurationsDirectory.convention(layout.buildDirectory.dir("dokka-config"))
-
-      extensions.create<DokkatooExtension.Versions>(VERSIONS_EXTENSION_NAME).apply {
-        jetbrainsDokka.convention(DokkatooConstants.DOKKA_VERSION)
-        jetbrainsMarkdown.convention("0.3.1")
-        freemarker.convention("2.3.31")
-        kotlinxHtml.convention("0.8.0")
-        kotlinxCoroutines.convention("1.6.4")
-      }
     }
+
+    dokkatooExtension.versions {
+      jetbrainsDokka.convention(DokkatooConstants.DOKKA_VERSION)
+      jetbrainsMarkdown.convention("0.3.1")
+      freemarker.convention("2.3.31")
+      kotlinxHtml.convention("0.8.0")
+      kotlinxCoroutines.convention("1.6.4")
+    }
+
+    return dokkatooExtension
   }
 
   /** Set defaults in all [DokkatooExtension.dokkatooPublications]s */

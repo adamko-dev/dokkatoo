@@ -2,11 +2,13 @@ package dev.adamko.dokkatoo.dokka
 
 import dev.adamko.dokkatoo.internal.DokkaPluginParametersContainer
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
+import dev.adamko.dokkatoo.internal.adding
 import java.io.Serializable
 import javax.inject.Inject
 import org.gradle.api.Named
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
@@ -32,9 +34,13 @@ constructor(
    * Configurations for Dokka Generator Plugins. Must be provided from
    * [dev.adamko.dokkatoo.DokkatooExtension.pluginsConfiguration].
    */
+  private val _pluginsConfiguration: DokkaPluginParametersContainer,
+) : Named, Serializable, ExtensionAware {
+
+  /** Configurations for Dokka Generator Plugins. */
   @get:Nested
-  val pluginsConfiguration: DokkaPluginParametersContainer,
-) : Named, Serializable {
+  val pluginsConfiguration: DokkaPluginParametersContainer =
+    extensions.adding("pluginsConfiguration") { _pluginsConfiguration }
 
   @Internal
   override fun getName(): String = formatName

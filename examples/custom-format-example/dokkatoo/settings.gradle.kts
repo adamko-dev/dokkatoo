@@ -2,8 +2,8 @@ rootProject.name = "custom-format-example"
 
 pluginManagement {
   repositories {
-    gradlePluginPortal()
     mavenCentral()
+    gradlePluginPortal()
     maven(providers.gradleProperty("testMavenRepo"))
   }
 }

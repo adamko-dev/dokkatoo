@@ -2,9 +2,7 @@ package dev.adamko.dokkatoo
 
 import dev.adamko.dokkatoo.dokka.DokkaPublication
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec
-import dev.adamko.dokkatoo.dokka.plugins.DokkaPluginParametersBaseSpec
-import dev.adamko.dokkatoo.internal.DokkaPluginParametersContainer
-import dev.adamko.dokkatoo.internal.DokkatooInternalApi
+import dev.adamko.dokkatoo.internal.*
 import java.io.Serializable
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.file.DirectoryProperty
@@ -55,8 +53,10 @@ constructor(
    * The type of site is determined by the Dokka Plugins. By default, an HTML site will be generated.
    */
   val dokkatooPublications: NamedDomainObjectContainer<DokkaPublication> =
-    objects.domainObjectContainer(DokkaPublication::class) { named ->
-      objects.newInstance(named, pluginsConfiguration)
+    extensions.adding("dokkatooPublications") {
+      objects.domainObjectContainer { named ->
+        objects.newInstance(named, pluginsConfiguration)
+      }
     }
 
   /**
@@ -87,7 +87,10 @@ constructor(
    *
    * Dokka will merge Dokka Source Sets from other subprojects if...
    */
-  abstract val dokkatooSourceSets: NamedDomainObjectContainer<DokkaSourceSetSpec>
+  val dokkatooSourceSets: NamedDomainObjectContainer<DokkaSourceSetSpec> =
+    extensions.adding("dokkatooSourceSets") {
+      objects.domainObjectContainer()
+    }
 
   /**
    * Dokka Plugin are used to configure the way Dokka generates a format.
@@ -95,9 +98,21 @@ constructor(
    * container.
    */
   val pluginsConfiguration: DokkaPluginParametersContainer =
-    objects.polymorphicDomainObjectContainer(DokkaPluginParametersBaseSpec::class)
+    extensions.adding("pluginsConfiguration") {
+      objects.dokkaPluginParametersContainer()
+    }
 
-  interface Versions {
+  /**
+   * Versions of dependencies that Dokkatoo will use to run Dokka Generator.
+   *
+   * These versions can be set to change the versions of dependencies that Dokkatoo uses defaults,
+   * or can be read to align versions.
+   */
+  val versions: Versions = extensions.adding("versions") {
+    objects.newInstance()
+  }
+
+  interface Versions : ExtensionAware {
 
     /** Default version used for Dokka dependencies */
     val jetbrainsDokka: Property<String>
@@ -107,6 +122,9 @@ constructor(
     val kotlinxCoroutines: Property<String>
 
     companion object {
+      /** @see DokkatooExtension.versions */
+      @Deprecated("explicit `version` property was added")
+      @Suppress("unused")
       const val VERSIONS_EXTENSION_NAME = "versions"
     }
   }

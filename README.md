@@ -108,7 +108,7 @@ dokkatoo {
     }
   }
 
-  pluginsConfiguration.named<DokkaHtmlPluginParameters>("html") {
+  pluginsConfiguration.html {
     customStyleSheets.from(
       "./customResources/logo-styles.css",
       "./customResources/custom-style-to-add.css",
