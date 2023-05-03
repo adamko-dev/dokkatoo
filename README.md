@@ -147,7 +147,7 @@ dependencies {
   dokkatoo(projects(":subproject-world"))
   
   // This is required at the moment, see https://github.com/adamko-dev/dokkatoo/issues/14
-  dokkatooPluginHtml("org.jetbrains.dokka:all-modules-page-plugin:1.7.20")
+  dokkatooPluginHtml("org.jetbrains.dokka:all-modules-page-plugin:${org.jetbrains.dokka.DokkaVersion.version}")
 }
 ```
 
