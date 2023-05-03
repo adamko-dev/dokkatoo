@@ -210,7 +210,7 @@ constructor(
       externalDocumentationLinks {
         configureEach {
           enabled.convention(true)
-          packageListUrl.convention(url.map { it.appendPath("package-list") })
+          packageListUrl.convention(url.map { it.appendPath("package-list").apply { hashCode() } })
         }
 
         maybeCreate("jdk") {

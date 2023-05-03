@@ -65,14 +65,14 @@ constructor(
    *
    * @param[value] will be converted to a [URL]
    */
-  fun url(value: String) = url.set(URL(value))
+  fun url(value: String) = url.set(URL(value).apply { hashCode() })
 
   /**
    * Set the value of [url].
    *
    * @param[value] will be converted to a [URL]
    */
-  fun url(value: Provider<String>) = url.set(value.map(::URL))
+  fun url(value: Provider<String>) = url.set(value.map { URL(it).apply { hashCode() } })
 
   /**
    * Specifies the exact location of a `package-list` instead of relying on Dokka
@@ -92,14 +92,15 @@ constructor(
    *
    * @param[value] will be converted to a [URL]
    */
-  fun packageListUrl(value: String) = packageListUrl.set(URL(value))
+  fun packageListUrl(value: String) = packageListUrl.set(URL(value).apply { hashCode() })
 
   /**
    * Set the value of [packageListUrl].
    *
    * @param[value] will be converted to a [URL]
    */
-  fun packageListUrl(value: Provider<String>) = packageListUrl.set(value.map(::URL))
+  fun packageListUrl(value: Provider<String>) =
+    packageListUrl.set(value.map { URL(it).apply { hashCode() } })
 
   /**
    * If enabled this link will be passed to the Dokka Generator.
