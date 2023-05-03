@@ -152,8 +152,7 @@ constructor(
 
     val pluginsClasspath = pluginsClasspath.files.toList()
 
-    val pluginsConfiguration =
-      pluginsConfiguration.map(DokkaPluginParametersBaseSpec::build)
+    val pluginsConfiguration = pluginsConfiguration.map(DokkaPluginParametersBaseSpec::build)
     val failOnWarning = failOnWarning.get()
     val delayTemplateSubstitution = delayTemplateSubstitution.get()
     val suppressObviousFunctions = suppressObviousFunctions.get()

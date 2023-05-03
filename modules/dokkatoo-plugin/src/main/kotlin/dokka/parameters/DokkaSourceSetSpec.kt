@@ -3,8 +3,7 @@ package dev.adamko.dokkatoo.dokka.parameters
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetIdSpec.Companion.dokkaSourceSetIdSpec
 import dev.adamko.dokkatoo.dokka.parameters.KotlinPlatform.Companion.dokkaType
 import dev.adamko.dokkatoo.dokka.parameters.VisibilityModifier.Companion.dokkaType
-import dev.adamko.dokkatoo.internal.DokkatooInternalApi
-import dev.adamko.dokkatoo.internal.mapToSet
+import dev.adamko.dokkatoo.internal.*
 import java.io.Serializable
 import java.net.URL
 import javax.inject.Inject
@@ -12,6 +11,7 @@ import org.gradle.api.*
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.model.ReplacedBy
+import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.*
 import org.gradle.api.tasks.*
 import org.gradle.kotlin.dsl.*
@@ -49,7 +49,8 @@ constructor(
   DokkaParameterBuilder<DokkaParametersKxs.DokkaSourceSetKxs>,
   HasConfigurableVisibilityModifiers,
   Named,
-  Serializable {
+  Serializable,
+  ExtensionAware {
 
   @Internal // will be tracked by sourceSetId
   override fun getName(): String = name
@@ -153,7 +154,10 @@ constructor(
    * By default, the values are deduced from information provided by the Kotlin Gradle plugin.
    */
   @get:Nested
-  abstract val dependentSourceSets: NamedDomainObjectContainer<DokkaSourceSetIdSpec>
+  val dependentSourceSets: NamedDomainObjectContainer<DokkaSourceSetIdSpec> =
+    extensions.adding("dependentSourceSets") {
+      objects.domainObjectContainer()
+    }
 
   /**
    * Classpath for analysis and interactive samples.
@@ -222,7 +226,8 @@ constructor(
    * Prefer using [externalDocumentationLink] action/closure for adding links.
    */
   @get:Nested
-  abstract val externalDocumentationLinks: NamedDomainObjectContainer<DokkaExternalDocumentationLinkSpec>
+  val externalDocumentationLinks: NamedDomainObjectContainer<DokkaExternalDocumentationLinkSpec> =
+    extensions.adding("externalDocumentationLinks") { objects.domainObjectContainer() }
 
   /**
    * Platform to be used for setting up code analysis and samples.

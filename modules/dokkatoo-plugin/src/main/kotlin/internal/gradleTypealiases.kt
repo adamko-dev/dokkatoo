@@ -4,7 +4,8 @@ import dev.adamko.dokkatoo.dokka.plugins.DokkaPluginParametersBaseSpec
 import org.gradle.api.ExtensiblePolymorphicDomainObjectContainer
 
 /** Container for all [Dokka Plugin parameters][DokkaPluginParametersBaseSpec]. */
-typealias DokkaPluginParametersContainer = ExtensiblePolymorphicDomainObjectContainer<DokkaPluginParametersBaseSpec>
+typealias DokkaPluginParametersContainer =
+    ExtensiblePolymorphicDomainObjectContainer<DokkaPluginParametersBaseSpec>
 
 
 /**

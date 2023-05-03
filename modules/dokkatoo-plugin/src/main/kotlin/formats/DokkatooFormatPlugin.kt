@@ -149,7 +149,7 @@ abstract class DokkatooFormatPlugin(
 
     var addDefaultDokkaDependencies = true
 
-    /** Create a [Dependency] for  */
+    /** Create a [Dependency] for a Dokka module */
     fun DependencyHandler.dokka(module: String): Provider<Dependency> =
       dokkatooExtension.versions.jetbrainsDokka.map { version -> create("org.jetbrains.dokka:$module:$version") }
 

@@ -1,18 +1,20 @@
 package dev.adamko.dokkatoo.internal
 
-import org.gradle.api.Action
-import org.gradle.api.NamedDomainObjectContainer
-import org.gradle.api.Project
-import org.gradle.api.Task
+import dev.adamko.dokkatoo.dokka.plugins.DokkaPluginParametersBaseSpec
+import org.gradle.api.*
 import org.gradle.api.artifacts.ArtifactView
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.artifacts.component.ComponentIdentifier
 import org.gradle.api.artifacts.component.ProjectComponentIdentifier
 import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.model.ObjectFactory
+import org.gradle.api.plugins.ExtensionAware
+import org.gradle.api.plugins.ExtensionContainer
 import org.gradle.api.provider.Provider
 import org.gradle.api.specs.Spec
 import org.gradle.api.tasks.TaskProvider
+import org.gradle.kotlin.dsl.*
 
 
 /**
@@ -115,4 +117,67 @@ internal fun ConfigurationContainer.collectIncomingFiles(
       collector.builtBy(builtBy)
     }
   }
+}
+
+
+/**
+ * Create a new [NamedDomainObjectContainer], using
+ * [org.gradle.kotlin.dsl.domainObjectContainer]
+ * (but [T] is `reified`).
+ *
+ * @param[factory] an optional factory for creating elements
+ * @see org.gradle.kotlin.dsl.domainObjectContainer
+ */
+internal inline fun <reified T : Any> ObjectFactory.domainObjectContainer(
+  factory: NamedDomainObjectFactory<T>? = null
+): NamedDomainObjectContainer<T> =
+  if (factory == null) {
+    domainObjectContainer(T::class)
+  } else {
+    domainObjectContainer(T::class, factory)
+  }
+
+
+/**
+ * Create a new [ExtensiblePolymorphicDomainObjectContainer], using
+ * [org.gradle.kotlin.dsl.polymorphicDomainObjectContainer]
+ * (but [T] is `reified`).
+ *
+ * @see org.gradle.kotlin.dsl.polymorphicDomainObjectContainer
+ */
+internal inline fun <reified T : Any> ObjectFactory.polymorphicDomainObjectContainer()
+    : ExtensiblePolymorphicDomainObjectContainer<T> =
+  polymorphicDomainObjectContainer(T::class)
+
+
+/**
+ * Add an extension to the [ExtensionContainer], and return the value.
+ *
+ * Adding an extension is especially useful for improving the DSL in build scripts when [T] is a
+ * [NamedDomainObjectContainer].
+ * Using an extension will allow Gradle to generate
+ * [type-safe model accessors](https://docs.gradle.org/current/userguide/kotlin_dsl.html#kotdsl:accessor_applicability)
+ * for added types.
+ *
+ * ([name] should match the property name. This has to be done manually. I tried using a
+ * delegated-property provider but then Gradle can't introspect the types properly, so it fails to
+ * create accessors).
+ */
+internal inline fun <reified T : Any> ExtensionContainer.adding(
+  name: String,
+  crossinline valueProvider: () -> T,
+): T {
+  val value: T = valueProvider()
+  add<T>(name, value)
+  return value
+}
+
+/** Create a new [DokkaPluginParametersContainer] instance. */
+internal fun ObjectFactory.dokkaPluginParametersContainer(): DokkaPluginParametersContainer {
+  val container = polymorphicDomainObjectContainer<DokkaPluginParametersBaseSpec>()
+  container.whenObjectAdded {
+    // workaround for https://github.com/gradle/gradle/issues/24972
+    (container as ExtensionAware).extensions.add(name, this)
+  }
+  return container
 }
