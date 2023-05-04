@@ -13,7 +13,7 @@ import dev.adamko.dokkatoo.tasks.DokkatooPrepareModuleDescriptorTask
 import dev.adamko.dokkatoo.tasks.DokkatooPrepareParametersTask
 import dev.adamko.dokkatoo.tasks.DokkatooTask
 import java.io.File
-import java.net.URL
+import java.net.URI
 import javax.inject.Inject
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
@@ -216,7 +216,7 @@ constructor(
 
         maybeCreate("jdk") {
           enabled.convention(this@dss.enableJdkDocumentationLink)
-          url(this@dss.jdkVersion.map { jdkVersion ->
+          uri(this@dss.jdkVersion.map { jdkVersion ->
             when {
               jdkVersion < 11 -> "https://docs.oracle.com/javase/${jdkVersion}/docs/api/"
               else            -> "https://docs.oracle.com/en/java/javase/${jdkVersion}/docs/api/"
@@ -232,17 +232,17 @@ constructor(
 
         maybeCreate("kotlinStdlib") {
           enabled.convention(this@dss.enableKotlinStdLibDocumentationLink)
-          url("https://kotlinlang.org/api/latest/jvm/stdlib/")
+          uri("https://kotlinlang.org/api/latest/jvm/stdlib/")
         }
 
         maybeCreate("androidSdk") {
           enabled.convention(this@dss.enableAndroidDocumentationLink)
-          url("https://developer.android.com/reference/kotlin/")
+          uri("https://developer.android.com/reference/kotlin/")
         }
 
         maybeCreate("androidX") {
           enabled.convention(this@dss.enableAndroidDocumentationLink)
-          url("https://developer.android.com/reference/kotlin/")
+          uri("https://developer.android.com/reference/kotlin/")
           packageListUrl("https://developer.android.com/reference/kotlin/androidx/package-list")
         }
       }
@@ -286,8 +286,8 @@ constructor(
       prettyPrintIndent = "  "
     }
 
-    private fun URL.appendPath(value: String): URL =
-      toURI().resolve("$path/$value").normalize().toURL()
+    private fun URI.appendPath(value: String): URI =
+      resolve("$path/$value").normalize()
   }
 
   @DokkatooInternalApi

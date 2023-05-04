@@ -5,6 +5,7 @@ import dev.adamko.dokkatoo.dokka.parameters.KotlinPlatform.Companion.dokkaType
 import dev.adamko.dokkatoo.dokka.parameters.VisibilityModifier.Companion.dokkaType
 import dev.adamko.dokkatoo.internal.*
 import java.io.Serializable
+import java.net.URI
 import java.net.URL
 import javax.inject.Inject
 import org.gradle.api.*
@@ -414,7 +415,7 @@ constructor(
   )
   fun externalDocumentationLink(url: String, packageListUrl: String? = null) {
     externalDocumentationLinks.create("...") {
-      url(url)
+      uri(url)
       if (packageListUrl != null) {
         packageListUrl(packageListUrl)
       }
@@ -431,7 +432,7 @@ constructor(
           "}"
     ),
   )
-  fun externalDocumentationLink(url: URL, packageListUrl: URL? = null) {
+  fun externalDocumentationLink(url: URI, packageListUrl: URI? = null) {
     externalDocumentationLinks.add(
       objects.newInstance(DokkaExternalDocumentationLinkSpec::class).also {
         it.url.set(url)

@@ -2,7 +2,7 @@ package dev.adamko.dokkatoo.dokka.parameters
 
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import java.io.Serializable
-import java.net.URL
+import java.net.URI
 import javax.inject.Inject
 import org.gradle.api.Named
 import org.gradle.api.provider.Property
@@ -25,9 +25,9 @@ import org.gradle.api.tasks.Internal
  *
  * ```kotlin
  * externalDocumentationLink {
- *     url.set(URL("https://kotlinlang.org/api/kotlinx.serialization/"))
+ *     url.set(URI("https://kotlinlang.org/api/kotlinx.serialization/"))
  *     packageListUrl.set(
- *         rootProject.projectDir.resolve("serialization.package.list").toURL()
+ *         rootProject.projectDir.resolve("serialization.package.list").toURI()
  *     )
  * }
  * ```
@@ -58,21 +58,21 @@ constructor(
    * ```
    */
   @get:Input
-  abstract val url: Property<URL>
+  abstract val url: Property<URI>
 
   /**
    * Set the value of [url].
    *
    * @param[value] will be converted to a [URL]
    */
-  fun url(value: String) = url.set(URL(value))
+  fun uri(value: String) = url.set(URI(value))
 
   /**
    * Set the value of [url].
    *
    * @param[value] will be converted to a [URL]
    */
-  fun url(value: Provider<String>) = url.set(value.map(::URL))
+  fun uri(value: Provider<String>) = url.set(value.map(::URI))
 
   /**
    * Specifies the exact location of a `package-list` instead of relying on Dokka
@@ -85,21 +85,21 @@ constructor(
    * ```
    */
   @get:Input
-  abstract val packageListUrl: Property<URL>
+  abstract val packageListUrl: Property<URI>
 
   /**
    * Set the value of [packageListUrl].
    *
-   * @param[value] will be converted to a [URL]
+   * @param[value] will be converted to a [URI]
    */
-  fun packageListUrl(value: String) = packageListUrl.set(URL(value))
+  fun packageListUrl(value: String) = packageListUrl.set(URI(value))
 
   /**
    * Set the value of [packageListUrl].
    *
-   * @param[value] will be converted to a [URL]
+   * @param[value] will be converted to a [URI]
    */
-  fun packageListUrl(value: Provider<String>) = packageListUrl.set(value.map(::URL))
+  fun packageListUrl(value: Provider<String>) = packageListUrl.set(value.map(::URI))
 
   /**
    * If enabled this link will be passed to the Dokka Generator.

@@ -20,7 +20,7 @@ class DokkaExternalDocumentationLinkSpecTest : FunSpec({
   context("expect url can be set") {
     test("using a string") {
       val actual = project.createExternalDocLinkSpec("test") {
-        url("https://github.com/adamko-dev/dokkatoo/")
+        uri("https://github.com/adamko-dev/dokkatoo/")
       }
 
       actual.url.get().toString() shouldBe "https://github.com/adamko-dev/dokkatoo/"
@@ -28,7 +28,7 @@ class DokkaExternalDocumentationLinkSpecTest : FunSpec({
 
     test("using a string-provider") {
       val actual = project.createExternalDocLinkSpec("test") {
-        url(project.provider { "https://github.com/adamko-dev/dokkatoo/" })
+        uri(project.provider { "https://github.com/adamko-dev/dokkatoo/" })
       }
 
       actual.url.get().toString() shouldBe "https://github.com/adamko-dev/dokkatoo/"
@@ -68,7 +68,7 @@ class DokkaExternalDocumentationLinkSpecTest : FunSpec({
     }
     test("expect packageListUrl is required") {
       val actual = project.createExternalDocLinkSpec("test") {
-        url("https://github.com/adamko-dev/dokkatoo/")
+        uri("https://github.com/adamko-dev/dokkatoo/")
         packageListUrl.set(null as URL?)
       }
 
@@ -87,7 +87,7 @@ class DokkaExternalDocumentationLinkSpecTest : FunSpec({
           fail("ExternalDocLink is disabled - $propertyName should not be queried")
         }
 
-        url(failingProvider("url"))
+        uri(failingProvider("url"))
         packageListUrl(failingProvider("packageListUrl"))
 
         enabled.set(false)

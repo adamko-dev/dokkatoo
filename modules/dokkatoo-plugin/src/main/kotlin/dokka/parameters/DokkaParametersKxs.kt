@@ -1,6 +1,6 @@
 @file:UseSerializers(
   FileAsPathStringSerializer::class,
-  URLSerializer::class,
+  URISerializer::class,
 )
 
 package dev.adamko.dokkatoo.dokka.parameters
@@ -8,6 +8,7 @@ package dev.adamko.dokkatoo.dokka.parameters
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import dev.adamko.dokkatoo.internal.mapToSet
 import java.io.File
+import java.net.URI
 import java.net.URL
 import java.nio.file.Paths
 import kotlinx.serialization.KSerializer
@@ -130,14 +131,14 @@ data class DokkaParametersKxs(
   @DokkatooInternalApi
   data class SourceLinkDefinitionKxs(
     val localDirectory: String,
-    val remoteUrl: URL,
+    val remoteUrl: URI,
     val remoteLineSuffix: String? = null,
   ) {
 
     internal fun convert() =
       SourceLinkDefinitionImpl(
         localDirectory = localDirectory,
-        remoteUrl = remoteUrl,
+        remoteUrl = remoteUrl.toURL(),
         remoteLineSuffix = remoteLineSuffix,
       )
   }
@@ -221,13 +222,13 @@ data class DokkaParametersKxs(
   @Serializable
   @DokkatooInternalApi
   data class ExternalDocumentationLinkKxs(
-    val url: URL,
-    val packageListUrl: URL,
+    val url: URI,
+    val packageListUrl: URI,
   ) {
     internal fun convert() =
       ExternalDocumentationLinkImpl(
-        url = url,
-        packageListUrl = packageListUrl,
+        url = url.toURL(),
+        packageListUrl = packageListUrl.toURL(),
       )
   }
 
@@ -245,14 +246,14 @@ data class DokkaParametersKxs(
 }
 
 
-/** Serialize a [URL] as string */
-private object URLSerializer : KSerializer<URL> {
+/** Serialize a [URI] as string */
+private object URISerializer : KSerializer<URI> {
   override val descriptor: SerialDescriptor =
-    PrimitiveSerialDescriptor("java.net.URL", PrimitiveKind.STRING)
+    PrimitiveSerialDescriptor("java.net.URI", PrimitiveKind.STRING)
 
-  override fun deserialize(decoder: Decoder): URL = URL(decoder.decodeString())
+  override fun deserialize(decoder: Decoder): URI = URI(decoder.decodeString())
 
-  override fun serialize(encoder: Encoder, value: URL) = encoder.encodeString(value.toString())
+  override fun serialize(encoder: Encoder, value: URI) = encoder.encodeString(value.toString())
 }
 
 

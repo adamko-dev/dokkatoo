@@ -2,6 +2,7 @@ package dev.adamko.dokkatoo.dokka.parameters
 
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import java.io.Serializable
+import java.net.URI
 import java.net.URL
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
@@ -67,21 +68,21 @@ constructor() :
    * ```
    */
   @get:Input
-  abstract val remoteUrl: Property<URL>
+  abstract val remoteUrl: Property<URI>
 
   /**
    * Set the value of [remoteUrl].
    *
-   * @param[value] will be converted to a [URL]
+   * @param[value] will be converted to a [URI]
    */
-  fun remoteUrl(value: String) = remoteUrl.set(URL(value))
+  fun remoteUrl(value: String) = remoteUrl.set(URI(value))
 
   /**
    * Set the value of [remoteUrl].
    *
-   * @param[value] will be converted to a [URL]
+   * @param[value] will be converted to a [URI]
    */
-  fun remoteUrl(value: Provider<String>) = remoteUrl.set(value.map(::URL))
+  fun remoteUrl(value: Provider<String>) = remoteUrl.set(value.map(::URI))
 
   /**
    * Suffix used to append source code line number to the URL. This will help readers navigate
