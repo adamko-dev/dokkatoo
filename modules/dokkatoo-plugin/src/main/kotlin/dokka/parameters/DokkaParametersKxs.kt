@@ -9,7 +9,6 @@ import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import dev.adamko.dokkatoo.internal.mapToSet
 import java.io.File
 import java.net.URI
-import java.net.URL
 import java.nio.file.Paths
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
@@ -210,12 +209,13 @@ data class DokkaParametersKxs(
     val modulePath: String,
   ) {
 
-    internal fun convert() = DokkaModuleDescriptionImpl(
-      name = name,
-      relativePathToOutputDirectory = File(modulePath.removePrefix(":").replace(':', '/')),
-      includes = includes,
-      sourceOutputDirectory = sourceOutputDirectory,
-    )
+    internal fun convert() =
+      DokkaModuleDescriptionImpl(
+        name = name,
+        relativePathToOutputDirectory = File(modulePath.removePrefix(":").replace(':', '/')),
+        includes = includes,
+        sourceOutputDirectory = sourceOutputDirectory,
+      )
   }
 
 
@@ -231,6 +231,7 @@ data class DokkaParametersKxs(
         packageListUrl = packageListUrl.toURL(),
       )
   }
+
 
   @Serializable
   @DokkatooInternalApi
@@ -251,9 +252,11 @@ private object URISerializer : KSerializer<URI> {
   override val descriptor: SerialDescriptor =
     PrimitiveSerialDescriptor("java.net.URI", PrimitiveKind.STRING)
 
-  override fun deserialize(decoder: Decoder): URI = URI(decoder.decodeString())
+  override fun deserialize(decoder: Decoder): URI =
+    URI(decoder.decodeString())
 
-  override fun serialize(encoder: Encoder, value: URI) = encoder.encodeString(value.toString())
+  override fun serialize(encoder: Encoder, value: URI): Unit =
+    encoder.encodeString(value.toString())
 }
 
 

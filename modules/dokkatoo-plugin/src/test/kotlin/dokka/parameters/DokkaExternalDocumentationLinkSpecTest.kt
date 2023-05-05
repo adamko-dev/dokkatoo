@@ -6,7 +6,7 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
-import java.net.URL
+import java.net.URI
 import org.gradle.api.Project
 import org.gradle.api.internal.provider.MissingValueException
 import org.gradle.api.provider.Provider
@@ -20,7 +20,7 @@ class DokkaExternalDocumentationLinkSpecTest : FunSpec({
   context("expect url can be set") {
     test("using a string") {
       val actual = project.createExternalDocLinkSpec("test") {
-        uri("https://github.com/adamko-dev/dokkatoo/")
+        url("https://github.com/adamko-dev/dokkatoo/")
       }
 
       actual.url.get().toString() shouldBe "https://github.com/adamko-dev/dokkatoo/"
@@ -28,7 +28,7 @@ class DokkaExternalDocumentationLinkSpecTest : FunSpec({
 
     test("using a string-provider") {
       val actual = project.createExternalDocLinkSpec("test") {
-        uri(project.provider { "https://github.com/adamko-dev/dokkatoo/" })
+        url(project.provider { "https://github.com/adamko-dev/dokkatoo/" })
       }
 
       actual.url.get().toString() shouldBe "https://github.com/adamko-dev/dokkatoo/"
@@ -56,7 +56,7 @@ class DokkaExternalDocumentationLinkSpecTest : FunSpec({
   context("when building a ExternalDocumentationLinkKxs") {
     test("expect url is required") {
       val actual = project.createExternalDocLinkSpec("test") {
-        url.set(null as URL?)
+        url.set(null as URI?)
         packageListUrl("https://github.com/adamko-dev/dokkatoo/")
       }
 
@@ -68,8 +68,8 @@ class DokkaExternalDocumentationLinkSpecTest : FunSpec({
     }
     test("expect packageListUrl is required") {
       val actual = project.createExternalDocLinkSpec("test") {
-        uri("https://github.com/adamko-dev/dokkatoo/")
-        packageListUrl.set(null as URL?)
+        url("https://github.com/adamko-dev/dokkatoo/")
+        packageListUrl.set(null as URI?)
       }
 
       val caughtException = shouldThrow<MissingValueException> {
@@ -87,7 +87,7 @@ class DokkaExternalDocumentationLinkSpecTest : FunSpec({
           fail("ExternalDocLink is disabled - $propertyName should not be queried")
         }
 
-        uri(failingProvider("url"))
+        url(failingProvider("url"))
         packageListUrl(failingProvider("packageListUrl"))
 
         enabled.set(false)

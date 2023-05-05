@@ -216,7 +216,7 @@ constructor(
 
         maybeCreate("jdk") {
           enabled.convention(this@dss.enableJdkDocumentationLink)
-          uri(this@dss.jdkVersion.map { jdkVersion ->
+          url(this@dss.jdkVersion.map { jdkVersion ->
             when {
               jdkVersion < 11 -> "https://docs.oracle.com/javase/${jdkVersion}/docs/api/"
               else            -> "https://docs.oracle.com/en/java/javase/${jdkVersion}/docs/api/"
@@ -232,17 +232,17 @@ constructor(
 
         maybeCreate("kotlinStdlib") {
           enabled.convention(this@dss.enableKotlinStdLibDocumentationLink)
-          uri("https://kotlinlang.org/api/latest/jvm/stdlib/")
+          url("https://kotlinlang.org/api/latest/jvm/stdlib/")
         }
 
         maybeCreate("androidSdk") {
           enabled.convention(this@dss.enableAndroidDocumentationLink)
-          uri("https://developer.android.com/reference/kotlin/")
+          url("https://developer.android.com/reference/kotlin/")
         }
 
         maybeCreate("androidX") {
           enabled.convention(this@dss.enableAndroidDocumentationLink)
-          uri("https://developer.android.com/reference/kotlin/")
+          url("https://developer.android.com/reference/kotlin/")
           packageListUrl("https://developer.android.com/reference/kotlin/androidx/package-list")
         }
       }
@@ -271,13 +271,16 @@ constructor(
     const val EXTENSION_NAME = "dokkatoo"
 
     /**
-     * The group of all Dokkatoo Gradle tasks.
+     * The group of all Dokkatoo [Gradle tasks][org.gradle.api.Task].
      *
      * @see org.gradle.api.Task.getGroup
      */
     const val TASK_GROUP = "dokkatoo"
 
+    /** The names of [Gradle tasks][org.gradle.api.Task] created by Dokkatoo */
     val taskNames = TaskNames(null)
+
+    /** The names of [Configuration]s created by Dokkatoo */
     val dependencyContainerNames = DependencyContainerNames(null)
 
     internal val jsonMapper = Json {

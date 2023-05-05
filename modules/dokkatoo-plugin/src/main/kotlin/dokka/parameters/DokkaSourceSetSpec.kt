@@ -6,7 +6,6 @@ import dev.adamko.dokkatoo.dokka.parameters.VisibilityModifier.Companion.dokkaTy
 import dev.adamko.dokkatoo.internal.*
 import java.io.Serializable
 import java.net.URI
-import java.net.URL
 import javax.inject.Inject
 import org.gradle.api.*
 import org.gradle.api.file.ConfigurableFileCollection
@@ -23,20 +22,20 @@ import org.gradle.kotlin.dsl.*
  * Can be configured in the following way with Gradle Kotlin DSL:
  *
  * ```kotlin
- * import dev.adamko.dokkatoo.DokkaTask
+ * // build.gradle.kts
  *
- * tasks.dokkaHtml {
- *     dokkaSourceSets {
- *         // configure individual source set by name
- *         named("customSourceSet") {
- *             suppress.set(true)
- *         }
- *
- *         // configure all source sets at once
- *         configureEach {
- *             reportUndocumented.set(true)
- *         }
+ * dokkatoo {
+ *   dokkatooSourceSets {
+ *     // configure individual source set by name
+ *     named("customSourceSet") {
+ *       suppress.set(true)
  *     }
+ *
+ *     // configure all source sets at once
+ *     configureEach {
+ *       reportUndocumented.set(true)
+ *     }
+ *   }
  * }
  * ```
  */
@@ -415,7 +414,7 @@ constructor(
   )
   fun externalDocumentationLink(url: String, packageListUrl: String? = null) {
     externalDocumentationLinks.create("...") {
-      uri(url)
+      url(url)
       if (packageListUrl != null) {
         packageListUrl(packageListUrl)
       }

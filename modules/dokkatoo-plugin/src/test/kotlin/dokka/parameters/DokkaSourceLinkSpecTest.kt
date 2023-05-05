@@ -7,7 +7,7 @@ import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import java.io.File
-import java.net.URL
+import java.net.URI
 import org.gradle.api.Project
 import org.gradle.api.internal.provider.MissingValueException
 import org.gradle.api.provider.Provider
@@ -101,7 +101,7 @@ class DokkaSourceLinkSpecTest : FunSpec({
 
       val actual = project.createDokkaSourceLinkSpec {
         localDirectory.set(tempdir())
-        remoteUrl.set(null as URL?)
+        remoteUrl.set(null as URI?)
         remoteLineSuffix.set("%L")
       }
 

@@ -70,7 +70,7 @@ class DokkatooPluginTest : FunSpec({
     context("DokkatooSourceSets") {
       val testSourceSet = extension.dokkatooSourceSets.create_("Test") {
         externalDocumentationLinks.create_("gradle") {
-          uri("https://docs.gradle.org/7.6.1/javadoc")
+          url("https://docs.gradle.org/7.6.1/javadoc")
         }
       }
 
