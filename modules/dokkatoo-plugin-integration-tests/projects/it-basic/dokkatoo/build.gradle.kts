@@ -33,10 +33,8 @@ dokkatoo {
     }
     sourceLink {
       localDirectory.set(file("src/main"))
-      remoteUrl.set(
-        uri(
-          "https://github.com/Kotlin/dokka/tree/master/integration-tests/gradle/projects/it-basic/src/main"
-        ).toURL()
+      remoteUrl(
+        "https://github.com/Kotlin/dokka/tree/master/integration-tests/gradle/projects/it-basic/src/main"
       )
     }
   }
