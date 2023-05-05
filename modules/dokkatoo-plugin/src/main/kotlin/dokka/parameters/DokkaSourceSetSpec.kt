@@ -434,9 +434,9 @@ constructor(
   fun externalDocumentationLink(url: URL, packageListUrl: URL? = null) {
     externalDocumentationLinks.add(
       objects.newInstance(DokkaExternalDocumentationLinkSpec::class).also {
-        it.url.set(url)
+        it.url.set(url.toURI())
         if (packageListUrl != null) {
-          it.packageListUrl.set(packageListUrl)
+          it.packageListUrl.set(packageListUrl.toURI())
         }
       }
     )

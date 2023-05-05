@@ -13,7 +13,7 @@ import dev.adamko.dokkatoo.tasks.DokkatooPrepareModuleDescriptorTask
 import dev.adamko.dokkatoo.tasks.DokkatooPrepareParametersTask
 import dev.adamko.dokkatoo.tasks.DokkatooTask
 import java.io.File
-import java.net.URL
+import java.net.URI
 import javax.inject.Inject
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
@@ -286,8 +286,8 @@ constructor(
       prettyPrintIndent = "  "
     }
 
-    private fun URL.appendPath(value: String): URL =
-      toURI().resolve("$path/$value").normalize().toURL()
+    private fun URI.appendPath(value: String): URI =
+      resolve("$path/$value").normalize()
   }
 
   @DokkatooInternalApi
