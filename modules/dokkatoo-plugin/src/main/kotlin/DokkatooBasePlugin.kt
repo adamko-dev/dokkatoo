@@ -271,13 +271,16 @@ constructor(
     const val EXTENSION_NAME = "dokkatoo"
 
     /**
-     * The group of all Dokkatoo Gradle tasks.
+     * The group of all Dokkatoo [Gradle tasks][org.gradle.api.Task].
      *
      * @see org.gradle.api.Task.getGroup
      */
     const val TASK_GROUP = "dokkatoo"
 
+    /** The names of [Gradle tasks][org.gradle.api.Task] created by Dokkatoo */
     val taskNames = TaskNames(null)
+
+    /** The names of [Configuration]s created by Dokkatoo */
     val dependencyContainerNames = DependencyContainerNames(null)
 
     internal val jsonMapper = Json {
