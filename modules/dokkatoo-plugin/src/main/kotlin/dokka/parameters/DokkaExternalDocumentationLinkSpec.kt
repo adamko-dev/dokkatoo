@@ -2,13 +2,14 @@ package dev.adamko.dokkatoo.dokka.parameters
 
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import java.io.Serializable
-import java.net.URL
+import java.net.URI
 import javax.inject.Inject
 import org.gradle.api.Named
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
+import org.intellij.lang.annotations.Language
 
 /**
  * Configuration builder that allows creating links leading to externally hosted
@@ -25,10 +26,10 @@ import org.gradle.api.tasks.Internal
  *
  * ```kotlin
  * externalDocumentationLink {
- *     url.set(URL("https://kotlinlang.org/api/kotlinx.serialization/"))
- *     packageListUrl.set(
- *         rootProject.projectDir.resolve("serialization.package.list").toURL()
- *     )
+ *  url.set(URI("https://kotlinlang.org/api/kotlinx.serialization/"))
+ *  packageListUrl.set(
+ *    rootProject.projectDir.resolve("serialization.package.list").toURI()
+ *  )
  * }
  * ```
  */
@@ -54,25 +55,27 @@ constructor(
    * Example:
    *
    * ```kotlin
-   * java.net.URL("https://kotlinlang.org/api/kotlinx.serialization/")
+   * java.net.URI("https://kotlinlang.org/api/kotlinx.serialization/")
    * ```
    */
   @get:Input
-  abstract val url: Property<URL>
+  abstract val url: Property<URI>
 
   /**
    * Set the value of [url].
    *
-   * @param[value] will be converted to a [URL]
+   * @param[value] will be converted to a [URI]
    */
-  fun url(value: String) = url.set(URL(value))
+  fun url(@Language("http-url-reference") value: String): Unit =
+    url.set(URI(value))
 
   /**
    * Set the value of [url].
    *
-   * @param[value] will be converted to a [URL]
+   * @param[value] will be converted to a [URI]
    */
-  fun url(value: Provider<String>) = url.set(value.map(::URL))
+  fun url(value: Provider<String>): Unit =
+    url.set(value.map(::URI))
 
   /**
    * Specifies the exact location of a `package-list` instead of relying on Dokka
@@ -85,21 +88,23 @@ constructor(
    * ```
    */
   @get:Input
-  abstract val packageListUrl: Property<URL>
+  abstract val packageListUrl: Property<URI>
 
   /**
    * Set the value of [packageListUrl].
    *
-   * @param[value] will be converted to a [URL]
+   * @param[value] will be converted to a [URI]
    */
-  fun packageListUrl(value: String) = packageListUrl.set(URL(value))
+  fun packageListUrl(@Language("http-url-reference") value: String): Unit =
+    packageListUrl.set(URI(value))
 
   /**
    * Set the value of [packageListUrl].
    *
-   * @param[value] will be converted to a [URL]
+   * @param[value] will be converted to a [URI]
    */
-  fun packageListUrl(value: Provider<String>) = packageListUrl.set(value.map(::URL))
+  fun packageListUrl(value: Provider<String>): Unit =
+    packageListUrl.set(value.map(::URI))
 
   /**
    * If enabled this link will be passed to the Dokka Generator.

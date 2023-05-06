@@ -2,13 +2,14 @@ package dev.adamko.dokkatoo.dokka.parameters
 
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import java.io.Serializable
-import java.net.URL
+import java.net.URI
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
+import org.intellij.lang.annotations.Language
 
 /**
  * Configuration builder that allows adding a `source` link to each signature
@@ -19,9 +20,9 @@ import org.gradle.api.tasks.Optional
  *
  * ```kotlin
  * sourceLink {
- *     localDirectory.set(projectDir.resolve("src"))
- *     remoteUrl.set(URL("https://github.com/kotlin/dokka/tree/master/src"))
- *     remoteLineSuffix.set("#L")
+ *   localDirectory.set(projectDir.resolve("src"))
+ *   remoteUrl.set(URI("https://github.com/kotlin/dokka/tree/master/src"))
+ *   remoteLineSuffix.set("#L")
  * }
  * ```
  */
@@ -63,25 +64,27 @@ constructor() :
    * Example:
    *
    * ```kotlin
-   * java.net.URL("https://github.com/username/projectname/tree/master/src"))
+   * java.net.URI("https://github.com/username/projectname/tree/master/src"))
    * ```
    */
   @get:Input
-  abstract val remoteUrl: Property<URL>
+  abstract val remoteUrl: Property<URI>
 
   /**
    * Set the value of [remoteUrl].
    *
-   * @param[value] will be converted to a [URL]
+   * @param[value] will be converted to a [URI]
    */
-  fun remoteUrl(value: String) = remoteUrl.set(URL(value))
+  fun remoteUrl(@Language("http-url-reference") value: String): Unit =
+    remoteUrl.set(URI(value))
 
   /**
    * Set the value of [remoteUrl].
    *
-   * @param[value] will be converted to a [URL]
+   * @param[value] will be converted to a [URI]
    */
-  fun remoteUrl(value: Provider<String>) = remoteUrl.set(value.map(::URL))
+  fun remoteUrl(value: Provider<String>): Unit =
+    remoteUrl.set(value.map(::URI))
 
   /**
    * Suffix used to append source code line number to the URL. This will help readers navigate

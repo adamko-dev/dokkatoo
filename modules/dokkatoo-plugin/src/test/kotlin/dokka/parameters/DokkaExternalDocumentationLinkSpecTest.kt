@@ -6,7 +6,7 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
-import java.net.URL
+import java.net.URI
 import org.gradle.api.Project
 import org.gradle.api.internal.provider.MissingValueException
 import org.gradle.api.provider.Provider
@@ -56,7 +56,7 @@ class DokkaExternalDocumentationLinkSpecTest : FunSpec({
   context("when building a ExternalDocumentationLinkKxs") {
     test("expect url is required") {
       val actual = project.createExternalDocLinkSpec("test") {
-        url.set(null as URL?)
+        url.set(null as URI?)
         packageListUrl("https://github.com/adamko-dev/dokkatoo/")
       }
 
@@ -69,7 +69,7 @@ class DokkaExternalDocumentationLinkSpecTest : FunSpec({
     test("expect packageListUrl is required") {
       val actual = project.createExternalDocLinkSpec("test") {
         url("https://github.com/adamko-dev/dokkatoo/")
-        packageListUrl.set(null as URL?)
+        packageListUrl.set(null as URI?)
       }
 
       val caughtException = shouldThrow<MissingValueException> {

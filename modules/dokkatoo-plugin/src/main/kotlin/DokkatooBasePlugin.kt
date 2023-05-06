@@ -13,7 +13,7 @@ import dev.adamko.dokkatoo.tasks.DokkatooPrepareModuleDescriptorTask
 import dev.adamko.dokkatoo.tasks.DokkatooPrepareParametersTask
 import dev.adamko.dokkatoo.tasks.DokkatooTask
 import java.io.File
-import java.net.URL
+import java.net.URI
 import javax.inject.Inject
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
@@ -271,13 +271,16 @@ constructor(
     const val EXTENSION_NAME = "dokkatoo"
 
     /**
-     * The group of all Dokkatoo Gradle tasks.
+     * The group of all Dokkatoo [Gradle tasks][org.gradle.api.Task].
      *
      * @see org.gradle.api.Task.getGroup
      */
     const val TASK_GROUP = "dokkatoo"
 
+    /** The names of [Gradle tasks][org.gradle.api.Task] created by Dokkatoo */
     val taskNames = TaskNames(null)
+
+    /** The names of [Configuration]s created by Dokkatoo */
     val dependencyContainerNames = DependencyContainerNames(null)
 
     internal val jsonMapper = Json {
@@ -286,8 +289,8 @@ constructor(
       prettyPrintIndent = "  "
     }
 
-    private fun URL.appendPath(value: String): URL =
-      toURI().resolve("$path/$value").normalize().toURL()
+    private fun URI.appendPath(value: String): URI =
+      resolve("$path/$value").normalize()
   }
 
   @DokkatooInternalApi

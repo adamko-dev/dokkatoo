@@ -22,20 +22,20 @@ import org.gradle.kotlin.dsl.*
  * Can be configured in the following way with Gradle Kotlin DSL:
  *
  * ```kotlin
- * import dev.adamko.dokkatoo.DokkaTask
+ * // build.gradle.kts
  *
- * tasks.dokkaHtml {
- *     dokkaSourceSets {
- *         // configure individual source set by name
- *         named("customSourceSet") {
- *             suppress.set(true)
- *         }
- *
- *         // configure all source sets at once
- *         configureEach {
- *             reportUndocumented.set(true)
- *         }
+ * dokkatoo {
+ *   dokkatooSourceSets {
+ *     // configure individual source set by name
+ *     named("customSourceSet") {
+ *       suppress.set(true)
  *     }
+ *
+ *     // configure all source sets at once
+ *     configureEach {
+ *       reportUndocumented.set(true)
+ *     }
+ *   }
  * }
  * ```
  */
@@ -434,9 +434,9 @@ constructor(
   fun externalDocumentationLink(url: URL, packageListUrl: URL? = null) {
     externalDocumentationLinks.add(
       objects.newInstance(DokkaExternalDocumentationLinkSpec::class).also {
-        it.url.set(url)
+        it.url.set(url.toURI())
         if (packageListUrl != null) {
-          it.packageListUrl.set(packageListUrl)
+          it.packageListUrl.set(packageListUrl.toURI())
         }
       }
     )

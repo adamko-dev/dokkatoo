@@ -145,7 +145,7 @@ dependencies {
   // the subprojects must also have Dokkatoo applied
   dokkatoo(projects(":subproject-hello"))
   dokkatoo(projects(":subproject-world"))
-  
+
   // This is required at the moment, see https://github.com/adamko-dev/dokkatoo/issues/14
   dokkatooPluginHtml(
     dokkatoo.versions.jetbrainsDokka.map { dokkaVersion ->
