@@ -22,14 +22,14 @@ constructor() : DokkatooTask.WithSourceSets() {
   @get:Input
   abstract val moduleName: Property<String>
 
-  @get:InputDirectory
-  @get:PathSensitive(RELATIVE)
-  abstract val moduleDirectory: DirectoryProperty
-
-  @get:InputFiles
-  @get:Optional
-  @get:PathSensitive(RELATIVE)
-  abstract val includes: ConfigurableFileCollection
+//  @get:InputDirectory
+//  @get:PathSensitive(RELATIVE)
+//  abstract val moduleDirectory: DirectoryProperty
+//
+//  @get:InputFiles
+//  @get:Optional
+//  @get:PathSensitive(RELATIVE)
+//  abstract val includes: ConfigurableFileCollection
 
   @get:OutputFile
   abstract val dokkaModuleDescriptorJson: RegularFileProperty
@@ -40,14 +40,14 @@ constructor() : DokkatooTask.WithSourceSets() {
   @TaskAction
   internal fun generateModuleConfiguration() {
     val moduleName = moduleName.get()
-    val moduleDirectory = moduleDirectory.asFile.get()
-    val includes = includes.files
+//    val moduleDirectory = moduleDirectory.asFile.get()
+//    val includes = includes.files
     val modulePath = modulePath.get()
 
     val moduleDesc = DokkaParametersKxs.DokkaModuleDescriptionKxs(
       name = moduleName,
-      sourceOutputDirectory = moduleDirectory,
-      includes = includes,
+//      sourceOutputDirectory = moduleDirectory,
+//      includes = includes,
       modulePath = modulePath,
     )
 

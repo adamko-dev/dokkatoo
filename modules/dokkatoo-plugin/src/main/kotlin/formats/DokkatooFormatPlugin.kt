@@ -60,11 +60,11 @@ abstract class DokkatooFormatPlugin(
       val dokkatooConsumer =
         target.configurations.named(DokkatooBasePlugin.dependencyContainerNames.dokkatoo)
 
-      val dependencyContainers = DokkatooDependencyContainers(
-        formatName = formatName,
-        dokkatooConsumer = dokkatooConsumer,
-        project = target,
-      )
+//      val dependencyContainers = DokkatooDependencyContainers(
+//        formatName = formatName,
+//        dokkatooConsumer = dokkatooConsumer,
+//        project = target,
+//      )
 
       val dokkatooTasks = DokkatooTasksContainer(
         project = target,

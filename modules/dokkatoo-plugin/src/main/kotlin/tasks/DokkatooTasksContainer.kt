@@ -23,7 +23,7 @@ class DokkatooTasksContainer(
 ) {
   private val formatName: String get() = publication.formatName
 
-  private val taskNames = DokkatooBasePlugin.TaskNames(formatName)
+  private val taskNames = DokkatooTaskNames(formatName)
 
   val prepareParameters = project.tasks.register<DokkatooPrepareParametersTask>(
     taskNames.prepareParameters,
@@ -47,19 +47,14 @@ class DokkatooTasksContainer(
 
     publicationEnabled.convention(publication.enabled)
 
-    cacheRoot.convention(publication.cacheRoot)
+//    cacheRoot.convention(publication.cacheRoot)
     delayTemplateSubstitution.convention(publication.delayTemplateSubstitution)
     failOnWarning.convention(publication.failOnWarning)
     finalizeCoroutines.convention(publication.finalizeCoroutines)
-    includes.from(publication.includes)
+//    includes.from(publication.includes)
     moduleName.convention(publication.moduleName)
     moduleVersion.convention(publication.moduleVersion)
     offlineMode.convention(publication.offlineMode)
-    pluginsClasspath.from(
-      dependencyContainers.dokkaPluginsIntransitiveClasspath.map { classpath ->
-        classpath.incoming.artifacts.artifactFiles
-      }
-    )
 
     pluginsConfiguration.addAllLater(providers.provider { publication.pluginsConfiguration })
 
@@ -87,6 +82,11 @@ class DokkatooTasksContainer(
           .artifacts.artifactFiles
       }
     )
+    pluginsClasspath.from(
+      dependencyContainers.dokkaPluginsIntransitiveClasspath.map { classpath ->
+        classpath.incoming.artifacts.artifactFiles
+      }
+    )
   }
 
   val generateModule = project.tasks.register<DokkatooGenerateTask>(
@@ -102,17 +102,22 @@ class DokkatooTasksContainer(
         classpath.incoming.artifacts.artifactFiles
       }
     )
+    pluginsClasspath.from(
+      dependencyContainers.dokkaPluginsIntransitiveClasspath.map { classpath ->
+        classpath.incoming.artifacts.artifactFiles
+      }
+    )
   }
 
   val prepareModuleDescriptor = project.tasks.register<DokkatooPrepareModuleDescriptorTask>(
     taskNames.prepareModuleDescriptor
   ) task@{
     description = "Prepares the Dokka Module Descriptor for $formatName"
-    includes.from(publication.includes)
+    //includes.from(publication.includes)
     dokkaModuleDescriptorJson.convention(
       dokkatooExtension.dokkatooConfigurationsDirectory.file("$formatName/module_descriptor.json")
     )
-    moduleDirectory.set(generateModule.flatMap { it.outputDirectory })
+    //moduleDirectory.set(generateModule.flatMap { it.outputDirectory })
 
 //      dokkaSourceSets.addAllLater(providers.provider { dokkatooExtension.dokkatooSourceSets })
 //      dokkaSourceSets.configureEach {

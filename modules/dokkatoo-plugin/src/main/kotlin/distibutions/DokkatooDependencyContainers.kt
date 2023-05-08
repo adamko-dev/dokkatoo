@@ -35,16 +35,16 @@ import org.gradle.kotlin.dsl.*
  */
 @DokkatooInternalApi
 class DokkatooDependencyContainers(
-  private val formatName: String,
-  dokkatooConsumer: NamedDomainObjectProvider<Configuration>,
+//  private val formatName: String,
+//  dokkatooConsumer: NamedDomainObjectProvider<Configuration>,
   project: Project,
+  private val dokkatooAttributes: DokkatooConfigurationAttributes,
 ) {
 
   private val objects: ObjectFactory = project.objects
 
-  private val dependencyContainerNames = DokkatooBasePlugin.DependencyContainerNames(formatName)
+  private val dependencyContainerNames = DependencyContainerNames(null)
 
-  private val dokkatooAttributes: DokkatooConfigurationAttributes = objects.newInstance()
 
   private fun AttributeContainer.dokkaCategory(category: DokkatooConfigurationAttributes.DokkatooCategoryAttribute) {
     attribute(DOKKATOO_BASE_ATTRIBUTE, dokkatooAttributes.dokkatooBaseUsage)
@@ -59,6 +59,28 @@ class DokkatooDependencyContainers(
     attribute(TARGET_JVM_ENVIRONMENT_ATTRIBUTE, objects.named(STANDARD_JVM))
     attribute(LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(JAR))
   }
+
+
+  val dokkatooFilesProvider: NamedDomainObjectProvider<Configuration> =
+    project.configurations.register(dependencyContainerNames.dokkatoo) {
+      description = "Provide Dokkatoo files to other subprojects"
+      asProvider()
+      isVisible = true
+      attributes {
+        attribute(DOKKATOO_BASE_ATTRIBUTE, dokkatooAttributes.dokkatooBaseUsage)
+      }
+    }
+
+  val dokkatooFilesConsumer: NamedDomainObjectProvider<Configuration> =
+    project.configurations.register(dependencyContainerNames.dokkatoo) {
+      description = "Provide Dokkatoo files to other subprojects"
+      asConsumer()
+      isVisible = true
+      attributes {
+        attribute(DOKKATOO_BASE_ATTRIBUTE, dokkatooAttributes.dokkatooBaseUsage)
+      }
+    }
+
 
   //<editor-fold desc="Dokka Parameters JSON files">
   // TODO sharing parameters is required for a 'DokkaCollect' equivalent, but this is not implemented yet

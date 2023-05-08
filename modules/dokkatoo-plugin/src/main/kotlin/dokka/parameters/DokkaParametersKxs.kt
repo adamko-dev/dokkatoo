@@ -19,7 +19,6 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import org.gradle.api.Named
-import org.gradle.kotlin.dsl.*
 import org.jetbrains.dokka.*
 
 
@@ -32,38 +31,54 @@ import org.jetbrains.dokka.*
 data class DokkaParametersKxs(
   val moduleName: String,
   val moduleVersion: String? = null,
-  val cacheRoot: File? = null,
+
   val offlineMode: Boolean,
   val failOnWarning: Boolean,
   val sourceSets: List<DokkaSourceSetKxs>,
-  val pluginsClasspath: List<File>,
+
   val pluginsConfiguration: List<PluginConfigurationKxs>,
-  val delayTemplateSubstitution: Boolean,
+//  val delayTemplateSubstitution: Boolean,
   val suppressObviousFunctions: Boolean,
-  val includes: Set<File>,
+
   val suppressInheritedMembers: Boolean,
   val finalizeCoroutines: Boolean,
 
   val modules: List<DokkaModuleDescriptionKxs>,
 ) : Named {
 
+  data class Files(
+    val outputDir: File,
+    val cacheRoot: File? = null,
+    val pluginsClasspath: List<File>,
+    val includes: Set<File>,
+  )
+
   override fun getName(): String = moduleName
 
-  fun convert(outputDir: File): DokkaConfiguration {
+  fun convert(
+    delayTemplateSubstitution: Boolean,
+    files: Files,
+    sourceSetFiles: Map<SourceSetIdKxs, DokkaSourceSetKxs.Files>,
+    moduleFiles: Map<String, DokkaModuleDescriptionKxs.Files>,
+  ): DokkaConfiguration {
     return DokkaConfigurationImpl(
       moduleName = moduleName,
       moduleVersion = moduleVersion,
-      outputDir = outputDir,
-      cacheRoot = cacheRoot,
+      outputDir = files.outputDir,
+      cacheRoot = files.cacheRoot,
       offlineMode = offlineMode,
-      sourceSets = sourceSets.map(DokkaSourceSetKxs::convert),
-      pluginsClasspath = pluginsClasspath,
+      sourceSets = sourceSets.map {
+        it.convert(sourceSetFiles[it.sourceSetId] ?: DokkaSourceSetKxs.Files.EMPTY)
+      },
+      pluginsClasspath = files.pluginsClasspath,
       pluginsConfiguration = pluginsConfiguration.map(PluginConfigurationKxs::convert),
-      modules = modules.map(DokkaModuleDescriptionKxs::convert),
+      modules = modules.map {
+        it.convert(moduleFiles[it.name] ?: error("missing files for $it"))
+      },
       failOnWarning = failOnWarning,
       delayTemplateSubstitution = delayTemplateSubstitution,
       suppressObviousFunctions = suppressObviousFunctions,
-      includes = includes,
+      includes = files.includes,
       suppressInheritedMembers = suppressInheritedMembers,
       finalizeCoroutines = finalizeCoroutines,
     )
@@ -74,11 +89,7 @@ data class DokkaParametersKxs(
   data class DokkaSourceSetKxs(
     val sourceSetId: SourceSetIdKxs,
     val displayName: String,
-    val classpath: List<File>,
-    val sourceRoots: Set<File>,
     val dependentSourceSetIds: Set<SourceSetIdKxs>,
-    val samples: Set<File>,
-    val includes: Set<File>,
     val reportUndocumented: Boolean,
     val skipEmptyPackages: Boolean,
     val skipDeprecated: Boolean,
@@ -90,22 +101,41 @@ data class DokkaParametersKxs(
     val apiVersion: String? = null,
     val enableKotlinStdLibDocumentationLink: Boolean,
     val enableJdkDocumentationLink: Boolean,
-    val suppressedFiles: Set<File>,
     val analysisPlatform: Platform,
     val documentedVisibilities: Set<DokkaConfiguration.Visibility>,
   ) : Named {
 
+    data class Files(
+      val classpath: List<File>,
+      val sourceRoots: Set<File>,
+      val includes: Set<File>,
+      val samples: Set<File>,
+      val suppressedFiles: Set<File>,
+    ) {
+      companion object {
+        val EMPTY = Files(
+          classpath = emptyList(),
+          sourceRoots = emptySet(),
+          includes = emptySet(),
+          samples = emptySet(),
+          suppressedFiles = emptySet(),
+        )
+      }
+    }
+
     override fun getName(): String = displayName
 
-    internal fun convert() =
+    internal fun convert(
+      files: Files,
+    ) =
       DokkaSourceSetImpl(
         displayName = displayName,
         sourceSetID = sourceSetId.convert(),
-        classpath = classpath,
-        sourceRoots = sourceRoots,
+        classpath = files.classpath,
+        sourceRoots = files.sourceRoots,
         dependentSourceSets = dependentSourceSetIds.mapToSet(SourceSetIdKxs::convert),
-        samples = samples,
-        includes = includes,
+        samples = files.samples,
+        includes = files.includes,
         reportUndocumented = reportUndocumented,
         skipEmptyPackages = skipEmptyPackages,
         skipDeprecated = skipDeprecated,
@@ -119,7 +149,7 @@ data class DokkaParametersKxs(
         apiVersion = apiVersion,
         noStdlibLink = !enableKotlinStdLibDocumentationLink,
         noJdkLink = !enableJdkDocumentationLink,
-        suppressedFiles = suppressedFiles,
+        suppressedFiles = files.suppressedFiles,
         analysisPlatform = analysisPlatform,
         documentedVisibilities = documentedVisibilities,
       )
@@ -184,37 +214,36 @@ data class DokkaParametersKxs(
    * a Dokka Module. A [DokkaModuleDescriptionKxs] describes a config file for the Dokka Module that
    * describes its content. This config file will be used by any aggregating project to produce
    * a Dokka Publication with multiple modules.
-   *
-   * Note: this class implements [java.io.Serializable] because it is used as a
-   * [Gradle Property][org.gradle.api.provider.Property], and Gradle must be able to fingerprint
-   * property values classes using Java Serialization.
-   *
-   * All other configuration data classes also implement [java.io.Serializable] via their parent interfaces.
    */
   @Serializable
   @DokkatooInternalApi
   data class DokkaModuleDescriptionKxs(
     /** @see DokkaConfiguration.DokkaModuleDescription.name */
     val name: String,
-    /**
-     * Location of the Dokka Module directory for a subproject.
-     *
-     * @see DokkaConfiguration.DokkaModuleDescription.sourceOutputDirectory
-     */
-    val sourceOutputDirectory: File,
-    /** @see DokkaConfiguration.DokkaModuleDescription.includes */
-    val includes: Set<File>,
 
     /** @see [org.gradle.api.Project.getPath] */
     val modulePath: String,
   ) {
 
-    internal fun convert() =
+    data class Files(
+      /**
+       * Location of the Dokka Module directory for a subproject.
+       *
+       * @see DokkaConfiguration.DokkaModuleDescription.sourceOutputDirectory
+       */
+      val sourceOutputDirectory: File,
+      /** @see DokkaConfiguration.DokkaModuleDescription.includes */
+      val includes: Set<File>,
+    )
+
+    internal fun convert(
+      files: Files,
+    ) =
       DokkaModuleDescriptionImpl(
         name = name,
         relativePathToOutputDirectory = File(modulePath.removePrefix(":").replace(':', '/')),
-        includes = includes,
-        sourceOutputDirectory = sourceOutputDirectory,
+        includes = files.includes,
+        sourceOutputDirectory = files.sourceOutputDirectory,
       )
   }
 

@@ -57,6 +57,19 @@ constructor(
   @get:Input
   abstract val generationType: Property<GenerationType>
 
+  /**
+   * Classpath that contains the Dokka Generator Plugins used to modify this publication.
+   *
+   * The plugins should be configured in [dev.adamko.dokkatoo.dokka.DokkaPublication.pluginsConfiguration].
+   */
+  @get:InputFiles
+  @get:Classpath
+  abstract val pluginsClasspath: ConfigurableFileCollection
+
+  @get:InputFiles
+  @get:PathSensitive(RELATIVE)
+  abstract val includes: ConfigurableFileCollection
+
   @get:InputFiles
   @get:Optional
   @get:PathSensitive(RELATIVE)
@@ -121,7 +134,29 @@ constructor(
       }
     }
 
-    val dokkaParametersImpl = dokkaParameters.convert(outputDirectory)
+    val files = DokkaParametersKxs.Files(
+      outputDir = outputDirectory,
+      cacheRoot = cacheDirectory.asFile.orNull,
+      pluginsClasspath = pluginsClasspath.files.toList(),
+      includes = includes.files,
+    )
+
+    val sourceSetFiles = dokkaSourceSets.filterNot {
+      val suppressed = it.suppress.get()
+      logger.info("Dokka source set ${it.sourceSetId.get()} ${if (suppressed) "is" else "isn't"} suppressed")
+      suppressed
+    }.associate {
+      it.sourceSetId.get().build() to it.buildFiles()
+    }
+
+    val moduleFiles: Map<String, DokkaParametersKxs.DokkaModuleDescriptionKxs.Files> =
+      emptyMap() // TODO
+
+    val dokkaParametersImpl = dokkaParameters.convert(
+      files = files,
+      sourceSetFiles = sourceSetFiles,
+      moduleFiles = moduleFiles,
+    )
 
     workQueue.submit(DokkaGeneratorWorker::class) {
       this.dokkaParameters.set(dokkaParametersImpl)

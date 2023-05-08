@@ -57,9 +57,9 @@ constructor(
   @get:Optional
   abstract val dokkaModuleFiles: ConfigurableFileCollection
 
-  @get:LocalState
+//  @get:LocalState
   // cacheRoot is not used by Dokka, and will probably be deprecated
-  abstract val cacheRoot: DirectoryProperty
+//  abstract val cacheRoot: DirectoryProperty
 
   @get:Input
   abstract val delayTemplateSubstitution: Property<Boolean>
@@ -67,9 +67,9 @@ constructor(
   @get:Input
   abstract val failOnWarning: Property<Boolean>
 
-  @get:InputFiles
-  @get:PathSensitive(RELATIVE)
-  abstract val includes: ConfigurableFileCollection
+//  @get:InputFiles
+//  @get:PathSensitive(RELATIVE)
+//  abstract val includes: ConfigurableFileCollection
 
   @get:Input
   abstract val finalizeCoroutines: Property<Boolean>
@@ -103,14 +103,14 @@ constructor(
   @get:Input
   abstract val offlineMode: Property<Boolean>
 
-  /**
-   * Classpath that contains the Dokka Generator Plugins used to modify this publication.
-   *
-   * The plugins should be configured in [dev.adamko.dokkatoo.dokka.DokkaPublication.pluginsConfiguration].
-   */
-  @get:InputFiles
-  @get:Classpath
-  abstract val pluginsClasspath: ConfigurableFileCollection
+//  /**
+//   * Classpath that contains the Dokka Generator Plugins used to modify this publication.
+//   *
+//   * The plugins should be configured in [dev.adamko.dokkatoo.dokka.DokkaPublication.pluginsConfiguration].
+//   */
+//  @get:InputFiles
+//  @get:Classpath
+//  abstract val pluginsClasspath: ConfigurableFileCollection
 
   @get:Input
   abstract val suppressObviousFunctions: Property<Boolean>
@@ -142,7 +142,7 @@ constructor(
 
     val moduleName = moduleName.get()
     val moduleVersion = moduleVersion.orNull?.takeIf { it != "unspecified" }
-    val cacheRoot = cacheRoot.asFile.orNull
+//    val cacheRoot = cacheRoot.asFile.orNull
     val offlineMode = offlineMode.get()
     val sourceSets = dokkaSourceSets.filterNot {
       val suppressed = it.suppress.get()
@@ -150,13 +150,13 @@ constructor(
       suppressed
     }.map(DokkaSourceSetSpec::build)
 
-    val pluginsClasspath = pluginsClasspath.files.toList()
+//    val pluginsClasspath = pluginsClasspath.files.toList()
 
     val pluginsConfiguration = pluginsConfiguration.map(DokkaPluginParametersBaseSpec::build)
     val failOnWarning = failOnWarning.get()
     val delayTemplateSubstitution = delayTemplateSubstitution.get()
     val suppressObviousFunctions = suppressObviousFunctions.get()
-    val includes = includes.files
+//    val includes = includes.files
     val suppressInheritedMembers = suppressInheritedMembers.get()
     val finalizeCoroutines = finalizeCoroutines.get()
 
@@ -164,16 +164,16 @@ constructor(
 
     // construct the base configuration for THIS project
     val baseDokkaParams = DokkaParametersKxs(
-      cacheRoot = cacheRoot,
+      //cacheRoot = cacheRoot,
       delayTemplateSubstitution = delayTemplateSubstitution,
       failOnWarning = failOnWarning,
       finalizeCoroutines = finalizeCoroutines,
-      includes = includes,
+//      includes = includes,
       moduleName = moduleName,
       moduleVersion = moduleVersion,
       modules = dokkaModuleDescriptors,
       offlineMode = offlineMode,
-      pluginsClasspath = pluginsClasspath,
+//      pluginsClasspath = pluginsClasspath,
       pluginsConfiguration = pluginsConfiguration,
       sourceSets = sourceSets,
       suppressInheritedMembers = suppressInheritedMembers,

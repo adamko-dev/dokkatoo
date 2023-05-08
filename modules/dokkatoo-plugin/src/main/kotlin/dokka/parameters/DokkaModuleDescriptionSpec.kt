@@ -30,8 +30,8 @@ abstract class DokkaModuleDescriptionSpec
   override fun build() =
     DokkaParametersKxs.DokkaModuleDescriptionKxs(
       name = moduleName,
-      sourceOutputDirectory = sourceOutputDirectory.get().asFile,
-      includes = includes.files,
+//      sourceOutputDirectory = sourceOutputDirectory.get().asFile,
+//      includes = includes.files,
       modulePath = projectPath.get(),
     )
 }

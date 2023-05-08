@@ -1,10 +1,14 @@
 package dev.adamko.dokkatoo
 
+import dev.adamko.dokkatoo.distibutions.DependenciesManager
+import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes
 import dev.adamko.dokkatoo.dokka.DokkaPublication
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec
 import dev.adamko.dokkatoo.internal.*
 import java.io.Serializable
+import javax.inject.Inject
 import org.gradle.api.NamedDomainObjectContainer
+import org.gradle.api.Project
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.ExtensionAware
@@ -16,7 +20,9 @@ import org.gradle.kotlin.dsl.*
  */
 abstract class DokkatooExtension
 @DokkatooInternalApi
+@Inject
 constructor(
+  project: Project,
   objects: ObjectFactory,
 ) : ExtensionAware, Serializable {
 
@@ -111,6 +117,14 @@ constructor(
   val versions: Versions = extensions.adding("versions") {
     objects.newInstance()
   }
+
+  internal val configurationAttributes: DokkatooConfigurationAttributes = objects.newInstance()
+
+  internal val dependenciesManager: DependenciesManager = DependenciesManager(
+    project = project,
+    d2Attributes = configurationAttributes,
+    objects = objects,
+  )
 
   interface Versions : ExtensionAware {
 

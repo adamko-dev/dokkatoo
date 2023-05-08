@@ -39,9 +39,6 @@ constructor() : DefaultTask() {
 
     /**
      * Source sets used to generate a Dokka Module.
-     *
-     * The values are not used directly in this task, but they are required to be registered as a
-     * task input for up-to-date checks
      */
     @get:Nested
     val dokkaSourceSets: NamedDomainObjectContainer<DokkaSourceSetSpec> =

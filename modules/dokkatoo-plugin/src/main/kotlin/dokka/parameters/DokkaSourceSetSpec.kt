@@ -5,7 +5,6 @@ import dev.adamko.dokkatoo.dokka.parameters.KotlinPlatform.Companion.dokkaType
 import dev.adamko.dokkatoo.dokka.parameters.VisibilityModifier.Companion.dokkaType
 import dev.adamko.dokkatoo.internal.*
 import java.io.Serializable
-import java.net.URL
 import javax.inject.Inject
 import org.gradle.api.*
 import org.gradle.api.file.ConfigurableFileCollection
@@ -393,55 +392,6 @@ constructor(
     )
   }
 
-  /** @see externalDocumentationLinks */
-  @Deprecated(
-    externalDocumentationLinkDeprecationMessage,
-    ReplaceWith("externalDocumentationLinks.create(\"...\", action)"),
-  )
-  fun externalDocumentationLink(action: Action<in DokkaExternalDocumentationLinkSpec>) {
-    externalDocumentationLinks.create("...", action)
-  }
-
-  /** @see externalDocumentationLinks */
-  @Deprecated(
-    externalDocumentationLinkDeprecationMessage,
-    ReplaceWith(
-      "externalDocumentationLinks.create(TODO(\"<unique name>\")) {\n" +
-          "  this.url(url)\n" +
-          "  if (packageListUrl != null) this.packageListUrl(packageListUrl)\n" +
-          "}"
-    ),
-  )
-  fun externalDocumentationLink(url: String, packageListUrl: String? = null) {
-    externalDocumentationLinks.create("...") {
-      url(url)
-      if (packageListUrl != null) {
-        packageListUrl(packageListUrl)
-      }
-    }
-  }
-
-  /** @see externalDocumentationLinks */
-  @Deprecated(
-    externalDocumentationLinkDeprecationMessage,
-    ReplaceWith(
-      "externalDocumentationLinks.create(TODO(\"<unique name>\")) {\n" +
-          "  this.url.set(url)\n" +
-          "  if (packageListUrl != null) this.packageListUrl.set(packageListUrl)\n" +
-          "}"
-    ),
-  )
-  fun externalDocumentationLink(url: URL, packageListUrl: URL? = null) {
-    externalDocumentationLinks.add(
-      objects.newInstance(DokkaExternalDocumentationLinkSpec::class).also {
-        it.url.set(url.toURI())
-        if (packageListUrl != null) {
-          it.packageListUrl.set(packageListUrl.toURI())
-        }
-      }
-    )
-  }
-
   @DokkatooInternalApi
   override fun build(): DokkaParametersKxs.DokkaSourceSetKxs {
     val externalDocumentationLinks = externalDocumentationLinks
@@ -451,11 +401,11 @@ constructor(
     return DokkaParametersKxs.DokkaSourceSetKxs(
       sourceSetId = sourceSetId.get().build(),
       displayName = displayName.get(),
-      classpath = classpath.files.toList(),
-      sourceRoots = sourceRoots.files,
+//      classpath = classpath.files.toList(),
+//      sourceRoots = sourceRoots.files,
       dependentSourceSetIds = dependentSourceSets.mapToSet(DokkaSourceSetIdSpec::build),
-      samples = samples.files,
-      includes = includes.files,
+//      samples = samples.files,
+//      includes = includes.files,
       reportUndocumented = reportUndocumented.get(),
       skipEmptyPackages = skipEmptyPackages.get(),
       skipDeprecated = skipDeprecated.get(),
@@ -467,14 +417,20 @@ constructor(
       apiVersion = apiVersion.orNull,
       enableKotlinStdLibDocumentationLink = enableKotlinStdLibDocumentationLink.get(),
       enableJdkDocumentationLink = enableJdkDocumentationLink.get(),
-      suppressedFiles = suppressedFiles.files,
+//      suppressedFiles = suppressedFiles.files,
       analysisPlatform = analysisPlatform.get().dokkaType,
       documentedVisibilities = documentedVisibilities.get().mapToSet { it.dokkaType },
     )
   }
 
-  private companion object {
-    private const val externalDocumentationLinkDeprecationMessage =
-      "DokkaExternalDocumentationLinkSpecs require a unique name. Helper functions for creating an external doc link have been moved to DokkaExternalDocumentationLinkSpec. Use `externalDocumentationLinks.create(...) { ... } instead."
+  @DokkatooInternalApi
+  fun buildFiles(): DokkaParametersKxs.DokkaSourceSetKxs.Files {
+    return DokkaParametersKxs.DokkaSourceSetKxs.Files(
+      classpath = classpath.files.toList(),
+      sourceRoots = sourceRoots.files,
+      samples = samples.files,
+      includes = includes.files,
+      suppressedFiles = suppressedFiles.files,
+    )
   }
 }
