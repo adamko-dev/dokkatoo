@@ -1,17 +1,11 @@
 package dev.adamko.dokkatoo.dokka.parameters
 
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.engine.spec.tempdir
-import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.string.shouldContain
-import java.io.File
-import java.net.URI
 import org.gradle.api.Project
-import org.gradle.api.internal.provider.MissingValueException
 import org.gradle.api.provider.Provider
-import org.gradle.kotlin.dsl.newInstance
+import org.gradle.kotlin.dsl.*
 import org.gradle.testfixtures.ProjectBuilder
 
 class DokkaSourceLinkSpecTest : FunSpec({
@@ -45,89 +39,6 @@ class DokkaSourceLinkSpecTest : FunSpec({
       }
 
       actual.remoteUrl.get().toString() shouldBe "https://github.com/adamko-dev/dokkatoo/"
-    }
-  }
-
-
-  context("when DokkaSourceLinkSpec is built") {
-
-    test("expect built object contains all properties") {
-      val tempDir = tempdir()
-
-      val actual = project.createDokkaSourceLinkSpec {
-        localDirectory.set(tempDir)
-        remoteUrl("https://github.com/adamko-dev/dokkatoo/")
-        remoteLineSuffix.set("%L")
-      }
-
-      val actualBuilt = actual.build()
-
-      actualBuilt.should {
-        it.remoteUrl shouldBe actual.remoteUrl.get()
-        it.localDirectory shouldBe tempDir.invariantSeparatorsPath
-        it.remoteLineSuffix shouldBe "%L"
-      }
-    }
-
-    test("expect localDirectory is required") {
-      val actual = project.createDokkaSourceLinkSpec {
-        localDirectory.set(null as File?)
-        remoteUrl("https://github.com/adamko-dev/dokkatoo/")
-        remoteLineSuffix.set("%L")
-      }
-
-      val caughtException = shouldThrow<MissingValueException> {
-        actual.build()
-      }
-
-      caughtException.message shouldContain "Cannot query the value of property 'localDirectory' because it has no value available"
-    }
-
-    test("expect localDirectory is an invariantSeparatorsPath") {
-      val tempDir = tempdir()
-
-      val actual = project.createDokkaSourceLinkSpec {
-        localDirectory.set(tempDir)
-        remoteUrl("https://github.com/adamko-dev/dokkatoo/")
-        remoteLineSuffix.set(null as String?)
-      }
-
-      actual.build().should {
-        it.localDirectory shouldBe tempDir.invariantSeparatorsPath
-      }
-    }
-
-    test("expect remoteUrl is required") {
-
-      val actual = project.createDokkaSourceLinkSpec {
-        localDirectory.set(tempdir())
-        remoteUrl.set(null as URI?)
-        remoteLineSuffix.set("%L")
-      }
-
-      val caughtException = shouldThrow<MissingValueException> {
-        actual.build()
-      }
-
-      caughtException.message shouldContain "Cannot query the value of property 'remoteUrl' because it has no value available"
-    }
-
-    test("expect remoteLineSuffix is optional") {
-      val tempDir = tempdir()
-
-      val actual = project.createDokkaSourceLinkSpec {
-        localDirectory.set(tempDir)
-        remoteUrl("https://github.com/adamko-dev/dokkatoo/")
-        remoteLineSuffix.set(null as String?)
-      }
-
-      val actualBuilt = actual.build()
-
-      actualBuilt.should {
-        it.remoteUrl shouldBe actual.remoteUrl.get()
-        it.localDirectory.shouldBe(tempDir.invariantSeparatorsPath)
-        it.remoteLineSuffix.shouldBe(null)
-      }
     }
   }
 }) {

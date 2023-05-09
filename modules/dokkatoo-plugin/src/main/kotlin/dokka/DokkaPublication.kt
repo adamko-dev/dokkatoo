@@ -34,13 +34,13 @@ constructor(
    * Configurations for Dokka Generator Plugins. Must be provided from
    * [dev.adamko.dokkatoo.DokkatooExtension.pluginsConfiguration].
    */
-  private val _pluginsConfiguration: DokkaPluginParametersContainer,
+  pluginsConfiguration: DokkaPluginParametersContainer,
 ) : Named, Serializable, ExtensionAware {
 
   /** Configurations for Dokka Generator Plugins. */
   @get:Nested
   val pluginsConfiguration: DokkaPluginParametersContainer =
-    extensions.adding("pluginsConfiguration") { _pluginsConfiguration }
+    extensions.adding("pluginsConfiguration", pluginsConfiguration)
 
   @Internal
   override fun getName(): String = formatName
@@ -66,6 +66,7 @@ constructor(
   @get:Input
   // marked as an Input because a DokkaPublication is used to configure the appropriate
   // DokkatooTasks, which will then
+  @DokkatooInternalApi
   protected val outputDirPath: Provider<String>
     get() = outputDir.map { it.asFile.invariantSeparatorsPath }
 
@@ -80,6 +81,7 @@ constructor(
    */
   @get:Input
   @get:Optional
+  @DokkatooInternalApi
   protected val cacheRootPath: Provider<String>
     get() = cacheRoot.map { it.asFile.invariantSeparatorsPath }
 

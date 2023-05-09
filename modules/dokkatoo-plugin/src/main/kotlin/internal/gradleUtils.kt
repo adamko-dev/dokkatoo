@@ -25,9 +25,12 @@ import org.gradle.kotlin.dsl.*
  * isCanBeConsumed = true
  * ```
  */
-internal fun Configuration.asProvider() {
+internal fun Configuration.asProvider(
+  visible: Boolean = true,
+) {
   isCanBeResolved = false
   isCanBeConsumed = true
+  isVisible = visible
 }
 
 /**
@@ -38,9 +41,12 @@ internal fun Configuration.asProvider() {
  * isCanBeConsumed = false
  * ```
  * */
-internal fun Configuration.asConsumer() {
+internal fun Configuration.asConsumer(
+  visible: Boolean = false,
+) {
   isCanBeResolved = true
   isCanBeConsumed = false
+  isVisible = visible
 }
 
 
@@ -165,12 +171,12 @@ internal inline fun <reified T : Any> ObjectFactory.polymorphicDomainObjectConta
  */
 internal inline fun <reified T : Any> ExtensionContainer.adding(
   name: String,
-  crossinline valueProvider: () -> T,
+  value: T,
 ): T {
-  val value: T = valueProvider()
   add<T>(name, value)
   return value
 }
+
 
 /** Create a new [DokkaPluginParametersContainer] instance. */
 internal fun ObjectFactory.dokkaPluginParametersContainer(): DokkaPluginParametersContainer {

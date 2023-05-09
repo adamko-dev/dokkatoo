@@ -35,13 +35,12 @@ enum class VisibilityModifier {
 
     // Not defined as a property to try and minimize the dependency on Dokka Core types
     internal val VisibilityModifier.dokkaType: DokkaConfiguration.Visibility
-      get() =
-        when (this) {
-          PUBLIC    -> DokkaConfiguration.Visibility.PUBLIC
-          PRIVATE   -> DokkaConfiguration.Visibility.PRIVATE
-          PROTECTED -> DokkaConfiguration.Visibility.PROTECTED
-          INTERNAL  -> DokkaConfiguration.Visibility.INTERNAL
-          PACKAGE   -> DokkaConfiguration.Visibility.PACKAGE
-        }
+      get() = when (this) {
+        PUBLIC    -> DokkaConfiguration.Visibility.PUBLIC
+        PRIVATE   -> DokkaConfiguration.Visibility.PRIVATE
+        PROTECTED -> DokkaConfiguration.Visibility.PROTECTED
+        INTERNAL  -> DokkaConfiguration.Visibility.INTERNAL
+        PACKAGE   -> DokkaConfiguration.Visibility.PACKAGE
+      }
   }
 }

@@ -1,24 +1,18 @@
 package dev.adamko.dokkatoo
 
-import dev.adamko.dokkatoo.dokka.parameters.DokkaParametersKxs
 import dev.adamko.dokkatoo.internal.DokkatooConstants.DOKKATOO_VERSION
 import dev.adamko.dokkatoo.utils.*
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.inspectors.forAll
 import io.kotest.inspectors.shouldForAll
 import io.kotest.matchers.collections.shouldBeIn
-import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
-import io.kotest.matchers.collections.shouldNotContainAnyOf
 import io.kotest.matchers.file.shouldBeAFile
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.paths.shouldBeAFile
-import io.kotest.matchers.paths.shouldExist
 import io.kotest.matchers.paths.shouldNotExist
 import io.kotest.matchers.should
 import io.kotest.matchers.string.shouldBeEmpty
 import io.kotest.matchers.string.shouldContain
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.json.decodeFromStream
 import org.gradle.testkit.runner.TaskOutcome.*
 
 class MultiModuleFunctionalTest : FunSpec({
@@ -78,40 +72,6 @@ class MultiModuleFunctionalTest : FunSpec({
           )
       }
     }
-
-    val dokkaConfigurationFile =
-      project.file("build/dokka-config/html/dokka_parameters.json")
-    dokkaConfigurationFile.shouldExist()
-    dokkaConfigurationFile.shouldBeAFile()
-    @OptIn(ExperimentalSerializationApi::class)
-    val dokkaConfiguration = kotlinx.serialization.json.Json.decodeFromStream(
-      DokkaParametersKxs.serializer(),
-      dokkaConfigurationFile.toFile().inputStream(),
-    )
-
-    context("expect pluginsClasspath") {
-      val pluginClasspathJars = dokkaConfiguration.pluginsClasspath.map { it.name }
-
-      test("does not contain subproject jars") {
-        pluginClasspathJars.shouldNotContainAnyOf(
-          "subproject-hello.jar",
-          "subproject-goodbye.jar",
-        )
-      }
-
-      test("contains the default Dokka plugins") {
-        pluginClasspathJars.shouldContainExactlyInAnyOrder(
-          "all-modules-page-plugin-1.7.20.jar",
-          "dokka-analysis-1.8.10.jar",
-          "dokka-base-1.8.10.jar",
-          "freemarker-2.3.31.jar",
-          "kotlin-analysis-compiler-1.8.10.jar",
-          "kotlin-analysis-intellij-1.8.10.jar",
-          "kotlinx-html-jvm-0.8.0.jar",
-          "templating-plugin-1.8.10.jar",
-        )
-      }
-    }
   }
 
   context("Gradle caching") {
@@ -162,7 +122,7 @@ class MultiModuleFunctionalTest : FunSpec({
             test("expect build is successful") {
               output shouldContainAll listOf(
                 "BUILD SUCCESSFUL",
-                "36 actionable tasks: 36 up-to-date",
+                "24 actionable tasks: 24 up-to-date",
               )
             }
 
@@ -272,7 +232,7 @@ class MultiModuleFunctionalTest : FunSpec({
 
               test("expect :subproject-goodbye tasks are up-to-date, because no files changed") {
                 shouldHaveTasksWithOutcome(
-                  ":subproject-goodbye:prepareDokkatooParametersHtml" to UP_TO_DATE,
+//                  ":subproject-goodbye:prepareDokkatooParametersHtml" to UP_TO_DATE,
                   ":subproject-goodbye:dokkatooGenerateModuleHtml" to UP_TO_DATE,
                   ":subproject-goodbye:prepareDokkatooModuleDescriptorHtml" to UP_TO_DATE,
                 )
@@ -281,7 +241,7 @@ class MultiModuleFunctionalTest : FunSpec({
               val successfulOutcomes = listOf(SUCCESS, FROM_CACHE)
               test("expect :subproject-hello tasks should be re-run, since a file changed") {
                 shouldHaveTasksWithAnyOutcome(
-                  ":subproject-hello:prepareDokkatooParametersHtml" to successfulOutcomes,
+//                  ":subproject-hello:prepareDokkatooParametersHtml" to successfulOutcomes,
                   ":subproject-hello:dokkatooGenerateModuleHtml" to successfulOutcomes,
                   ":subproject-hello:prepareDokkatooModuleDescriptorHtml" to successfulOutcomes,
                 )
@@ -289,7 +249,7 @@ class MultiModuleFunctionalTest : FunSpec({
 
               test("expect aggregating tasks should re-run because the :subproject-hello Dokka Module changed") {
                 shouldHaveTasksWithAnyOutcome(
-                  ":prepareDokkatooParametersHtml" to successfulOutcomes,
+//                  ":prepareDokkatooParametersHtml" to successfulOutcomes,
                   ":dokkatooGeneratePublicationHtml" to successfulOutcomes,
                 )
               }
@@ -298,8 +258,8 @@ class MultiModuleFunctionalTest : FunSpec({
                 output shouldContain "BUILD SUCCESSFUL"
               }
 
-              test("expect 8 tasks are run") {
-                output shouldContain "8 actionable tasks"
+              test("expect 5 tasks are run") {
+                output shouldContain "5 actionable tasks"
               }
             }
 
@@ -393,11 +353,7 @@ class MultiModuleFunctionalTest : FunSpec({
             ¦> Task :dokkatooGeneratePublicationHtml
             ¦> Task :dokkatooGeneratePublicationJavadoc
             ¦> Task :dokkatooGeneratePublicationJekyll
-            ¦> Task :prepareDokkatooParameters
-            ¦> Task :prepareDokkatooParametersGfm
-            ¦> Task :prepareDokkatooParametersHtml
-            ¦> Task :prepareDokkatooParametersJavadoc
-            ¦> Task :prepareDokkatooParametersJekyll
+            ¦> Task :prepareDokkatooParameters UP-TO-DATE
             ¦> Task :subproject-goodbye:clean
             ¦> Task :subproject-goodbye:dokkatooGenerateModuleGfm
             ¦> Task :subproject-goodbye:dokkatooGenerateModuleHtml
@@ -407,10 +363,6 @@ class MultiModuleFunctionalTest : FunSpec({
             ¦> Task :subproject-goodbye:prepareDokkatooModuleDescriptorHtml
             ¦> Task :subproject-goodbye:prepareDokkatooModuleDescriptorJavadoc
             ¦> Task :subproject-goodbye:prepareDokkatooModuleDescriptorJekyll
-            ¦> Task :subproject-goodbye:prepareDokkatooParametersGfm
-            ¦> Task :subproject-goodbye:prepareDokkatooParametersHtml
-            ¦> Task :subproject-goodbye:prepareDokkatooParametersJavadoc
-            ¦> Task :subproject-goodbye:prepareDokkatooParametersJekyll
             ¦> Task :subproject-hello:clean
             ¦> Task :subproject-hello:dokkatooGenerateModuleGfm
             ¦> Task :subproject-hello:dokkatooGenerateModuleHtml
@@ -420,11 +372,7 @@ class MultiModuleFunctionalTest : FunSpec({
             ¦> Task :subproject-hello:prepareDokkatooModuleDescriptorHtml
             ¦> Task :subproject-hello:prepareDokkatooModuleDescriptorJavadoc
             ¦> Task :subproject-hello:prepareDokkatooModuleDescriptorJekyll
-            ¦> Task :subproject-hello:prepareDokkatooParametersGfm
-            ¦> Task :subproject-hello:prepareDokkatooParametersHtml
-            ¦> Task :subproject-hello:prepareDokkatooParametersJavadoc
-            ¦> Task :subproject-hello:prepareDokkatooParametersJekyll
-          """.trimMargin("¦")
+          """.trimMargin("¦").trim()
         }
     }
   }
@@ -462,8 +410,8 @@ private fun initDokkatooProject(
     dir("subproject-hello") {
       buildGradleKts = """
           |plugins {
-          |    kotlin("jvm") version "1.7.20"
-          |    id("dev.adamko.dokkatoo") version "$DOKKATOO_VERSION"
+          |  kotlin("jvm") version "1.7.20"
+          |  id("dev.adamko.dokkatoo") version "$DOKKATOO_VERSION"
           |}
           |
         """.trimMargin()
@@ -489,8 +437,8 @@ private fun initDokkatooProject(
 
       buildGradleKts = """
           |plugins {
-          |    kotlin("jvm") version "1.7.20"
-          |    id("dev.adamko.dokkatoo") version "$DOKKATOO_VERSION"
+          |  kotlin("jvm") version "1.7.20"
+          |  id("dev.adamko.dokkatoo") version "$DOKKATOO_VERSION"
           |}
           |
         """.trimMargin()

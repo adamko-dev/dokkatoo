@@ -10,7 +10,6 @@ import dev.adamko.dokkatoo.dokka.parameters.VisibilityModifier
 import dev.adamko.dokkatoo.internal.*
 import dev.adamko.dokkatoo.tasks.DokkatooGenerateTask
 import dev.adamko.dokkatoo.tasks.DokkatooPrepareModuleDescriptorTask
-import dev.adamko.dokkatoo.tasks.DokkatooPrepareParametersTask
 import dev.adamko.dokkatoo.tasks.DokkatooTask
 import java.io.File
 import java.net.URI
@@ -96,17 +95,21 @@ constructor(
       modulePath.convention(dokkatooExtension.modulePath)
     }
 
-    target.tasks.withType<DokkatooPrepareParametersTask>().configureEach {
+    target.tasks.withType<DokkatooGenerateTask>().configureEach {
+
+      publicationEnabled.convention(true)
       onlyIf("publication must be enabled") { publicationEnabled.getOrElse(true) }
-    }
 
-    target.tasks.withType<DokkatooTask.WithSourceSets>().configureEach {
-      addAllDokkaSourceSets(providers.provider { dokkatooExtension.dokkatooSourceSets })
+      generator.addAllDokkaSourceSets(providers.provider { dokkatooExtension.dokkatooSourceSets })
 
-      dokkatooExtension.dokkatooSourceSets.configureDefaults(
+      generator.dokkaSourceSets.configureDefaults(
         sourceSetScopeConvention = dokkatooExtension.sourceSetScopeDefault
       )
     }
+
+    dokkatooExtension.dokkatooSourceSets.configureDefaults(
+      sourceSetScopeConvention = dokkatooExtension.sourceSetScopeDefault
+    )
   }
 
   private fun createExtension(project: Project): DokkatooExtension {
@@ -250,9 +253,10 @@ constructor(
   }
 
   private fun TaskContainer.createDokkaLifecycleTasks() {
+    @Suppress("DEPRECATION")
     val prepareParameters = register<DokkatooTask>(taskNames.prepareParameters) {
-      description = "Prepares Dokka parameters for all formats"
-      dependsOn(withType<DokkatooPrepareParametersTask>())
+      description = "[DEPRECATED no longer used] Prepares Dokka parameters for all formats"
+      //dependsOn(withType<DokkatooPrepareParametersTask>())
     }
 
     register<DokkatooTask>(taskNames.generate) {
@@ -352,6 +356,7 @@ constructor(
     val generate = "dokkatooGenerate".appendFormat()
     val generatePublication = "dokkatooGeneratePublication".appendFormat()
     val generateModule = "dokkatooGenerateModule".appendFormat()
+    @Deprecated("parameters are no longer generated separately, use the publication/module generator task instead")
     val prepareParameters = "prepareDokkatooParameters".appendFormat()
     val prepareModuleDescriptor = "prepareDokkatooModuleDescriptor".appendFormat()
   }

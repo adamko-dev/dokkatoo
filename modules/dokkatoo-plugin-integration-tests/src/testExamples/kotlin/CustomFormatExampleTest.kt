@@ -112,10 +112,9 @@ class CustomFormatExampleTest : FunSpec({
         .build().should { dokkatooBuildCache ->
 
           dokkatooBuildCache.output shouldContainAll listOf(
-            "> Task :prepareDokkatooParametersHtml UP-TO-DATE",
             "> Task :dokkatooGeneratePublicationHtml UP-TO-DATE",
             "BUILD SUCCESSFUL",
-            "2 actionable tasks: 2 up-to-date",
+            "1 actionable task: 1 up-to-date",
           )
           withClue("Dokka Generator should not be triggered, so check it doesn't log anything") {
             dokkatooBuildCache.output shouldNotContain "Generation completed successfully"
@@ -187,8 +186,8 @@ private fun initDokkatooProject(
 
     buildGradleKts += """
       |
-      |tasks.withType<dev.adamko.dokkatoo.tasks.DokkatooPrepareParametersTask>().configureEach {
-      |  dokkaSourceSets.configureEach {
+      |tasks.withType<dev.adamko.dokkatoo.tasks.DokkatooGenerateTask>().configureEach {
+      |  generator.dokkaSourceSets.configureEach {
       |    sourceSetScope.set(":dokkaHtml") // only necessary for testing
       |  }
       |}

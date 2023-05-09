@@ -84,7 +84,6 @@ private fun haveOutcome(outcome: TaskOutcome): Matcher<BuildTask?> =
   haveAnyOutcome(listOf(outcome))
 
 
-
 private fun haveAnyOutcome(outcomes: Collection<TaskOutcome>): Matcher<BuildTask?> {
   val shouldHaveOutcome = when (outcomes.size) {
     0 -> error("Must provide 1 or more expected task outcome, but received none")

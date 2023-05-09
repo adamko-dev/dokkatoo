@@ -1,7 +1,7 @@
 package dev.adamko.dokkatoo.formats
 
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
-import org.gradle.kotlin.dsl.dependencies
+import org.gradle.kotlin.dsl.*
 
 abstract class DokkatooJekyllPlugin
 @DokkatooInternalApi

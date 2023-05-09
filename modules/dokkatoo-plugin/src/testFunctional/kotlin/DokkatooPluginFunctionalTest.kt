@@ -12,7 +12,7 @@ class DokkatooPluginFunctionalTest : FunSpec({
   val testProject = gradleKtsProjectTest("DokkatooPluginFunctionalTest") {
     buildGradleKts = """
       |plugins {
-      |    id("dev.adamko.dokkatoo") version "$DOKKATOO_VERSION"
+      |  id("dev.adamko.dokkatoo") version "$DOKKATOO_VERSION"
       |}
       |
     """.trimMargin()
@@ -45,11 +45,11 @@ class DokkatooPluginFunctionalTest : FunSpec({
         "prepareDokkatooModuleDescriptorHtml"    to "Prepares the Dokka Module Descriptor for html",
         "prepareDokkatooModuleDescriptorJavadoc" to "Prepares the Dokka Module Descriptor for javadoc",
         "prepareDokkatooModuleDescriptorJekyll"  to "Prepares the Dokka Module Descriptor for jekyll",
-        "prepareDokkatooParameters"              to "Prepares Dokka parameters for all formats",
-        "prepareDokkatooParametersGfm"           to "Prepares Dokka parameters for generating the gfm publication",
-        "prepareDokkatooParametersHtml"          to "Prepares Dokka parameters for generating the html publication",
-        "prepareDokkatooParametersJavadoc"       to "Prepares Dokka parameters for generating the javadoc publication",
-        "prepareDokkatooParametersJekyll"        to "Prepares Dokka parameters for generating the jekyll publication",
+        "prepareDokkatooParameters"              to "[DEPRECATED no longer used] Prepares Dokka parameters for all formats",
+        "prepareDokkatooParametersGfm"           to "[DEPRECATED no longer used] Prepares Dokka parameters for generating the gfm publication",
+        "prepareDokkatooParametersHtml"          to "[DEPRECATED no longer used] Prepares Dokka parameters for generating the html publication",
+        "prepareDokkatooParametersJavadoc"       to "[DEPRECATED no longer used] Prepares Dokka parameters for generating the javadoc publication",
+        "prepareDokkatooParametersJekyll"        to "[DEPRECATED no longer used] Prepares Dokka parameters for generating the jekyll publication",
         //@formatter:on
       )
     }
@@ -92,8 +92,6 @@ class DokkatooPluginFunctionalTest : FunSpec({
         |    - dev.adamko.dokkatoo.base     = dokkatoo
         |    - dev.adamko.dokkatoo.category = generator-parameters
         |    - dev.adamko.dokkatoo.format   = $format
-        |Artifacts
-        |    - build/dokka-config/$format/dokka_parameters.json (artifactType = json)
         |
       """.trimMargin()
 

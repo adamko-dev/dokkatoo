@@ -8,8 +8,7 @@ import org.gradle.api.Project
 import org.gradle.api.logging.Logging
 import org.gradle.api.plugins.JavaBasePlugin
 import org.gradle.api.plugins.JavaPluginExtension
-import org.gradle.kotlin.dsl.getByType
-import org.gradle.kotlin.dsl.withType
+import org.gradle.kotlin.dsl.*
 
 /**
  * Apply Java specific configuration to the Dokkatoo plugin.

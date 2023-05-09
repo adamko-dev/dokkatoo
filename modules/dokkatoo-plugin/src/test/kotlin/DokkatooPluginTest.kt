@@ -1,7 +1,5 @@
 package dev.adamko.dokkatoo
 
-import dev.adamko.dokkatoo.tasks.DokkatooPrepareParametersTask
-import dev.adamko.dokkatoo.utils.configureEach_
 import dev.adamko.dokkatoo.utils.create_
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
@@ -23,42 +21,6 @@ class DokkatooPluginTest : FunSpec({
     project.plugins.apply(type = DokkatooPlugin::class)
     project.plugins.hasPlugin("dev.adamko.dokkatoo") shouldBe true
     project.plugins.hasPlugin(DokkatooPlugin::class) shouldBe true
-  }
-
-  test("dokka configuration task") {
-    val project = ProjectBuilder.builder().build()
-    project.plugins.apply("dev.adamko.dokkatoo")
-
-    project.tasks.withType<DokkatooPrepareParametersTask>().configureEach_ {
-      dokkaSourceSets.create_("Blah") {
-
-        sourceSetScope.set("moduleName")
-        classpath.setFrom(emptyList<String>())
-        sourceRoots.from(project.file("src/main/kotlin"))
-        samples.from(emptyList<String>())
-        includes.from(emptyList<String>())
-
-        //classpath = emptyList()
-        //sourceRoots = setOf(file("src/main/kotlin"))
-        //dependentSourceSets = emptySet()
-        //samples = emptySet()
-        //includes = emptySet()
-        //documentedVisibilities = DokkaConfiguration.Visibility.values().toSet()
-        //reportUndocumented = false
-        //skipEmptyPackages = true
-        //skipDeprecated = false
-        //jdkVersion = 8
-        //sourceLinks = emptySet()
-        //perPackageOptions = emptyList()
-        //externalDocumentationLinks = emptySet()
-        //languageVersion = null
-        //apiVersion = null
-        //noStdlibLink = false
-        //noJdkLink = false
-        //suppressedFiles = emptySet()
-        //analysisPlatform = org.jetbrains.dokka.Platform.DEFAULT
-      }
-    }
   }
 
   context("Dokkatoo property conventions") {

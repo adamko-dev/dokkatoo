@@ -1,8 +1,6 @@
 package dev.adamko.dokkatoo.dokka.parameters
 
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetIdSpec.Companion.dokkaSourceSetIdSpec
-import dev.adamko.dokkatoo.dokka.parameters.KotlinPlatform.Companion.dokkaType
-import dev.adamko.dokkatoo.dokka.parameters.VisibilityModifier.Companion.dokkaType
 import dev.adamko.dokkatoo.internal.*
 import java.io.Serializable
 import java.net.URL
@@ -46,7 +44,6 @@ constructor(
   private val name: String,
   private val objects: ObjectFactory,
 ) :
-  DokkaParameterBuilder<DokkaParametersKxs.DokkaSourceSetKxs>,
   HasConfigurableVisibilityModifiers,
   Named,
   Serializable,
@@ -155,9 +152,7 @@ constructor(
    */
   @get:Nested
   val dependentSourceSets: NamedDomainObjectContainer<DokkaSourceSetIdSpec> =
-    extensions.adding("dependentSourceSets") {
-      objects.domainObjectContainer()
-    }
+    extensions.adding("dependentSourceSets", objects.domainObjectContainer())
 
   /**
    * Classpath for analysis and interactive samples.
@@ -227,7 +222,7 @@ constructor(
    */
   @get:Nested
   val externalDocumentationLinks: NamedDomainObjectContainer<DokkaExternalDocumentationLinkSpec> =
-    extensions.adding("externalDocumentationLinks") { objects.domainObjectContainer() }
+    extensions.adding("externalDocumentationLinks", objects.domainObjectContainer())
 
   /**
    * Platform to be used for setting up code analysis and samples.
@@ -439,37 +434,6 @@ constructor(
           it.packageListUrl.set(packageListUrl.toURI())
         }
       }
-    )
-  }
-
-  @DokkatooInternalApi
-  override fun build(): DokkaParametersKxs.DokkaSourceSetKxs {
-    val externalDocumentationLinks = externalDocumentationLinks
-      .mapNotNull(DokkaExternalDocumentationLinkSpec::build)
-      .toSet()
-
-    return DokkaParametersKxs.DokkaSourceSetKxs(
-      sourceSetId = sourceSetId.get().build(),
-      displayName = displayName.get(),
-      classpath = classpath.files.toList(),
-      sourceRoots = sourceRoots.files,
-      dependentSourceSetIds = dependentSourceSets.mapToSet(DokkaSourceSetIdSpec::build),
-      samples = samples.files,
-      includes = includes.files,
-      reportUndocumented = reportUndocumented.get(),
-      skipEmptyPackages = skipEmptyPackages.get(),
-      skipDeprecated = skipDeprecated.get(),
-      jdkVersion = jdkVersion.get(),
-      sourceLinks = sourceLinks.map(DokkaSourceLinkSpec::build).toSet(),
-      perPackageOptions = perPackageOptions.map(DokkaPackageOptionsSpec::build),
-      externalDocumentationLinks = externalDocumentationLinks,
-      languageVersion = languageVersion.orNull,
-      apiVersion = apiVersion.orNull,
-      enableKotlinStdLibDocumentationLink = enableKotlinStdLibDocumentationLink.get(),
-      enableJdkDocumentationLink = enableJdkDocumentationLink.get(),
-      suppressedFiles = suppressedFiles.files,
-      analysisPlatform = analysisPlatform.get().dokkaType,
-      documentedVisibilities = documentedVisibilities.get().mapToSet { it.dokkaType },
     )
   }
 

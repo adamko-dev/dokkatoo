@@ -136,10 +136,9 @@ class KotlinMultiplatformExampleTest : FunSpec({
             }
 
             output shouldContainAll listOf(
-              "> Task :prepareDokkatooParametersHtml UP-TO-DATE",
               "> Task :dokkatooGeneratePublicationHtml UP-TO-DATE",
               "BUILD SUCCESSFUL",
-              "16 actionable tasks: 1 executed, 15 up-to-date",
+              "15 actionable tasks: 1 executed, 14 up-to-date",
             )
             withClue("Dokka Generator should not be triggered, so check it doesn't log anything") {
               output shouldNotContain "Generation completed successfully"

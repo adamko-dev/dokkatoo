@@ -10,8 +10,8 @@ dokkatoo {
   modulePath.set("childProjectA") // match the original dokka default
 }
 
-tasks.withType<dev.adamko.dokkatoo.tasks.DokkatooPrepareParametersTask>().configureEach {
-  dokkaSourceSets.configureEach {
+tasks.withType<dev.adamko.dokkatoo.tasks.DokkatooGenerateTask>().configureEach {
+  generator.dokkaSourceSets.configureEach {
     sourceSetScope.set(":parentProject:childProjectA:dokkaHtmlPartial")
   }
 }

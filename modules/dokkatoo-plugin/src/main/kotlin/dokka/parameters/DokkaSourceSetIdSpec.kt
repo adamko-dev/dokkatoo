@@ -25,14 +25,10 @@ constructor(
    */
   @get:Input
   val scopeId: String
-) : DokkaParameterBuilder<DokkaParametersKxs.SourceSetIdKxs>, Named, Serializable {
+) : Named, Serializable {
 
   @get:Input
   abstract var sourceSetName: String
-
-  @DokkatooInternalApi
-  override fun build(): DokkaParametersKxs.SourceSetIdKxs =
-    DokkaParametersKxs.SourceSetIdKxs(scopeId, sourceSetName)
 
   @Internal
   override fun getName(): String = "$scopeId/$sourceSetName"

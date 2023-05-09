@@ -72,8 +72,8 @@ fun <T> NamedDomainObjectContainer<T>.register_(
 
 fun DokkaSourceSetSpec.sourceLink_(
   action: DokkaSourceLinkSpec.() -> Unit
-) = sourceLink(action)
+): Unit = sourceLink(action)
 
 fun DokkaSourceSetSpec.perPackageOption_(
   action: DokkaPackageOptionsSpec.() -> Unit
-) = perPackageOption(action)
+): Unit = perPackageOption(action)

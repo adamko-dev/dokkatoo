@@ -1,10 +1,16 @@
 package dev.adamko.dokkatoo.tasks
 
 import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.jsonMapper
-import dev.adamko.dokkatoo.dokka.parameters.DokkaParametersKxs
+import dev.adamko.dokkatoo.dokka.parameters.DokkaModuleDescriptionKxs
+import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
+import dev.adamko.dokkatoo.internal.adding
+import dev.adamko.dokkatoo.internal.domainObjectContainer
+import javax.inject.Inject
 import kotlinx.serialization.encodeToString
+import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.file.*
+import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import org.gradle.api.tasks.PathSensitivity.RELATIVE
@@ -12,12 +18,15 @@ import org.gradle.api.tasks.PathSensitivity.RELATIVE
 /**
  * Produces a Dokka Configuration that describes a single module of a multimodule Dokka configuration.
  *
- * @see dev.adamko.dokkatoo.dokka.parameters.DokkaParametersKxs.DokkaModuleDescriptionKxs
+ * @see dev.adamko.dokkatoo.dokka.parameters.DokkaModuleDescriptionKxs
  */
 @CacheableTask
 abstract class DokkatooPrepareModuleDescriptorTask
 @DokkatooInternalApi
-constructor() : DokkatooTask.WithSourceSets() {
+@Inject
+constructor(
+  objects: ObjectFactory
+) : DokkatooTask.WithSourceSets(objects) {
 
   @get:Input
   abstract val moduleName: Property<String>
@@ -37,6 +46,17 @@ constructor() : DokkatooTask.WithSourceSets() {
   @get:Input
   abstract val modulePath: Property<String>
 
+  /**
+   * Source sets used to generate a Dokka Module.
+   *
+   * The values are not used directly in this task, but they are required to be registered as a
+   * task input for up-to-date checks
+   */
+  @get:Nested
+  @Suppress("OVERRIDE_DEPRECATION")
+  override val dokkaSourceSets: NamedDomainObjectContainer<DokkaSourceSetSpec> =
+    extensions.adding("dokkaSourceSets", objects.domainObjectContainer())
+
   @TaskAction
   internal fun generateModuleConfiguration() {
     val moduleName = moduleName.get()
@@ -44,7 +64,7 @@ constructor() : DokkatooTask.WithSourceSets() {
     val includes = includes.files
     val modulePath = modulePath.get()
 
-    val moduleDesc = DokkaParametersKxs.DokkaModuleDescriptionKxs(
+    val moduleDesc = DokkaModuleDescriptionKxs(
       name = moduleName,
       sourceOutputDirectory = moduleDirectory,
       includes = includes,
