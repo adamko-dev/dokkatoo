@@ -107,6 +107,10 @@ constructor(
       )
     }
 
+    target.tasks.withType<DokkatooTask.WithSourceSets>().configureEach {
+      addAllDokkaSourceSets(providers.provider { dokkatooExtension.dokkatooSourceSets })
+    }
+
     dokkatooExtension.dokkatooSourceSets.configureDefaults(
       sourceSetScopeConvention = dokkatooExtension.sourceSetScopeDefault
     )

@@ -373,7 +373,6 @@ public final class dev/adamko/dokkatoo/tasks/DokkatooGenerateTask$GenerationType
 
 public abstract class dev/adamko/dokkatoo/tasks/DokkatooPrepareModuleDescriptorTask : dev/adamko/dokkatoo/tasks/DokkatooTask$WithSourceSets {
 	public abstract fun getDokkaModuleDescriptorJson ()Lorg/gradle/api/file/RegularFileProperty;
-	public fun getDokkaSourceSets ()Lorg/gradle/api/NamedDomainObjectContainer;
 	public abstract fun getIncludes ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public abstract fun getModuleDirectory ()Lorg/gradle/api/file/DirectoryProperty;
 	public abstract fun getModuleName ()Lorg/gradle/api/provider/Property;

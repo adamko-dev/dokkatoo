@@ -2,13 +2,9 @@ package dev.adamko.dokkatoo.tasks
 
 import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.jsonMapper
 import dev.adamko.dokkatoo.dokka.parameters.DokkaModuleDescriptionKxs
-import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
-import dev.adamko.dokkatoo.internal.adding
-import dev.adamko.dokkatoo.internal.domainObjectContainer
 import javax.inject.Inject
 import kotlinx.serialization.encodeToString
-import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.file.*
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
@@ -45,17 +41,6 @@ constructor(
 
   @get:Input
   abstract val modulePath: Property<String>
-
-  /**
-   * Source sets used to generate a Dokka Module.
-   *
-   * The values are not used directly in this task, but they are required to be registered as a
-   * task input for up-to-date checks
-   */
-  @get:Nested
-  @Suppress("OVERRIDE_DEPRECATION")
-  override val dokkaSourceSets: NamedDomainObjectContainer<DokkaSourceSetSpec> =
-    extensions.adding("dokkaSourceSets", objects.domainObjectContainer())
 
   @TaskAction
   internal fun generateModuleConfiguration() {

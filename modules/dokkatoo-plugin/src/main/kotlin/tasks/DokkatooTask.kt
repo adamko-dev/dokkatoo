@@ -52,7 +52,10 @@ constructor() : DefaultTask() {
     open val dokkaSourceSets: NamedDomainObjectContainer<DokkaSourceSetSpec> =
       extensions.adding("dokkaSourceSets", objects.domainObjectContainer())
 
-    @Deprecated("Property is moved to specific task implementation")
+    @Deprecated(
+      "Use Gradle function, addAllLater()",
+      ReplaceWith("dokkaSourceSets.addAllLater(sourceSets)")
+    )
     fun addAllDokkaSourceSets(sourceSets: Provider<Iterable<DokkaSourceSetSpec>>) {
       dokkaSourceSets.addAllLater(sourceSets)
     }

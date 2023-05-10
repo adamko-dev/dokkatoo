@@ -371,14 +371,6 @@ abstract class DokkatooFormatPlugin(
         }
       )
       generator.apply {
-        dokkaModuleFiles.from(
-          dependencyContainers.dokkaModuleConsumer.map { elements ->
-            elements.incoming
-              .artifactView { componentFilter(LocalProjectOnlyFilter) }
-              .artifacts.artifactFiles
-          }
-        )
-
         publicationEnabled.convention(publication.enabled)
 
         failOnWarning.convention(publication.failOnWarning)
@@ -387,14 +379,12 @@ abstract class DokkatooFormatPlugin(
         moduleName.convention(publication.moduleName)
         moduleVersion.convention(publication.moduleVersion)
         offlineMode.convention(publication.offlineMode)
+        pluginsConfiguration.addAllLater(providers.provider { publication.pluginsConfiguration })
         pluginsClasspath.from(
           dependencyContainers.dokkaPluginsIntransitiveClasspath.map { classpath ->
             classpath.incoming.artifacts.artifactFiles
           }
         )
-
-        pluginsConfiguration.addAllLater(providers.provider { publication.pluginsConfiguration })
-
         suppressInheritedMembers.convention(publication.suppressInheritedMembers)
         suppressObviousFunctions.convention(publication.suppressObviousFunctions)
       }
@@ -444,7 +434,6 @@ abstract class DokkatooFormatPlugin(
       generationType.set(DokkatooGenerateTask.GenerationType.MODULE)
 
       outputDirectory.convention(dokkatooExtension.dokkatooModuleDirectory.dir(formatName))
-
 
       applyFormatSpecificConfiguration()
     }
