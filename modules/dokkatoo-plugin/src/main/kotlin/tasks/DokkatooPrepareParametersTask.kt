@@ -13,6 +13,7 @@ import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
 import org.gradle.api.tasks.PathSensitivity.RELATIVE
 import org.gradle.kotlin.dsl.*
+import org.gradle.work.DisableCachingByDefault
 
 /**
  * Builds the Dokka Parameters that the Dokka Generator will use to produce a Dokka Publication for this project.
@@ -21,6 +22,7 @@ import org.gradle.kotlin.dsl.*
  * via ... TODO explain how to include other subprojects/modules
  */
 @Deprecated("merged into DokkatooGenerateTask")
+@DisableCachingByDefault(because = "This task has been deprecated")
 abstract class DokkatooPrepareParametersTask
 @DokkatooInternalApi
 @Inject
