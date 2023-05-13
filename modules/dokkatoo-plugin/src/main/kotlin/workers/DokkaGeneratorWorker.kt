@@ -2,6 +2,7 @@ package dev.adamko.dokkatoo.workers
 
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import dev.adamko.dokkatoo.internal.LoggerAdapter
+import java.io.File
 import java.time.Duration
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
@@ -32,13 +33,17 @@ abstract class DokkaGeneratorWorker : WorkAction<DokkaGeneratorWorker.Parameters
     dokkaParameters.outputDir.deleteRecursively()
     dokkaParameters.outputDir.mkdirs()
 
-    executeDokkaGenerator(dokkaParameters)
+    executeDokkaGenerator(
+      parameters.logFile.get().asFile,
+      dokkaParameters,
+    )
   }
 
   private fun executeDokkaGenerator(
+    logFile: File,
     dokkaParameters: DokkaConfiguration
   ) {
-    LoggerAdapter(parameters.logFile.get().asFile).use { logger ->
+    LoggerAdapter(logFile).use { logger ->
       logger.progress("Executing DokkaGeneratorWorker with dokkaParameters: $dokkaParameters")
 
       val generator = DokkaGenerator(dokkaParameters, logger)
