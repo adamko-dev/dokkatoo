@@ -101,7 +101,7 @@ constructor(
   @TaskAction
   internal fun generateDocumentation() {
     val dokkaConfiguration = createDokkaConfiguration()
-    logger.info("dokkaConfiguration: dokkaConfiguration")
+    logger.info("dokkaConfiguration: $dokkaConfiguration")
 
     logger.info("DokkaGeneratorWorker runtimeClasspath: ${runtimeClasspath.asPath}")
     val workQueue = workers.processIsolation {
