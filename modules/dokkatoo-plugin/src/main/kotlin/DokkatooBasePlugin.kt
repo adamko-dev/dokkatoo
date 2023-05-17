@@ -1,9 +1,9 @@
 package dev.adamko.dokkatoo
 
-import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes
-import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes.Companion.DOKKATOO_BASE_ATTRIBUTE
-import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes.Companion.DOKKATOO_CATEGORY_ATTRIBUTE
-import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes.Companion.DOKKA_FORMAT_ATTRIBUTE
+import dev.adamko.dokkatoo.distributions.DokkatooConfigurationAttributes
+import dev.adamko.dokkatoo.distributions.DokkatooConfigurationAttributes.Companion.DOKKATOO_BASE_ATTRIBUTE
+import dev.adamko.dokkatoo.distributions.DokkatooConfigurationAttributes.Companion.DOKKATOO_CATEGORY_ATTRIBUTE
+import dev.adamko.dokkatoo.distributions.DokkatooConfigurationAttributes.Companion.DOKKA_FORMAT_ATTRIBUTE
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec
 import dev.adamko.dokkatoo.dokka.parameters.KotlinPlatform
 import dev.adamko.dokkatoo.dokka.parameters.VisibilityModifier
