@@ -13,21 +13,18 @@ import org.jetbrains.dokka.DokkaSourceSetImpl
  * The conversion is defined in a separate class to try and prevent classes from Dokka Generator
  * leaking into the public API.
  */
-// TODO create
 @DokkatooInternalApi
 internal object DokkaModuleDescriptionBuilder {
 
   fun build(
     spec: DokkaModuleDescriptionSpec,
-    includes: Set<File>,
-    sourceOutputDirectory: File,
   ): DokkaModuleDescriptionImpl =
     DokkaModuleDescriptionImpl(
       name = spec.name,
       relativePathToOutputDirectory = File(
         spec.projectPath.get().removePrefix(":").replace(':', '/')
       ),
-      includes = includes,
-      sourceOutputDirectory = sourceOutputDirectory,
+      includes = spec.includes.files,
+      sourceOutputDirectory = spec.sourceOutputDirectory.asFile.get(),
     )
 }

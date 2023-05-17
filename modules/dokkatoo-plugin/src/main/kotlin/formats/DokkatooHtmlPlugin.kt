@@ -15,7 +15,7 @@ constructor() : DokkatooFormatPlugin(formatName = "html") {
     registerDokkaBasePluginConfiguration()
     registerDokkaVersioningPlugin()
 
-    dokkatooTasks.generatePublication.configure {
+    dokkatooFormatTasks.generatePublication.configure {
       doLast {
         val indexHtml =
           outputDirectory.asFile.orNull?.resolve("index.html")?.invariantSeparatorsPath

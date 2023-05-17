@@ -400,9 +400,9 @@ private fun initDokkatooProject(
       |}
       |
       |dependencies {
-      |  dokkatoo(project(":subproject-hello"))
-      |  dokkatoo(project(":subproject-goodbye"))
-      |  dokkatooPluginHtml("org.jetbrains.dokka:all-modules-page-plugin:1.7.20")
+      |  dokkatooModule(project(":subproject-hello"))
+      |  dokkatooModule(project(":subproject-goodbye"))
+      |  dokkatooPluginsHtml("org.jetbrains.dokka:all-modules-page-plugin:1.7.20")
       |}
       |
     """.trimMargin()

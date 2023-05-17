@@ -1,9 +1,11 @@
 package dev.adamko.dokkatoo
 
-import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes
-import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes.Companion.DOKKATOO_BASE_ATTRIBUTE
-import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes.Companion.DOKKATOO_CATEGORY_ATTRIBUTE
-import dev.adamko.dokkatoo.distibutions.DokkatooConfigurationAttributes.Companion.DOKKA_FORMAT_ATTRIBUTE
+import dev.adamko.dokkatoo.distributions.*
+import dev.adamko.dokkatoo.distributions.DokkatooConfigurationAttributes.Companion.DOKKATOO_COMPONENT_ATTRIBUTE
+import dev.adamko.dokkatoo.distributions.DokkatooConfigurationAttributes.Companion.DOKKATOO_FORMAT_ATTRIBUTE
+import dev.adamko.dokkatoo.distributions.DokkatooConfigurationAttributes.Companion.DOKKA_COMPONENT_ARTIFACT_ATTRIBUTE
+import dev.adamko.dokkatoo.distributions.DokkatooConfigurationAttributes.Companion.DOKKA_MODULE_DESCRIPTION_NAME_ATTRIBUTE
+import dev.adamko.dokkatoo.distributions.DokkatooConfigurationAttributes.Companion.DOKKA_SOURCE_SET_ID_ATTRIBUTE
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec
 import dev.adamko.dokkatoo.dokka.parameters.KotlinPlatform
 import dev.adamko.dokkatoo.dokka.parameters.VisibilityModifier
@@ -11,6 +13,7 @@ import dev.adamko.dokkatoo.internal.*
 import dev.adamko.dokkatoo.tasks.DokkatooGenerateTask
 import dev.adamko.dokkatoo.tasks.DokkatooPrepareModuleDescriptorTask
 import dev.adamko.dokkatoo.tasks.DokkatooTask
+import internal.HasFormatName
 import java.io.File
 import java.net.URI
 import javax.inject.Inject
@@ -50,22 +53,16 @@ constructor(
 
     target.tasks.createDokkaLifecycleTasks()
 
-    val configurationAttributes = objects.newInstance<DokkatooConfigurationAttributes>()
+    setupConfigurationAttributes(target)
 
-    target.dependencies.attributesSchema {
-      attribute(DOKKATOO_BASE_ATTRIBUTE)
-      attribute(DOKKATOO_CATEGORY_ATTRIBUTE)
-      attribute(DOKKA_FORMAT_ATTRIBUTE)
-    }
-
-    target.configurations.register(dependencyContainerNames.dokkatoo) {
-      description = "Fetch all Dokkatoo files from all configurations in other subprojects"
-      asConsumer()
-      isVisible = false
-      attributes {
-        attribute(DOKKATOO_BASE_ATTRIBUTE, configurationAttributes.dokkatooBaseUsage)
-      }
-    }
+//    target.configurations.register(dependencyContainerNames.dokkatoo) {
+//      description = "Fetch all Dokkatoo files from all configurations in other subprojects"
+//      asConsumer()
+//      isVisible = false
+//      attributes {
+//        attribute(DOKKATOO_BASE_ATTRIBUTE, configurationAttributes.dokkatooBaseUsage)
+//      }
+//    }
 
     configureDokkaPublicationsDefaults(dokkatooExtension)
     dokkatooExtension.dokkatooSourceSets.configureDefaults(
@@ -76,6 +73,7 @@ constructor(
       cacheDirectory.convention(dokkatooExtension.dokkatooCacheDirectory)
       workerDebugEnabled.convention(false)
       workerLogFile.convention(temporaryDir.resolve("dokka-worker.log"))
+      dokkaConfigurationJsonFile.convention(temporaryDir.resolve("dokka-configuration.json"))
       // increase memory - DokkaGenerator is hungry https://github.com/Kotlin/dokka/issues/1405
       workerMinHeapSize.convention("512m")
       workerMaxHeapSize.convention("1g")
@@ -100,15 +98,17 @@ constructor(
       publicationEnabled.convention(true)
       onlyIf("publication must be enabled") { publicationEnabled.getOrElse(true) }
 
-      generator.addAllDokkaSourceSets(providers.provider { dokkatooExtension.dokkatooSourceSets })
+      generator.dokkaSourceSets.addAllLater(providers.provider {
+        dokkatooExtension.dokkatooSourceSets
+      })
 
       generator.dokkaSourceSets.configureDefaults(
         sourceSetScopeConvention = dokkatooExtension.sourceSetScopeDefault
       )
     }
 
-    target.tasks.withType<DokkatooTask.WithSourceSets>().configureEach {
-      addAllDokkaSourceSets(providers.provider { dokkatooExtension.dokkatooSourceSets })
+    target.tasks.withType<DokkatooPrepareModuleDescriptorTask>().configureEach {
+      dokkaSourceSets.addAllLater(providers.provider { dokkatooExtension.dokkatooSourceSets })
     }
 
     dokkatooExtension.dokkatooSourceSets.configureDefaults(
@@ -117,7 +117,13 @@ constructor(
   }
 
   private fun createExtension(project: Project): DokkatooExtension {
-    val dokkatooExtension = project.extensions.create<DokkatooExtension>(EXTENSION_NAME).apply {
+
+    val baseDependencyContainers = BaseDependencyContainers(project)
+
+    val dokkatooExtension = project.extensions.create<DokkatooExtension>(
+      EXTENSION_NAME,
+      baseDependencyContainers,
+    ).apply {
       moduleName.convention(providers.provider { project.name })
       moduleVersion.convention(providers.provider { project.version.toString() })
       modulePath.convention(project.pathAsFilePath())
@@ -137,6 +143,34 @@ constructor(
     }
 
     return dokkatooExtension
+  }
+
+  private fun setupConfigurationAttributes(project: Project) {
+
+//    val configurationAttributes = objects.newInstance<DokkatooConfigurationAttributes>()
+
+    project.dependencies.attributesSchema {
+      attribute(DOKKATOO_COMPONENT_ATTRIBUTE) {
+        compatibilityRules.add(DokkatooComponentTypeRule::class)
+        disambiguationRules.add(DokkatooComponentTypeDisambiguationRule::class)
+      }
+      attribute(DOKKATOO_FORMAT_ATTRIBUTE) {
+        compatibilityRules.add(DokkaFormatRule::class)
+        disambiguationRules.add(DokkaFormatDisambiguationRule::class)
+      }
+      attribute(DOKKA_SOURCE_SET_ID_ATTRIBUTE) {
+        compatibilityRules.add(DokkaSourceSetIdRule::class)
+        disambiguationRules.add(DokkaSourceSetIdDisambiguationRule::class)
+      }
+      attribute(DOKKA_MODULE_DESCRIPTION_NAME_ATTRIBUTE) {
+        compatibilityRules.add(DokkaModuleDescriptionNameRule::class)
+        disambiguationRules.add(DokkaModuleDescriptionNameDisambiguationRule::class)
+      }
+      attribute(DOKKA_COMPONENT_ARTIFACT_ATTRIBUTE) {
+        compatibilityRules.add(DokkaParameterFileTypeRule::class)
+        disambiguationRules.add(DokkaParameterFileTypeDisambiguationRule::class)
+      }
+    }
   }
 
   /** Set defaults in all [DokkatooExtension.dokkatooPublications]s */
@@ -302,61 +336,7 @@ constructor(
   }
 
   @DokkatooInternalApi
-  abstract class HasFormatName {
-    abstract val formatName: String?
-
-    /** Appends [formatName] to the end of the string, camelcase style, if [formatName] is not null */
-    protected fun String.appendFormat(): String =
-      when (val name = formatName) {
-        null -> this
-        else -> this + name.uppercaseFirstChar()
-      }
-  }
-
-  /**
-   * Names of the Gradle [Configuration]s used by the [Dokkatoo Plugin][DokkatooBasePlugin].
-   *
-   * Beware the confusing terminology:
-   * - [Gradle Configurations][org.gradle.api.artifacts.Configuration] - share files between subprojects. Each has a name.
-   * - [DokkaConfiguration][org.jetbrains.dokka.DokkaConfiguration] - parameters for executing the Dokka Generator
-   */
-  @DokkatooInternalApi
-  class DependencyContainerNames(override val formatName: String?) : HasFormatName() {
-
-    val dokkatoo = "dokkatoo".appendFormat()
-
-    /** Name of the [Configuration] that _consumes_ [dev.adamko.dokkatoo.dokka.parameters.DokkaParametersKxs] from projects */
-    val dokkatooParametersConsumer = "dokkatooParameters".appendFormat()
-
-    /** Name of the [Configuration] that _provides_ [org.jetbrains.dokka.DokkaConfiguration] to other projects */
-    val dokkatooParametersOutgoing = "dokkatooParametersElements".appendFormat()
-
-    /** Name of the [Configuration] that _consumes_ all [org.jetbrains.dokka.DokkaConfiguration.DokkaModuleDescription] files */
-    val dokkatooModuleFilesConsumer = "dokkatooModule".appendFormat()
-
-    /** Name of the [Configuration] that _provides_ all [org.jetbrains.dokka.DokkaConfiguration.DokkaModuleDescription] files to other projects */
-    val dokkatooModuleFilesProvider = "dokkatooModuleElements".appendFormat()
-
-    /**
-     * Classpath used to execute the Dokka Generator.
-     *
-     * Extends [dokkaPluginsClasspath], so Dokka plugins and their dependencies are included.
-     */
-    val dokkaGeneratorClasspath = "dokkatooGeneratorClasspath".appendFormat()
-
-    /** Dokka Plugins (including transitive dependencies, so this can be passed to the Dokka Generator Worker classpath) */
-    val dokkaPluginsClasspath = "dokkatooPlugin".appendFormat()
-
-    /**
-     * Dokka Plugins (excluding transitive dependencies) will be used to create Dokka Generator Parameters
-     *
-     * Generally, this configuration should not be invoked manually. Instead, use [dokkaPluginsClasspath].
-     */
-    val dokkaPluginsIntransitiveClasspath = "dokkatooPluginIntransitive".appendFormat()
-  }
-
-  @DokkatooInternalApi
-  class TaskNames(override val formatName: String?) : HasFormatName() {
+  class TaskNames(override val formatName: String?) : HasFormatName {
     val generate = "dokkatooGenerate".appendFormat()
     val generatePublication = "dokkatooGeneratePublication".appendFormat()
     val generateModule = "dokkatooGenerateModule".appendFormat()

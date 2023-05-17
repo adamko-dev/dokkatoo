@@ -9,3 +9,7 @@ package dev.adamko.dokkatoo.internal
  */
 internal fun String.uppercaseFirstChar(): String =
   if (isNotEmpty()) Character.toTitleCase(this[0]) + substring(1) else this
+
+
+internal fun joinCamelCase(vararg strings: String?): String =
+  strings.filterNotNull().joinToString("", transform = String::uppercaseFirstChar)

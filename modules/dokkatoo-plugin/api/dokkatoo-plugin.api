@@ -7,7 +7,7 @@ public abstract class dev/adamko/dokkatoo/DokkatooBasePlugin : org/gradle/api/Pl
 }
 
 public final class dev/adamko/dokkatoo/DokkatooBasePlugin$Companion {
-	public final fun getDependencyContainerNames ()Ldev/adamko/dokkatoo/DokkatooBasePlugin$DependencyContainerNames;
+	public final fun getDependencyContainerNames ()Ldev/adamko/dokkatoo/distributions/DependencyContainerNames;
 	public final fun getTaskNames ()Ldev/adamko/dokkatoo/DokkatooBasePlugin$TaskNames;
 }
 
@@ -43,6 +43,18 @@ public final class dev/adamko/dokkatoo/DokkatooExtension$Versions$Companion {
 public abstract class dev/adamko/dokkatoo/DokkatooPlugin : org/gradle/api/Plugin {
 	public synthetic fun apply (Ljava/lang/Object;)V
 	public fun apply (Lorg/gradle/api/Project;)V
+}
+
+public abstract interface class dev/adamko/dokkatoo/distributions/DokkatooConfigurationAttributes$DokkatooParametersIdAttribute$DokkaModuleDescriptionName : dev/adamko/dokkatoo/distributions/DokkatooConfigurationAttributes$DokkatooParametersIdAttribute {
+}
+
+public abstract interface class dev/adamko/dokkatoo/distributions/DokkatooConfigurationAttributes$DokkatooParametersIdAttribute$DokkaSourceSetId : dev/adamko/dokkatoo/distributions/DokkatooConfigurationAttributes$DokkatooParametersIdAttribute {
+}
+
+public abstract interface class dev/adamko/dokkatoo/distributions/FormatDependenciesManager$OutgoingArtifactProvider$Artifact : dev/adamko/dokkatoo/distributions/FormatDependenciesManager$OutgoingArtifactProvider {
+}
+
+public abstract interface class dev/adamko/dokkatoo/distributions/FormatDependenciesManager$OutgoingArtifactProvider$Artifacts : dev/adamko/dokkatoo/distributions/FormatDependenciesManager$OutgoingArtifactProvider {
 }
 
 public abstract class dev/adamko/dokkatoo/dokka/DokkaPublication : java/io/Serializable, org/gradle/api/Named, org/gradle/api/plugins/ExtensionAware {
@@ -88,21 +100,6 @@ public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaGeneratorParamet
 	public final fun getPluginsConfiguration ()Lorg/gradle/api/ExtensiblePolymorphicDomainObjectContainer;
 	public abstract fun getSuppressInheritedMembers ()Lorg/gradle/api/provider/Property;
 	public abstract fun getSuppressObviousFunctions ()Lorg/gradle/api/provider/Property;
-}
-
-public final class dev/adamko/dokkatoo/dokka/parameters/DokkaModuleDescriptionKxs$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
-	public static final field INSTANCE Ldev/adamko/dokkatoo/dokka/parameters/DokkaModuleDescriptionKxs$$serializer;
-	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
-	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ldev/adamko/dokkatoo/dokka/parameters/DokkaModuleDescriptionKxs;
-	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
-	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
-	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Ldev/adamko/dokkatoo/dokka/parameters/DokkaModuleDescriptionKxs;)V
-	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
-}
-
-public final class dev/adamko/dokkatoo/dokka/parameters/DokkaModuleDescriptionKxs$Companion {
-	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaPackageOptionsSpec : dev/adamko/dokkatoo/dokka/parameters/HasConfigurableVisibilityModifiers, java/io/Serializable {

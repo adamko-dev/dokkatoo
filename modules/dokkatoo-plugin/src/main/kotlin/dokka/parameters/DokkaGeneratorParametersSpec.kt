@@ -93,9 +93,15 @@ constructor(
   }
 
   /** Dokka Module files from other subprojects. */
-  @get:InputFiles
-  //@get:NormalizeLineEndings
-  @get:PathSensitive(RELATIVE)
-  @get:Optional
+//  @get:InputFiles
+//  //@get:NormalizeLineEndings
+//  @get:PathSensitive(RELATIVE)
+//  @get:Optional
+  @get:Internal
+  @Deprecated("use DokkaModuleDescriptionSpec instead")
   abstract val dokkaModuleFiles: ConfigurableFileCollection
+
+  @get:Nested
+  val dokkaModules: NamedDomainObjectContainer<DokkaModuleDescriptionSpec> =
+    extensions.adding("dokkaModules", objects.domainObjectContainer())
 }

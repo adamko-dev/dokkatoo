@@ -57,6 +57,7 @@ constructor() : DefaultTask() {
       ReplaceWith("dokkaSourceSets.addAllLater(sourceSets)")
     )
     fun addAllDokkaSourceSets(sourceSets: Provider<Iterable<DokkaSourceSetSpec>>) {
+      @Suppress("DEPRECATION")
       dokkaSourceSets.addAllLater(sourceSets)
     }
   }

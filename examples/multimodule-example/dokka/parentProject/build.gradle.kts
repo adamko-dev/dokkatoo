@@ -30,4 +30,3 @@ tasks.dokkaHtmlMultiModule {
 dependencies {
     implementation(kotlin("stdlib"))
 }
-

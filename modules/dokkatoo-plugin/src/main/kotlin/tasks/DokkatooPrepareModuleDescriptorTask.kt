@@ -44,16 +44,16 @@ constructor(
 
   @TaskAction
   internal fun generateModuleConfiguration() {
-    val moduleName = moduleName.get()
-    val moduleDirectory = moduleDirectory.asFile.get()
-    val includes = includes.files
-    val modulePath = modulePath.get()
+//    val moduleName = moduleName.get()
+//    val moduleDirectory = moduleDirectory.asFile.get()
+//    val includes = includes.files
+//    val modulePath = modulePath.get()
 
     val moduleDesc = DokkaModuleDescriptionKxs(
-      name = moduleName,
-      sourceOutputDirectory = moduleDirectory,
-      includes = includes,
-      modulePath = modulePath,
+      name = moduleName.get(),
+      modulePath = modulePath.get(),
+//      sourceOutputDirectory = moduleDirectory,
+//      includes = includes,
     )
 
     val encodedModuleDesc = jsonMapper.encodeToString(moduleDesc)
