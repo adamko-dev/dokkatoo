@@ -1,4 +1,4 @@
-package dev.adamko.dokkatoo.distibutions
+package dev.adamko.dokkatoo.distributions
 
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import javax.inject.Inject
