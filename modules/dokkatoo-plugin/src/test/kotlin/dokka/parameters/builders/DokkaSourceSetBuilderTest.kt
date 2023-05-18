@@ -150,7 +150,6 @@ class DokkaSourceSetBuilderTest : FunSpec({
       val sourceSetSpec = project.createDokkaSourceSetSpec("testRemoteUrlRequired") {
         sourceLink_ {
           localDirectory.set(tempdir())
-//          remoteUrl.convention(project.providers.provider { null })
           remoteUrl.set(project.providers.provider { null })
           remoteLineSuffix.set("%L")
         }
@@ -170,7 +169,6 @@ class DokkaSourceSetBuilderTest : FunSpec({
         sourceLink_ {
           localDirectory.set(tempDir)
           remoteUrl("https://github.com/adamko-dev/dokkatoo/")
-//          remoteLineSuffix.convention(project.providers.provider { null })
           remoteLineSuffix.set(project.providers.provider { null })
         }
       }

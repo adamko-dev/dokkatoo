@@ -100,15 +100,11 @@ constructor(
       publicationEnabled.convention(true)
       onlyIf("publication must be enabled") { publicationEnabled.getOrElse(true) }
 
-      generator.addAllDokkaSourceSets(providers.provider { dokkatooExtension.dokkatooSourceSets })
+      generator.dokkaSourceSets.addAllLater(providers.provider { dokkatooExtension.dokkatooSourceSets })
 
       generator.dokkaSourceSets.configureDefaults(
         sourceSetScopeConvention = dokkatooExtension.sourceSetScopeDefault
       )
-    }
-
-    target.tasks.withType<DokkatooTask.WithSourceSets>().configureEach {
-      addAllDokkaSourceSets(providers.provider { dokkatooExtension.dokkatooSourceSets })
     }
 
     dokkatooExtension.dokkatooSourceSets.configureDefaults(
@@ -260,7 +256,6 @@ constructor(
     @Suppress("DEPRECATION")
     val prepareParameters = register<DokkatooTask>(taskNames.prepareParameters) {
       description = "[DEPRECATED no longer used] Prepares Dokka parameters for all formats"
-      //dependsOn(withType<DokkatooPrepareParametersTask>())
     }
 
     register<DokkatooTask>(taskNames.generate) {
@@ -326,9 +321,11 @@ constructor(
     val dokkatoo = "dokkatoo".appendFormat()
 
     /** Name of the [Configuration] that _consumes_ [dev.adamko.dokkatoo.dokka.parameters.DokkaParametersKxs] from projects */
+    @Deprecated("Not used")
     val dokkatooParametersConsumer = "dokkatooParameters".appendFormat()
 
     /** Name of the [Configuration] that _provides_ [org.jetbrains.dokka.DokkaConfiguration] to other projects */
+    @Deprecated("Not used")
     val dokkatooParametersOutgoing = "dokkatooParametersElements".appendFormat()
 
     /** Name of the [Configuration] that _consumes_ all [org.jetbrains.dokka.DokkaConfiguration.DokkaModuleDescription] files */

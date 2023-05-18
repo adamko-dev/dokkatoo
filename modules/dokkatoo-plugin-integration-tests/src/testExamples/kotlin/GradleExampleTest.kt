@@ -114,7 +114,6 @@ class GradleExampleTest : FunSpec({
         .build().should { dokkatooBuildCache ->
 
           dokkatooBuildCache.output shouldContainAll listOf(
-            //"> Task :prepareDokkatooParametersHtml UP-TO-DATE",
             "> Task :dokkatooGeneratePublicationHtml UP-TO-DATE",
             "BUILD SUCCESSFUL",
             "1 actionable task: 1 up-to-date",

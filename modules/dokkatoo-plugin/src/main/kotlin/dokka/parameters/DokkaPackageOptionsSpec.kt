@@ -79,7 +79,6 @@ constructor() :
    *
    * Default is `false`.
    */
-//   * This setting works well with [AbstractDokkaTask.failOnWarning].
   @get:Input
   abstract val reportUndocumented: Property<Boolean>
 }

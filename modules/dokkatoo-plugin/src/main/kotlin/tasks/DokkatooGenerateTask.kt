@@ -43,9 +43,8 @@ constructor(
   pluginsConfiguration: DokkaPluginParametersContainer,
 ) : DokkatooTask() {
 
-  @get:Internal
-  @Deprecated("removing DokkatooPrepareParametersTask")
-  abstract val dokkaParametersJson: RegularFileProperty
+  @get:OutputDirectory
+  abstract val outputDirectory: DirectoryProperty
 
   /**
    * Classpath required to run Dokka Generator.
@@ -57,9 +56,6 @@ constructor(
 
   @get:LocalState
   abstract val cacheDirectory: DirectoryProperty
-
-  @get:OutputDirectory
-  abstract val outputDirectory: DirectoryProperty
 
   /**
    * Generating a Dokka Module? Set this to [GenerationType.MODULE].
@@ -137,9 +133,6 @@ constructor(
       this.outputDirectory.dir(it.modulePath).get().asFile.mkdirs()
     }
 
-//    val moduleDescriptionFiles: Map<String, DokkaModuleDescriptionKxs.Files> =
-//      emptyMap() // TODO...
-
     return DokkaParametersBuilder.build(
       spec = generator,
       delayTemplateSubstitution = delayTemplateSubstitution,
@@ -166,6 +159,10 @@ constructor(
   }
 
   //region Deprecated Properties
+  @get:Internal
+  @Deprecated("DokkatooPrepareParametersTask has been removed, there is no more JSON file. Properties can be set using the `generator` property")
+  abstract val dokkaParametersJson: RegularFileProperty
+
   @Suppress("unused")
   @get:ReplacedBy("generator.dokkaModuleFiles")
   @Deprecated("moved to nested property", ReplaceWith("generator.dokkaModuleFiles"))

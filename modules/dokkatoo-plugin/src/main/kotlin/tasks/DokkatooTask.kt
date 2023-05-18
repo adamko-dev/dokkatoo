@@ -26,12 +26,6 @@ constructor() : DefaultTask() {
     group = DokkatooBasePlugin.TASK_GROUP
   }
 
-  /**
-   * A [DokkatooTask] that depends on [DokkaSourceSetSpec]s.
-   *
-   * Any task that implements [WithSourceSets] doesn't have to use the sources, but it will use
-   * them as part of Gradle up-to-date checks.
-   */
   @CacheableTask
   @Deprecated("no longer needed")
   abstract class WithSourceSets
@@ -57,6 +51,7 @@ constructor() : DefaultTask() {
       ReplaceWith("dokkaSourceSets.addAllLater(sourceSets)")
     )
     fun addAllDokkaSourceSets(sourceSets: Provider<Iterable<DokkaSourceSetSpec>>) {
+      @Suppress("DEPRECATION")
       dokkaSourceSets.addAllLater(sourceSets)
     }
   }

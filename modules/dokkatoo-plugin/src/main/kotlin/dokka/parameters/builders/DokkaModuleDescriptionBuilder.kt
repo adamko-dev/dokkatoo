@@ -13,7 +13,7 @@ import org.jetbrains.dokka.DokkaSourceSetImpl
  * The conversion is defined in a separate class to try and prevent classes from Dokka Generator
  * leaking into the public API.
  */
-// TODO create
+// to be used to fix https://github.com/adamko-dev/dokkatoo/issues/67
 @DokkatooInternalApi
 internal object DokkaModuleDescriptionBuilder {
 

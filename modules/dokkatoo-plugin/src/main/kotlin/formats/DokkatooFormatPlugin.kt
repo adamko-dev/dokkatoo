@@ -233,7 +233,7 @@ abstract class DokkatooFormatPlugin(
     //<editor-fold desc="Dokka Parameters JSON files">
     // TODO sharing parameters is required for a 'DokkaCollect' equivalent, but this is not implemented yet
     /** Fetch Dokka Parameter files from other subprojects */
-    @Suppress("unused")
+    @Suppress("unused", "DEPRECATION")
     @Deprecated("Not used")
     val dokkaParametersConsumer: NamedDomainObjectProvider<Configuration> =
       project.configurations.register(dependencyContainerNames.dokkatooParametersConsumer) {
@@ -246,14 +246,12 @@ abstract class DokkatooFormatPlugin(
       }
 
     /** Provide Dokka Parameter files to other subprojects */
-    @Suppress("unused")
+    @Suppress("unused", "DEPRECATION")
     @Deprecated("Not used")
     val dokkaParametersOutgoing: NamedDomainObjectProvider<Configuration> =
       project.configurations.register(dependencyContainerNames.dokkatooParametersOutgoing) {
         description = "Provide Dokka Parameters for $formatName to other subprojects"
         asProvider()
-        // extend from dokkaConfigurationsConsumer, so Dokka Module Configs propagate api() style
-        //extendsFrom(dokkaParametersConsumer.get())
         attributes {
           dokkaCategory(dokkatooAttributes.dokkaParameters)
         }

@@ -232,7 +232,6 @@ class MultiModuleFunctionalTest : FunSpec({
 
               test("expect :subproject-goodbye tasks are up-to-date, because no files changed") {
                 shouldHaveTasksWithOutcome(
-//                  ":subproject-goodbye:prepareDokkatooParametersHtml" to UP_TO_DATE,
                   ":subproject-goodbye:dokkatooGenerateModuleHtml" to UP_TO_DATE,
                   ":subproject-goodbye:prepareDokkatooModuleDescriptorHtml" to UP_TO_DATE,
                 )
@@ -241,7 +240,6 @@ class MultiModuleFunctionalTest : FunSpec({
               val successfulOutcomes = listOf(SUCCESS, FROM_CACHE)
               test("expect :subproject-hello tasks should be re-run, since a file changed") {
                 shouldHaveTasksWithAnyOutcome(
-//                  ":subproject-hello:prepareDokkatooParametersHtml" to successfulOutcomes,
                   ":subproject-hello:dokkatooGenerateModuleHtml" to successfulOutcomes,
                   ":subproject-hello:prepareDokkatooModuleDescriptorHtml" to successfulOutcomes,
                 )
@@ -249,7 +247,6 @@ class MultiModuleFunctionalTest : FunSpec({
 
               test("expect aggregating tasks should re-run because the :subproject-hello Dokka Module changed") {
                 shouldHaveTasksWithAnyOutcome(
-//                  ":prepareDokkatooParametersHtml" to successfulOutcomes,
                   ":dokkatooGeneratePublicationHtml" to successfulOutcomes,
                 )
               }
