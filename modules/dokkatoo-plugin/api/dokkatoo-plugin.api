@@ -371,7 +371,7 @@ public final class dev/adamko/dokkatoo/tasks/DokkatooGenerateTask$GenerationType
 	public static fun values ()[Ldev/adamko/dokkatoo/tasks/DokkatooGenerateTask$GenerationType;
 }
 
-public abstract class dev/adamko/dokkatoo/tasks/DokkatooPrepareModuleDescriptorTask : dev/adamko/dokkatoo/tasks/DokkatooTask$WithSourceSets {
+public abstract class dev/adamko/dokkatoo/tasks/DokkatooPrepareModuleDescriptorTask : dev/adamko/dokkatoo/tasks/DokkatooTask {
 	public abstract fun getDokkaModuleDescriptorJson ()Lorg/gradle/api/file/RegularFileProperty;
 	public abstract fun getIncludes ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public abstract fun getModuleDirectory ()Lorg/gradle/api/file/DirectoryProperty;
