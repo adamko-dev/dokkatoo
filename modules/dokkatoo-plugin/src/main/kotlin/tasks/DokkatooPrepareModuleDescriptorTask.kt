@@ -5,11 +5,12 @@ import dev.adamko.dokkatoo.dokka.parameters.DokkaModuleDescriptionKxs
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import javax.inject.Inject
 import kotlinx.serialization.encodeToString
-import org.gradle.api.file.*
-import org.gradle.api.model.ObjectFactory
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.tasks.*
-import org.gradle.api.tasks.PathSensitivity.RELATIVE
+import org.gradle.api.tasks.CacheableTask
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.TaskAction
 
 /**
  * Produces a Dokka Configuration that describes a single module of a multimodule Dokka configuration.
@@ -20,40 +21,22 @@ import org.gradle.api.tasks.PathSensitivity.RELATIVE
 abstract class DokkatooPrepareModuleDescriptorTask
 @DokkatooInternalApi
 @Inject
-constructor(
-  objects: ObjectFactory
-) : DokkatooTask.WithSourceSets(objects) {
+constructor() : DokkatooTask() {
 
   @get:Input
   abstract val moduleName: Property<String>
 
-  @get:InputDirectory
-  @get:PathSensitive(RELATIVE)
-  abstract val moduleDirectory: DirectoryProperty
-
-  @get:InputFiles
-  @get:Optional
-  @get:PathSensitive(RELATIVE)
-  abstract val includes: ConfigurableFileCollection
+  @get:Input
+  abstract val modulePath: Property<String>
 
   @get:OutputFile
   abstract val dokkaModuleDescriptorJson: RegularFileProperty
 
-  @get:Input
-  abstract val modulePath: Property<String>
-
   @TaskAction
   internal fun generateModuleConfiguration() {
-    val moduleName = moduleName.get()
-    val moduleDirectory = moduleDirectory.asFile.get()
-    val includes = includes.files
-    val modulePath = modulePath.get()
-
     val moduleDesc = DokkaModuleDescriptionKxs(
-      name = moduleName,
-      sourceOutputDirectory = moduleDirectory,
-      includes = includes,
-      modulePath = modulePath,
+      name = moduleName.get(),
+      modulePath = modulePath.get(),
     )
 
     val encodedModuleDesc = jsonMapper.encodeToString(moduleDesc)

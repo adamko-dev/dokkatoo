@@ -3,6 +3,8 @@ package dev.adamko.dokkatoo
 import dev.adamko.dokkatoo.distributions.DokkatooConfigurationAttributes
 import dev.adamko.dokkatoo.distributions.DokkatooConfigurationAttributes.Companion.DOKKATOO_BASE_ATTRIBUTE
 import dev.adamko.dokkatoo.distributions.DokkatooConfigurationAttributes.Companion.DOKKATOO_CATEGORY_ATTRIBUTE
+import dev.adamko.dokkatoo.distributions.DokkatooConfigurationAttributes.Companion.DOKKATOO_MODULE_DESCRIPTION_NAME_ATTRIBUTE
+import dev.adamko.dokkatoo.distributions.DokkatooConfigurationAttributes.Companion.DOKKATOO_SOURCE_SET_ID_ATTRIBUTE
 import dev.adamko.dokkatoo.distributions.DokkatooConfigurationAttributes.Companion.DOKKA_FORMAT_ATTRIBUTE
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec
 import dev.adamko.dokkatoo.dokka.parameters.KotlinPlatform
@@ -10,6 +12,7 @@ import dev.adamko.dokkatoo.dokka.parameters.VisibilityModifier
 import dev.adamko.dokkatoo.internal.*
 import dev.adamko.dokkatoo.tasks.DokkatooGenerateTask
 import dev.adamko.dokkatoo.tasks.DokkatooPrepareModuleDescriptorTask
+import dev.adamko.dokkatoo.tasks.DokkatooPrepareModuleIncludesTask
 import dev.adamko.dokkatoo.tasks.DokkatooTask
 import java.io.File
 import java.net.URI
@@ -56,6 +59,8 @@ constructor(
       attribute(DOKKATOO_BASE_ATTRIBUTE)
       attribute(DOKKATOO_CATEGORY_ATTRIBUTE)
       attribute(DOKKA_FORMAT_ATTRIBUTE)
+      attribute(DOKKATOO_SOURCE_SET_ID_ATTRIBUTE)
+      attribute(DOKKATOO_MODULE_DESCRIPTION_NAME_ATTRIBUTE)
     }
 
     target.configurations.register(dependencyContainerNames.dokkatoo) {
@@ -91,16 +96,19 @@ constructor(
 
     target.tasks.withType<DokkatooPrepareModuleDescriptorTask>().configureEach {
       moduleName.convention(dokkatooExtension.moduleName)
-      includes.from(providers.provider { dokkatooExtension.dokkatooSourceSets.flatMap { it.includes } })
       modulePath.convention(dokkatooExtension.modulePath)
     }
 
-    target.tasks.withType<DokkatooGenerateTask>().configureEach {
+    target.tasks.withType<DokkatooPrepareModuleIncludesTask>().configureEach {
+      includes.from(providers.provider { dokkatooExtension.dokkatooSourceSets.flatMap { it.includes } })
+      destinationDir.convention(objects.directoryProperty().fileValue(temporaryDir))
+    }
 
+    target.tasks.withType<DokkatooGenerateTask>().configureEach {
       publicationEnabled.convention(true)
       onlyIf("publication must be enabled") { publicationEnabled.getOrElse(true) }
 
-      generator.addAllDokkaSourceSets(providers.provider { dokkatooExtension.dokkatooSourceSets })
+      generator.dokkaSourceSets.addAllLater(providers.provider { dokkatooExtension.dokkatooSourceSets })
 
       generator.dokkaSourceSets.configureDefaults(
         sourceSetScopeConvention = dokkatooExtension.sourceSetScopeDefault
@@ -332,10 +340,17 @@ constructor(
     val dokkatooParametersOutgoing = "dokkatooParametersElements".appendFormat()
 
     /** Name of the [Configuration] that _consumes_ all [org.jetbrains.dokka.DokkaConfiguration.DokkaModuleDescription] files */
-    val dokkatooModuleFilesConsumer = "dokkatooModule".appendFormat()
-
+    val dokkatooModuleDescriptorConsumer = "dokkatooModuleDescriptor".appendFormat()
     /** Name of the [Configuration] that _provides_ all [org.jetbrains.dokka.DokkaConfiguration.DokkaModuleDescription] files to other projects */
-    val dokkatooModuleFilesProvider = "dokkatooModuleElements".appendFormat()
+    val dokkatooModuleDescriptorProvider = "dokkatooModuleDescriptorElements".appendFormat()
+
+    val dokkatooModuleIncludesConsumer = "dokkatooModuleIncludes".appendFormat()
+    val dokkatooModuleIncludesProvider = "dokkatooModuleIncludesElements".appendFormat()
+
+    val dokkatooModuleSourceOutputDirectoriesConsumer =
+      "dokkatooModuleSourceOutputDirectories".appendFormat()
+    val dokkatooModuleSourceOutputDirectoriesProvider =
+      "dokkatooModuleSourceOutputDirectoriesElements".appendFormat()
 
     /**
      * Classpath used to execute the Dokka Generator.
@@ -363,5 +378,6 @@ constructor(
     @Deprecated("parameters are no longer generated separately, use the publication/module generator task instead")
     val prepareParameters = "prepareDokkatooParameters".appendFormat()
     val prepareModuleDescriptor = "prepareDokkatooModuleDescriptor".appendFormat()
+    val prepareModuleIncludes = "prepareModuleIncludes".appendFormat()
   }
 }

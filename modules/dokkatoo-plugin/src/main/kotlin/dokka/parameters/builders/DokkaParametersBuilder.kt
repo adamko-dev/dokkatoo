@@ -1,7 +1,7 @@
 package dev.adamko.dokkatoo.dokka.parameters.builders
 
 import dev.adamko.dokkatoo.dokka.parameters.DokkaGeneratorParametersSpec
-import dev.adamko.dokkatoo.dokka.parameters.DokkaModuleDescriptionKxs
+import dev.adamko.dokkatoo.dokka.parameters.DokkaModuleDescriptionSpec
 import dev.adamko.dokkatoo.dokka.plugins.DokkaPluginParametersBaseSpec
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import java.io.File
@@ -26,7 +26,7 @@ internal object DokkaParametersBuilder {
   fun build(
     spec: DokkaGeneratorParametersSpec,
     delayTemplateSubstitution: Boolean,
-    modules: List<DokkaModuleDescriptionKxs>,
+    modules: Set<DokkaModuleDescriptionSpec>,
     outputDirectory: File,
     cacheDirectory: File? = null,
   ): DokkaConfiguration {
@@ -56,7 +56,7 @@ internal object DokkaParametersBuilder {
       sourceSets = DokkaSourceSetBuilder.buildAll(sourceSets),
       pluginsClasspath = pluginsClasspath,
       pluginsConfiguration = pluginsConfiguration.map(::build),
-      modules = modules.map(DokkaModuleDescriptionKxs::convert),
+      modules = modules.map(DokkaModuleDescriptionBuilder::build),
 //      modules = modules.map {
 //        it.convert(
 //          moduleDescriptionFiles.get(it.name)

@@ -14,7 +14,6 @@ import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.model.ReplacedBy
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
@@ -131,8 +130,8 @@ constructor(
       null                       -> error("missing GenerationType")
     }
 
-    val dokkaModuleDescriptors = dokkaModuleDescriptors()
-    dokkaModuleDescriptors.forEach {
+    val dokkaModuleDescriptors = generator.dokkaModules
+    dokkaModuleDescriptors().forEach {
       // workaround until https://github.com/Kotlin/dokka/pull/2867 is released
       this.outputDirectory.dir(it.modulePath).get().asFile.mkdirs()
     }
@@ -150,9 +149,11 @@ constructor(
   }
 
   private fun dokkaModuleDescriptors(): List<DokkaModuleDescriptionKxs> {
-    return generator.dokkaModuleFiles.asFileTree
-      .matching { include("**/module_descriptor.json") }
-      .files.map { file ->
+    return generator.dokkaModules//.asFileTree
+//      .matching { include("**/module_descriptor.json") }
+      //.files
+      .map { spec ->
+        val file = spec.moduleDescriptorJson.asFile.get()
         try {
           val fileContent = file.readText()
           jsonMapper.decodeFromString(
@@ -167,9 +168,9 @@ constructor(
 
   //region Deprecated Properties
   @Suppress("unused")
-  @get:ReplacedBy("generator.dokkaModuleFiles")
+  @get:Internal
   @Deprecated("moved to nested property", ReplaceWith("generator.dokkaModuleFiles"))
   val dokkaModuleFiles: ConfigurableFileCollection
-    get() = generator.dokkaModuleFiles
+    get() = objects.fileCollection()
   //endregion
 }

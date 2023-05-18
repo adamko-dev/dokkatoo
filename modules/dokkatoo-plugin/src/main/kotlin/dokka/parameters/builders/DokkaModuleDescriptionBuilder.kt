@@ -1,8 +1,11 @@
 package dev.adamko.dokkatoo.dokka.parameters.builders
 
+import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.jsonMapper
+import dev.adamko.dokkatoo.dokka.parameters.DokkaModuleDescriptionKxs
 import dev.adamko.dokkatoo.dokka.parameters.DokkaModuleDescriptionSpec
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import java.io.File
+import java.io.IOException
 import org.jetbrains.dokka.DokkaModuleDescriptionImpl
 import org.jetbrains.dokka.DokkaSourceSetImpl
 
@@ -19,15 +22,28 @@ internal object DokkaModuleDescriptionBuilder {
 
   fun build(
     spec: DokkaModuleDescriptionSpec,
-    includes: Set<File>,
-    sourceOutputDirectory: File,
-  ): DokkaModuleDescriptionImpl =
-    DokkaModuleDescriptionImpl(
-      name = spec.name,
+//    includes: Set<File>,
+//    sourceOutputDirectory: File,
+  ): DokkaModuleDescriptionImpl {
+    val moduleDescriptorJson = spec.moduleDescriptorJson.asFile.get()
+
+    val moduleKxs = try {
+      val fileContent = moduleDescriptorJson.readText()
+      jsonMapper.decodeFromString(
+        DokkaModuleDescriptionKxs.serializer(),
+        fileContent,
+      )
+    } catch (ex: Exception) {
+      throw IOException("Could not parse DokkaModuleDescriptionKxs from $moduleDescriptorJson", ex)
+    }
+
+    return DokkaModuleDescriptionImpl(
+      name = moduleKxs.name,
       relativePathToOutputDirectory = File(
-        spec.projectPath.get().removePrefix(":").replace(':', '/')
+        moduleKxs.modulePath.removePrefix(":").replace(':', '/')
       ),
-      includes = includes,
-      sourceOutputDirectory = sourceOutputDirectory,
+      includes = spec.includes.files,
+      sourceOutputDirectory = spec.sourceOutputDirectory.asFile.get(),
     )
+  }
 }

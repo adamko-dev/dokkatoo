@@ -8,12 +8,19 @@ import dev.adamko.dokkatoo.adapters.DokkatooKotlinAdapter
 import dev.adamko.dokkatoo.distributions.DokkatooConfigurationAttributes
 import dev.adamko.dokkatoo.distributions.DokkatooConfigurationAttributes.Companion.DOKKATOO_BASE_ATTRIBUTE
 import dev.adamko.dokkatoo.distributions.DokkatooConfigurationAttributes.Companion.DOKKATOO_CATEGORY_ATTRIBUTE
+import dev.adamko.dokkatoo.distributions.DokkatooConfigurationAttributes.Companion.DOKKATOO_MODULE_DESCRIPTION_NAME_ATTRIBUTE
 import dev.adamko.dokkatoo.distributions.DokkatooConfigurationAttributes.Companion.DOKKA_FORMAT_ATTRIBUTE
 import dev.adamko.dokkatoo.dokka.DokkaPublication
-import dev.adamko.dokkatoo.internal.*
+import dev.adamko.dokkatoo.dokka.parameters.DokkaModuleDescriptionSpec
+import dev.adamko.dokkatoo.internal.DokkatooInternalApi
+import dev.adamko.dokkatoo.internal.asConsumer
+import dev.adamko.dokkatoo.internal.asProvider
+import dev.adamko.dokkatoo.internal.configuring
 import dev.adamko.dokkatoo.tasks.DokkatooGenerateTask
 import dev.adamko.dokkatoo.tasks.DokkatooPrepareModuleDescriptorTask
+import dev.adamko.dokkatoo.tasks.DokkatooPrepareModuleIncludesTask
 import dev.adamko.dokkatoo.tasks.DokkatooPrepareParametersTask
+import java.io.File
 import javax.inject.Inject
 import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.Plugin
@@ -32,8 +39,10 @@ import org.gradle.api.attributes.Usage.JAVA_RUNTIME
 import org.gradle.api.attributes.Usage.USAGE_ATTRIBUTE
 import org.gradle.api.attributes.java.TargetJvmEnvironment.STANDARD_JVM
 import org.gradle.api.attributes.java.TargetJvmEnvironment.TARGET_JVM_ENVIRONMENT_ATTRIBUTE
+import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileSystemOperations
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
@@ -80,12 +89,14 @@ abstract class DokkatooFormatPlugin(
         target.configurations.named(DokkatooBasePlugin.dependencyContainerNames.dokkatoo)
 
       val dependencyContainers = DependencyContainers(
+        moduleName = dokkatooExtension.moduleName,
         formatName = formatName,
         dokkatooConsumer = dokkatooConsumer,
         project = target,
       )
 
       val dokkatooTasks = DokkatooTasks(
+        moduleName = dokkatooExtension.moduleName,
         project = target,
         publication = publication,
         dokkatooExtension = dokkatooExtension,
@@ -93,13 +104,26 @@ abstract class DokkatooFormatPlugin(
         providers = providers,
       )
 
-      dependencyContainers.dokkaModuleOutgoing.configure {
+      dependencyContainers.dokkaModuleDescriptorOutgoing.configure {
         outgoing {
-          artifact(dokkatooTasks.prepareModuleDescriptor.flatMap { it.dokkaModuleDescriptorJson })
+          artifact(dokkatooTasks.prepareModuleDescriptor.flatMap { it.dokkaModuleDescriptorJson }) {
+//            builtBy(dokkatooTasks.prepareModuleDescriptor, dokkatooTasks.generateModule)
+          }
         }
+      }
+
+      dependencyContainers.dokkatooModuleIncludesProvider.configure {
+        outgoing {
+          artifact(dokkatooTasks.prepareModuleIncludes.map { it.destinationDir }) {
+//            builtBy(dokkatooTasks.prepareModuleIncludes, dokkatooTasks.generateModule)
+          }
+        }
+      }
+
+      dependencyContainers.dokkatooModuleSourceOutputDirectoriesProvider.configure {
         outgoing {
           artifact(dokkatooTasks.generateModule.flatMap { it.outputDirectory }) {
-            type = "directory"
+//            builtBy(dokkatooTasks.generateModule)
           }
         }
       }
@@ -205,6 +229,7 @@ abstract class DokkatooFormatPlugin(
    */
   @DokkatooInternalApi
   class DependencyContainers(
+    private val moduleName: Provider<String>,
     private val formatName: String,
     dokkatooConsumer: NamedDomainObjectProvider<Configuration>,
     project: Project,
@@ -261,25 +286,70 @@ abstract class DokkatooFormatPlugin(
     //</editor-fold>
 
     //<editor-fold desc="Dokka Module files">
-    /** Fetch Dokka Module files from other subprojects */
-    val dokkaModuleConsumer: NamedDomainObjectProvider<Configuration> =
-      project.configurations.register(dependencyContainerNames.dokkatooModuleFilesConsumer) {
+    /** Fetch Dokka Module descriptor files from other subprojects */
+    val dokkaModuleDescriptorConsumer: NamedDomainObjectProvider<Configuration> =
+      project.configurations.register(dependencyContainerNames.dokkatooModuleDescriptorConsumer) {
         description = "Fetch Dokka Module files for $formatName from other subprojects"
         asConsumer()
         extendsFrom(dokkatooConsumer.get())
         attributes {
-          dokkaCategory(dokkatooAttributes.dokkaModuleFiles)
+          dokkaCategory(dokkatooAttributes.dokkaModuleDescriptors)
         }
       }
-    /** Provide Dokka Module files to other subprojects */
-    val dokkaModuleOutgoing: NamedDomainObjectProvider<Configuration> =
-      project.configurations.register(dependencyContainerNames.dokkatooModuleFilesProvider) {
+    /** Provide Dokka Module descriptor files to other subprojects */
+    val dokkaModuleDescriptorOutgoing: NamedDomainObjectProvider<Configuration> =
+      project.configurations.register(dependencyContainerNames.dokkatooModuleDescriptorProvider) {
         description = "Provide Dokka Module files for $formatName to other subprojects"
         asProvider()
         // extend from dokkaConfigurationsConsumer, so Dokka Module Configs propagate api() style
-        extendsFrom(dokkaModuleConsumer.get())
+        extendsFrom(dokkaModuleDescriptorConsumer.get())
         attributes {
-          dokkaCategory(dokkatooAttributes.dokkaModuleFiles)
+          dokkaCategory(dokkatooAttributes.dokkaModuleDescriptors)
+          attribute(DOKKATOO_MODULE_DESCRIPTION_NAME_ATTRIBUTE, objects.named(moduleName.get()))
+        }
+      }
+    /** Fetch Dokka Module files from other subprojects */
+    val dokkatooModuleIncludesConsumer: NamedDomainObjectProvider<Configuration> =
+      project.configurations.register(dependencyContainerNames.dokkatooModuleIncludesConsumer) {
+        description = "Fetch Dokka Module files for $formatName from other subprojects"
+        asConsumer()
+        extendsFrom(dokkatooConsumer.get())
+        attributes {
+          dokkaCategory(dokkatooAttributes.dokkaModuleIncludes)
+        }
+      }
+    /** Provide Dokka Module files to other subprojects */
+    val dokkatooModuleIncludesProvider: NamedDomainObjectProvider<Configuration> =
+      project.configurations.register(dependencyContainerNames.dokkatooModuleIncludesProvider) {
+        description = "Provide Dokka Module files for $formatName to other subprojects"
+        asProvider()
+        // extend from dokkaConfigurationsConsumer, so Dokka Module Configs propagate api() style
+        extendsFrom(dokkatooModuleIncludesConsumer.get())
+        attributes {
+          dokkaCategory(dokkatooAttributes.dokkaModuleIncludes)
+          attribute(DOKKATOO_MODULE_DESCRIPTION_NAME_ATTRIBUTE, objects.named(moduleName.get()))
+        }
+      }
+    /** Fetch Dokka Module files from other subprojects */
+    val dokkatooModuleSourceOutputDirectoriesConsumer: NamedDomainObjectProvider<Configuration> =
+      project.configurations.register(dependencyContainerNames.dokkatooModuleSourceOutputDirectoriesConsumer) {
+        description = "Fetch Dokka Module files for $formatName from other subprojects"
+        asConsumer()
+        extendsFrom(dokkatooConsumer.get())
+        attributes {
+          dokkaCategory(dokkatooAttributes.dokkaModuleSourceOutputDirs)
+        }
+      }
+    /** Provide Dokka Module files to other subprojects */
+    val dokkatooModuleSourceOutputDirectoriesProvider: NamedDomainObjectProvider<Configuration> =
+      project.configurations.register(dependencyContainerNames.dokkatooModuleSourceOutputDirectoriesProvider) {
+        description = "Provide Dokka Module files for $formatName to other subprojects"
+        asProvider()
+        // extend from dokkaConfigurationsConsumer, so Dokka Module Configs propagate api() style
+        extendsFrom(dokkatooModuleSourceOutputDirectoriesConsumer.get())
+        attributes {
+          dokkaCategory(dokkatooAttributes.dokkaModuleSourceOutputDirs)
+          attribute(DOKKATOO_MODULE_DESCRIPTION_NAME_ATTRIBUTE, objects.named(moduleName.get()))
         }
       }
     //</editor-fold>
@@ -354,12 +424,16 @@ abstract class DokkatooFormatPlugin(
   @DokkatooInternalApi
   class DokkatooTasks(
     project: Project,
+    private val moduleName: Provider<String>,
     private val publication: DokkaPublication,
     private val dokkatooExtension: DokkatooExtension,
     private val dependencyContainers: DependencyContainers,
 
     private val providers: ProviderFactory,
   ) {
+    private val objects = project.objects
+    private val layout = project.layout
+
     private val formatName: String get() = publication.formatName
 
     private val taskNames = DokkatooBasePlugin.TaskNames(formatName)
@@ -412,15 +486,89 @@ abstract class DokkatooFormatPlugin(
 
       outputDirectory.convention(dokkatooExtension.dokkatooPublicationDirectory.dir(formatName))
 
+      //region Module Inputs
+      // Try to make Gradle realise there's a task dependency, so it will run subproject tasks, to
+      // prevent error:
+      // > Querying the mapped value of Map(string->File, org.gradle.api.internal.provider.DefaultMapProperty$CollectingSupplier@73682744) before task ':subproject-hello:prepareDokkatooModuleDescriptorGfm' has completed is not supported
+      inputs.files(
+        dependencyContainers.dokkaModuleDescriptorConsumer.map {
+          it.incoming.artifactView { lenient(true) }.artifacts.artifactFiles
+        }
+      )
+      inputs.files(
+        dependencyContainers.dokkatooModuleIncludesConsumer.map {
+          it.incoming.artifactView { lenient(true) }.artifacts.artifactFiles
+        }
+      )
+      inputs.files(
+        dependencyContainers.dokkatooModuleSourceOutputDirectoriesConsumer.map {
+          it.incoming.artifactView { lenient(true) }.artifacts.artifactFiles
+        }
+      )
+      //endregion
+
+      val moduleDescriptorFiles: Provider<Map<String?, File>> =
+          dependencyContainers.dokkaModuleDescriptorConsumer
+            .flatMap { conf ->
+              @Suppress("UnstableApiUsage")
+              conf
+                .incoming
+                .artifactView { lenient(true) }
+                .artifacts
+                .resolvedArtifacts
+                .map { artifacts ->
+                  artifacts
+                    .filter {
+                      println("[$path] dokkaModuleDescriptor filtering $it ${it.variant.attributes}")
+                      it.variant.attributes.getAttribute(DOKKATOO_MODULE_DESCRIPTION_NAME_ATTRIBUTE) != null
+                    }.groupingBy { artifact ->
+                      artifact.variant.attributes
+                        .getAttribute(DOKKATOO_MODULE_DESCRIPTION_NAME_ATTRIBUTE)?.name
+                    }.fold(objects.fileCollection()) { files, element ->
+                      files.from(element.file)
+                    }.mapValues { (_, files) ->
+                      println("[$path] dokkaModuleDescriptor ${moduleName.get()} has ${files.files}")
+                      files.first()
+                    }
+                }
+            }
+
+      fun moduleSourceDirs(moduleName: String): Provider<FileCollection> =
+        dependencyContainers.dokkatooModuleSourceOutputDirectoriesConsumer.moduleFiles(moduleName)
+
+      fun moduleIncludes(moduleName: String): Provider<FileCollection> =
+        dependencyContainers.dokkatooModuleIncludesConsumer.moduleFiles(moduleName)
+
+
+      val moduleDescriptors =
+        moduleDescriptorFiles.map { descriptors ->
+          descriptors
+            .filterKeys { it != null }
+            .mapKeys { it.key!! }
+            .map { (moduleName, file) ->
+              objects.newInstance<DokkaModuleDescriptionSpec>(moduleName).apply {
+                moduleDescriptorJson.set(file)
+
+                sourceOutputDirectory.set(
+                  // verbose syntax is workaround for https://github.com/gradle/gradle/issues/23708
+                  layout.file(
+                    moduleSourceDirs(moduleName)
+                      .map { files ->
+                        println("[$path] output dirs for $moduleName $files")
+                        files.first()
+                      }
+                  )
+                )
+                includes.from(
+                  moduleIncludes(moduleName)
+                )
+              }
+            }
+        }
+
       generator.apply {
         // depend on Dokka Module Descriptors from other subprojects
-        dokkaModuleFiles.from(
-          dependencyContainers.dokkaModuleConsumer.map { modules ->
-            modules.incoming
-              .artifactView { componentFilter(LocalProjectOnlyFilter) }
-              .artifacts.artifactFiles
-          }
-        )
+        dokkaModules.addAllLater(moduleDescriptors)
       }
 
       applyFormatSpecificConfiguration()
@@ -442,16 +590,53 @@ abstract class DokkatooFormatPlugin(
       taskNames.prepareModuleDescriptor
     ) task@{
       description = "Prepares the Dokka Module Descriptor for $formatName"
-      includes.from(publication.includes)
       dokkaModuleDescriptorJson.convention(
         dokkatooExtension.dokkatooConfigurationsDirectory.file("$formatName/module_descriptor.json")
       )
-      moduleDirectory.set(generateModule.flatMap { it.outputDirectory })
-
-//      dokkaSourceSets.addAllLater(providers.provider { dokkatooExtension.dokkatooSourceSets })
-//      dokkaSourceSets.configureEach {
-//        sourceSetScope.convention(this@task.path)
-//      }
     }
+
+    val prepareModuleIncludes = project.tasks.register<DokkatooPrepareModuleIncludesTask>(
+      taskNames.prepareModuleIncludes
+    ) {
+      description = "Prepares the Dokka Module includes for $formatName"
+      // default inputs/outputs are set in DokkatooBasePlugin
+    }
+
+//    private fun <T : Named> Provider<Set<ResolvedArtifactResult>>.groupingBy(
+//      attribute: Attribute<T>
+//    ): Provider<Map<String?, FileCollection>> {
+//      return map { artifacts ->
+//        artifacts
+//          .groupingBy { artifact ->
+//            artifact.variant.attributes.getAttribute(attribute)?.name
+//          }.fold(objects.fileCollection()) { files, element ->
+//            files.from(element.file)
+//          }
+//      }
+//    }
+
+
+    private fun NamedDomainObjectProvider<Configuration>.moduleFiles(moduleName: String): Provider<FileCollection> =
+      flatMap { conf ->
+        @Suppress("UnstableApiUsage")
+        conf
+          .incoming
+          .artifactView {
+            lenient(true)
+            attributes {
+              attribute(DOKKATOO_MODULE_DESCRIPTION_NAME_ATTRIBUTE, objects.named(moduleName))
+            }
+          }
+          .artifacts
+          .resolvedArtifacts
+          .map { artifacts ->
+            artifacts
+              .filter {
+                it.variant.attributes.getAttribute(DOKKATOO_MODULE_DESCRIPTION_NAME_ATTRIBUTE)?.name == moduleName
+              }.fold(objects.fileCollection()) { acc, art ->
+                acc.from(art.file)
+              }
+          }
+      }
   }
 }

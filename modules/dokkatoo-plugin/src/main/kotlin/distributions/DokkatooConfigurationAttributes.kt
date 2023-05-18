@@ -28,7 +28,10 @@ constructor(
   val dokkaParameters: DokkatooCategoryAttribute = objects.named("generator-parameters")
 
   /** for [Configuration]s that provide or consume Dokka Module files */
-  val dokkaModuleFiles: DokkatooCategoryAttribute = objects.named("module-files")
+  val dokkaModuleDescriptors: DokkatooCategoryAttribute = objects.named("module-descriptors")
+  val dokkaModuleIncludes: DokkatooCategoryAttribute = objects.named("module-includes")
+  val dokkaModuleSourceOutputDirs: DokkatooCategoryAttribute =
+    objects.named("module-source-output-dirs")
 //  val dokkaModuleSource: DokkatooCategoryAttribute = objects.named("module-source")
 
   val dokkaGeneratorClasspath: DokkatooCategoryAttribute = objects.named("generator-classpath")
@@ -45,6 +48,16 @@ constructor(
   interface DokkaFormatAttribute : Named
 
   @DokkatooInternalApi
+  interface DokkatooParameterIdAttribute : Named {
+    //    /** @see dev.adamko.dokkatoo.dokka.parameters.DokkaParametersKxs */
+//    interface DokkaParametersType : DokkatooParameterAttribute
+//    /** @see dev.adamko.dokkatoo.dokka.parameters.DokkaParametersKxs.DokkaSourceSetKxs */
+    interface DokkaSourceSetId : DokkatooParameterIdAttribute
+    //    /** @see dev.adamko.dokkatoo.dokka.parameters.DokkaParametersKxs.DokkaModuleDescriptionKxs */
+    interface DokkaModuleDescriptionName : DokkatooParameterIdAttribute
+  }
+
+  @DokkatooInternalApi
   companion object {
     val DOKKATOO_BASE_ATTRIBUTE =
       Attribute<DokkatooBaseAttribute>("dev.adamko.dokkatoo.base")
@@ -52,6 +65,10 @@ constructor(
       Attribute<DokkatooCategoryAttribute>("dev.adamko.dokkatoo.category")
     val DOKKA_FORMAT_ATTRIBUTE =
       Attribute<DokkaFormatAttribute>("dev.adamko.dokkatoo.format")
+    val DOKKATOO_SOURCE_SET_ID_ATTRIBUTE =
+      Attribute<DokkatooParameterIdAttribute.DokkaSourceSetId>("dev.adamko.dokkatoo.source_set_id")
+    val DOKKATOO_MODULE_DESCRIPTION_NAME_ATTRIBUTE =
+      Attribute<DokkatooParameterIdAttribute.DokkaModuleDescriptionName>("dev.adamko.dokkatoo.module_description_name")
 
     private inline fun <reified T> Attribute(name: String): Attribute<T> =
       Attribute.of(name, T::class.java)

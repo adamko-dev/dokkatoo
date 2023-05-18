@@ -92,10 +92,13 @@ constructor(
     dokkaSourceSets.addAllLater(sourceSets)
   }
 
-  /** Dokka Module files from other subprojects. */
-  @get:InputFiles
-  //@get:NormalizeLineEndings
-  @get:PathSensitive(RELATIVE)
-  @get:Optional
-  abstract val dokkaModuleFiles: ConfigurableFileCollection
+//  /** Dokka Module files from other subprojects. */
+//  @get:InputFiles
+//  //@get:NormalizeLineEndings
+//  @get:PathSensitive(RELATIVE)
+//  @get:Optional
+//  abstract val dokkaModuleFiles: ConfigurableFileCollection
+
+  @get:Nested
+  abstract val dokkaModules: NamedDomainObjectContainer<DokkaModuleDescriptionSpec>   //  = extensions.adding("dokkaModules", objects.domainObjectContainer())
 }
