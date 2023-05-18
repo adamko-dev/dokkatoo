@@ -11,7 +11,7 @@ import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.CacheableTask
-import org.gradle.api.tasks.Nested
+import org.gradle.api.tasks.Internal
 
 /** Base Dokkatoo task */
 @CacheableTask
@@ -26,16 +26,14 @@ constructor() : DefaultTask() {
     group = DokkatooBasePlugin.TASK_GROUP
   }
 
-  /**
-   * A [DokkatooTask] that depends on [DokkaSourceSetSpec]s.
-   *
-   * Any task that implements [WithSourceSets] doesn't have to use the sources, but it will use
-   * them as part of Gradle up-to-date checks.
-   */
   @CacheableTask
+  @Deprecated("no longer needed")
   abstract class WithSourceSets
   @DokkatooInternalApi
-  constructor() : DokkatooTask() {
+  @Inject
+  constructor(
+    objects: ObjectFactory
+  ) : DokkatooTask() {
 
     /**
      * Source sets used to generate a Dokka Module.
@@ -43,11 +41,17 @@ constructor() : DefaultTask() {
      * The values are not used directly in this task, but they are required to be registered as a
      * task input for up-to-date checks
      */
-    @get:Nested
-    val dokkaSourceSets: NamedDomainObjectContainer<DokkaSourceSetSpec> =
-      extensions.adding("dokkaSourceSets") { objects.domainObjectContainer() }
+    @get:Internal
+    @Deprecated("Property is moved to specific task implementation")
+    open val dokkaSourceSets: NamedDomainObjectContainer<DokkaSourceSetSpec> =
+      extensions.adding("dokkaSourceSets", objects.domainObjectContainer())
 
+    @Deprecated(
+      "Use Gradle function, addAllLater()",
+      ReplaceWith("dokkaSourceSets.addAllLater(sourceSets)")
+    )
     fun addAllDokkaSourceSets(sourceSets: Provider<Iterable<DokkaSourceSetSpec>>) {
+      @Suppress("DEPRECATION")
       dokkaSourceSets.addAllLater(sourceSets)
     }
   }

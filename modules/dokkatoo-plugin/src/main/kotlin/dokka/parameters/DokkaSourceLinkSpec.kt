@@ -28,9 +28,7 @@ import org.intellij.lang.annotations.Language
  */
 abstract class DokkaSourceLinkSpec
 @DokkatooInternalApi
-constructor() :
-  DokkaParameterBuilder<DokkaParametersKxs.SourceLinkDefinitionKxs>,
-  Serializable {
+constructor() : Serializable {
 
   /**
    * Path to the local source directory. The path must be relative to the root of current project.
@@ -53,6 +51,7 @@ constructor() :
    * Should not be used anywhere directly.
    */
   @get:Input
+  @DokkatooInternalApi
   protected val localDirectoryPath: Provider<String>
     get() = localDirectory.map { it.asFile.invariantSeparatorsPath }
 
@@ -104,13 +103,4 @@ constructor() :
   @get:Optional
   @get:Input
   abstract val remoteLineSuffix: Property<String>
-
-  @DokkatooInternalApi
-  override fun build(): DokkaParametersKxs.SourceLinkDefinitionKxs {
-    return DokkaParametersKxs.SourceLinkDefinitionKxs(
-      localDirectory = localDirectory.get().asFile.invariantSeparatorsPath,
-      remoteUrl = remoteUrl.get(),
-      remoteLineSuffix = remoteLineSuffix.orNull,
-    )
-  }
 }

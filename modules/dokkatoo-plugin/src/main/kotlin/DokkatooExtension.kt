@@ -53,11 +53,10 @@ constructor(
    * The type of site is determined by the Dokka Plugins. By default, an HTML site will be generated.
    */
   val dokkatooPublications: NamedDomainObjectContainer<DokkaPublication> =
-    extensions.adding("dokkatooPublications") {
-      objects.domainObjectContainer { named ->
-        objects.newInstance(named, pluginsConfiguration)
-      }
-    }
+    extensions.adding(
+      "dokkatooPublications",
+      objects.domainObjectContainer { named -> objects.newInstance(named, pluginsConfiguration) }
+    )
 
   /**
    * Dokka Source Sets describe the source code that should be included in a Dokka Publication.
@@ -88,9 +87,7 @@ constructor(
    * Dokka will merge Dokka Source Sets from other subprojects if...
    */
   val dokkatooSourceSets: NamedDomainObjectContainer<DokkaSourceSetSpec> =
-    extensions.adding("dokkatooSourceSets") {
-      objects.domainObjectContainer()
-    }
+    extensions.adding("dokkatooSourceSets", objects.domainObjectContainer())
 
   /**
    * Dokka Plugin are used to configure the way Dokka generates a format.
@@ -98,9 +95,7 @@ constructor(
    * container.
    */
   val pluginsConfiguration: DokkaPluginParametersContainer =
-    extensions.adding("pluginsConfiguration") {
-      objects.dokkaPluginParametersContainer()
-    }
+    extensions.adding("pluginsConfiguration", objects.dokkaPluginParametersContainer())
 
   /**
    * Versions of dependencies that Dokkatoo will use to run Dokka Generator.
@@ -108,9 +103,7 @@ constructor(
    * These versions can be set to change the versions of dependencies that Dokkatoo uses defaults,
    * or can be read to align versions.
    */
-  val versions: Versions = extensions.adding("versions") {
-    objects.newInstance()
-  }
+  val versions: Versions = extensions.adding("versions", objects.newInstance())
 
   interface Versions : ExtensionAware {
 

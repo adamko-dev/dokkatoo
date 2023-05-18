@@ -55,8 +55,8 @@ dokkatoo {
   }
 }
 
-tasks.withType<dev.adamko.dokkatoo.tasks.DokkatooPrepareParametersTask>().configureEach {
-  dokkaSourceSets.configureEach {
+tasks.withType<dev.adamko.dokkatoo.tasks.DokkatooGenerateTask>().configureEach {
+  generator.dokkaSourceSets.configureEach {
     sourceSetScope.set(":dokkaHtml")
   }
 }

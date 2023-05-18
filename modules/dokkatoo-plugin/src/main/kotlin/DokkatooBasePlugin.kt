@@ -10,7 +10,6 @@ import dev.adamko.dokkatoo.dokka.parameters.VisibilityModifier
 import dev.adamko.dokkatoo.internal.*
 import dev.adamko.dokkatoo.tasks.DokkatooGenerateTask
 import dev.adamko.dokkatoo.tasks.DokkatooPrepareModuleDescriptorTask
-import dev.adamko.dokkatoo.tasks.DokkatooPrepareParametersTask
 import dev.adamko.dokkatoo.tasks.DokkatooTask
 import java.io.File
 import java.net.URI
@@ -88,6 +87,7 @@ constructor(
           //"-XX:FlightRecorderOptions=repository=$baseDir/jfr,stackdepth=512",
         )
       )
+      dokkaConfigurationJsonFile.convention(temporaryDir.resolve("dokka-configuration.json"))
     }
 
     target.tasks.withType<DokkatooPrepareModuleDescriptorTask>().configureEach {
@@ -96,17 +96,21 @@ constructor(
       modulePath.convention(dokkatooExtension.modulePath)
     }
 
-    target.tasks.withType<DokkatooPrepareParametersTask>().configureEach {
+    target.tasks.withType<DokkatooGenerateTask>().configureEach {
+
+      publicationEnabled.convention(true)
       onlyIf("publication must be enabled") { publicationEnabled.getOrElse(true) }
-    }
 
-    target.tasks.withType<DokkatooTask.WithSourceSets>().configureEach {
-      addAllDokkaSourceSets(providers.provider { dokkatooExtension.dokkatooSourceSets })
+      generator.dokkaSourceSets.addAllLater(providers.provider { dokkatooExtension.dokkatooSourceSets })
 
-      dokkatooExtension.dokkatooSourceSets.configureDefaults(
+      generator.dokkaSourceSets.configureDefaults(
         sourceSetScopeConvention = dokkatooExtension.sourceSetScopeDefault
       )
     }
+
+    dokkatooExtension.dokkatooSourceSets.configureDefaults(
+      sourceSetScopeConvention = dokkatooExtension.sourceSetScopeDefault
+    )
   }
 
   private fun createExtension(project: Project): DokkatooExtension {
@@ -250,9 +254,9 @@ constructor(
   }
 
   private fun TaskContainer.createDokkaLifecycleTasks() {
+    @Suppress("DEPRECATION")
     val prepareParameters = register<DokkatooTask>(taskNames.prepareParameters) {
-      description = "Prepares Dokka parameters for all formats"
-      dependsOn(withType<DokkatooPrepareParametersTask>())
+      description = "[DEPRECATED no longer used] Prepares Dokka parameters for all formats"
     }
 
     register<DokkatooTask>(taskNames.generate) {
@@ -318,9 +322,11 @@ constructor(
     val dokkatoo = "dokkatoo".appendFormat()
 
     /** Name of the [Configuration] that _consumes_ [dev.adamko.dokkatoo.dokka.parameters.DokkaParametersKxs] from projects */
+    @Deprecated("Not used")
     val dokkatooParametersConsumer = "dokkatooParameters".appendFormat()
 
     /** Name of the [Configuration] that _provides_ [org.jetbrains.dokka.DokkaConfiguration] to other projects */
+    @Deprecated("Not used")
     val dokkatooParametersOutgoing = "dokkatooParametersElements".appendFormat()
 
     /** Name of the [Configuration] that _consumes_ all [org.jetbrains.dokka.DokkaConfiguration.DokkaModuleDescription] files */
@@ -352,6 +358,7 @@ constructor(
     val generate = "dokkatooGenerate".appendFormat()
     val generatePublication = "dokkatooGeneratePublication".appendFormat()
     val generateModule = "dokkatooGenerateModule".appendFormat()
+    @Deprecated("parameters are no longer generated separately, use the publication/module generator task instead")
     val prepareParameters = "prepareDokkatooParameters".appendFormat()
     val prepareModuleDescriptor = "prepareDokkatooModuleDescriptor".appendFormat()
   }

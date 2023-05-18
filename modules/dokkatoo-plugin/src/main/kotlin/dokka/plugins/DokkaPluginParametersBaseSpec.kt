@@ -1,7 +1,5 @@
 package dev.adamko.dokkatoo.dokka.plugins
 
-import dev.adamko.dokkatoo.dokka.parameters.DokkaParameterBuilder
-import dev.adamko.dokkatoo.dokka.parameters.DokkaParametersKxs
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import java.io.Serializable
 import javax.inject.Inject
@@ -25,17 +23,7 @@ constructor(
   private val name: String,
   @get:Input
   open val pluginFqn: String,
-) : DokkaParameterBuilder<DokkaParametersKxs.PluginConfigurationKxs>,
-  Serializable,
-  Named {
-
-  override fun build(): DokkaParametersKxs.PluginConfigurationKxs {
-    return DokkaParametersKxs.PluginConfigurationKxs(
-      fqPluginName = pluginFqn,
-      serializationFormat = org.jetbrains.dokka.DokkaConfiguration.SerializationFormat.JSON,
-      values = jsonEncode(),
-    )
-  }
+) : Serializable, Named {
 
   abstract fun jsonEncode(): String // to be implemented by subclasses
 

@@ -108,7 +108,6 @@ class BasicProjectIntegrationTest : FunSpec({
         .forwardOutput()
         .build().should { buildResult ->
           buildResult.output shouldContainAll listOf(
-            "Task :prepareDokkatooParametersHtml UP-TO-DATE",
             "Task :dokkatooGeneratePublicationHtml UP-TO-DATE",
           )
         }
