@@ -10,6 +10,7 @@ import dev.adamko.dokkatoo.internal.adding
 import dev.adamko.dokkatoo.workers.DokkaGeneratorWorker
 import java.io.IOException
 import javax.inject.Inject
+import kotlinx.serialization.json.JsonElement
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
@@ -22,6 +23,7 @@ import org.gradle.kotlin.dsl.*
 import org.gradle.process.JavaForkOptions
 import org.gradle.workers.WorkerExecutor
 import org.jetbrains.dokka.DokkaConfiguration
+import org.jetbrains.dokka.toJsonString
 
 /**
  * Executes the Dokka Generator, and produces documentation.
@@ -85,9 +87,16 @@ constructor(
   /** @see JavaForkOptions.jvmArgs */
   @get:Input
   abstract val workerJvmArgs: ListProperty<String>
-
   @get:Internal
   abstract val workerLogFile: RegularFileProperty
+
+  /**
+   * The [DokkaConfiguration] by Dokka Generator can be saved to a file for debugging purposes.
+   * To disable this behaviour set this property to `null`.
+   */
+  @DokkatooInternalApi
+  @get:Internal
+  abstract val dokkaConfigurationJsonFile: RegularFileProperty
 
   enum class GenerationType {
     MODULE,
@@ -98,8 +107,10 @@ constructor(
   internal fun generateDocumentation() {
     val dokkaConfiguration = createDokkaConfiguration()
     logger.info("dokkaConfiguration: $dokkaConfiguration")
+    dumpDokkaConfigurationJson(dokkaConfiguration)
 
     logger.info("DokkaGeneratorWorker runtimeClasspath: ${runtimeClasspath.asPath}")
+
     val workQueue = workers.processIsolation {
       classpath.from(runtimeClasspath)
       forkOptions {
@@ -116,6 +127,26 @@ constructor(
       this.dokkaParameters.set(dokkaConfiguration)
       this.logFile.set(workerLogFile)
     }
+  }
+
+  /**
+   * Dump the [DokkaConfiguration] JSON to a file ([dokkaConfigurationJsonFile]) for debugging
+   * purposes.
+   */
+  private fun dumpDokkaConfigurationJson(
+    dokkaConfiguration: DokkaConfiguration,
+  ) {
+    val destFile = dokkaConfigurationJsonFile.asFile.orNull ?: return
+    destFile.parentFile.mkdirs()
+    destFile.createNewFile()
+
+    val compactJson = dokkaConfiguration.toJsonString()
+    val json = jsonMapper.decodeFromString(JsonElement.serializer(), compactJson)
+    val prettyJson = jsonMapper.encodeToString(JsonElement.serializer(), json)
+
+    destFile.writeText(prettyJson)
+
+    logger.info("[$path] Dokka Generator configuration JSON: ${destFile.toURI()}")
   }
 
   private fun createDokkaConfiguration(): DokkaConfiguration {

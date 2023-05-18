@@ -87,6 +87,7 @@ constructor(
           //"-XX:FlightRecorderOptions=repository=$baseDir/jfr,stackdepth=512",
         )
       )
+      dokkaConfigurationJsonFile.convention(temporaryDir.resolve("dokka-configuration.json"))
     }
 
     target.tasks.withType<DokkatooPrepareModuleDescriptorTask>().configureEach {
