@@ -2,8 +2,8 @@ rootProject.name = "dokkatoo"
 
 pluginManagement {
   repositories {
-    gradlePluginPortal()
     mavenCentral()
+    gradlePluginPortal()
   }
 }
 
