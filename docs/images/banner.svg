@@ -4,7 +4,6 @@
   viewBox="0 0 508 127"
   height="480"
   width="1920"
-  xml:space="preserve"
   xmlns="http://www.w3.org/2000/svg"
 >
   <defs>
@@ -93,5 +92,5 @@
     <circle id="eye" cx="62" cy="110" r="6"/>
   </g>
 
-  <text x="25" y="18" font-family="JetBrains Mono" transform="scale(6)" fill="#fff">Dokkatoo</text>
+  <text x="150" y="100" font-family="JetBrains Mono" font-size="70" fill="#fff">Dokkatoo</text>
 </svg>
