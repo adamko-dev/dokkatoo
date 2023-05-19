@@ -1,182 +1,106 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
-   id="svg893"
-   version="1.1"
-   viewBox="0 0 338.66667 169.33333"
-   height="640"
-   width="1280"
-   xml:space="preserve"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:svg="http://www.w3.org/2000/svg">
-  <defs
-   id="defs887"><rect
-   x="508.09457"
-   y="216.73248"
-   width="1013.1222"
-   height="336.3443"
-   id="rect3056" />
+  version="1.1"
+  viewBox="0 0 128 64"
+  width="1280"
+  height="640"
+  xmlns="http://www.w3.org/2000/svg"
+  style="background-color: black;"
+>
+  <defs>
+    <style>
+      /*
+      Specifically only embed the font required for 'Dokkatoo'
+      // NOTE replace &amp; with plain ampersand in URL, because XML can't handle it even though it's in a comment
+      https://fonts.googleapis.com/icon?family=JetBrains+Mono&amp;text=Dokkatoo
+      https://amio.github.io/embedded-google-fonts/
+      */
+      @font-face {
+        font-family: 'JetBrains Mono';
+        font-style: normal;
+        font-weight: 400;
+        src: url(data:application/font-woff2;charset=utf-8;base64,d09GMgABAAAAAAP0AA8AAAAAB3QAAAObAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGhwbHhwoBmA/U1RBVF4AXBEICoM0gn8LEAABNgIkAxAEIAWFAAcgGywGyAQeKK/6V5U0JrWweuRkIPSAPu3uB3ECeFTjw871+62KWCXStRIqNcGi7y+i1sSSaUziSTQxRM5L6vcAzzDqRKNLEcAyDCJUdBzUN3C9Btu4UaSm55biRv/HadtC+EEOMEosXtPTONLHCq1Fsl2X1eJCHCDPyko05JykRD2hIjkuIYS2cyPSXsWf3wBueJ1sC3iG5f/b2r//+0D7VxzbhbjhgyDIA/JtMO5qKuXOQ8A6NNq+2Hh7x0jdnuwcaewRKxEcYANONARSrGo4CBul0MWFIJ+4NT3yRL1dPCdiSygYxYmvk4krKtzvZBepNNJNPyOdbX3ca39uP2nfZF9pX2ZflLElKBYI22blBV2fYOCIInJaMz4oQh1zGhLZdCjgz3VNW2ZsV8vXrFirHMv1puWOlu5lyqHO8fuRCz6fUa7OCQptMWAYZWcDYjGolFh83Tjr22YEg+ocP3yOIYyNC77yc4JCGGdfZeE15VBSVajKKqPcoPFsICDEoqzghwWfZlkM4D/EBwv+5WcDQjOEEgqFIReUovrtW9+u8xyLS7KPxh6j9u0nM9oiohtT9qZEN7VFZDQVNFvZWdZeMzvLauafkIrmyty85oqyu6PCXor2mIesanf6cEmFt7exdKqyc+X38bVpkenJRUmh+Xce9xw98Snet6uv6Lrh4/ZHHI/v7Lzh1+7fOOqyvJ7wevNiK7zO67Esrye8zrzEDK/3esyCONNMvjjZNONiLTP54mTLpCMjPyct5Zria66pvubd4ndTkuIvLwbg3zE5JiN1c+UTM96V8b+5Ne3Lj/F3Xr/96tO2t1/9+a+Y/336xdq/hM7ZoJo96jk5h37PXzH/XaBfPLYXZCXV1GLipYyoGTebSzxCHw/glKJWpG8Zl88xSl8PwSfEiZtIsE2sEUlWCF2kEc8rIp1jXCtysIUlkZMjVApXEMkeSlRj3IBDenFlYiXLMJCs0g5BMf300kgfWYxosj100kwFrfl2OhiJ60cYYJhYTmqHhmlmiE4GGGGYE+jtpIff0c8Q7ZykgHRyyaaVESyGaKSTPobJox8U+MhximmlnVF6aGSIclp1KAB+ZXcRygkmHq1DdvMuXd6upgwkTkfr0JfK2zx0XWFxCv0MMNl19cBAU/FUvJxdlNJBK7uavK+QIfrpopXmrH6T0QGGoQPR+EOD7W+n82fxKE2coHmyJp2sYNqT3cXDe5zSTNqthC7U1gAAAA==) format('woff2');
+      }
+    </style>
+
     <linearGradient
-   id="linearGradient2173"
-   gradientUnits="userSpaceOnUse"
-   x1="6"
-   y1="-63"
-   x2="52"
-   y2="-63"
-   gradientTransform="matrix(1,0,0,-1,0,62.081959)">
-      <stop
-   offset="0.14140008"
-   style="stop-color:#4d4d4d"
-   id="stop2" />
-      <stop
-   offset="1"
-   style="stop-color:#000000"
-   id="stop4" />
+      id="upper-beak-gradient"
+      gradientUnits="userSpaceOnUse"
+      x1="0"
+      y1="31"
+      x2="16"
+      y2="31">
+      <stop offset="0" stop-color="#2d2d2d"/>
+      <stop offset="1" stop-color="#3d3d3d"/>
     </linearGradient>
     <linearGradient
-   id="SVGID_1_"
-   gradientUnits="userSpaceOnUse"
-   x1="4"
-   y1="50"
-   x2="20"
-   y2="65"
-   gradientTransform="matrix(1,0,0,-1,0,61)">
-        <stop
-   offset="0"
-   style="stop-color:#0095D5"
-   id="stop7" />
-      <stop
-   offset="0.2"
-   style="stop-color:#3C83DC"
-   id="stop9" />
-      <stop
-   offset="0.4"
-   style="stop-color:#6D74E1"
-   id="stop11" />
-      <stop
-   offset="0.6"
-   style="stop-color:#806EE3"
-   id="stop13" />
-      </linearGradient>
+      id="lower-beak-gradient"
+      gradientUnits="userSpaceOnUse"
+      x1="0"
+      y1="31"
+      x2="16"
+      y2="31">
+      <stop offset="1" stop-color="#1d1d1d"/>
+      <stop offset="0" stop-color="#2d2d2d"/>
+    </linearGradient>
     <linearGradient
-   id="SVGID_2_"
-   gradientUnits="userSpaceOnUse"
-   x1="53.362949"
-   y1="62.926205"
-   x2="121.83583"
-   y2="-4.9728923">
-      <stop
-   offset="0.1075"
-   style="stop-color:#C757BC"
-   id="stop16" />
-      <stop
-   offset="0.2138"
-   style="stop-color:#D0609A"
-   id="stop18" />
-      <stop
-   offset="0.4254"
-   style="stop-color:#E1725C"
-   id="stop20" />
-      <stop
-   offset="0.6048"
-   style="stop-color:#EE7E2F"
-   id="stop22" />
-      <stop
-   offset="0.743"
-   style="stop-color:#F58613"
-   id="stop24" />
-      <stop
-   offset="0.8232"
-   style="stop-color:#F88909"
-   id="stop26" />
-      </linearGradient>
+      id="blue-purple-gradient"
+      gradientUnits="userSpaceOnUse"
+      x1="0"
+      y1="31"
+      x2="31"
+      y2="0">
+      <stop offset="0.3" stop-color="#0095D5"/>
+      <stop offset="0.5" stop-color="#3C83DC"/>
+      <stop offset="0.6" stop-color="#6D74E1"/>
+      <stop offset="0.7" stop-color="#806EE3"/>
+    </linearGradient>
     <linearGradient
-   xlink:href="#SVGID_1_"
-   id="linearGradient1655"
-   gradientUnits="userSpaceOnUse"
-   gradientTransform="matrix(1,0,0,-1,0,61)"
-   x1="52.39006"
-   y1="-15.986445"
-   x2="127.13229"
-   y2="60.86771" />
+      id="purple-orange-gradient"
+      gradientUnits="userSpaceOnUse"
+      x1="0"
+      y1="31"
+      x2="31"
+      y2="0">
+      <stop offset="0.5" stop-color="#C757BC"/>
+      <stop offset="0.65" stop-color="#D0609A"/>
+      <stop offset="0.9" stop-color="#F88909"/>
+    </linearGradient>
+  </defs>
 
+  <rect id="black-background" width="100%" height="100%"/>
 
-    <linearGradient
-   xlink:href="#SVGID_1_"
-   id="linearGradient13292"
-   gradientUnits="userSpaceOnUse"
-   gradientTransform="matrix(1,0,0,-1,0,61)"
-   x1="52.39006"
-   y1="-15.986445"
-   x2="127.13229"
-   y2="60.86771" /></defs>
-  <rect
-   id="rect25224"
-   width="338.66666"
-   height="169.33333"
-   x="0"
-   y="-169.33333"
-   style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none"
-   transform="scale(1,-1)" />
+  <g transform="translate(2,16)" id="bird">
+    <path id="blue-feathers" fill="url(#blue-purple-gradient)"
+      d="
+        M5,19 v-10 l7,-7 h10
+        M20,16 l8,-8 v10 l-3,3
+        "/>
+    <path id="orange-feather" fill="url(#purple-orange-gradient)"
+      d="M11,13 l11,-11 h6 v6 l-8,8 l-3,-3"/>
+    <path id="white-head" fill="#fff"
+      d="M5,19 l6,-6 h6 l8,8 v3 l2,6 h-18 l2,-4"/>
+    <g id="beak">
+      <path id="lower-beak" fill="url(#lower-beak-gradient)"
+        d="M5,26 l4,3 l4,-3 Z"/>
+      <path id="upper-beak" fill="url(#upper-beak-gradient)"
+        d="M4,26 l5,-4 l4,4 Z"/>
+    </g>
+    <g id="eye">
+      <circle id="eye-base" fill="#000" cx="15" cy="21" r="1.5"/>
+      <path id="eye-twinkle" fill="none"
+        stroke="#f5f5f5"
+        stroke-linecap="round"
+        stroke-width=".2"
+        d="M15.1,20.1 q0.9,-0.1 1,0.9"/>
+    </g>
+  </g>
 
-
-  
-  <g
-   id="g872"
-   transform="translate(0.83464338,33.315321)"><g
-     id="g13290"
-     transform="matrix(0.45455461,0,0,0.45455461,30.939982,22.021047)"
-     style="stroke-width:2.19996"><path
-   id="middle-feather"
-   style="fill:url(#SVGID_2_);fill-opacity:1;stroke-width:2.19996"
-   d="M 32,62 64,90 123,28 V 3.96875 H 92 Z" />
-    <path
-   id="bottom-feather"
-   style="fill:url(#linearGradient13292);stroke-width:2.19996"
-   d="M 77.525602,74.753012 112,102 123,90 V 26.85241 Z" />
-    <path
-   id="white-head"
-   style="fill:#ffffff;stroke-width:2.19996"
-   d="M 25.12307,108.3116 7.0034378,86.991444 32,62 h 30 l 50,40 v 23 L 11.164181,124.72951 Z" />
-    <path
-   id="top-feather"
-   style="fill:url(#linearGradient1655);stroke-width:2.19996"
-   d="M 8,43 7,87 92,3.96875 H 46 Z" />
-    <path
-   id="beak"
-   style="fill:url(#linearGradient2173);stroke-width:2.19996"
-   d="m 30,103.08196 22,22 H 6 Z" />
-    <circle
-   id="eye"
-   cx="62"
-   cy="110"
-   r="6"
-   style="stroke-width:2.19996" /></g><g
-     aria-label="Dokkatoo"
-     transform="matrix(0.2301084,0,0,0.2301084,-21.943411,-11.635154)"
-     id="text3054"
-     style="font-size:192px;line-height:1.25;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect3056);stroke-width:1.14982"><path
-       d="m 525.75775,391.42846 v -140.16 h 36.288 q 13.632,0 23.424,5.184 9.984,5.184 15.36,14.592 5.568,9.408 5.568,22.272 v 55.872 q 0,12.864 -5.568,22.464 -5.376,9.408 -15.36,14.592 -9.792,5.184 -23.424,5.184 z m 17.28,-15.36 h 19.008 q 12.672,0 19.776,-7.104 7.296,-7.104 7.296,-19.776 v -55.872 q 0,-12.48 -7.296,-19.584 -7.104,-7.104 -19.776,-7.104 h -19.008 z"
-       style="font-family:'JetBrains Mono';fill:#ffffff;stroke-width:1.14982"
-       id="path850" /><path
-       d="m 680.89382,392.96446 q -19.008,0 -30.336,-11.136 -11.136,-11.136 -11.136,-31.104 v -24.192 q 0,-20.16 11.136,-31.104 11.136,-11.136 30.336,-11.136 19.2,0 30.336,11.136 11.136,10.944 11.136,31.104 v 24.192 q 0,19.968 -11.328,31.104 -11.136,11.136 -30.144,11.136 z m 0,-15.36 q 11.328,0 17.664,-6.336 6.528,-6.336 6.528,-18.624 v -28.032 q 0,-12.288 -6.528,-18.624 -6.336,-6.336 -17.664,-6.336 -11.136,0 -17.664,6.336 -6.528,6.336 -6.528,18.624 v 28.032 q 0,12.288 6.528,18.624 6.528,6.336 17.664,6.336 z"
-       style="font-family:'JetBrains Mono';fill:#ffffff;stroke-width:1.14982"
-       id="path852" /><path
-       d="m 757.1179,391.42846 v -140.16 h 17.28 v 78.144 h 20.16 l 29.568,-43.584 h 19.776 l -33.984,50.304 35.904,55.296 h -20.16 l -30.72,-47.04 h -20.544 v 47.04 z"
-       style="font-family:'JetBrains Mono';fill:#ffffff;stroke-width:1.14982"
-       id="path854" /><path
-       d="m 872.31797,391.42846 v -140.16 h 17.28 v 78.144 h 20.16 l 29.568,-43.584 h 19.776 l -33.984,50.304 35.904,55.296 h -20.16 l -30.72,-47.04 h -20.544 v 47.04 z"
-       style="font-family:'JetBrains Mono';fill:#ffffff;stroke-width:1.14982"
-       id="path856" /><path
-       d="m 1017.278,393.34846 q -16.32,0 -25.91996,-9.024 -9.6,-9.216 -9.6,-24 0,-9.792 4.416,-17.088 4.416,-7.296 12.288,-11.328 7.87196,-4.224 18.04796,-4.224 h 32.64 v -8.256 q 0,-20.544 -22.464,-20.544 -9.984,0 -16.128,3.648 -6.144,3.648 -6.528,10.176 h -17.27996 q 0.96,-12.48 11.52,-20.544 10.75196,-8.256 28.41596,-8.256 19.2,0 29.376,9.216 10.368,9.216 10.368,25.728 v 72.576 h -17.088 v -19.2 h -0.384 q -1.536,9.792 -9.792,15.552 -8.256,5.568 -21.888,5.568 z m 4.224,-14.592 q 12.672,0 20.16,-6.144 7.488,-6.144 7.488,-16.704 v -14.784 h -30.72 q -8.448,0 -13.824,5.184 -5.18396,4.992 -5.18396,13.44 0,8.832 5.75996,14.016 5.952,4.992 16.32,4.992 z"
-       style="font-family:'JetBrains Mono';fill:#ffffff;stroke-width:1.14982"
-       id="path858" /><path
-       d="m 1152.2541,391.42846 q -13.056,0 -20.928,-7.488 -7.872,-7.68 -7.872,-20.352 v -62.016 h -30.336 v -15.744 h 30.336 v -29.76 h 17.28 v 29.76 h 43.2 v 15.744 h -43.2 v 62.016 q 0,5.376 3.072,8.832 3.264,3.264 8.448,3.264 h 30.72 v 15.744 z"
-       style="font-family:'JetBrains Mono';fill:#ffffff;stroke-width:1.14982"
-       id="path860" /><path
-       d="m 1256.8942,392.96446 q -19.008,0 -30.336,-11.136 -11.136,-11.136 -11.136,-31.104 v -24.192 q 0,-20.16 11.136,-31.104 11.136,-11.136 30.336,-11.136 19.2,0 30.336,11.136 11.136,10.944 11.136,31.104 v 24.192 q 0,19.968 -11.328,31.104 -11.136,11.136 -30.144,11.136 z m 0,-15.36 q 11.328,0 17.664,-6.336 6.528,-6.336 6.528,-18.624 v -28.032 q 0,-12.288 -6.528,-18.624 -6.336,-6.336 -17.664,-6.336 -11.136,0 -17.664,6.336 -6.528,6.336 -6.528,18.624 v 28.032 q 0,12.288 6.528,18.624 6.528,6.336 17.664,6.336 z"
-       style="font-family:'JetBrains Mono';fill:#ffffff;stroke-width:1.14982"
-       id="path862" /><path
-       d="m 1372.0943,392.96446 q -19.008,0 -30.336,-11.136 -11.136,-11.136 -11.136,-31.104 v -24.192 q 0,-20.16 11.136,-31.104 11.136,-11.136 30.336,-11.136 19.2,0 30.336,11.136 11.136,10.944 11.136,31.104 v 24.192 q 0,19.968 -11.328,31.104 -11.136,11.136 -30.144,11.136 z m 0,-15.36 q 11.328,0 17.664,-6.336 6.528,-6.336 6.528,-18.624 v -28.032 q 0,-12.288 -6.528,-18.624 -6.336,-6.336 -17.664,-6.336 -11.136,0 -17.664,6.336 -6.528,6.336 -6.528,18.624 v 28.032 q 0,12.288 6.528,18.624 6.528,6.336 17.664,6.336 z"
-       style="font-family:'JetBrains Mono';fill:#ffffff;stroke-width:1.14982"
-       id="path864" /></g></g></svg>
+  <text x="33" y="32" font-family="JetBrains Mono" font-size="18" fill="#fff">Dokkatoo</text>
+  <text x="34.2" y="39" font-family="JetBrains Mono" font-size="5" fill="#ddd">
+    Generate Kotlin documentation
+  </text>
+  <text x="34.3" y="45" font-family="JetBrains Mono" font-size="3" fill="#999">
+    https://github.com/adamko-dev/dokkatoo
+  </text>
+</svg>
