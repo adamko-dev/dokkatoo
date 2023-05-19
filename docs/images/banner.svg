@@ -11,7 +11,8 @@
     <style>
       /*
       Specifically only embed the font required for 'Dokkatoo'
-      https://fonts.googleapis.com/icon?family=JetBrains+Mono&text=Dokkatoo,
+      // NOTE replace &amp; with plain ampersand in URL, because XML can't handle it even though it's in a comment
+      https://fonts.googleapis.com/icon?family=JetBrains+Mono&amp;text=Dokkatoo
       https://amio.github.io/embedded-google-fonts/
       */
       @font-face {
