@@ -2,7 +2,7 @@ import buildsrc.utils.excludeGeneratedGradleDsl
 import buildsrc.utils.initIdeProjectLogo
 
 plugins {
-  buildsrc.conventions.base
+  id("buildsrc.conventions.base")
   idea
 }
 

@@ -1,6 +1,6 @@
 plugins {
-  buildsrc.conventions.`maven-publish-test`
-  buildsrc.conventions.`dokkatoo-example-projects`
+  id("buildsrc.conventions.maven-publish-test")
+  id("buildsrc.conventions.dokkatoo-example-projects")
 }
 
 tasks.setupDokkaTemplateProjects {

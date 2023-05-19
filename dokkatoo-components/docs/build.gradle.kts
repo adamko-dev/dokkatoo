@@ -1,12 +1,12 @@
 import dev.adamko.dokkatoo.dokka.plugins.DokkaHtmlPluginParameters
 
 plugins {
-  buildsrc.conventions.base
-  dev.adamko.`dokkatoo-html`
+  id("buildsrc.conventions.base")
+  id("dev.adamko.dokkatoo-html")
 }
 
 dependencies {
-  dokkatoo(projects.modules.dokkatooPlugin)
+  dokkatoo(projects.dokkatooPlugin)
   dokkatooPluginHtml(libs.kotlin.dokkaPlugin.allModulesPage)
   dokkatooPluginHtml(libs.kotlin.dokkaPlugin.templating)
 }

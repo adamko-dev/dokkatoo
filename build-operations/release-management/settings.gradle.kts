@@ -1,4 +1,4 @@
-rootProject.name = "buildSrc"
+rootProject.name = "release-management"
 
 pluginManagement {
   repositories {
@@ -14,12 +14,13 @@ dependencyResolutionManagement {
 
   repositories {
     mavenCentral()
-    gradlePluginPortal()
   }
 
   versionCatalogs {
     create("libs") {
-      from(files("../gradle/libs.versions.toml"))
+      from(files("../../gradle/libs.versions.toml"))
     }
   }
 }
+
+includeBuild("../../dokkatoo-components")

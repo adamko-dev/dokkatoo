@@ -12,9 +12,9 @@ plugins {
   `jvm-test-suite`
   `test-report-aggregation`
 
-  buildsrc.conventions.`java-base`
-  buildsrc.conventions.`maven-publish-test`
-  buildsrc.conventions.`dokkatoo-example-projects`
+  id("buildsrc.conventions.java-base")
+  id("buildsrc.conventions.maven-publish-test")
+  id("buildsrc.conventions.dokkatoo-example-projects")
 }
 
 description = """
@@ -23,10 +23,10 @@ description = """
   """.trimIndent()
 
 dependencies {
-  testMavenPublication(projects.modules.dokkatooPlugin)
+  testMavenPublication(projects.dokkatooPlugin)
   exampleProjects(projects.examples)
 
-  testFixturesApi(testFixtures(projects.modules.dokkatooPlugin))
+  testFixturesApi(testFixtures(projects.dokkatooPlugin))
 
   testFixturesImplementation(gradleTestKit())
 

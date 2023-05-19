@@ -1,9 +1,7 @@
 package buildsrc.conventions
 
-import buildsrc.conventions.Maven_publish_test_gradle.MavenPublishTest
 import buildsrc.utils.asConsumer
 import buildsrc.utils.asProvider
-import buildsrc.tasks.SetupDokkaProjects
 
 plugins {
   id("buildsrc.conventions.base")

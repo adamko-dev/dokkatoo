@@ -4,7 +4,7 @@ import buildsrc.utils.skipTestFixturesPublications
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  buildsrc.conventions.`kotlin-gradle-plugin`
+  id("buildsrc.conventions.kotlin-gradle-plugin")
 
   kotlin("plugin.serialization") version embeddedKotlinVersion
   `java-test-fixtures`
@@ -12,13 +12,13 @@ plugins {
   `jvm-test-suite`
   `test-report-aggregation`
 
-  buildsrc.conventions.`github-maven-publish`
+  id("buildsrc.conventions.github-maven-publish")
 
-  buildsrc.conventions.`maven-publish-test`
+  id("buildsrc.conventions.maven-publish-test")
 
-  dev.adamko.kotlin.`binary-compatibility-validator`
+  id("dev.adamko.kotlin.binary-compatibility-validator")
 
-  dev.adamko.`dokkatoo-html`
+  id("dev.adamko.dokkatoo-html")
 }
 
 description = "Generates documentation for Kotlin projects (using Dokka)"
