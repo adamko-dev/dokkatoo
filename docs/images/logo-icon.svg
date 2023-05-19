@@ -66,7 +66,7 @@
       d="M11,13 l11,-11 h6 v6 l-8,8 l-3,-3"/>
     <path id="white-head" fill="#fff"
       d="M5,19 l6,-6 h6 l8,8 v3 l2,6 h-18 l2,-4"/>
-    <g id="beak">
+    <g id="beak" stroke-width="0.2" stroke="#666" >
       <path id="lower-beak" fill="url(#lower-beak-gradient)"
         d="M5,26 l4,3 l4,-3 Z"/>
       <path id="upper-beak" fill="url(#upper-beak-gradient)"
