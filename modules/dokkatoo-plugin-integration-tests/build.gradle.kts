@@ -179,3 +179,33 @@ tasks.withType<Test>().configureEach {
 dokkaSourceDownload {
   dokkaVersion.set(libs.versions.kotlin.dokka)
 }
+
+val updateAndroidLocalProperties by tasks.registering {
+  // find all local.properties files
+  val localPropertiesFiles = layout.projectDirectory.dir("projects").asFileTree
+    .matching {
+      include("**/local.properties")
+    }.files
+
+  outputs.files(localPropertiesFiles).withPropertyName("localPropertiesFiles")
+
+  val androidSdkDir = layout.projectDirectory.file("projects/ANDROID_SDK").asFile
+
+  // add the relative path as a property for Gradle up-to-date checks:
+  inputs.property("androidSdkDirPath", androidSdkDir.relativeTo(projectDir).invariantSeparatorsPath)
+
+  doLast {
+    localPropertiesFiles.forEach { file ->
+      file.writeText(
+        file.useLines { lines ->
+          lines.joinToString("\n") { line ->
+            when {
+              line.startsWith("sdk.dir=") -> "sdk.dir=${androidSdkDir.invariantSeparatorsPath}"
+              else                        -> line
+            }
+          }
+        }
+      )
+    }
+  }
+}
