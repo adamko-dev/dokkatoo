@@ -22,6 +22,7 @@ idea {
         ".gradle",
         "build",
         "gradle/wrapper",
+        "ANDROID_SDK",
       )
       addAll(
         projectDir.walk().filter { file ->
@@ -33,5 +34,7 @@ idea {
     }
   }
 }
+
+configurations.detachedConfiguration().asPath.split(" ")
 
 initIdeProjectLogo("docs/images/logo-icon.svg")
