@@ -4,6 +4,7 @@ pluginManagement {
   repositories {
     maven(providers.gradleProperty("testMavenRepo"))
     mavenCentral()
+//    mavenLocal()
     google()
     gradlePluginPortal()
   }
@@ -14,6 +15,7 @@ dependencyResolutionManagement {
   repositories {
     maven(providers.gradleProperty("testMavenRepo"))
     mavenCentral()
+//    mavenLocal()
     google()
   }
 }

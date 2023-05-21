@@ -2,6 +2,8 @@ package dev.adamko.dokkatoo.adapters
 
 import com.android.build.gradle.api.ApplicationVariant
 import com.android.build.gradle.api.LibraryVariant
+import com.android.build.gradle.internal.publishing.AndroidArtifacts
+import com.android.build.gradle.internal.publishing.AndroidArtifacts.ArtifactType.PROCESSED_JAR
 import dev.adamko.dokkatoo.DokkatooBasePlugin
 import dev.adamko.dokkatoo.DokkatooExtension
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetIdSpec
@@ -17,8 +19,7 @@ import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ConfigurationContainer
-import org.gradle.api.attributes.Usage.JAVA_RUNTIME
-import org.gradle.api.attributes.Usage.USAGE_ATTRIBUTE
+import org.gradle.api.attributes.Usage.*
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
 import org.gradle.api.logging.Logging
@@ -278,10 +279,47 @@ private class KotlinCompilationDetailsBuilder(
       configurations.collectIncomingFiles(named = named, collector = compilationClasspath) {
         withVariantReselection()
         attributes {
-          attribute(USAGE_ATTRIBUTE, objects.named(JAVA_RUNTIME))
+          attribute(USAGE_ATTRIBUTE, objects.named(JAVA_API))
         }
         lenient(true)
       }
+
+//      @Suppress("UnstableApiUsage")
+//      configurations.collectIncomingFiles(named = named, collector = compilationClasspath) {
+//        withVariantReselection()
+//        attributes {
+////          attribute(USAGE_ATTRIBUTE, objects.named(JAVA_API))
+//          attribute(AndroidArtifacts.ARTIFACT_TYPE, AndroidArtifacts.ArtifactType.CLASSES_JAR.type)
+//        }
+//        lenient(true)
+//      }
+//      @Suppress("UnstableApiUsage")
+//      configurations.collectIncomingFiles(named = named, collector = compilationClasspath) {
+//        withVariantReselection()
+//        attributes {
+////          attribute(USAGE_ATTRIBUTE, objects.named(JAVA_API))
+//          attribute(AndroidArtifacts.ARTIFACT_TYPE, AndroidArtifacts.ArtifactType.JAR.type)
+//        }
+//        lenient(true)
+//      }
+//      @Suppress("UnstableApiUsage")
+//      configurations.collectIncomingFiles(named = named, collector = compilationClasspath) {
+//        withVariantReselection()
+//        attributes {
+////          attribute(USAGE_ATTRIBUTE, objects.named(JAVA_API))
+//          attribute(AndroidArtifacts.ARTIFACT_TYPE, AndroidArtifacts.ArtifactType.CLASSES.type)
+//        }
+//        lenient(true)
+//      }
+//      @Suppress("UnstableApiUsage")
+//      configurations.collectIncomingFiles(named = named, collector = compilationClasspath) {
+//        withVariantReselection()
+//        attributes {
+////          attribute(USAGE_ATTRIBUTE, objects.named(JAVA_API))
+//          attribute(AndroidArtifacts.ARTIFACT_TYPE, AndroidArtifacts.ArtifactType.PROCESSED_JAR.type)
+//        }
+//        lenient(true)
+//      }
     }
 
     val standardConfigurations = mutableListOf<String>().apply {

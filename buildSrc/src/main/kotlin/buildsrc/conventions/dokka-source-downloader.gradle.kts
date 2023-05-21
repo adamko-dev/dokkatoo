@@ -3,6 +3,7 @@ package buildsrc.conventions
 import buildsrc.utils.asConsumer
 import buildsrc.utils.asProvider
 import buildsrc.utils.dropDirectories
+import org.gradle.api.attributes.Usage.USAGE_ATTRIBUTE
 import org.gradle.kotlin.dsl.support.serviceOf
 
 plugins {
@@ -18,14 +19,14 @@ val dsdExt = extensions.create<DokkaSourceDownloaderExtension>("dokkaSourceDownl
 val kotlinDokkaSource by configurations.creating {
   asConsumer()
   attributes {
-    attribute(Usage.USAGE_ATTRIBUTE, objects.named("externals-dokka-src"))
+    attribute(USAGE_ATTRIBUTE, objects.named("externals-dokka-src"))
   }
 }
 
 val kotlinDokkaSourceElements by configurations.registering {
   asProvider()
   attributes {
-    attribute(Usage.USAGE_ATTRIBUTE, objects.named("externals-dokka-src"))
+    attribute(USAGE_ATTRIBUTE, objects.named("externals-dokka-src"))
   }
 }
 

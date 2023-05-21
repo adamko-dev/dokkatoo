@@ -1,8 +1,10 @@
 @file:Suppress("UnstableApiUsage") // jvm test suites & test report aggregation are incubating
 
+import buildsrc.tasks.SetupDokkaProjects
 import buildsrc.utils.skipTestFixturesPublications
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.util.suffixIfNot
 
 plugins {
   kotlin("jvm")
@@ -156,6 +158,36 @@ tasks.setupDokkaTemplateProjects {
       )
     }
   )
+
+  // TODO try to improve this, make it more unified.
+  //      Maybe make a NDOC with an element per source `settings.gradle` file?
+
+  val androidLocalPropertiesFile = layout.projectDirectory
+    .file("projects/it-android-0/dokka/local.properties")
+  outputs.file(androidLocalPropertiesFile).withPropertyName("androidLocalPropertiesFile")
+
+  finalizedBy(updateAndroidLocalProperties)
+
+//  val androidSdkDir = layout.projectDirectory.file("projects/ANDROID_SDK").asFile
+
+  // add the relative path as a property for Gradle up-to-date checks:
+//  inputs.property("androidSdkDirPath", androidSdkDir.relativeTo(projectDir).invariantSeparatorsPath)
+
+  doLast {
+    androidLocalPropertiesFile.asFile.apply {
+      // every time this task is executed it wipes the local.properties file,
+      // so create an empty file that will be updated by tasks.updateAndroidLocalProperties
+      parentFile.mkdirs()
+      createNewFile()
+      writeText(
+//          |sdk.dir=${androidSdkDir.invariantSeparatorsPath}
+        """
+          |sdk.dir=
+          |
+        """.trimMargin()
+      )
+    }
+  }
 }
 
 dokkatooExampleProjects {
@@ -181,6 +213,9 @@ dokkaSourceDownload {
 }
 
 val updateAndroidLocalProperties by tasks.registering {
+
+  mustRunAfter(tasks.withType<SetupDokkaProjects>())
+
   // find all local.properties files
   val localPropertiesFiles = layout.projectDirectory.dir("projects").asFileTree
     .matching {
@@ -203,9 +238,13 @@ val updateAndroidLocalProperties by tasks.registering {
               line.startsWith("sdk.dir=") -> "sdk.dir=${androidSdkDir.invariantSeparatorsPath}"
               else                        -> line
             }
-          }
+          }.suffixIfNot("\n")
         }
       )
     }
   }
+}
+
+tasks.updateDokkatooExamples {
+  dependsOn(updateAndroidLocalProperties)
 }
