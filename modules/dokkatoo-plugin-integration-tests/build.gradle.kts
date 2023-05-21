@@ -158,6 +158,19 @@ tasks.setupDokkaTemplateProjects {
   )
 }
 
+dokkatooExampleProjects {
+  gradleProperties {
+    projectsItAndroid0Dokkatoo {
+      content.set(
+        """
+          android.useAndroidX=true
+        """.trimIndent()
+      )
+    }
+  }
+}
+
+
 tasks.withType<Test>().configureEach {
   // this seems to help OOM errors in the Worker Daemons
   //setForkEvery(1)
