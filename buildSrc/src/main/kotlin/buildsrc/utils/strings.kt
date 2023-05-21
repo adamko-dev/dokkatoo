@@ -19,10 +19,10 @@ private inline fun String.mapFirstChar(
 
 
 /**
- * Filters all non-alphanumeric characters and converts the result into camelCase.
+ * Exclude all non-alphanumeric characters and converts the result into a camelCase string.
  */
 internal fun String.toAlphaNumericCamelCase(): String =
-  map { if (it.isLetterOrDigit()) it else ' '}
+  map { if (it.isLetterOrDigit()) it else ' ' }
     .joinToString("")
     .split(" ")
     .filter { it.isNotBlank() }

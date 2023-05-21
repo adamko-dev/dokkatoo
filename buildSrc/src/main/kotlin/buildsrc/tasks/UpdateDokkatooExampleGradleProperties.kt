@@ -7,7 +7,6 @@ import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFile
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
@@ -19,7 +18,7 @@ import org.gradle.api.tasks.*
 abstract class UpdateDokkatooExampleGradleProperties @Inject constructor(
   @get:Internal
   val objects: ObjectFactory
-) : DefaultTask(), ExtensionAware {
+) : DefaultTask() {
 
   @get:Nested
   abstract val gradleProperties: NamedDomainObjectContainer<GradlePropertiesSpec>
