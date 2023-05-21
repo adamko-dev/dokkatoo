@@ -1,5 +1,6 @@
 package buildsrc.conventions
 
+import buildsrc.settings.MavenPublishTestSettings
 import buildsrc.utils.asConsumer
 import buildsrc.utils.asProvider
 
@@ -8,25 +9,15 @@ import buildsrc.utils.asProvider
 
 Utility for publishing a project to a local Maven directory for use in integration tests.
 
-
-
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 plugins {
   base
 }
 
-abstract class MavenPublishTest(
-  val testMavenRepo: Provider<Directory>
-) {
-  companion object {
-    val attribute = Attribute.of("maven-publish-test", String::class.java)
-  }
-}
-
 val Gradle.rootGradle: Gradle get() = generateSequence(gradle) { it.parent }.last()
 
-val mavenPublishTestExtension = extensions.create<MavenPublishTest>(
+val mavenPublishTestExtension = extensions.create<MavenPublishTestSettings>(
   "mavenPublishTest",
   gradle.rootGradle.rootProject.layout.buildDirectory.dir("test-maven-repo"),
 )
@@ -84,7 +75,7 @@ val testMavenPublication by configurations.registering {
   asConsumer()
   isVisible = false
   attributes {
-    attribute(MavenPublishTest.attribute, "testMavenRepo")
+    attribute(MavenPublishTestSettings.attribute, "testMavenRepo")
   }
 }
 
@@ -93,7 +84,7 @@ val testMavenPublicationElements by configurations.registering {
   isVisible = true
   extendsFrom(testMavenPublication.get())
   attributes {
-    attribute(MavenPublishTest.attribute, "testMavenRepo")
+    attribute(MavenPublishTestSettings.attribute, "testMavenRepo")
   }
   outgoing {
     artifact(mavenPublishTestExtension.testMavenRepo) {
@@ -104,6 +95,6 @@ val testMavenPublicationElements by configurations.registering {
 
 dependencies {
   attributesSchema {
-    attribute(MavenPublishTest.attribute)
+    attribute(MavenPublishTestSettings.attribute)
   }
 }
