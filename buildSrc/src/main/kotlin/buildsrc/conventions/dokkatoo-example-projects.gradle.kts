@@ -13,12 +13,10 @@ plugins {
   id("buildsrc.conventions.dokkatoo-example-projects-base")
 }
 
-val TASK_GROUP = "dokkatoo examples"
-
 val prepareDokkaSourceTask = tasks.named<Sync>("prepareDokkaSource")
 
 val setupDokkaTemplateProjects by tasks.registering(SetupDokkaProjects::class) {
-  group = TASK_GROUP
+  group = DokkatooExampleProjectsSettings.TASK_GROUP
 
   dependsOn(prepareDokkaSourceTask)
 
@@ -58,8 +56,7 @@ fun createDokkatooExampleProjectsSettings(
     // for each settings file, create a GradlePropertiesSpec
     settingsFiles.forEach {
       val destinationDir = it.parentFile
-      val name =
-        destinationDir.toRelativeString(projectDir.asFile).toAlphaNumericCamelCase()
+      val name = destinationDir.toRelativeString(projectDir.asFile).toAlphaNumericCamelCase()
       gradleProperties.register(name) {
         this.destinationDir.set(destinationDir)
       }
@@ -80,7 +77,7 @@ val dokkatooExampleProjectsSettings = createDokkatooExampleProjectsSettings()
 val updateDokkatooExamplesGradleProperties by tasks.registering(
   UpdateDokkatooExampleGradleProperties::class
 ) {
-  group = TASK_GROUP
+  group = DokkatooExampleProjectsSettings.TASK_GROUP
 
   mustRunAfter(tasks.withType<SetupDokkaProjects>())
 
@@ -90,7 +87,7 @@ val updateDokkatooExamplesGradleProperties by tasks.registering(
 val dokkatooVersion = provider { project.version.toString() }
 
 val updateDokkatooExamplesBuildFiles by tasks.registering {
-  group = TASK_GROUP
+  group = DokkatooExampleProjectsSettings.TASK_GROUP
   description = "Update the Gradle build files in the Dokkatoo examples"
 
   outputs.upToDateWhen { false }
@@ -130,9 +127,9 @@ val updateDokkatooExamplesBuildFiles by tasks.registering {
 }
 
 
-val updateDokkatooExamples by tasks.registering task@{
-  group = TASK_GROUP
-  description = "lifecycle task for all '$TASK_GROUP' tasks"
+val updateDokkatooExamples by tasks.registering {
+  group = DokkatooExampleProjectsSettings.TASK_GROUP
+  description = "lifecycle task for all '${DokkatooExampleProjectsSettings.TASK_GROUP}' tasks"
   dependsOn(
     setupDokkaTemplateProjects,
     updateDokkatooExamplesGradleProperties,

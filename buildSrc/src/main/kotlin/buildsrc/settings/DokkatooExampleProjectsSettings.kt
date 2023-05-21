@@ -20,6 +20,7 @@ abstract class DokkatooExampleProjectsSettings @Inject constructor(
     extensions.adding("gradleProperties", objects.domainObjectContainer())
 
   companion object {
+    const val TASK_GROUP = "dokkatoo examples"
     const val EXTENSION_NAME = "dokkatooExampleProjects"
   }
 }
