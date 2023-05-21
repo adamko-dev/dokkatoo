@@ -1,7 +1,7 @@
 package buildsrc.conventions
 
-import buildsrc.settings.MavenPublishTestSettings
 import buildsrc.settings.DokkatooExampleProjectsSettings
+import buildsrc.settings.MavenPublishTestSettings
 import buildsrc.tasks.*
 import buildsrc.utils.*
 import org.gradle.kotlin.dsl.support.serviceOf
@@ -66,7 +66,11 @@ fun createDokkatooExampleProjectsSettings(
     }
 
     gradleProperties.configureEach {
-      enableTestMavenRepo.convention(true)
+      content.add(
+        mavenPublishTestExtension.testMavenRepoPath.map { testMavenRepoPath ->
+          "testMavenRepo=$testMavenRepoPath"
+        }
+      )
     }
   }
 }
@@ -81,8 +85,6 @@ val updateDokkatooExamplesGradleProperties by tasks.registering(
   mustRunAfter(tasks.withType<SetupDokkaProjects>())
 
   gradleProperties.addAllLater(providers.provider { dokkatooExampleProjectsSettings.gradleProperties })
-
-  testMavenRepo.set(mavenPublishTestExtension.testMavenRepo)
 }
 
 val dokkatooVersion = provider { project.version.toString() }

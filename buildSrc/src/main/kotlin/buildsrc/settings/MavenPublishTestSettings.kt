@@ -11,6 +11,8 @@ import org.gradle.api.provider.Provider
 abstract class MavenPublishTestSettings(
   val testMavenRepo: Provider<Directory>
 ) : ExtensionAware {
+  val testMavenRepoPath: Provider<String> = testMavenRepo.map { it.asFile.invariantSeparatorsPath }
+
   companion object {
     val attribute = Attribute.of("maven-publish-test", String::class.java)
   }

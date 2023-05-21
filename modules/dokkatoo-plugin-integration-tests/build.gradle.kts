@@ -161,11 +161,7 @@ tasks.setupDokkaTemplateProjects {
 dokkatooExampleProjects {
   gradleProperties {
     projectsItAndroid0Dokkatoo {
-      content.set(
-        """
-          android.useAndroidX=true
-        """.trimIndent()
-      )
+      content.add("android.useAndroidX=true")
     }
   }
 }
