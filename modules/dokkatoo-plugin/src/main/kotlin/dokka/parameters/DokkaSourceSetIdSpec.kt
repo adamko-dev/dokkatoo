@@ -27,17 +27,16 @@ constructor(
   val scopeId: String,
 
   @get:Input
-  val sourceSetName: String
+  @set:Deprecated(
+    "To support the use of DokkaSourceSetIdSpec in Sets, sourceSetName cannot be modified",
+  )
+  var sourceSetName: String
 ) : Named, Serializable {
 
   @Internal
   override fun getName(): String = "$scopeId/$sourceSetName"
 
   override fun toString(): String = "DokkaSourceSetIdSpec($scopeId/$sourceSetName)"
-
-  @Deprecated("To support the use of DokkaSourceSetIdSpec in Sets, sourceSetName cannot be modified")
-  fun setSourceSetName(value: String) {
-  }
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
