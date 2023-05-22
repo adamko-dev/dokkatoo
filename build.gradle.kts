@@ -15,24 +15,23 @@ idea {
     excludeGeneratedGradleDsl(layout)
 
     excludeDirs.apply {
-      addAll(
-        layout.files(
-          ".idea",
-          "gradle/kotlin-js-store",
-          "gradle/wrapper",
-          "externals/kotlin-dokka",
-        )
+      // exclude .gradle, IDE dirs from nested projects (e.g. example & template projects)
+      // so IntelliJ project-wide search isn't cluttered with irrelevant files
+      val excludedDirs = setOf(
+        ".idea",
+        ".gradle",
+        "build",
+        "gradle/wrapper",
       )
-      // exclude .gradle dirs from nested projects (e.g. example & template projects)
       addAll(
-        layout.projectDirectory.asFile.walk()
-          .filter { it.isDirectory && it.name == ".gradle" }
-          .flatMap { file ->
-            file.walk().maxDepth(1).filter { it.isDirectory }.toList()
+        projectDir.walk().filter { file ->
+          excludedDirs.any {
+            file.invariantSeparatorsPath.endsWith(it)
           }
+        }
       )
     }
   }
 }
 
-initIdeProjectLogo("media/img/logo.svg")
+initIdeProjectLogo("docs/images/logo-icon.svg")
