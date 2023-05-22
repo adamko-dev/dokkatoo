@@ -1,10 +1,7 @@
 package dev.adamko.dokkatoo.adapters
 
 import com.android.build.gradle.api.ApplicationVariant
-import com.android.build.gradle.api.BaseVariant
 import com.android.build.gradle.api.LibraryVariant
-import com.android.build.gradle.api.TestVariant
-import com.android.build.gradle.api.UnitTestVariant
 import dev.adamko.dokkatoo.DokkatooBasePlugin
 import dev.adamko.dokkatoo.DokkatooExtension
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetIdSpec
@@ -13,6 +10,7 @@ import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec
 import dev.adamko.dokkatoo.dokka.parameters.KotlinPlatform
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import dev.adamko.dokkatoo.internal.collectIncomingFiles
+import dev.adamko.dokkatoo.internal.not
 import javax.inject.Inject
 import org.gradle.api.Named
 import org.gradle.api.NamedDomainObjectContainer
@@ -36,7 +34,6 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinSingleTargetExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation.Companion.MAIN_COMPILATION_NAME
-import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation.Companion.TEST_COMPILATION_NAME
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.mpp.AbstractKotlinNativeCompilation
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinJvmAndroidCompilation
@@ -130,7 +127,7 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
     val kssClasspath = determineClasspath(details)
 
     register(details.name) dss@{
-      suppress.set(details.suppressDefault())
+      suppress.set(!details.isMainSourceSet())
       sourceRoots.from(details.sourceDirectories)
       classpath.from(kssClasspath)
       analysisPlatform.set(kssPlatform)
@@ -312,43 +309,13 @@ private class KotlinCompilationDetailsBuilder(
   }
 
   companion object {
-    private fun KotlinCompilation<*>.debugPrint() {
-      val androidVariant: BaseVariant? = (this as? KotlinJvmAndroidCompilation)?.androidVariant
-      val avType = androidVariant?.let { it::class.simpleName }
-
-
-
-      androidVariant?.let { it::class.qualifiedName }
-
-      val avIsLibrary = androidVariant is LibraryVariant
-      val avIsApplication = androidVariant is ApplicationVariant
-      val avIsTest = androidVariant is TestVariant
-      val avIsUnitTest = androidVariant is UnitTestVariant
-
-      println(
-        "is $name main? androidVariant:${androidVariant?.name} $avType "
-            + "avIsLibrary:$avIsLibrary "
-            + "avIsApplication:$avIsApplication "
-            + "avIsTest:$avIsTest "
-            + "avIsUnitTest:$avIsUnitTest "
-      )
-    }
-
     private fun KotlinCompilation<*>.isMain(): Boolean {
-
-      debugPrint()
-
       return when (this) {
         is KotlinJvmAndroidCompilation ->
-          androidVariant is LibraryVariant
-              || androidVariant is ApplicationVariant
-              && androidVariant !is TestVariant
-              && androidVariant !is UnitTestVariant
+          androidVariant is LibraryVariant || androidVariant is ApplicationVariant
 
         else                           ->
           name == MAIN_COMPILATION_NAME
-//              && !name.endsWith(TEST_COMPILATION_NAME, ignoreCase = true)
-//              && !name.startsWith("androidTest", ignoreCase = true)
       }
     }
   }
@@ -374,20 +341,8 @@ private abstract class KotlinSourceSetDetails @Inject constructor(
   /** The specific compilations used to build this source set */
   abstract val compilations: ListProperty<KotlinCompilationDetails>
 
-  /** Default value for [DokkaSourceSetSpec.suppress] */
-  fun suppressDefault(): Provider<Boolean> {
-    return providers.zip(
-      isMainSourceSet(),
-      sourceDirectories.elements
-    ) { isMain, sourceDirs ->
-      // suppress this source set if
-      !isMain // it's not a 'main' source set (which implies it's a test source set)
-//          || sourceDirs.isEmpty() // or there's no source code
-    }
-  }
-
   /** Estimate if this Kotlin source set are 'main' sources (as opposed to 'test' sources). */
-  private fun isMainSourceSet(): Provider<Boolean> =
+  fun isMainSourceSet(): Provider<Boolean> =
     compilations.map { values ->
       values.any { it.mainCompilation }
     }
