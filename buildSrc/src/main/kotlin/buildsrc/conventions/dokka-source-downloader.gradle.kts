@@ -1,5 +1,6 @@
 package buildsrc.conventions
 
+import buildsrc.settings.DokkaSourceDownloaderSettings
 import buildsrc.utils.asConsumer
 import buildsrc.utils.asProvider
 import buildsrc.utils.dropDirectories
@@ -10,13 +11,11 @@ plugins {
   id("buildsrc.conventions.base")
 }
 
-interface DokkaSourceDownloaderExtension {
-  val dokkaVersion: Property<String>
-}
+val dsdExt: DokkaSourceDownloaderSettings = extensions.create<DokkaSourceDownloaderSettings>(
+  DokkaSourceDownloaderSettings.EXTENSION_NAME
+)
 
-val dsdExt = extensions.create<DokkaSourceDownloaderExtension>("dokkaSourceDownload")
-
-val kotlinDokkaSource by configurations.creating {
+val kotlinDokkaSource by configurations.creating<Configuration> {
   asConsumer()
   attributes {
     attribute(USAGE_ATTRIBUTE, objects.named("externals-dokka-src"))

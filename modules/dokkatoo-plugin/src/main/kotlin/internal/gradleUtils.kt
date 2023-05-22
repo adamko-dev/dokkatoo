@@ -60,8 +60,9 @@ internal object LocalProjectOnlyFilter : Spec<ComponentIdentifier> {
     element is ProjectComponentIdentifier
 }
 
+
 /** Invert the result of a [Spec] predicate */
-internal operator fun <T> Spec<T>.not() = Spec<T> { !this@not.isSatisfiedBy(it) }
+internal operator fun <T> Spec<T>.not(): Spec<T> = Spec<T> { !this@not.isSatisfiedBy(it) }
 
 
 internal fun Project.pathAsFilePath() = path

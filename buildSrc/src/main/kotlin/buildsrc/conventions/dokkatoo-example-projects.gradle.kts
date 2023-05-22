@@ -57,13 +57,13 @@ fun createDokkatooExampleProjectsSettings(
     settingsFiles.forEach {
       val destinationDir = it.parentFile
       val name = destinationDir.toRelativeString(projectDir.asFile).toAlphaNumericCamelCase()
-      gradleProperties.register(name) {
-        this.destinationDir.set(destinationDir)
+      exampleProjects.register(name) {
+        this.exampleProjectDir.set(destinationDir)
       }
     }
 
-    gradleProperties.configureEach {
-      content.add(
+    exampleProjects.configureEach {
+      gradlePropertiesContent.add(
         mavenPublishTestExtension.testMavenRepoPath.map { testMavenRepoPath ->
           "testMavenRepo=$testMavenRepoPath"
         }
@@ -75,13 +75,15 @@ fun createDokkatooExampleProjectsSettings(
 val dokkatooExampleProjectsSettings = createDokkatooExampleProjectsSettings()
 
 val updateDokkatooExamplesGradleProperties by tasks.registering(
-  UpdateDokkatooExampleGradleProperties::class
+  UpdateDokkatooExampleProjects::class
 ) {
   group = DokkatooExampleProjectsSettings.TASK_GROUP
 
   mustRunAfter(tasks.withType<SetupDokkaProjects>())
 
-  gradleProperties.addAllLater(providers.provider { dokkatooExampleProjectsSettings.gradleProperties })
+  exampleProjects.addAllLater(providers.provider {
+    dokkatooExampleProjectsSettings.exampleProjects
+  })
 }
 
 val dokkatooVersion = provider { project.version.toString() }
@@ -98,7 +100,7 @@ val updateDokkatooExamplesBuildFiles by tasks.registering {
   val dokkatooVersion = dokkatooVersion
 
   val dokkatooPluginVersionMatcher = """
-    id[^"]+?\"dev\.adamko\.dokkatoo\".+?version \"([^"]+?)\"
+    id[^"]+?"dev\.adamko\.dokkatoo".+?version "([^"]+?)"
     """.trimIndent().toRegex()
 
   val gradleBuildFiles =
@@ -113,8 +115,8 @@ val updateDokkatooExamplesBuildFiles by tasks.registering {
   outputs.files(gradleBuildFiles)
 
   doLast {
-    gradleBuildFiles.get().forEach {
-      val file = it.asFile
+    gradleBuildFiles.get().forEach { fileLocation ->
+      val file = fileLocation.asFile
       if (file.exists()) {
         file.writeText(
           file.readText().replace(dokkatooPluginVersionMatcher) {

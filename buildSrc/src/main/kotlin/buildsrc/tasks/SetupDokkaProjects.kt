@@ -17,7 +17,6 @@ import org.gradle.api.tasks.TaskAction
 abstract class SetupDokkaProjects @Inject constructor(
   private val files: FileSystemOperations,
   private val layout: ProjectLayout,
-  private val objects: ObjectFactory,
 ) : DefaultTask() {
 
   @get:Input
@@ -27,9 +26,8 @@ abstract class SetupDokkaProjects @Inject constructor(
   abstract val dokkaSourceDir: DirectoryProperty
 
   @get:OutputDirectories
-  val destinationDirs: FileCollection = layout.files(
-    destinationToSources.map { it.keys }
-  )
+  val destinationDirs: FileCollection
+    get() = layout.files(destinationToSources.map { it.keys })
 
   init {
     group = "dokka examples"

@@ -185,9 +185,9 @@ tasks.setupDokkaTemplateProjects {
 }
 
 dokkatooExampleProjects {
-  gradleProperties {
+  exampleProjects {
     projectsItAndroid0Dokkatoo {
-      content.add("android.useAndroidX=true")
+      gradlePropertiesContent.add("android.useAndroidX=true")
     }
   }
 }
