@@ -35,6 +35,4 @@ idea {
   }
 }
 
-configurations.detachedConfiguration().asPath.split(" ")
-
 initIdeProjectLogo("docs/images/logo-icon.svg")
