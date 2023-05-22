@@ -7,6 +7,7 @@ import dev.adamko.dokkatoo.dokka.parameters.VisibilityModifier.Companion.dokkaTy
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import dev.adamko.dokkatoo.internal.mapNotNullToSet
 import dev.adamko.dokkatoo.internal.mapToSet
+import org.gradle.api.logging.Logging
 import org.jetbrains.dokka.*
 
 
@@ -20,17 +21,44 @@ import org.jetbrains.dokka.*
 @DokkatooInternalApi
 internal object DokkaSourceSetBuilder {
 
-  fun buildAll(sourceSets: List<DokkaSourceSetSpec>): List<DokkaSourceSetImpl> =
-    sourceSets.map(::build)
+  private val logger = Logging.getLogger(DokkaParametersBuilder::class.java)
+
+  fun buildAll(sourceSets: Set<DokkaSourceSetSpec>): List<DokkaSourceSetImpl> {
+
+    val suppressedSourceSetIds = sourceSets.mapNotNullToSet {
+      val suppressed = it.suppress.get()
+      val sourceSetId = it.sourceSetId.get()
+      if (suppressed) {
+        logger.info("Dokka source set $sourceSetId is suppressed")
+        sourceSetId
+      } else {
+        logger.info("Dokka source set $sourceSetId isn't suppressed")
+        null
+      }
+    }
+
+    println("suppressedSourceSetIds:$suppressedSourceSetIds")
+
+    val enabledSourceSets = sourceSets.filter { it.sourceSetId.get() !in suppressedSourceSetIds }
+
+    return enabledSourceSets.map { build(it, suppressedSourceSetIds) }
+  }
 
   private fun build(
     spec: DokkaSourceSetSpec,
+    suppressedSourceSetIds: Set<DokkaSourceSetIdSpec>,
   ): DokkaSourceSetImpl {
+
+    val dependentSourceSets =
+      (spec.dependentSourceSets subtract suppressedSourceSetIds).mapToSet(::build)
+
+    println("building DokkaSourceSet ${spec.sourceSetId.get()}, with dependents: $dependentSourceSets")
+
     return DokkaSourceSetImpl(
       // properties
       analysisPlatform = spec.analysisPlatform.get().dokkaType,
       apiVersion = spec.apiVersion.orNull,
-      dependentSourceSets = spec.dependentSourceSets.mapToSet(::build),
+      dependentSourceSets = dependentSourceSets,
       displayName = spec.displayName.get(),
       documentedVisibilities = spec.documentedVisibilities.get().mapToSet { it.dokkaType },
       externalDocumentationLinks = spec.externalDocumentationLinks.mapNotNullToSet(::build),

@@ -2,8 +2,8 @@ package dev.adamko.dokkatoo.adapters
 
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.BaseExtension
-import com.android.build.gradle.BasePlugin
 import com.android.build.gradle.LibraryExtension
+import com.android.build.gradle.TestExtension
 import com.android.build.gradle.api.BaseVariant
 import com.android.build.gradle.internal.dependency.VariantDependencies
 import com.android.build.gradle.internal.publishing.AndroidArtifacts
@@ -21,9 +21,9 @@ import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.file.FileCollection
 import org.gradle.api.logging.Logging
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.kotlin.dsl.*
-import org.jetbrains.kotlin.gradle.plugin.android.AndroidGradleWrapper
 
 @DokkatooInternalApi
 abstract class DokkatooAndroidAdapter @Inject constructor(
@@ -36,20 +36,69 @@ abstract class DokkatooAndroidAdapter @Inject constructor(
 
     project.plugins.withType<DokkatooBasePlugin>().configureEach {
       project.pluginManager.apply {
-        withPlugin("com.android.base") { configure(project, id) }
-        withPlugin("com.android.application") { configure(project, id) }
-        withPlugin("com.android.library") { configure(project, id) }
+        withPlugin("com.android.base") { configure(project) }
+        withPlugin("com.android.application") { configure(project) }
+        withPlugin("com.android.library") { configure(project) }
       }
     }
   }
 
-  protected fun configure(project: Project, androidPluginId: String) {
+  protected fun configure(project: Project) {
     val dokkatooExtension = project.extensions.getByType<DokkatooExtension>()
 
-    // TODO try to remove this android stuff, hopefully fetching files via Configurations is enough
     val androidExt = project.extensions.getByType<BaseExtension>()
-    @Suppress("DEPRECATION")
-    val androidPlugin = project.plugins.findPlugin(androidPluginId) as? BasePlugin ?: return
+
+    dokkatooExtension.dokkatooSourceSets.configureEach {
+
+      classpath.from(
+        analysisPlatform.map { analysisPlatform ->
+          when (analysisPlatform) {
+            KotlinPlatform.AndroidJVM ->
+              collectAndroidClasspath(
+                androidExt = androidExt,
+                configurations = project.configurations,
+              )
+
+            else                      ->
+              objects.fileCollection()
+          }
+
+        }
+      )
+    }
+  }
+
+  private fun collectAndroidClasspath(
+    androidExt: BaseExtension,
+    configurations: ConfigurationContainer,
+  ): FileCollection {
+    val compilationClasspath = objects.fileCollection()
+
+    fun collectConfiguration(named: String) {
+      configurations.collectIncomingFiles(named, compilationClasspath) {
+        attributes {
+          attribute(AndroidArtifacts.ARTIFACT_TYPE, PROCESSED_JAR.type)
+        }
+        lenient(true)
+      }
+    }
+
+    // fetch android.jar
+    collectConfiguration(named = VariantDependencies.CONFIG_NAME_ANDROID_APIS)
+
+    val variantConfigurations = variantConfigurationNames(androidExt)
+    // fetching _all_ configuration names is very brute force and should probably be refined to
+    // only fetch those that match a specific DokkaSourceSetSpec
+
+    for (variantConfig in variantConfigurations.get()) {
+      collectConfiguration(named = variantConfig)
+    }
+
+    return compilationClasspath
+  }
+
+  /** Fetch all configuration names used by all variants. */
+  private fun variantConfigurationNames(androidExt: BaseExtension): Provider<List<String>> {
 
     val variants: DomainObjectSet<BaseVariant> =
       objects.domainObjectSet(BaseVariant::class).apply {
@@ -57,153 +106,21 @@ abstract class DokkatooAndroidAdapter @Inject constructor(
           when (androidExt) {
             is LibraryExtension -> androidExt.libraryVariants
             is AppExtension     -> androidExt.applicationVariants
+            is TestExtension    -> androidExt.applicationVariants
             else                -> emptyList()
           }
         })
       }
 
-//    val variantsCompileClasspath = objects.fileCollection().from(
-//      providers.provider { variants.map { it.getCompileClasspath(null) } }
-//    )
-
-    dokkatooExtension.dokkatooSourceSets.configureEach {
-
-      analysisPlatform.map { platform ->
-        val compilationClasspath = objects.fileCollection()
-        if (platform == KotlinPlatform.AndroidJVM) {
-          // fetch Android JARs using the same method as the Kotlin/Android plugin
-          // https://github.com/JetBrains/kotlin/blob/v1.8.21/libraries/tools/kotlin-gradle-plugin/src/common/kotlin/org/jetbrains/kotlin/gradle/targets/android/AndroidProjectHandler.kt#L294-L301
-          compilationClasspath.from(
-            providers.provider { AndroidGradleWrapper.getRuntimeJars(androidPlugin, androidExt) }
-          )
-          compilationClasspath.from(
-            providers.provider { variants.map { it.getCompileClasspath(null) } }
-          )
-          compilationClasspath.from(
-            providers.provider { variants.map { it.getCompileClasspathArtifacts(null) } }
-          )
-        }
-      }
-
-      val androidClasspath = analysisPlatform.map { analysisPlatform ->
-        collectAndroidClasspath(
-          project.configurations,
-          analysisPlatform,
+    return providers.provider {
+      variants.flatMap {
+        setOf(
+          it.compileConfiguration.name,
+          it.runtimeConfiguration.name,
+          it.annotationProcessorConfiguration.name,
         )
       }
-
-      classpath.from(androidClasspath)
-//
-//
-//      classpath.from(AndroidGradleWrapper.getRuntimeJars(androidPlugin, androidExt))
     }
-  }
-
-  private fun collectAndroidClasspath(
-    configurations: ConfigurationContainer,
-    analysisPlatform: KotlinPlatform,
-  ): FileCollection {
-    val compilationClasspath = objects.fileCollection()
-    if (analysisPlatform != KotlinPlatform.AndroidJVM) return compilationClasspath
-
-    fun collectConfiguration(named: String) {
-
-//      configurations.collectIncomingFiles(named, compilationClasspath)
-
-      // need to fetch JARs explicitly, because Android Gradle Plugin is weird
-      // and doesn't seem to register the attributes properly
-////          @Suppress("UnstableApiUsage")
-//          configurations.collectIncomingFiles(named, compilationClasspath) {
-////            withVariantReselection()
-//            attributes { attribute(AndroidArtifacts.ARTIFACT_TYPE, JAR.type) }
-//            lenient(true)
-//          }
-
-//      @Suppress("UnstableApiUsage")
-      configurations.collectIncomingFiles(named, compilationClasspath) {
-//        withVariantReselection()
-        attributes {
-          attribute(AndroidArtifacts.ARTIFACT_TYPE, PROCESSED_JAR.type)
-        }
-        lenient(true)
-      }
-////      @Suppress("UnstableApiUsage")
-//      configurations.collectIncomingFiles(named, compilationClasspath) {
-////        withVariantReselection()
-//        attributes {
-//          attribute(AndroidArtifacts.ARTIFACT_TYPE, AndroidArtifacts.ArtifactType.JAR.type)
-//        }
-//        lenient(true)
-//      }
-////      @Suppress("UnstableApiUsage")
-//      configurations.collectIncomingFiles(named, compilationClasspath) {
-////        withVariantReselection()
-//        attributes {
-//          attribute(AndroidArtifacts.ARTIFACT_TYPE, AndroidArtifacts.ArtifactType.CLASSES_JAR.type)
-//        }
-//        lenient(true)
-//      }
-////      @Suppress("UnstableApiUsage")
-//      configurations.collectIncomingFiles(named, compilationClasspath) {
-////        withVariantReselection()
-//        attributes {
-//          attribute(AndroidArtifacts.ARTIFACT_TYPE, AndroidArtifacts.ArtifactType.CLASSES.type)
-//        }
-//        lenient(true)
-//      }
-    }
-
-    // fetch android.jar
-    collectConfiguration(named = VariantDependencies.CONFIG_NAME_ANDROID_APIS)
-
-
-//    listOf(
-//      "releaseCompilationApi",
-//      "releaseCompilationImplementation",
-//      "releaseCompilationCompileOnly",
-//      "releaseCompilationRuntimeOnly",
-//      "releaseApiElements",
-//      "releaseRuntimeElements",
-//      "releaseCompileClasspath",
-//      "releaseRuntimeClasspath",
-//      "releaseApi",
-//      "releaseImplementation",
-//      "releaseCompileOnly",
-//      "releaseRuntimeOnly",
-//      "releaseApiDependenciesMetadata",
-//      "releaseImplementationDependenciesMetadata",
-//      "releaseCompileOnlyDependenciesMetadata",
-//      "releaseRuntimeOnlyDependenciesMetadata",
-//      "api",
-//      "implementation",
-//      "compileOnly",
-//      "runtimeOnly",
-//      "apiDependenciesMetadata",
-//      "implementationDependenciesMetadata",
-//      "compileOnlyDependenciesMetadata",
-//      "runtimeOnlyDependenciesMetadata"
-//    ).forEach {
-//      collectConfiguration(named = it)
-//    }
-
-//    collectConfiguration(named = VariantDependencies.CONFIG_NAME_COMPILE)
-//    collectConfiguration(named = VariantDependencies.CONFIG_NAME_PUBLISH)
-//    collectConfiguration(named = VariantDependencies.CONFIG_NAME_ANNOTATION_PROCESSOR)
-//    collectConfiguration(named = VariantDependencies.CONFIG_NAME_API)
-//    collectConfiguration(named = VariantDependencies.CONFIG_NAME_APPLICATION)
-//    collectConfiguration(named = VariantDependencies.CONFIG_NAME_IMPLEMENTATION)
-//    collectConfiguration(named = VariantDependencies.CONFIG_NAME_CORE_LIBRARY_DESUGARING)
-//    collectConfiguration(named = "release")
-    collectConfiguration(named = "releaseCompileClasspath")
-    collectConfiguration(named = "releaseRuntimeClasspath")
-//    collectConfiguration(named = "compile")
-
-// releaseCompileClasspath
-// releaseRuntimeClasspath
-// releaseUnitTestCompileClasspath
-// releaseUnitTestRuntimeClasspath
-
-    return compilationClasspath
   }
 
   @DokkatooInternalApi

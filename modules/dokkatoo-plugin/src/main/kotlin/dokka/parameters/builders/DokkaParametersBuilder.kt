@@ -4,6 +4,7 @@ import dev.adamko.dokkatoo.dokka.parameters.DokkaGeneratorParametersSpec
 import dev.adamko.dokkatoo.dokka.parameters.DokkaModuleDescriptionKxs
 import dev.adamko.dokkatoo.dokka.plugins.DokkaPluginParametersBaseSpec
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
+import dev.adamko.dokkatoo.internal.mapNotNullToSet
 import java.io.File
 import org.gradle.api.logging.Logging
 import org.jetbrains.dokka.DokkaConfiguration
@@ -21,8 +22,6 @@ import org.jetbrains.dokka.PluginConfigurationImpl
 @DokkatooInternalApi
 internal object DokkaParametersBuilder {
 
-  private val logger = Logging.getLogger(DokkaParametersBuilder::class.java)
-
   fun build(
     spec: DokkaGeneratorParametersSpec,
     delayTemplateSubstitution: Boolean,
@@ -33,11 +32,7 @@ internal object DokkaParametersBuilder {
     val moduleName = spec.moduleName.get()
     val moduleVersion = spec.moduleVersion.orNull?.takeIf { it != "unspecified" }
     val offlineMode = spec.offlineMode.get()
-    val sourceSets = spec.dokkaSourceSets.filterNot {
-      val suppressed = it.suppress.get()
-      logger.info("Dokka source set ${it.sourceSetId.get()} ${if (suppressed) "is" else "isn't"} suppressed")
-      suppressed
-    }
+    val sourceSets = DokkaSourceSetBuilder.buildAll(spec.dokkaSourceSets)
     val failOnWarning = spec.failOnWarning.get()
     val suppressObviousFunctions = spec.suppressObviousFunctions.get()
     val suppressInheritedMembers = spec.suppressInheritedMembers.get()
@@ -53,7 +48,7 @@ internal object DokkaParametersBuilder {
       outputDir = outputDirectory,
       cacheRoot = cacheDirectory,
       offlineMode = offlineMode,
-      sourceSets = DokkaSourceSetBuilder.buildAll(sourceSets),
+      sourceSets = sourceSets,
       pluginsClasspath = pluginsClasspath,
       pluginsConfiguration = pluginsConfiguration.map(::build),
       modules = modules.map(DokkaModuleDescriptionKxs::convert),

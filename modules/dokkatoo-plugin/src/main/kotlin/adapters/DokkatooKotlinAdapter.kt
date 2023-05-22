@@ -1,9 +1,10 @@
 package dev.adamko.dokkatoo.adapters
 
 import com.android.build.gradle.api.ApplicationVariant
+import com.android.build.gradle.api.BaseVariant
 import com.android.build.gradle.api.LibraryVariant
-import com.android.build.gradle.internal.publishing.AndroidArtifacts
-import com.android.build.gradle.internal.publishing.AndroidArtifacts.ArtifactType.PROCESSED_JAR
+import com.android.build.gradle.api.TestVariant
+import com.android.build.gradle.api.UnitTestVariant
 import dev.adamko.dokkatoo.DokkatooBasePlugin
 import dev.adamko.dokkatoo.DokkatooExtension
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetIdSpec
@@ -12,14 +13,14 @@ import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec
 import dev.adamko.dokkatoo.dokka.parameters.KotlinPlatform
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import dev.adamko.dokkatoo.internal.collectIncomingFiles
-import dev.adamko.dokkatoo.internal.not
 import javax.inject.Inject
 import org.gradle.api.Named
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ConfigurationContainer
-import org.gradle.api.attributes.Usage.*
+import org.gradle.api.attributes.Usage.JAVA_API
+import org.gradle.api.attributes.Usage.USAGE_ATTRIBUTE
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
 import org.gradle.api.logging.Logging
@@ -34,6 +35,8 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinSingleTargetExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
+import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation.Companion.MAIN_COMPILATION_NAME
+import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation.Companion.TEST_COMPILATION_NAME
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.mpp.AbstractKotlinNativeCompilation
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinJvmAndroidCompilation
@@ -127,9 +130,7 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
     val kssClasspath = determineClasspath(details)
 
     register(details.name) dss@{
-      // only set source-set specific properties, default values for the other properties
-      // (like displayName) are set in DokkatooBasePlugin
-      suppress.set(!details.isMainSourceSet())
+      suppress.set(details.suppressDefault())
       sourceRoots.from(details.sourceDirectories)
       classpath.from(kssClasspath)
       analysisPlatform.set(kssPlatform)
@@ -283,43 +284,6 @@ private class KotlinCompilationDetailsBuilder(
         }
         lenient(true)
       }
-
-//      @Suppress("UnstableApiUsage")
-//      configurations.collectIncomingFiles(named = named, collector = compilationClasspath) {
-//        withVariantReselection()
-//        attributes {
-////          attribute(USAGE_ATTRIBUTE, objects.named(JAVA_API))
-//          attribute(AndroidArtifacts.ARTIFACT_TYPE, AndroidArtifacts.ArtifactType.CLASSES_JAR.type)
-//        }
-//        lenient(true)
-//      }
-//      @Suppress("UnstableApiUsage")
-//      configurations.collectIncomingFiles(named = named, collector = compilationClasspath) {
-//        withVariantReselection()
-//        attributes {
-////          attribute(USAGE_ATTRIBUTE, objects.named(JAVA_API))
-//          attribute(AndroidArtifacts.ARTIFACT_TYPE, AndroidArtifacts.ArtifactType.JAR.type)
-//        }
-//        lenient(true)
-//      }
-//      @Suppress("UnstableApiUsage")
-//      configurations.collectIncomingFiles(named = named, collector = compilationClasspath) {
-//        withVariantReselection()
-//        attributes {
-////          attribute(USAGE_ATTRIBUTE, objects.named(JAVA_API))
-//          attribute(AndroidArtifacts.ARTIFACT_TYPE, AndroidArtifacts.ArtifactType.CLASSES.type)
-//        }
-//        lenient(true)
-//      }
-//      @Suppress("UnstableApiUsage")
-//      configurations.collectIncomingFiles(named = named, collector = compilationClasspath) {
-//        withVariantReselection()
-//        attributes {
-////          attribute(USAGE_ATTRIBUTE, objects.named(JAVA_API))
-//          attribute(AndroidArtifacts.ARTIFACT_TYPE, AndroidArtifacts.ArtifactType.PROCESSED_JAR.type)
-//        }
-//        lenient(true)
-//      }
     }
 
     val standardConfigurations = mutableListOf<String>().apply {
@@ -348,13 +312,43 @@ private class KotlinCompilationDetailsBuilder(
   }
 
   companion object {
+    private fun KotlinCompilation<*>.debugPrint() {
+      val androidVariant: BaseVariant? = (this as? KotlinJvmAndroidCompilation)?.androidVariant
+      val avType = androidVariant?.let { it::class.simpleName }
+
+
+
+      androidVariant?.let { it::class.qualifiedName }
+
+      val avIsLibrary = androidVariant is LibraryVariant
+      val avIsApplication = androidVariant is ApplicationVariant
+      val avIsTest = androidVariant is TestVariant
+      val avIsUnitTest = androidVariant is UnitTestVariant
+
+      println(
+        "is $name main? androidVariant:${androidVariant?.name} $avType "
+            + "avIsLibrary:$avIsLibrary "
+            + "avIsApplication:$avIsApplication "
+            + "avIsTest:$avIsTest "
+            + "avIsUnitTest:$avIsUnitTest "
+      )
+    }
+
     private fun KotlinCompilation<*>.isMain(): Boolean {
+
+      debugPrint()
+
       return when (this) {
         is KotlinJvmAndroidCompilation ->
-          androidVariant is LibraryVariant || androidVariant is ApplicationVariant
+          androidVariant is LibraryVariant
+              || androidVariant is ApplicationVariant
+              && androidVariant !is TestVariant
+              && androidVariant !is UnitTestVariant
 
         else                           ->
-          name == KotlinCompilation.Companion.MAIN_COMPILATION_NAME
+          name == MAIN_COMPILATION_NAME
+//              && !name.endsWith(TEST_COMPILATION_NAME, ignoreCase = true)
+//              && !name.startsWith("androidTest", ignoreCase = true)
       }
     }
   }
@@ -369,6 +363,7 @@ private class KotlinCompilationDetailsBuilder(
 @DokkatooInternalApi
 private abstract class KotlinSourceSetDetails @Inject constructor(
   private val named: String,
+  private val providers: ProviderFactory,
 ) : Named {
 
   /** Direct source sets that this source set depends on */
@@ -379,10 +374,22 @@ private abstract class KotlinSourceSetDetails @Inject constructor(
   /** The specific compilations used to build this source set */
   abstract val compilations: ListProperty<KotlinCompilationDetails>
 
+  /** Default value for [DokkaSourceSetSpec.suppress] */
+  fun suppressDefault(): Provider<Boolean> {
+    return providers.zip(
+      isMainSourceSet(),
+      sourceDirectories.elements
+    ) { isMain, sourceDirs ->
+      // suppress this source set if
+      !isMain // it's not a 'main' source set (which implies it's a test source set)
+//          || sourceDirs.isEmpty() // or there's no source code
+    }
+  }
+
   /** Estimate if this Kotlin source set are 'main' sources (as opposed to 'test' sources). */
-  fun isMainSourceSet(): Provider<Boolean> =
+  private fun isMainSourceSet(): Provider<Boolean> =
     compilations.map { values ->
-      values.isEmpty() || values.any { it.mainCompilation }
+      values.any { it.mainCompilation }
     }
 
   override fun getName(): String = named
