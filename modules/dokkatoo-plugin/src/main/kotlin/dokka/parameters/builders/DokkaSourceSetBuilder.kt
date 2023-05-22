@@ -37,8 +37,6 @@ internal object DokkaSourceSetBuilder {
       }
     }
 
-    println("suppressedSourceSetIds:$suppressedSourceSetIds")
-
     val enabledSourceSets = sourceSets.filter { it.sourceSetId.get() !in suppressedSourceSetIds }
 
     return enabledSourceSets.map { build(it, suppressedSourceSetIds) }
@@ -51,8 +49,6 @@ internal object DokkaSourceSetBuilder {
 
     val dependentSourceSets =
       (spec.dependentSourceSets subtract suppressedSourceSetIds).mapToSet(::build)
-
-    println("building DokkaSourceSet ${spec.sourceSetId.get()}, with dependents: $dependentSourceSets")
 
     return DokkaSourceSetImpl(
       // properties

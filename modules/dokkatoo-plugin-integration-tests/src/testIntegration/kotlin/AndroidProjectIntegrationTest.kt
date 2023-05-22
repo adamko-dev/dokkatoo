@@ -151,11 +151,6 @@ private fun initDokkaProject(
     copyIntegrationTestProject("it-android-0/dokka")
 
     buildGradleKts = buildGradleKts
-      .replace(
-        // no idea why this needs to be changed
-        """file("../customResources/""",
-        """file("./customResources/""",
-      )
       // update relative paths to the template files - they're now in the same directory
       .replace(
         """../template.root.gradle.kts""",

@@ -168,11 +168,6 @@ tasks.setupDokkaTemplateProjects {
 
   finalizedBy(updateAndroidLocalProperties)
 
-//  val androidSdkDir = layout.projectDirectory.file("projects/ANDROID_SDK").asFile
-
-  // add the relative path as a property for Gradle up-to-date checks:
-//  inputs.property("androidSdkDirPath", androidSdkDir.relativeTo(projectDir).invariantSeparatorsPath)
-
   doLast {
     androidLocalPropertiesFile.asFile.apply {
       // every time this task is executed it wipes the local.properties file,
@@ -180,7 +175,6 @@ tasks.setupDokkaTemplateProjects {
       parentFile.mkdirs()
       createNewFile()
       writeText(
-//          |sdk.dir=${androidSdkDir.invariantSeparatorsPath}
         """
           |sdk.dir=
           |
