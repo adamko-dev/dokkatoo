@@ -54,9 +54,11 @@ abstract class DokkatooAndroidAdapter @Inject constructor(
         analysisPlatform.map { analysisPlatform ->
           when (analysisPlatform) {
             KotlinPlatform.AndroidJVM ->
-              collectAndroidClasspath(
+              AndroidClasspathCollector(
                 androidExt = androidExt,
                 configurations = project.configurations,
+                objects = objects,
+                providers = providers,
               )
 
             else                      ->
@@ -68,9 +70,29 @@ abstract class DokkatooAndroidAdapter @Inject constructor(
     }
   }
 
-  private fun collectAndroidClasspath(
+  @DokkatooInternalApi
+  companion object {
+    private val logger = Logging.getLogger(DokkatooAndroidAdapter::class.java)
+  }
+}
+
+
+/**
+ * A utility for determining the classpath of an Android compilation.
+ *
+ * It's important that this class is separate from [DokkatooAndroidAdapter]. It must be separate
+ * because it uses Android Gradle Plugin classes (like [BaseExtension]). Were it not separate, and
+ * these classes were present in the function signatures of [DokkatooAndroidAdapter], then when
+ * Gradle tries to create a decorated instance of [DokkatooAndroidAdapter] it will if the project
+ * does not have the Android Gradle Plugin applied, because the classes will be missing.
+ */
+private object AndroidClasspathCollector {
+
+  operator fun invoke(
     androidExt: BaseExtension,
     configurations: ConfigurationContainer,
+    objects: ObjectFactory,
+    providers: ProviderFactory,
   ): FileCollection {
     val compilationClasspath = objects.fileCollection()
 
@@ -86,9 +108,11 @@ abstract class DokkatooAndroidAdapter @Inject constructor(
     // fetch android.jar
     collectConfiguration(named = VariantDependencies.CONFIG_NAME_ANDROID_APIS)
 
-    val variantConfigurations = variantConfigurationNames(androidExt)
-    // fetching _all_ configuration names is very brute force and should probably be refined to
-    // only fetch those that match a specific DokkaSourceSetSpec
+    val variantConfigurations = collectVariantConfigurationNames(
+      androidExt,
+      objects.domainObjectSet(BaseVariant::class),
+      providers,
+    )
 
     for (variantConfig in variantConfigurations.get()) {
       collectConfiguration(named = variantConfig)
@@ -98,10 +122,16 @@ abstract class DokkatooAndroidAdapter @Inject constructor(
   }
 
   /** Fetch all configuration names used by all variants. */
-  private fun variantConfigurationNames(androidExt: BaseExtension): Provider<List<String>> {
+// fetching _all_ configuration names is very brute force and should probably be refined to
+// only fetch those that match a specific DokkaSourceSetSpec
+  private fun collectVariantConfigurationNames(
+    androidExt: BaseExtension,
+    collector: DomainObjectSet<BaseVariant>,
+    providers: ProviderFactory,
+  ): Provider<List<String>> {
 
     val variants: DomainObjectSet<BaseVariant> =
-      objects.domainObjectSet(BaseVariant::class).apply {
+      collector.apply {
         addAllLater(providers.provider {
           when (androidExt) {
             is LibraryExtension -> androidExt.libraryVariants
@@ -121,10 +151,5 @@ abstract class DokkatooAndroidAdapter @Inject constructor(
         )
       }
     }
-  }
-
-  @DokkatooInternalApi
-  companion object {
-    private val logger = Logging.getLogger(DokkatooAndroidAdapter::class.java)
   }
 }
