@@ -330,7 +330,6 @@ private class KotlinCompilationDetailsBuilder(
 @DokkatooInternalApi
 private abstract class KotlinSourceSetDetails @Inject constructor(
   private val named: String,
-  private val providers: ProviderFactory,
 ) : Named {
 
   /** Direct source sets that this source set depends on */
