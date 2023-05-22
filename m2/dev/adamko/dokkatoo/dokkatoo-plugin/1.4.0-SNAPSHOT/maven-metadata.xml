@@ -5,37 +5,37 @@
   <version>1.4.0-SNAPSHOT</version>
   <versioning>
     <snapshot>
-      <timestamp>20230519.200923</timestamp>
+      <timestamp>20230522.101207</timestamp>
       <buildNumber>1</buildNumber>
     </snapshot>
-    <lastUpdated>20230519200923</lastUpdated>
+    <lastUpdated>20230522101207</lastUpdated>
     <snapshotVersions>
-      <snapshotVersion>
-        <classifier>sources</classifier>
-        <extension>jar</extension>
-        <value>1.4.0-20230519.200923-1</value>
-        <updated>20230519200923</updated>
-      </snapshotVersion>
-      <snapshotVersion>
-        <extension>pom</extension>
-        <value>1.4.0-20230519.200923-1</value>
-        <updated>20230519200923</updated>
-      </snapshotVersion>
-      <snapshotVersion>
-        <extension>module</extension>
-        <value>1.4.0-20230519.200923-1</value>
-        <updated>20230519200923</updated>
-      </snapshotVersion>
       <snapshotVersion>
         <classifier>javadoc</classifier>
         <extension>jar</extension>
-        <value>1.4.0-20230519.200923-1</value>
-        <updated>20230519200923</updated>
+        <value>1.4.0-20230522.101207-1</value>
+        <updated>20230522101207</updated>
+      </snapshotVersion>
+      <snapshotVersion>
+        <classifier>sources</classifier>
+        <extension>jar</extension>
+        <value>1.4.0-20230522.101207-1</value>
+        <updated>20230522101207</updated>
       </snapshotVersion>
       <snapshotVersion>
         <extension>jar</extension>
-        <value>1.4.0-20230519.200923-1</value>
-        <updated>20230519200923</updated>
+        <value>1.4.0-20230522.101207-1</value>
+        <updated>20230522101207</updated>
+      </snapshotVersion>
+      <snapshotVersion>
+        <extension>pom</extension>
+        <value>1.4.0-20230522.101207-1</value>
+        <updated>20230522101207</updated>
+      </snapshotVersion>
+      <snapshotVersion>
+        <extension>module</extension>
+        <value>1.4.0-20230522.101207-1</value>
+        <updated>20230522101207</updated>
       </snapshotVersion>
     </snapshotVersions>
   </versioning>
