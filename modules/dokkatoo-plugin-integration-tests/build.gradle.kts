@@ -3,6 +3,7 @@
 import buildsrc.tasks.SetupDokkaProjects
 import buildsrc.utils.skipTestFixturesPublications
 import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.gradle.kotlin.dsl.support.serviceOf
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.util.suffixIfNot
 
@@ -218,18 +219,29 @@ val updateAndroidLocalProperties by tasks.registering {
 
   outputs.files(localPropertiesFiles).withPropertyName("localPropertiesFiles")
 
-  val androidSdkDir = layout.projectDirectory.file("projects/ANDROID_SDK").asFile
+  val layout = serviceOf<ProjectLayout>()
 
-  // add the relative path as a property for Gradle up-to-date checks:
-  inputs.property("androidSdkDirPath", androidSdkDir.relativeTo(projectDir).invariantSeparatorsPath)
+  val androidSdkDir = providers
+    .environmentVariable("ANDROID_SDK_ROOT")
+    .map(::File)
+    .orElse(layout.projectDirectory.file("projects/ANDROID_SDK").asFile)
+
+  // add the relative path as a property for Gradle up-to-date checks
+  // (the directory contents don't matter)
+  inputs.property(
+    "androidSdkDirPath",
+    androidSdkDir.map { it.relativeTo(projectDir).invariantSeparatorsPath }
+  )
 
   doLast {
+    val androidSdkDirPath = androidSdkDir.get().invariantSeparatorsPath
+
     localPropertiesFiles.forEach { file ->
       file.writeText(
         file.useLines { lines ->
           lines.joinToString("\n") { line ->
             when {
-              line.startsWith("sdk.dir=") -> "sdk.dir=${androidSdkDir.invariantSeparatorsPath}"
+              line.startsWith("sdk.dir=") -> "sdk.dir=$androidSdkDirPath"
               else                        -> line
             }
           }.suffixIfNot("\n")
