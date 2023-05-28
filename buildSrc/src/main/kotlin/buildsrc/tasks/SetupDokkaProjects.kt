@@ -1,35 +1,46 @@
 package buildsrc.tasks
 
-import java.io.File
+import buildsrc.settings.DokkaTemplateProjectSettings.DokkaTemplateProjectSpec
 import javax.inject.Inject
 import org.gradle.api.DefaultTask
+import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileSystemOperations
 import org.gradle.api.file.ProjectLayout
-import org.gradle.api.model.ObjectFactory
-import org.gradle.api.provider.MapProperty
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputDirectory
-import org.gradle.api.tasks.OutputDirectories
-import org.gradle.api.tasks.TaskAction
+import org.gradle.api.provider.ProviderFactory
+import org.gradle.api.tasks.*
 
 abstract class SetupDokkaProjects @Inject constructor(
-  private val files: FileSystemOperations,
+  private val fs: FileSystemOperations,
   private val layout: ProjectLayout,
-  private val objects: ObjectFactory,
+  private val providers: ProviderFactory,
 ) : DefaultTask() {
 
-  @get:Input
-  abstract val destinationToSources: MapProperty<File, List<String>>
+  @get:OutputDirectories
+  val destinationDirs: FileCollection
+    get() = layout.files(
+      destinationBaseDir.map { base ->
+        templateProjects.map { spec -> base.dir(spec.destinationPath) }
+      }
+    )
+
+  @get:Internal // tracked by destinationDirs
+  abstract val destinationBaseDir: DirectoryProperty
+
+  @get:Nested
+  abstract val templateProjects: NamedDomainObjectContainer<DokkaTemplateProjectSpec>
 
   @get:InputDirectory
   abstract val dokkaSourceDir: DirectoryProperty
 
-  @get:OutputDirectories
-  val destinationDirs: FileCollection = layout.files(
-    destinationToSources.map { it.keys }
-  )
+  @get:InputFiles
+  val additionalFiles: FileCollection
+    get() = layout.files(
+      providers.provider {
+        templateProjects.map { it.additionalFiles }
+      }
+    )
 
   init {
     group = "dokka examples"
@@ -37,17 +48,25 @@ abstract class SetupDokkaProjects @Inject constructor(
 
   @TaskAction
   internal fun action() {
-    val destinationToSources = destinationToSources.get()
     val dokkaSourceDir = dokkaSourceDir.get()
+    val destinationBaseDir = destinationBaseDir.get()
+    val templateProjects = templateProjects.filter { it.destinationPath.isPresent }
 
-    logger.info("destinationToSources: $destinationToSources")
+    templateProjects.forEach { spec ->
+      fs.sync {
+        with(spec.copySpec)
 
-    destinationToSources.forEach { (dest: File, sources: List<String>) ->
-      files.sync {
-        sources.forEach { src ->
-          from(dokkaSourceDir.dir(src))
-        }
-        into(dest)
+        from(dokkaSourceDir.dir(spec.sourcePath))
+
+        from(
+          spec.additionalPaths.get().map { additionalPath ->
+            dokkaSourceDir.asFile.resolve(additionalPath)
+          }
+        )
+
+        from(spec.additionalFiles)
+
+        into(destinationBaseDir.dir(spec.destinationPath))
       }
     }
   }

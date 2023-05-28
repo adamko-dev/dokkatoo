@@ -6,7 +6,7 @@ plugins {
     id("org.jetbrains.dokka")
 }
 
-apply(from = "../template.root.gradle.kts")
+apply(from = "./template.root.gradle.kts")
 
 kotlin {
     jvm()

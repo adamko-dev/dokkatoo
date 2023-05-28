@@ -6,7 +6,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
   kotlin("jvm")
-  kotlin("plugin.serialization") version embeddedKotlinVersion
+  kotlin("plugin.serialization")
   `java-test-fixtures`
 
   `jvm-test-suite`
@@ -130,32 +130,105 @@ tasks.withType<Test>().configureEach {
 
 skipTestFixturesPublications()
 
-tasks.setupDokkaTemplateProjects {
-  destinationToSources.set(
-    mapOf(
-      //@formatter:off
-      "projects/it-android-0/dokka"                to "integration-tests/gradle/projects/it-android-0",
-      "projects/it-basic/dokka"                    to "integration-tests/gradle/projects/it-basic",
-      "projects/it-basic-groovy/dokka"             to "integration-tests/gradle/projects/it-basic-groovy",
-      "projects/it-collector-0/dokka"              to "integration-tests/gradle/projects/it-collector-0",
-      "projects/it-js-ir-0/dokka"                  to "integration-tests/gradle/projects/it-js-ir-0",
-      "projects/it-multimodule-0/dokka"            to "integration-tests/gradle/projects/it-multimodule-0",
-      "projects/it-multimodule-1/dokka"            to "integration-tests/gradle/projects/it-multimodule-1",
-      "projects/it-multimodule-versioning-0/dokka" to "integration-tests/gradle/projects/it-multimodule-versioning-0",
-      "projects/it-multiplatform-0/dokka"          to "integration-tests/gradle/projects/it-multiplatform-0",
-
-      //"integration-tests/gradle/projects/coroutines"                  to "projects/coroutines/dokka",
-      //"integration-tests/gradle/projects/serialization"               to "projects/serialization/dokka",
-      //"integration-tests/gradle/projects/stdlib"                      to "projects/stdlib/dokka",
-      //@formatter:on
-    ).entries.associate { (dest, rootDir) ->
-      projectDir.resolve(dest) to listOf(
-        rootDir,
-        "integration-tests/gradle/projects/template.root.gradle.kts",
-        "integration-tests/gradle/projects/template.settings.gradle.kts",
-      )
-    }
+dokkaTemplateProjects {
+  register(
+    source = "integration-tests/gradle/projects/it-android-0",
+    destination = "projects/it-android-0/dokka",
   )
+  register(
+    source = "integration-tests/gradle/projects/it-basic",
+    destination = "projects/it-basic/dokka",
+  )
+  register(
+    source = "integration-tests/gradle/projects/it-basic-groovy",
+    destination = "projects/it-basic-groovy/dokka",
+  )
+  register(
+    source = "integration-tests/gradle/projects/it-collector-0",
+    destination = "projects/it-collector-0/dokka",
+  )
+  register(
+    source = "integration-tests/gradle/projects/it-js-ir-0",
+    destination = "projects/it-js-ir-0/dokka",
+  )
+  register(
+    source = "integration-tests/gradle/projects/it-multimodule-0",
+    destination = "projects/it-multimodule-0/dokka",
+  )
+  register(
+    source = "integration-tests/gradle/projects/it-multimodule-1",
+    destination = "projects/it-multimodule-1/dokka",
+  )
+  register(
+    source = "integration-tests/gradle/projects/it-multimodule-versioning-0",
+    destination = "projects/it-multimodule-versioning-0/dokka",
+  )
+  register(
+    source = "integration-tests/gradle/projects/it-multiplatform-0",
+    destination = "projects/it-multiplatform-0/dokka",
+  )
+
+//    register("projects/coroutines/dokka") { }
+//    register("projects/serialization/dokka") { }
+//    register("projects/stdlib/dokka") { }
+
+
+  configureEach {
+    additionalPaths.addAll(
+      "integration-tests/gradle/projects/template.root.gradle.kts",
+      "integration-tests/gradle/projects/template.settings.gradle.kts",
+    )
+  }
+}
+
+tasks.setupDokkaTemplateProjects.configure {
+
+  val kotlinDokkaVersion = libs.versions.kotlin.dokka
+  inputs.property("kotlinDokkaVersion", kotlinDokkaVersion)
+
+  doLast {
+    outputs.files.asFileTree.files.forEach { file ->
+      println("copied file $file")
+
+      when (file.name) {
+        "build.gradle.kts"             -> {
+          println("re-writing $file")
+          file.writeText(
+            file.readText()
+              .replace(
+                """../template.root.gradle.kts""",
+                """./template.root.gradle.kts""",
+              ).replace(
+                """${'$'}{System.getenv("DOKKA_VERSION")}""",
+                kotlinDokkaVersion.get(),
+              )
+          )
+        }
+
+        "settings.gradle.kts"          -> {
+          println("re-writing $file")
+          file.writeText(
+            file.readText()
+              .replace(
+                """../template.settings.gradle.kts""",
+                """./template.settings.gradle.kts""",
+              )
+          )
+        }
+
+        "template.settings.gradle.kts" -> {
+          println("re-writing $file")
+          file.writeText(
+            file.readText()
+              .replace(
+                """for-integration-tests-SNAPSHOT""",
+                kotlinDokkaVersion.get(),
+              )
+          )
+        }
+      }
+    }
+  }
 }
 
 tasks.withType<Test>().configureEach {
