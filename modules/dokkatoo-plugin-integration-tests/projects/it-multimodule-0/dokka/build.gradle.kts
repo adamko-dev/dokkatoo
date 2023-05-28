@@ -1,1 +1,1 @@
-apply(from = "../template.root.gradle.kts")
+apply(from = "./template.root.gradle.kts")

@@ -9,6 +9,8 @@ dependencies {
   implementation(libs.gradlePlugin.bcvMu)
   implementation(libs.gradlePlugin.dokkatoo)
   implementation(libs.gradlePlugin.gradlePublishPlugin)
+  implementation("org.jetbrains.kotlin:kotlin-serialization:$embeddedKotlinVersion")
+
 }
 
 java {

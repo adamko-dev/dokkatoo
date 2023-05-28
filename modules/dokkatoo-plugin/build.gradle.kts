@@ -5,20 +5,17 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
   buildsrc.conventions.`kotlin-gradle-plugin`
-
-  kotlin("plugin.serialization") version embeddedKotlinVersion
-  `java-test-fixtures`
-
-  `jvm-test-suite`
-  `test-report-aggregation`
-
-  buildsrc.conventions.`github-maven-publish`
-
-  buildsrc.conventions.`maven-publish-test`
+  kotlin("plugin.serialization")
 
   dev.adamko.kotlin.`binary-compatibility-validator`
 
   dev.adamko.`dokkatoo-html`
+  buildsrc.conventions.`github-maven-publish`
+
+  `java-test-fixtures`
+  `jvm-test-suite`
+  `test-report-aggregation`
+  buildsrc.conventions.`maven-publish-test`
 }
 
 description = "Generates documentation for Kotlin projects (using Dokka)"
