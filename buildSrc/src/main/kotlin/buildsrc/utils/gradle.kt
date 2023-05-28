@@ -18,7 +18,10 @@ import org.gradle.kotlin.dsl.*
  * isCanBeConsumed = true
  * ```
  */
-fun Configuration.asProvider() {
+fun Configuration.asProvider(
+  visible: Boolean = true
+) {
+  isVisible = visible
   isCanBeResolved = false
   isCanBeConsumed = true
 }
@@ -31,7 +34,10 @@ fun Configuration.asProvider() {
  * isCanBeConsumed = false
  * ```
  * */
-fun Configuration.asConsumer() {
+fun Configuration.asConsumer(
+  visible: Boolean = false
+) {
+  isVisible = visible
   isCanBeResolved = true
   isCanBeConsumed = false
 }

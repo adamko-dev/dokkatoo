@@ -8,7 +8,9 @@ plugins {
 }
 
 
-val exampleProjectsAttribute = Attribute.of("example-projects", String::class.java)
+val exampleProjectsAttribute: Attribute<String> =
+  Attribute.of("example-projects", String::class.java)
+
 dependencies.attributesSchema {
   attribute(exampleProjectsAttribute)
 }
@@ -16,12 +18,10 @@ dependencies.attributesSchema {
 
 val exampleProjects by configurations.registering {
   asConsumer()
-  isVisible = false
   attributes { attribute(exampleProjectsAttribute, "dokka") }
 }
 
 val exampleProjectsElements by configurations.registering {
   asProvider()
-  isVisible = true
   attributes { attribute(exampleProjectsAttribute, "dokka") }
 }

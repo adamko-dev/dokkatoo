@@ -158,23 +158,6 @@ private fun initDokkaProject(
         """file("../customResources/""",
         """file("./customResources/""",
       )
-      // update relative paths to the template files - they're now in the same directory
-      .replace(
-        """../template.root.gradle.kts""",
-        """./template.root.gradle.kts""",
-      )
-      .replace("""${'$'}{System.getenv("DOKKA_VERSION")}""", DOKKA_VERSION)
-
-    // update relative paths to the template files - they're now in the same directory
-    settingsGradleKts = settingsGradleKts
-      .replace(
-        """../template.settings.gradle.kts""",
-        """./template.settings.gradle.kts""",
-      )
-
-    var templateGradleSettings: String by projectFile("template.settings.gradle.kts")
-    templateGradleSettings = templateGradleSettings
-      .replace("for-integration-tests-SNAPSHOT", DOKKA_VERSION)
   }
 }
 

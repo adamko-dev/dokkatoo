@@ -1,6 +1,5 @@
 package dev.adamko.dokkatoo.tests.integration
 
-import dev.adamko.dokkatoo.internal.DokkatooConstants
 import dev.adamko.dokkatoo.utils.*
 import io.kotest.core.annotation.EnabledIf
 import io.kotest.core.spec.style.FunSpec
@@ -149,25 +148,6 @@ private fun initDokkaProject(
 ): GradleProjectTest {
   return GradleProjectTest(destinationDir.toPath()).apply {
     copyIntegrationTestProject("it-android-0/dokka")
-
-    buildGradleKts = buildGradleKts
-      // update relative paths to the template files - they're now in the same directory
-      .replace(
-        """../template.root.gradle.kts""",
-        """./template.root.gradle.kts""",
-      )
-      .replace("""${'$'}{System.getenv("DOKKA_VERSION")}""", DokkatooConstants.DOKKA_VERSION)
-
-    // update relative paths to the template files - they're now in the same directory
-    settingsGradleKts = settingsGradleKts
-      .replace(
-        """../template.settings.gradle.kts""",
-        """./template.settings.gradle.kts""",
-      )
-
-    var templateGradleSettings: String by projectFile("template.settings.gradle.kts")
-    templateGradleSettings = templateGradleSettings
-      .replace("for-integration-tests-SNAPSHOT", DokkatooConstants.DOKKA_VERSION)
   }
 }
 

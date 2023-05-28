@@ -1,10 +1,8 @@
 package buildsrc.conventions
 
-import buildsrc.settings.DokkatooExampleProjectsSettings
-import buildsrc.settings.MavenPublishTestSettings
+import buildsrc.settings.*
 import buildsrc.tasks.*
 import buildsrc.utils.*
-import org.gradle.kotlin.dsl.support.serviceOf
 
 plugins {
   id("buildsrc.conventions.base")
@@ -13,29 +11,37 @@ plugins {
   id("buildsrc.conventions.dokkatoo-example-projects-base")
 }
 
-val prepareDokkaSourceTask = tasks.named<Sync>("prepareDokkaSource")
+val mavenPublishTestExtension = extensions.getByType<MavenPublishTestSettings>()
+val dokkaTemplateProjectSettings =
+  extensions.create<DokkaTemplateProjectSettings>(
+    DokkaTemplateProjectSettings.EXTENSION_NAME,
+    { project.copySpec() }
+  ).apply {
+    this.destinationBaseDir.convention(layout.projectDirectory)
+  }
 
-val setupDokkaTemplateProjects by tasks.registering(SetupDokkaProjects::class) {
-  group = DokkatooExampleProjectsSettings.TASK_GROUP
+val prepareDokkaSource by tasks.existing(Sync::class)
 
-  dependsOn(prepareDokkaSourceTask)
-
-  // complicated workaround for https://github.com/gradle/gradle/issues/23708
-  val layout = serviceOf<ProjectLayout>()
-  val providers = serviceOf<ProviderFactory>()
-
-  val dokkaSrcDir = prepareDokkaSourceTask.flatMap {
+dokkaTemplateProjectSettings.dokkaSourceDir.convention(
+  prepareDokkaSource.flatMap {
     layout.dir(providers.provider {
       it.destinationDir
     })
   }
-  dokkaSourceDir.set(dokkaSrcDir)
+)
 
-  destinationToSources.convention(emptyMap())
+tasks.withType<SetupDokkaProjects>().configureEach {
+  dependsOn(prepareDokkaSource)
+
+  dokkaSourceDir.convention(dokkaTemplateProjectSettings.dokkaSourceDir)
+  destinationBaseDir.convention(dokkaTemplateProjectSettings.destinationBaseDir)
+
+  templateProjects.addAllLater(provider {
+    dokkaTemplateProjectSettings.templateProjects
+  })
 }
 
-val mavenPublishTestExtension = extensions.getByType<MavenPublishTestSettings>()
-
+val setupDokkaTemplateProjects by tasks.registering(SetupDokkaProjects::class)
 
 fun createDokkatooExampleProjectsSettings(
   projectDir: Directory = project.layout.projectDirectory
@@ -53,7 +59,7 @@ fun createDokkatooExampleProjectsSettings(
         )
       }.files
 
-    // for each settings file, create a GradlePropertiesSpec
+    // for each settings file, create a DokkatooExampleProjectSpec
     settingsFiles.forEach {
       val destinationDir = it.parentFile
       val name = destinationDir.toRelativeString(projectDir.asFile).toAlphaNumericCamelCase()
@@ -141,4 +147,5 @@ val updateDokkatooExamples by tasks.registering {
 
 tasks.assemble {
   dependsOn(updateDokkatooExamples)
+  dependsOn(setupDokkaTemplateProjects)
 }

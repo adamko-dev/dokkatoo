@@ -3,13 +3,11 @@
 import buildsrc.tasks.SetupDokkaProjects
 import buildsrc.utils.skipTestFixturesPublications
 import org.gradle.api.tasks.testing.logging.TestLogEvent
-import org.gradle.kotlin.dsl.support.serviceOf
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.jetbrains.kotlin.util.suffixIfNot
 
 plugins {
   kotlin("jvm")
-  kotlin("plugin.serialization") version embeddedKotlinVersion
+  kotlin("plugin.serialization")
   `java-test-fixtures`
 
   `jvm-test-suite`
@@ -18,6 +16,7 @@ plugins {
   buildsrc.conventions.`java-base`
   buildsrc.conventions.`maven-publish-test`
   buildsrc.conventions.`dokkatoo-example-projects`
+  buildsrc.conventions.`android-setup`
 }
 
 description = """
@@ -133,57 +132,114 @@ tasks.withType<Test>().configureEach {
 
 skipTestFixturesPublications()
 
-tasks.setupDokkaTemplateProjects {
-  destinationToSources.set(
-    mapOf(
-      //@formatter:off
-      "projects/it-android-0/dokka"                to "integration-tests/gradle/projects/it-android-0",
-      "projects/it-basic/dokka"                    to "integration-tests/gradle/projects/it-basic",
-      "projects/it-basic-groovy/dokka"             to "integration-tests/gradle/projects/it-basic-groovy",
-      "projects/it-collector-0/dokka"              to "integration-tests/gradle/projects/it-collector-0",
-      "projects/it-js-ir-0/dokka"                  to "integration-tests/gradle/projects/it-js-ir-0",
-      "projects/it-multimodule-0/dokka"            to "integration-tests/gradle/projects/it-multimodule-0",
-      "projects/it-multimodule-1/dokka"            to "integration-tests/gradle/projects/it-multimodule-1",
-      "projects/it-multimodule-versioning-0/dokka" to "integration-tests/gradle/projects/it-multimodule-versioning-0",
-      "projects/it-multiplatform-0/dokka"          to "integration-tests/gradle/projects/it-multiplatform-0",
+dokkaTemplateProjects {
 
-      //"integration-tests/gradle/projects/coroutines"                  to "projects/coroutines/dokka",
-      //"integration-tests/gradle/projects/serialization"               to "projects/serialization/dokka",
-      //"integration-tests/gradle/projects/stdlib"                      to "projects/stdlib/dokka",
-      //@formatter:on
-    ).entries.associate { (dest, rootDir) ->
-      projectDir.resolve(dest) to listOf(
-        rootDir,
-        "integration-tests/gradle/projects/template.root.gradle.kts",
-        "integration-tests/gradle/projects/template.settings.gradle.kts",
-      )
-    }
+  val androidLocalPropertiesFile = tasks.createAndroidLocalPropertiesFile.map {
+    it.outputs.files
+  }
+
+  register(
+    source = "integration-tests/gradle/projects/it-android-0",
+    destination = "projects/it-android-0/dokka",
+  ) {
+    additionalFiles.from(androidLocalPropertiesFile)
+  }
+  register(
+    source = "integration-tests/gradle/projects/it-basic",
+    destination = "projects/it-basic/dokka",
+  )
+  register(
+    source = "integration-tests/gradle/projects/it-basic-groovy",
+    destination = "projects/it-basic-groovy/dokka",
+  )
+  register(
+    source = "integration-tests/gradle/projects/it-collector-0",
+    destination = "projects/it-collector-0/dokka",
+  )
+  register(
+    source = "integration-tests/gradle/projects/it-js-ir-0",
+    destination = "projects/it-js-ir-0/dokka",
+  )
+  register(
+    source = "integration-tests/gradle/projects/it-multimodule-0",
+    destination = "projects/it-multimodule-0/dokka",
+  )
+  register(
+    source = "integration-tests/gradle/projects/it-multimodule-1",
+    destination = "projects/it-multimodule-1/dokka",
+  )
+  register(
+    source = "integration-tests/gradle/projects/it-multimodule-versioning-0",
+    destination = "projects/it-multimodule-versioning-0/dokka",
+  )
+  register(
+    source = "integration-tests/gradle/projects/it-multiplatform-0",
+    destination = "projects/it-multiplatform-0/dokka",
   )
 
-  // TODO try to improve this, make it more unified.
-  //      Maybe make a NDOC with an element per source `settings.gradle` file?
+//    register("projects/coroutines/dokka") { }
+//    register("projects/serialization/dokka") { }
+//    register("projects/stdlib/dokka") { }
 
-  val androidLocalPropertiesFile = layout.projectDirectory
-    .file("projects/it-android-0/dokka/local.properties")
-  outputs.file(androidLocalPropertiesFile).withPropertyName("androidLocalPropertiesFile")
 
-  finalizedBy(updateAndroidLocalProperties)
+  configureEach {
+    additionalPaths.addAll(
+      "integration-tests/gradle/projects/template.root.gradle.kts",
+      "integration-tests/gradle/projects/template.settings.gradle.kts",
+    )
+  }
+}
+
+tasks.setupDokkaTemplateProjects.configure {
+
+  val kotlinDokkaVersion = libs.versions.kotlin.dokka
+  inputs.property("kotlinDokkaVersion", kotlinDokkaVersion)
 
   doLast {
-    androidLocalPropertiesFile.asFile.apply {
-      // every time this task is executed it wipes the local.properties file,
-      // so create an empty file that will be updated by tasks.updateAndroidLocalProperties
-      parentFile.mkdirs()
-      createNewFile()
-      writeText(
-        """
-          |sdk.dir=
-          |
-        """.trimMargin()
-      )
+    outputs.files.asFileTree.files.forEach { file ->
+      println("copied file $file")
+
+      when (file.name) {
+        "build.gradle.kts"             -> {
+          println("re-writing $file")
+          file.writeText(
+            file.readText()
+              .replace(
+                """../template.root.gradle.kts""",
+                """./template.root.gradle.kts""",
+              ).replace(
+                """${'$'}{System.getenv("DOKKA_VERSION")}""",
+                kotlinDokkaVersion.get(),
+              )
+          )
+        }
+
+        "settings.gradle.kts"          -> {
+          println("re-writing $file")
+          file.writeText(
+            file.readText()
+              .replace(
+                """../template.settings.gradle.kts""",
+                """./template.settings.gradle.kts""",
+              )
+          )
+        }
+
+        "template.settings.gradle.kts" -> {
+          println("re-writing $file")
+          file.writeText(
+            file.readText()
+              .replace(
+                """for-integration-tests-SNAPSHOT""",
+                kotlinDokkaVersion.get(),
+              )
+          )
+        }
+      }
     }
   }
 }
+
 
 dokkatooExampleProjects {
   exampleProjects {
@@ -207,50 +263,10 @@ dokkaSourceDownload {
   dokkaVersion.set(libs.versions.kotlin.dokka)
 }
 
-val updateAndroidLocalProperties by tasks.registering {
-
+tasks.updateAndroidLocalProperties {
   mustRunAfter(tasks.withType<SetupDokkaProjects>())
-
-  // find all local.properties files
-  val localPropertiesFiles = layout.projectDirectory.dir("projects").asFileTree
-    .matching {
-      include("**/local.properties")
-    }.files
-
-  outputs.files(localPropertiesFiles).withPropertyName("localPropertiesFiles")
-
-  val layout = serviceOf<ProjectLayout>()
-
-  val androidSdkDir = providers
-    .environmentVariable("ANDROID_SDK_ROOT")
-    .map(::File)
-    .orElse(layout.projectDirectory.file("projects/ANDROID_SDK").asFile)
-
-  // add the relative path as a property for Gradle up-to-date checks
-  // (the directory contents don't matter)
-  inputs.property(
-    "androidSdkDirPath",
-    androidSdkDir.map { it.relativeTo(projectDir).invariantSeparatorsPath }
-  )
-
-  doLast {
-    val androidSdkDirPath = androidSdkDir.get().invariantSeparatorsPath
-
-    localPropertiesFiles.forEach { file ->
-      file.writeText(
-        file.useLines { lines ->
-          lines.joinToString("\n") { line ->
-            when {
-              line.startsWith("sdk.dir=") -> "sdk.dir=$androidSdkDirPath"
-              else                        -> line
-            }
-          }.suffixIfNot("\n")
-        }
-      )
-    }
-  }
 }
 
 tasks.updateDokkatooExamples {
-  dependsOn(updateAndroidLocalProperties)
+  dependsOn(tasks.updateAndroidLocalProperties)
 }
