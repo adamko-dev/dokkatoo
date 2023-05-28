@@ -5,11 +5,7 @@ import buildsrc.utils.asConsumer
 import buildsrc.utils.asProvider
 
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-
-Utility for publishing a project to a local Maven directory for use in integration tests.
-
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/** Utility for publishing a project to a local Maven directory for use in integration tests. */
 
 plugins {
   base

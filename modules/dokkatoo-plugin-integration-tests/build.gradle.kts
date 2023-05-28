@@ -240,7 +240,6 @@ tasks.setupDokkaTemplateProjects.configure {
   }
 }
 
-
 dokkatooExampleProjects {
   exampleProjects {
     projectsItAndroid0Dokkatoo {
