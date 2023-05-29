@@ -1,24 +1,34 @@
 package dev.adamko.dokkatoo.adapters
 
+import com.android.build.gradle.AppExtension
+import com.android.build.gradle.BaseExtension
+import com.android.build.gradle.LibraryExtension
+import com.android.build.gradle.TestExtension
+import com.android.build.gradle.api.BaseVariant
 import com.android.build.gradle.internal.dependency.VariantDependencies
 import com.android.build.gradle.internal.publishing.AndroidArtifacts
+import com.android.build.gradle.internal.publishing.AndroidArtifacts.ArtifactType.PROCESSED_JAR
 import dev.adamko.dokkatoo.DokkatooBasePlugin
 import dev.adamko.dokkatoo.DokkatooExtension
 import dev.adamko.dokkatoo.dokka.parameters.KotlinPlatform
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import dev.adamko.dokkatoo.internal.collectIncomingFiles
 import javax.inject.Inject
+import org.gradle.api.DomainObjectSet
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.file.FileCollection
 import org.gradle.api.logging.Logging
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Provider
+import org.gradle.api.provider.ProviderFactory
 import org.gradle.kotlin.dsl.*
 
 @DokkatooInternalApi
 abstract class DokkatooAndroidAdapter @Inject constructor(
   private val objects: ObjectFactory,
+  private val providers: ProviderFactory,
 ) : Plugin<Project> {
 
   override fun apply(project: Project) {
@@ -36,40 +46,110 @@ abstract class DokkatooAndroidAdapter @Inject constructor(
   protected fun configure(project: Project) {
     val dokkatooExtension = project.extensions.getByType<DokkatooExtension>()
 
+    val androidExt = project.extensions.getByType<BaseExtension>()
+
     dokkatooExtension.dokkatooSourceSets.configureEach {
 
-      val androidClasspath: Provider<FileCollection> =
-        analysisPlatform.map {
-          val compilationClasspath = objects.fileCollection()
-          if (it == KotlinPlatform.AndroidJVM) {
+      classpath.from(
+        analysisPlatform.map { analysisPlatform ->
+          when (analysisPlatform) {
+            KotlinPlatform.AndroidJVM ->
+              AndroidClasspathCollector(
+                androidExt = androidExt,
+                configurations = project.configurations,
+                objects = objects,
+                providers = providers,
+              )
 
-            fun collectConfiguration(named: String) {
-              project.configurations.collectIncomingFiles(named, compilationClasspath)
-              // need to fetch JARs explicitly, because Android Gradle Plugin is weird
-              // and doesn't seem to register the attributes properly
-              @Suppress("UnstableApiUsage")
-              project.configurations.collectIncomingFiles(named, compilationClasspath) {
-                withVariantReselection()
-                attributes {
-                  attribute(AndroidArtifacts.ARTIFACT_TYPE, AndroidArtifacts.ArtifactType.JAR.type)
-                }
-                lenient(true)
-              }
-            }
-
-            // fetch android.jar
-            collectConfiguration(named = VariantDependencies.CONFIG_NAME_ANDROID_APIS)
+            else                      ->
+              objects.fileCollection()
           }
 
-          compilationClasspath
         }
-
-      classpath.from(androidClasspath)
+      )
     }
   }
 
   @DokkatooInternalApi
   companion object {
     private val logger = Logging.getLogger(DokkatooAndroidAdapter::class.java)
+  }
+}
+
+
+/**
+ * A utility for determining the classpath of an Android compilation.
+ *
+ * It's important that this class is separate from [DokkatooAndroidAdapter]. It must be separate
+ * because it uses Android Gradle Plugin classes (like [BaseExtension]). Were it not separate, and
+ * these classes were present in the function signatures of [DokkatooAndroidAdapter], then when
+ * Gradle tries to create a decorated instance of [DokkatooAndroidAdapter] it will if the project
+ * does not have the Android Gradle Plugin applied, because the classes will be missing.
+ */
+private object AndroidClasspathCollector {
+
+  operator fun invoke(
+    androidExt: BaseExtension,
+    configurations: ConfigurationContainer,
+    objects: ObjectFactory,
+    providers: ProviderFactory,
+  ): FileCollection {
+    val compilationClasspath = objects.fileCollection()
+
+    fun collectConfiguration(named: String) {
+      configurations.collectIncomingFiles(named, compilationClasspath) {
+        attributes {
+          attribute(AndroidArtifacts.ARTIFACT_TYPE, PROCESSED_JAR.type)
+        }
+        lenient(true)
+      }
+    }
+
+    // fetch android.jar
+    collectConfiguration(named = VariantDependencies.CONFIG_NAME_ANDROID_APIS)
+
+    val variantConfigurations = collectVariantConfigurationNames(
+      androidExt,
+      objects.domainObjectSet(BaseVariant::class),
+      providers,
+    )
+
+    for (variantConfig in variantConfigurations.get()) {
+      collectConfiguration(named = variantConfig)
+    }
+
+    return compilationClasspath
+  }
+
+  /** Fetch all configuration names used by all variants. */
+// fetching _all_ configuration names is very brute force and should probably be refined to
+// only fetch those that match a specific DokkaSourceSetSpec
+  private fun collectVariantConfigurationNames(
+    androidExt: BaseExtension,
+    collector: DomainObjectSet<BaseVariant>,
+    providers: ProviderFactory,
+  ): Provider<List<String>> {
+
+    val variants: DomainObjectSet<BaseVariant> =
+      collector.apply {
+        addAllLater(providers.provider {
+          when (androidExt) {
+            is LibraryExtension -> androidExt.libraryVariants
+            is AppExtension     -> androidExt.applicationVariants
+            is TestExtension    -> androidExt.applicationVariants
+            else                -> emptyList()
+          }
+        })
+      }
+
+    return providers.provider {
+      variants.flatMap {
+        setOf(
+          it.compileConfiguration.name,
+          it.runtimeConfiguration.name,
+          it.annotationProcessorConfiguration.name,
+        )
+      }
+    }
   }
 }

@@ -123,10 +123,12 @@ public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceLinkSpec :
 
 public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceSetIdSpec : java/io/Serializable, org/gradle/api/Named {
 	public static final field Companion Ldev/adamko/dokkatoo/dokka/parameters/DokkaSourceSetIdSpec$Companion;
+	public fun equals (Ljava/lang/Object;)Z
 	public fun getName ()Ljava/lang/String;
 	public final fun getScopeId ()Ljava/lang/String;
-	public abstract fun getSourceSetName ()Ljava/lang/String;
-	public abstract fun setSourceSetName (Ljava/lang/String;)V
+	public final fun getSourceSetName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public final fun setSourceSetName (Ljava/lang/String;)V
 	public fun toString ()Ljava/lang/String;
 }
 

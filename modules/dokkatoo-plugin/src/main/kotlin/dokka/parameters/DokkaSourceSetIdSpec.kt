@@ -24,16 +24,33 @@ constructor(
    * multiple DokkaTasks that contain source sets with the same name (but different configuration)
    */
   @get:Input
-  val scopeId: String
-) : Named, Serializable {
+  val scopeId: String,
 
   @get:Input
-  abstract var sourceSetName: String
+  @set:Deprecated(
+    "To support the use of DokkaSourceSetIdSpec in Sets, sourceSetName cannot be modified",
+  )
+  var sourceSetName: String
+) : Named, Serializable {
 
   @Internal
   override fun getName(): String = "$scopeId/$sourceSetName"
 
-  override fun toString(): String = "DokkaSourceSetIdSpec($name)"
+  override fun toString(): String = "DokkaSourceSetIdSpec($scopeId/$sourceSetName)"
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is DokkaSourceSetIdSpec) return false
+
+    if (scopeId != other.scopeId) return false
+    return sourceSetName == other.sourceSetName
+  }
+
+  override fun hashCode(): Int {
+    var result = scopeId.hashCode()
+    result = 31 * result + sourceSetName.hashCode()
+    return result
+  }
 
   companion object {
 
@@ -42,9 +59,6 @@ constructor(
     fun ObjectFactory.dokkaSourceSetIdSpec(
       scopeId: String,
       sourceSetName: String,
-    ): DokkaSourceSetIdSpec =
-      newInstance<DokkaSourceSetIdSpec>(scopeId).apply {
-        this.sourceSetName = sourceSetName
-      }
+    ): DokkaSourceSetIdSpec = newInstance<DokkaSourceSetIdSpec>(scopeId, sourceSetName)
   }
 }

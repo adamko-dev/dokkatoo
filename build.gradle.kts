@@ -22,6 +22,7 @@ idea {
         ".gradle",
         "build",
         "gradle/wrapper",
+        "ANDROID_SDK",
       )
       addAll(
         projectDir.walk().filter { file ->

@@ -38,7 +38,7 @@ class DokkaSourceSetBuilderTest : FunSpec({
       }
 
       val caughtException = shouldThrow<MissingValueException> {
-        DokkaSourceSetBuilder.buildAll(listOf(sourceSetSpec))
+        DokkaSourceSetBuilder.buildAll(setOf(sourceSetSpec))
       }
 
       caughtException.message shouldContain "Cannot query the value of property 'url' because it has no value available"
@@ -54,7 +54,7 @@ class DokkaSourceSetBuilderTest : FunSpec({
       }
 
       val caughtException = shouldThrow<MissingValueException> {
-        DokkaSourceSetBuilder.buildAll(listOf(sourceSetSpec))
+        DokkaSourceSetBuilder.buildAll(setOf(sourceSetSpec))
       }
 
       caughtException.message shouldContain "Cannot query the value of property 'packageListUrl' because it has no value available"
@@ -68,7 +68,7 @@ class DokkaSourceSetBuilderTest : FunSpec({
         enabled.set(false)
       }
 
-      DokkaSourceSetBuilder.buildAll(listOf(sourceSetSpec)).shouldBeSingleton { sourceSet ->
+      DokkaSourceSetBuilder.buildAll(setOf(sourceSetSpec)).shouldBeSingleton { sourceSet ->
         sourceSet.externalDocumentationLinks.shouldForAll { link ->
           link.url shouldNotBeEqual linkSpec.url.get().toURL()
           link.packageListUrl shouldNotBeEqual linkSpec.packageListUrl.get().toURL()
@@ -93,7 +93,7 @@ class DokkaSourceSetBuilderTest : FunSpec({
         }
       }
 
-      val sourceSet = DokkaSourceSetBuilder.buildAll(listOf(sourceSetSpec)).single()
+      val sourceSet = DokkaSourceSetBuilder.buildAll(setOf(sourceSetSpec)).single()
 
       sourceSet.sourceLinks.shouldBeSingleton { sourceLink ->
         sourceLink.remoteUrl shouldBe URI("https://github.com/adamko-dev/dokkatoo/").toURL()
@@ -116,7 +116,7 @@ class DokkaSourceSetBuilderTest : FunSpec({
       }
 
       val caughtException = shouldThrow<MissingValueException> {
-        DokkaSourceSetBuilder.buildAll(listOf(sourceSetSpec))
+        DokkaSourceSetBuilder.buildAll(setOf(sourceSetSpec))
       }
 
       caughtException.message.shouldContainAll(
@@ -138,7 +138,7 @@ class DokkaSourceSetBuilderTest : FunSpec({
         }
       }
 
-      val link = DokkaSourceSetBuilder.buildAll(listOf(sourceSetSpec))
+      val link = DokkaSourceSetBuilder.buildAll(setOf(sourceSetSpec))
         .single()
         .sourceLinks
         .single()
@@ -156,7 +156,7 @@ class DokkaSourceSetBuilderTest : FunSpec({
       }
 
       val caughtException = shouldThrow<MissingValueException> {
-        DokkaSourceSetBuilder.buildAll(listOf(sourceSetSpec))
+        DokkaSourceSetBuilder.buildAll(setOf(sourceSetSpec))
       }
 
       caughtException.message shouldContain "Cannot query the value of property 'remoteUrl' because it has no value available"
@@ -173,7 +173,7 @@ class DokkaSourceSetBuilderTest : FunSpec({
         }
       }
 
-      val sourceSet = DokkaSourceSetBuilder.buildAll(listOf(sourceSetSpec)).single()
+      val sourceSet = DokkaSourceSetBuilder.buildAll(setOf(sourceSetSpec)).single()
 
       sourceSet.sourceLinks.shouldBeSingleton { sourceLink ->
         sourceLink.remoteUrl shouldBe URI("https://github.com/adamko-dev/dokkatoo/").toURL()

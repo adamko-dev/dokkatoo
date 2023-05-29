@@ -17,7 +17,7 @@ import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ConfigurationContainer
-import org.gradle.api.attributes.Usage.JAVA_RUNTIME
+import org.gradle.api.attributes.Usage.JAVA_API
 import org.gradle.api.attributes.Usage.USAGE_ATTRIBUTE
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
@@ -33,6 +33,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinSingleTargetExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
+import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation.Companion.MAIN_COMPILATION_NAME
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.mpp.AbstractKotlinNativeCompilation
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinJvmAndroidCompilation
@@ -126,8 +127,6 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
     val kssClasspath = determineClasspath(details)
 
     register(details.name) dss@{
-      // only set source-set specific properties, default values for the other properties
-      // (like displayName) are set in DokkatooBasePlugin
       suppress.set(!details.isMainSourceSet())
       sourceRoots.from(details.sourceDirectories)
       classpath.from(kssClasspath)
@@ -278,7 +277,7 @@ private class KotlinCompilationDetailsBuilder(
       configurations.collectIncomingFiles(named = named, collector = compilationClasspath) {
         withVariantReselection()
         attributes {
-          attribute(USAGE_ATTRIBUTE, objects.named(JAVA_RUNTIME))
+          attribute(USAGE_ATTRIBUTE, objects.named(JAVA_API))
         }
         lenient(true)
       }
@@ -316,7 +315,7 @@ private class KotlinCompilationDetailsBuilder(
           androidVariant is LibraryVariant || androidVariant is ApplicationVariant
 
         else                           ->
-          name == KotlinCompilation.Companion.MAIN_COMPILATION_NAME
+          name == MAIN_COMPILATION_NAME
       }
     }
   }
@@ -344,7 +343,7 @@ private abstract class KotlinSourceSetDetails @Inject constructor(
   /** Estimate if this Kotlin source set are 'main' sources (as opposed to 'test' sources). */
   fun isMainSourceSet(): Provider<Boolean> =
     compilations.map { values ->
-      values.isEmpty() || values.any { it.mainCompilation }
+      values.any { it.mainCompilation }
     }
 
   override fun getName(): String = named
