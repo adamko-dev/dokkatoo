@@ -40,7 +40,6 @@ dependencies {
   // don't define test dependencies here, instead define them in the testing.suites {} configuration below
 }
 
-
 tasks.withType<KotlinCompile>().configureEach {
   kotlinOptions {
     freeCompilerArgs += listOf(
@@ -50,6 +49,7 @@ tasks.withType<KotlinCompile>().configureEach {
   }
 }
 
+//region Test suites and task configuration
 testing.suites {
 
   withType<JvmTestSuite>().configureEach {
@@ -93,12 +93,10 @@ testing.suites {
     }
   }
 
-
   /** Examples tests suite */
   val testExamples by registering(JvmTestSuite::class) {
     description = "Test the example projects, from the 'examples' directory in the project root"
   }
-
 
   /** Integration tests suite */
   val testIntegration by registering(JvmTestSuite::class) {
@@ -111,6 +109,12 @@ testing.suites {
 
 
 tasks.withType<Test>().configureEach {
+  // this seems to help OOM errors in the Worker Daemons
+  //setForkEvery(1)
+  jvmArgs(
+    "-Xmx1g",
+    "-XX:MaxMetaspaceSize=512m",
+  )
 
   mustRunAfter(tasks.withType<AbstractPublishToMaven>())
 
@@ -129,8 +133,16 @@ tasks.withType<Test>().configureEach {
     showStackTraces = true
   }
 }
+//endregion
 
-skipTestFixturesPublications()
+//region Example & Template projects setup
+dokkatooExampleProjects {
+  exampleProjects {
+    projectsItAndroid0Dokkatoo {
+      gradlePropertiesContent.add("android.useAndroidX=true")
+    }
+  }
+}
 
 dokkaTemplateProjects {
 
@@ -181,7 +193,6 @@ dokkaTemplateProjects {
 //    register("projects/serialization/dokka") { }
 //    register("projects/stdlib/dokka") { }
 
-
   configureEach {
     additionalPaths.addAll(
       "integration-tests/gradle/projects/template.root.gradle.kts",
@@ -197,11 +208,8 @@ tasks.setupDokkaTemplateProjects.configure {
 
   doLast {
     outputs.files.asFileTree.files.forEach { file ->
-      println("copied file $file")
-
       when (file.name) {
         "build.gradle.kts"             -> {
-          println("re-writing $file")
           file.writeText(
             file.readText()
               .replace(
@@ -215,7 +223,6 @@ tasks.setupDokkaTemplateProjects.configure {
         }
 
         "settings.gradle.kts"          -> {
-          println("re-writing $file")
           file.writeText(
             file.readText()
               .replace(
@@ -226,7 +233,6 @@ tasks.setupDokkaTemplateProjects.configure {
         }
 
         "template.settings.gradle.kts" -> {
-          println("re-writing $file")
           file.writeText(
             file.readText()
               .replace(
@@ -240,24 +246,6 @@ tasks.setupDokkaTemplateProjects.configure {
   }
 }
 
-dokkatooExampleProjects {
-  exampleProjects {
-    projectsItAndroid0Dokkatoo {
-      gradlePropertiesContent.add("android.useAndroidX=true")
-    }
-  }
-}
-
-
-tasks.withType<Test>().configureEach {
-  // this seems to help OOM errors in the Worker Daemons
-  //setForkEvery(1)
-  jvmArgs(
-    "-Xmx1g",
-    "-XX:MaxMetaspaceSize=512m",
-  )
-}
-
 dokkaSourceDownload {
   dokkaVersion.set(libs.versions.kotlin.dokka)
 }
@@ -269,3 +257,6 @@ tasks.updateAndroidLocalProperties {
 tasks.updateDokkatooExamples {
   dependsOn(tasks.updateAndroidLocalProperties)
 }
+//endregion
+
+skipTestFixturesPublications()
