@@ -28,7 +28,7 @@ abstract class DokkatooPrepareParametersTask
 @Inject
 constructor(
   objects: ObjectFactory,
-) : DokkatooTask.WithSourceSets(objects) {
+) : DokkatooTask.WithSourceSets() {
 
   @get:OutputFile
   abstract val dokkaConfigurationJson: RegularFileProperty

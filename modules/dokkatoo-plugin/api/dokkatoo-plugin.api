@@ -408,6 +408,6 @@ public abstract class dev/adamko/dokkatoo/tasks/DokkatooTask : org/gradle/api/De
 
 public abstract class dev/adamko/dokkatoo/tasks/DokkatooTask$WithSourceSets : dev/adamko/dokkatoo/tasks/DokkatooTask {
 	public final fun addAllDokkaSourceSets (Lorg/gradle/api/provider/Provider;)V
-	public fun getDokkaSourceSets ()Lorg/gradle/api/NamedDomainObjectContainer;
+	public abstract fun getDokkaSourceSets ()Lorg/gradle/api/NamedDomainObjectContainer;
 }
 
