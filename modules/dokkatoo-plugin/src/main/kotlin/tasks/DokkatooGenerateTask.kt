@@ -72,8 +72,7 @@ constructor(
   abstract val publicationEnabled: Property<Boolean>
 
   @get:Nested
-  val generator: DokkaGeneratorParametersSpec =
-    extensions.adding("generator", objects.newInstance(pluginsConfiguration))
+  val generator: DokkaGeneratorParametersSpec = objects.newInstance(pluginsConfiguration)
 
   /** @see JavaForkOptions.getDebug */
   @get:Input

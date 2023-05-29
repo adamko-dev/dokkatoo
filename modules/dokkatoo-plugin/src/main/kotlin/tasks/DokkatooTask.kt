@@ -31,9 +31,7 @@ constructor() : DefaultTask() {
   abstract class WithSourceSets
   @DokkatooInternalApi
   @Inject
-  constructor(
-    objects: ObjectFactory
-  ) : DokkatooTask() {
+  constructor() : DokkatooTask() {
 
     /**
      * Source sets used to generate a Dokka Module.
@@ -43,8 +41,7 @@ constructor() : DefaultTask() {
      */
     @get:Internal
     @Deprecated("Property is moved to specific task implementation")
-    open val dokkaSourceSets: NamedDomainObjectContainer<DokkaSourceSetSpec> =
-      extensions.adding("dokkaSourceSets", objects.domainObjectContainer())
+    abstract val dokkaSourceSets: NamedDomainObjectContainer<DokkaSourceSetSpec>
 
     @Deprecated(
       "Use Gradle function, addAllLater()",
