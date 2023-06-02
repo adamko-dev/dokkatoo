@@ -29,14 +29,24 @@ abstract class DokkaGeneratorWorker : WorkAction<DokkaGeneratorWorker.Parameters
   override fun execute() {
     val dokkaParameters = parameters.dokkaParameters.get()
 
-    // Dokka Generator doesn't clean up old files, so we need to manually clean the output directory
-    dokkaParameters.outputDir.deleteRecursively()
-    dokkaParameters.outputDir.mkdirs()
+    prepareOutputDir(dokkaParameters)
 
     executeDokkaGenerator(
       parameters.logFile.get().asFile,
       dokkaParameters,
     )
+  }
+
+  private fun prepareOutputDir(dokkaParameters: DokkaConfiguration) {
+    // Dokka Generator doesn't clean up old files, so we need to manually clean the output directory
+    dokkaParameters.outputDir.deleteRecursively()
+    dokkaParameters.outputDir.mkdirs()
+
+    // workaround until https://github.com/Kotlin/dokka/pull/2867 is released
+    dokkaParameters.modules.forEach { module ->
+      val moduleDir = dokkaParameters.outputDir.resolve(module.relativePathToOutputDirectory)
+      moduleDir.mkdirs()
+    }
   }
 
   private fun executeDokkaGenerator(

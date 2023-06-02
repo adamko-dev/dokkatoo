@@ -6,7 +6,6 @@ import dev.adamko.dokkatoo.dokka.parameters.DokkaModuleDescriptionKxs
 import dev.adamko.dokkatoo.dokka.parameters.builders.DokkaParametersBuilder
 import dev.adamko.dokkatoo.internal.DokkaPluginParametersContainer
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
-import dev.adamko.dokkatoo.internal.adding
 import dev.adamko.dokkatoo.workers.DokkaGeneratorWorker
 import java.io.IOException
 import javax.inject.Inject
@@ -158,10 +157,6 @@ constructor(
     }
 
     val dokkaModuleDescriptors = dokkaModuleDescriptors()
-    dokkaModuleDescriptors.forEach {
-      // workaround until https://github.com/Kotlin/dokka/pull/2867 is released
-      this.outputDirectory.dir(it.modulePath).get().asFile.mkdirs()
-    }
 
     return DokkaParametersBuilder.build(
       spec = generator,
