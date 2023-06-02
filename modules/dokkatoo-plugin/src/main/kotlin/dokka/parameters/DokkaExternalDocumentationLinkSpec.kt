@@ -41,7 +41,7 @@ constructor(
 ) : Serializable, Named {
 
   /**
-   * Root URL of documentation to link with. **Must** contain a trailing slash.
+   * Root URL of documentation to link with.
    *
    * Dokka will do its best to automatically find `package-list` for the given URL, and link
    * declarations together.

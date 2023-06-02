@@ -1,19 +1,21 @@
 package dev.adamko.dokkatoo.dokka.parameters
 
+import dev.adamko.dokkatoo.DokkatooExtension
+import dev.adamko.dokkatoo.DokkatooPlugin
 import dev.adamko.dokkatoo.utils.create_
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.datatest.WithDataTestName
+import io.kotest.datatest.withData
 import io.kotest.matchers.shouldBe
-import org.gradle.api.Project
 import org.gradle.kotlin.dsl.*
 import org.gradle.testfixtures.ProjectBuilder
 
 
 class DokkaExternalDocumentationLinkSpecTest : FunSpec({
-  val project = ProjectBuilder.builder().build()
 
   context("expect url can be set") {
     test("using a string") {
-      val actual = project.createExternalDocLinkSpec("test") {
+      val actual = createExternalDocLinkSpec {
         url("https://github.com/adamko-dev/dokkatoo/")
       }
 
@@ -21,7 +23,7 @@ class DokkaExternalDocumentationLinkSpecTest : FunSpec({
     }
 
     test("using a string-provider") {
-      val actual = project.createExternalDocLinkSpec("test") {
+      val actual = createExternalDocLinkSpec {
         url(project.provider { "https://github.com/adamko-dev/dokkatoo/" })
       }
 
@@ -31,7 +33,7 @@ class DokkaExternalDocumentationLinkSpecTest : FunSpec({
 
   context("expect packageListUrl can be set") {
     test("using a string") {
-      val actual = project.createExternalDocLinkSpec("test") {
+      val actual = createExternalDocLinkSpec {
         packageListUrl("https://github.com/adamko-dev/dokkatoo/")
       }
 
@@ -39,19 +41,62 @@ class DokkaExternalDocumentationLinkSpecTest : FunSpec({
     }
 
     test("using a string-provider") {
-      val actual = project.createExternalDocLinkSpec("test") {
+      val actual = createExternalDocLinkSpec {
         packageListUrl(project.provider { "https://github.com/adamko-dev/dokkatoo/" })
       }
 
       actual.packageListUrl.get().toString() shouldBe "https://github.com/adamko-dev/dokkatoo/"
     }
   }
+
+  context("expect packageList defaults to url+package-list") {
+    data class TestCase(
+      val actualUrl: String,
+      val expected: String,
+      val testName: String,
+    ) : WithDataTestName {
+      override fun dataTestName(): String = testName
+    }
+
+    withData(
+      TestCase(
+        testName = "non-empty path, with trailing slash",
+        actualUrl = "https://github.com/adamko-dev/dokkatoo/",
+        expected = "https://github.com/adamko-dev/dokkatoo/package-list",
+      ),
+      TestCase(
+        testName = "non-empty path, without trailing slash",
+        actualUrl = "https://github.com/adamko-dev/dokkatoo",
+        expected = "https://github.com/adamko-dev/dokkatoo/package-list",
+      ),
+      TestCase(
+        testName = "empty path, with trailing slash",
+        actualUrl = "https://github.com/",
+        expected = "https://github.com/package-list",
+      ),
+      TestCase(
+        testName = "empty path, without trailing slash",
+        actualUrl = "https://github.com",
+        expected = "https://github.com/package-list",
+      )
+    ) { (actualUrl, expected) ->
+      val actual = createExternalDocLinkSpec { url(actualUrl) }
+      actual.packageListUrl.get().toString() shouldBe expected
+    }
+  }
 })
 
-private fun Project.createExternalDocLinkSpec(
-  name: String,
+private val project = ProjectBuilder.builder().build().also { project ->
+  project.plugins.apply(type = DokkatooPlugin::class)
+}
+
+private fun createExternalDocLinkSpec(
   configure: DokkaExternalDocumentationLinkSpec.() -> Unit
-): DokkaExternalDocumentationLinkSpec =
-  objects
-    .domainObjectContainer(DokkaExternalDocumentationLinkSpec::class)
-    .create_(name, configure)
+): DokkaExternalDocumentationLinkSpec {
+
+  val dssContainer = project.extensions.getByType<DokkatooExtension>().dokkatooSourceSets
+
+  return dssContainer.create_("test" + dssContainer.size)
+    .externalDocumentationLinks
+    .create("testLink", configure)
+}

@@ -29,7 +29,6 @@ class DokkaSourceSetBuilderTest : FunSpec({
     val project = createProject()
 
     test("expect url is required") {
-
       val sourceSetSpec = project.createDokkaSourceSetSpec("test1") {
         externalDocumentationLinks.create_("TestLink") {
           url.set(null as URI?)
@@ -78,7 +77,6 @@ class DokkaSourceSetBuilderTest : FunSpec({
   }
 
 
-
   context("when DokkaSourceLinkSpec is built") {
     val project = createProject()
 
@@ -125,7 +123,6 @@ class DokkaSourceSetBuilderTest : FunSpec({
         "property 'localDirectory'",
       )
     }
-
 
     test("expect localDirectory is an invariantSeparatorsPath") {
       val tempDir = tempdir()

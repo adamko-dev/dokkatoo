@@ -60,7 +60,7 @@ fun Configuration.withDependencies_(action: DependencySet.() -> Unit): Configura
   withDependencies(action)
 
 
-fun <T> NamedDomainObjectContainer<T>.create_(name: String, configure: T.() -> Unit): T =
+fun <T> NamedDomainObjectContainer<T>.create_(name: String, configure: T.() -> Unit = {}): T =
   create(name, configure)
 
 fun <T> NamedDomainObjectContainer<T>.register_(
