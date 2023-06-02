@@ -293,8 +293,11 @@ constructor(
       prettyPrintIndent = "  "
     }
 
-    private fun URI.appendPath(value: String): URI =
-      resolve("$path/$value").normalize()
+    private fun URI.appendPath(addition: String): URI {
+      val currentPath = path.removeSuffix("/")
+      val newPath = "$currentPath/$addition"
+      return resolve(newPath).normalize()
+    }
   }
 
   @DokkatooInternalApi
