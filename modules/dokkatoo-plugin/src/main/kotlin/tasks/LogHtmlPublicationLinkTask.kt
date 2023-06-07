@@ -1,0 +1,121 @@
+package dev.adamko.dokkatoo.tasks
+
+import dev.adamko.dokkatoo.internal.DokkatooInternalApi
+import dev.adamko.dokkatoo.internal.appendPath
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
+import java.time.Duration
+import javax.inject.Inject
+import org.gradle.api.provider.Property
+import org.gradle.api.provider.ProviderFactory
+import org.gradle.api.provider.ValueSource
+import org.gradle.api.provider.ValueSourceParameters
+import org.gradle.api.tasks.Console
+import org.gradle.api.tasks.TaskAction
+import org.gradle.kotlin.dsl.*
+import org.gradle.work.DisableCachingByDefault
+
+/**
+ * Prints an HTTP link in the console when the HTML publication is generated.
+ *
+ * The HTML publication requires a web server, since it loads resources via javascript.
+ *
+ * By default, it uses
+ * [IntelliJ's built-in server](https://www.jetbrains.com/help/idea/php-built-in-web-server.html)
+ * to host the file.
+ */
+@DisableCachingByDefault(because = "logging-only task")
+abstract class LogHtmlPublicationLinkTask
+@Inject
+@DokkatooInternalApi
+constructor(
+  providers: ProviderFactory
+) : DokkatooTask() {
+
+  @get:Console
+  abstract val serverUri: Property<String>
+
+  /**
+   * Path to the `index.html` of the publication. Will be appended to [serverUri].
+   *
+   * The IntelliJ built-in server requires a relative path originating from the _parent_ directory
+   * of the IntelliJ project.
+   *
+   * For example,
+   *
+   * * given an IntelliJ project path of
+   *    ```
+   *    /Users/rachel/projects/my-project/
+   *    ```
+   * * and the publication is generated with an index file
+   *    ```
+   *    /Users/rachel/projects/my-project/docs/build/dokka/html/index.html
+   *    ````
+   * * then IntelliJ requires the [indexHtmlPath] is
+   *    ```
+   *    my-project/docs/build/dokka/html/index.html
+   *    ```
+   */
+  @get:Console
+  abstract val indexHtmlPath: Property<String>
+
+  init {
+    // don't assign a group, it doesn't really make sense to display this task prominently.
+    group = "other"
+
+    @Suppress("UnstableApiUsage")
+    val serverActive = providers.of(ServerActiveCheck::class) {
+      parameters.uri.convention(serverUri)
+    }
+
+    super.onlyIf("server URL is reachable") { serverActive.get() }
+  }
+
+  @TaskAction
+  fun exec() {
+    val serverUri = serverUri.orNull
+    val filePath = indexHtmlPath.orNull
+
+    if (serverUri != null && !filePath.isNullOrBlank()) {
+      val link = URI(serverUri).appendPath(filePath).toString()
+
+      logger.lifecycle("Generated Dokka HTML publication: $link")
+    }
+  }
+
+  /**
+   * Check if the server URI that can host the generated Dokka HTML publication is accessible.
+   *
+   * The check uses a [ValueSource] source to attempt to be compatible with Configuration Cache, but
+   * I'm not certain that this is necessary, or if a [ValueSource] is the best way to achieve it.
+   */
+  @Suppress("UnstableApiUsage")
+  internal abstract class ServerActiveCheck : ValueSource<Boolean, ServerActiveCheck.Parameters> {
+
+    interface Parameters : ValueSourceParameters {
+      /** E.g. `http://localhost:63342` */
+      val uri: Property<String>
+    }
+
+    override fun obtain(): Boolean {
+      try {
+        val uri = URI.create(parameters.uri.get())
+        val client = HttpClient.newHttpClient()
+        val request = HttpRequest
+          .newBuilder()
+          .uri(uri)
+          .timeout(Duration.ofMillis(10))
+          .GET()
+          .build()
+        val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+
+        // don't care about the status - only if the server is available
+        return response.statusCode() > 0
+      } catch (ex: Exception) {
+        return false
+      }
+    }
+  }
+}
