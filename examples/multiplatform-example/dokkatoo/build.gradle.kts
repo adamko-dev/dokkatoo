@@ -10,7 +10,7 @@ kotlin {
   jvm() // Creates a JVM target with the default name "jvm"
   linuxX64("linux")
   macosX64("macos")
-  js(BOTH) {
+  js(IR) {
     browser()
   }
   sourceSets {
