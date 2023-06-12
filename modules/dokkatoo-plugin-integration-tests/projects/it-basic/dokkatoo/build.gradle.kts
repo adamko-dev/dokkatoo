@@ -12,6 +12,10 @@ dependencies {
   testImplementation(kotlin("test-junit"))
 }
 
+kotlin {
+  jvmToolchain(8)
+}
+
 dokkatoo {
   moduleName.set("Basic Project")
   dokkatooSourceSets.configureEach {
