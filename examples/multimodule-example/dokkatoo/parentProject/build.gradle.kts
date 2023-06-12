@@ -1,13 +1,21 @@
 plugins {
-  kotlin("jvm") version "1.7.20" apply false
+  kotlin("jvm") version "1.8.20" apply false
   id("dev.adamko.dokkatoo") version "1.5.0-SNAPSHOT"
 }
 
 dependencies {
   dokkatoo(project(":parentProject:childProjectA"))
   dokkatoo(project(":parentProject:childProjectB"))
-  dokkatooPluginHtml("org.jetbrains.dokka:all-modules-page-plugin:1.7.20")
-  dokkatooPluginHtml("org.jetbrains.dokka:templating-plugin:1.7.20")
+  dokkatooPluginHtml(
+    dokkatoo.versions.jetbrainsDokka.map { dokkaVersion ->
+      "org.jetbrains.dokka:all-modules-page-plugin:$dokkaVersion"
+    }
+  )
+  dokkatooPluginHtml(
+    dokkatoo.versions.jetbrainsDokka.map { dokkaVersion ->
+      "org.jetbrains.dokka:templating-plugin:$dokkaVersion"
+    }
+  )
 }
 
 dokkatoo {

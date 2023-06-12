@@ -1,5 +1,5 @@
 plugins {
-  kotlin("jvm") version "1.8.10"
+  kotlin("jvm") version "1.8.20"
   id("dev.adamko.dokkatoo") version "1.5.0-SNAPSHOT"
 }
 
@@ -17,7 +17,6 @@ dokkatoo {
     sourceLink {
       localDirectory.set(file("src/main/kotlin"))
       remoteUrl("https://github.com/Kotlin/dokka/tree/master/examples/gradle/dokka-gradle-example/src/main/kotlin")
-      //remoteUrl("https://github.com/adamko-dev/dokkatoo/tree/main/examples/gradle-example/dokkatoo/src/main/kotlin")
       remoteLineSuffix.set("#L")
     }
   }

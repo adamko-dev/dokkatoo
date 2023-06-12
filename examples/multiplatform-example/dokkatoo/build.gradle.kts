@@ -1,5 +1,5 @@
 plugins {
-  kotlin("multiplatform") version "1.8.10"
+  kotlin("multiplatform") version "1.8.20"
   id("dev.adamko.dokkatoo") version "1.5.0-SNAPSHOT"
 }
 
@@ -36,5 +36,4 @@ dokkatoo {
 dokkatoo {
   // DON'T COPY - this is only needed for internal Dokkatoo integration tests
   sourceSetScopeDefault.set( /* DON'T COPY */ ":dokkaHtml")
-  versions.jetbrainsDokka.set( /* DON'T COPY */ "1.7.20")
 }

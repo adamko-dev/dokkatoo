@@ -219,6 +219,7 @@ val buildConfigFileContents: Provider<TextResource> =
   }
 
 val generateDokkatooConstants by tasks.registering(Sync::class) {
+  group = project.name
 
   val buildConfigFileContents = buildConfigFileContents
 
