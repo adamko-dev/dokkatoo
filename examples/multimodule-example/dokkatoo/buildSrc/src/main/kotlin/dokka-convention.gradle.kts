@@ -1,4 +1,6 @@
-
+/**
+ * Common conventions for generating documentation with Dokkatoo.
+ */
 
 plugins {
   id("dev.adamko.dokkatoo")
