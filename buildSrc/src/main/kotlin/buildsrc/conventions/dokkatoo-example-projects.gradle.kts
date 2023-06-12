@@ -54,8 +54,8 @@ fun createDokkatooExampleProjectsSettings(
     val settingsFiles = projectDir.asFileTree
       .matching {
         include(
-          "**/*dokkatoo*/settings.gradle.kts",
-          "**/*dokkatoo*/settings.gradle",
+          "**/*dokkatoo*/**/settings.gradle.kts",
+          "**/*dokkatoo*/**/settings.gradle",
         )
       }.files
 
@@ -105,6 +105,10 @@ val updateDokkatooExamplesBuildFiles by tasks.registering {
 
   val dokkatooVersion = dokkatooVersion
 
+  val dokkatooDependencyVersionMatcher = """
+    \"dev\.adamko\.dokkatoo\:dokkatoo\-plugin\:([^"]+?)\"
+    """.trimIndent().toRegex()
+
   val dokkatooPluginVersionMatcher = """
     id[^"]+?"dev\.adamko\.dokkatoo".+?version "([^"]+?)"
     """.trimIndent().toRegex()
@@ -117,7 +121,6 @@ val updateDokkatooExamplesBuildFiles by tasks.registering {
           "**/*dokkatoo*/**/build.gradle",
         )
       }.elements
-
   outputs.files(gradleBuildFiles)
 
   doLast {
@@ -125,10 +128,16 @@ val updateDokkatooExamplesBuildFiles by tasks.registering {
       val file = fileLocation.asFile
       if (file.exists()) {
         file.writeText(
-          file.readText().replace(dokkatooPluginVersionMatcher) {
-            val oldVersion = it.groupValues[1]
-            it.value.replace(oldVersion, dokkatooVersion.get())
-          })
+          file.readText()
+            .replace(dokkatooPluginVersionMatcher) {
+              val oldVersion = it.groupValues[1]
+              it.value.replace(oldVersion, dokkatooVersion.get())
+            }
+            .replace(dokkatooDependencyVersionMatcher) {
+              val oldVersion = it.groupValues[1]
+              it.value.replace(oldVersion, dokkatooVersion.get())
+            }
+        )
       }
     }
   }

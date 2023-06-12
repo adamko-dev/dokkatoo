@@ -101,7 +101,6 @@ class MultimoduleExampleTest : FunSpec({
         .forwardOutput()
         .build()
 
-
       test("expect build is successful") {
         build.output shouldContain "BUILD SUCCESSFUL"
       }
@@ -132,7 +131,7 @@ class MultimoduleExampleTest : FunSpec({
             dokkatooBuildCache.output shouldContainAll listOf(
               "> Task :parentProject:dokkatooGeneratePublicationHtml UP-TO-DATE",
               "BUILD SUCCESSFUL",
-              "5 actionable tasks: 5 up-to-date",
+              "17 actionable tasks: 17 up-to-date",
             )
             withClue("Dokka Generator should not be triggered, so check it doesn't log anything") {
               dokkatooBuildCache.output shouldNotContain "Generation completed successfully"
@@ -180,8 +179,12 @@ private fun initDokkaProject(
   return GradleProjectTest(destinationDir.toPath()).apply {
     copyExampleProject("multimodule-example/dokka")
 
-    gradleProperties = gradleProperties
-      .replace("dokkaVersion=1.7.20", "dokkaVersion=$DOKKA_VERSION")
+    gradleProperties = gradleProperties.lines().joinToString("\n") { line ->
+      when {
+        line.startsWith("dokkaVersion=") -> "dokkaVersion=$DOKKA_VERSION"
+        else                             -> line
+      }
+    }
 
     settingsGradleKts = settingsGradleKts
       .replace(
@@ -190,9 +193,8 @@ private fun initDokkaProject(
           |
           |pluginManagement {
           |    repositories {
-          |        gradlePluginPortal()
           |        mavenCentral()
-          |        mavenLocal()
+          |        gradlePluginPortal()
           |    }
           |
         """.trimMargin()
@@ -201,7 +203,6 @@ private fun initDokkaProject(
         |dependencyResolutionManagement {
         |  repositories {
         |    mavenCentral()
-        |    mavenLocal()
         |  }
         |}
         |
@@ -217,7 +218,7 @@ private fun initDokkaProject(
         |  into(layout.buildDirectory.dir("dokka/html"))
         |}
         |
-        |tasks.matching { "dokka" in it.name.toLowerCase() && it.name != hackDokkaHtmlDir.name }.configureEach { 
+        |tasks.matching { it.name.contains("dokka", ignoreCase = true) && it.name != hackDokkaHtmlDir.name }.configureEach { 
         |  finalizedBy(hackDokkaHtmlDir)
         |}
         |

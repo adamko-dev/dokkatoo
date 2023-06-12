@@ -1,5 +1,5 @@
 plugins {
-  kotlin("multiplatform") version "1.8.10"
+  kotlin("multiplatform") version "1.8.22"
   id("dev.adamko.dokkatoo") version "1.5.0-SNAPSHOT"
 }
 
@@ -10,7 +10,7 @@ kotlin {
   jvm() // Creates a JVM target with the default name "jvm"
   linuxX64("linux")
   macosX64("macos")
-  js(BOTH) {
+  js(IR) {
     browser()
   }
   sourceSets {
@@ -32,9 +32,8 @@ dokkatoo {
 }
 
 
-
+//region DON'T COPY - this is only needed for internal Dokkatoo integration tests
 dokkatoo {
-  // DON'T COPY - this is only needed for internal Dokkatoo integration tests
-  sourceSetScopeDefault.set( /* DON'T COPY */ ":dokkaHtml")
-  versions.jetbrainsDokka.set( /* DON'T COPY */ "1.7.20")
+  sourceSetScopeDefault.set(":dokkaHtml")
 }
+//endregion

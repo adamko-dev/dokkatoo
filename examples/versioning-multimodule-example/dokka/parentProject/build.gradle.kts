@@ -4,16 +4,12 @@ import org.jetbrains.dokka.versioning.VersioningConfiguration
 
 buildscript {
     dependencies {
-        classpath("org.jetbrains.dokka:versioning-plugin:1.7.20")
+        classpath("org.jetbrains.dokka:versioning-plugin:1.8.20")
     }
 
     repositories {
         mavenCentral()
     }
-}
-
-dependencies {
-    implementation(kotlin("stdlib"))
 }
 
 val currentVersion = "1.0"

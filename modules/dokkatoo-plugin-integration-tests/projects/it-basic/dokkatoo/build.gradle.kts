@@ -2,15 +2,18 @@ import dev.adamko.dokkatoo.dokka.parameters.VisibilityModifier
 import dev.adamko.dokkatoo.dokka.plugins.DokkaHtmlPluginParameters
 
 plugins {
-  kotlin("jvm") version "1.8.10"
+  kotlin("jvm") version "1.8.22"
   id("dev.adamko.dokkatoo") version "1.5.0-SNAPSHOT"
 }
 
-version = "1.7.20-SNAPSHOT"
+version = "1.8.20-SNAPSHOT"
 
 dependencies {
-  implementation(kotlin("stdlib"))
   testImplementation(kotlin("test-junit"))
+}
+
+kotlin {
+  jvmToolchain(8)
 }
 
 dokkatoo {
@@ -50,7 +53,6 @@ dokkatoo {
   }
 
   dokkatooPublications.configureEach {
-    suppressObviousFunctions.set(true)
     suppressObviousFunctions.set(false)
   }
 }

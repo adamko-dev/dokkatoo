@@ -3,13 +3,13 @@ import org.jetbrains.dokka.base.DokkaBase
 import org.jetbrains.dokka.base.DokkaBaseConfiguration
 
 plugins {
-    kotlin("jvm") version "1.8.10"
-    id("org.jetbrains.dokka") version ("1.7.20")
+    kotlin("jvm") version "1.8.20"
+    id("org.jetbrains.dokka") version "1.8.20"
 }
 
 buildscript {
     dependencies {
-        classpath("org.jetbrains.dokka:dokka-base:1.7.20")
+        classpath("org.jetbrains.dokka:dokka-base:1.8.20")
     }
 }
 
@@ -31,6 +31,5 @@ tasks.dokkaHtml {
 }
 
 dependencies {
-    implementation(kotlin("stdlib"))
     testImplementation(kotlin("test-junit"))
 }

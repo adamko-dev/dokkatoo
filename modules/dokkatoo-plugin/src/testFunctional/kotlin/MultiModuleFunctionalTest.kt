@@ -397,14 +397,18 @@ private fun initDokkatooProject(
       |plugins {
       |  // Kotlin plugin shouldn't be necessary here, but without it Dokka errors
       |  // with ClassNotFound KotlinPluginExtension... very weird
-      |  kotlin("jvm") version "1.7.20" apply false
+      |  kotlin("jvm") version "1.8.22" apply false
       |  id("dev.adamko.dokkatoo") version "$DOKKATOO_VERSION"
       |}
       |
       |dependencies {
       |  dokkatoo(project(":subproject-hello"))
       |  dokkatoo(project(":subproject-goodbye"))
-      |  dokkatooPluginHtml("org.jetbrains.dokka:all-modules-page-plugin:1.7.20")
+      |  dokkatooPluginHtml(
+      |    dokkatoo.versions.jetbrainsDokka.map { dokkaVersion ->
+      |      "org.jetbrains.dokka:all-modules-page-plugin:${'$'}dokkaVersion"
+      |    }
+      |  )
       |}
       |
     """.trimMargin()
@@ -412,7 +416,7 @@ private fun initDokkatooProject(
     dir("subproject-hello") {
       buildGradleKts = """
           |plugins {
-          |  kotlin("jvm") version "1.7.20"
+          |  kotlin("jvm") version "1.8.22"
           |  id("dev.adamko.dokkatoo") version "$DOKKATOO_VERSION"
           |}
           |
@@ -439,7 +443,7 @@ private fun initDokkatooProject(
 
       buildGradleKts = """
           |plugins {
-          |  kotlin("jvm") version "1.7.20"
+          |  kotlin("jvm") version "1.8.22"
           |  id("dev.adamko.dokkatoo") version "$DOKKATOO_VERSION"
           |}
           |

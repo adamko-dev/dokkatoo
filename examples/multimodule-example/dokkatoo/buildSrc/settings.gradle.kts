@@ -1,4 +1,4 @@
-rootProject.name = "dokkatoo-multimodule-example"
+rootProject.name = "buildSrc"
 
 pluginManagement {
   repositories {
@@ -10,12 +10,12 @@ pluginManagement {
 
 @Suppress("UnstableApiUsage")
 dependencyResolutionManagement {
+
+  repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+
   repositories {
     mavenCentral()
+    gradlePluginPortal()
     maven(providers.gradleProperty("testMavenRepo"))
   }
 }
-
-include(":parentProject")
-include(":parentProject:childProjectA")
-include(":parentProject:childProjectB")
