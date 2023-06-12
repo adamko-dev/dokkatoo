@@ -36,9 +36,9 @@ dependencyResolutionManagement {
 }
 
 include(
-  ":docs",
   ":examples",
 
+  ":modules:docs",
   ":modules:dokkatoo-plugin",
   ":modules:dokkatoo-plugin-integration-tests",
 )

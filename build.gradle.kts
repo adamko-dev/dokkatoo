@@ -35,4 +35,4 @@ idea {
   }
 }
 
-initIdeProjectLogo("docs/images/logo-icon.svg")
+initIdeProjectLogo("modules/docs/images/logo-icon.svg")

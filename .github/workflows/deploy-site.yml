@@ -30,11 +30,11 @@ jobs:
         with:
           gradle-home-cache-cleanup: true
           arguments: | 
-            :docs:dokkatooGenerate
+            :modules:docs:dokkatooGenerate
 
       - uses: actions/upload-pages-artifact@v1
         with:
-          path: ./docs/build/dokka/html
+          path: ./modules/docs/build/dokka/html
 
   deploy:
     needs: build

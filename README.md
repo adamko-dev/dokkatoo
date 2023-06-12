@@ -4,7 +4,7 @@
 [![Slack](https://img.shields.io/badge/slack-%23dokka-white.svg?&style=for-the-badge&logo=slack)](https://slack-chats.kotlinlang.org/c/dokka)
 
 <picture>
-  <img alt="Dokkatoo Logo" src="./docs/images/banner.svg" style="margin: 1em">
+  <img alt="Dokkatoo Logo" src="./modules/docs/images/banner.svg" style="margin: 1em">
 </picture>
 
 [Dokkatoo](https://github.com/adamko-dev/dokkatoo) is a Gradle plugin that generates documentation
@@ -163,11 +163,10 @@ Run the Dokkatoo generation task.
 ./gradlew :dokkatooGeneratePublicationHtml
 ```
 
-Only run the task in the aggregating project (prefix the task name with the subproject path)
-so that Dokkatoo doesn't generate documentation in other subprojects (it won't cause problems, but
-it will be slower.)
+Dokkatoo will then generate documentation into `./build/dokka/`
 
-Dokkatoo will then generate documentation into `./docs/build/dokka/`
+To improve performance only run the task in the aggregating project by prefixing the task name with
+the subproject path (or `:` if aggregating in the root project).
 
 ### Migrating from Dokka Gradle Plugin
 
