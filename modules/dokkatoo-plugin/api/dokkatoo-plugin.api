@@ -412,8 +412,13 @@ public abstract class dev/adamko/dokkatoo/tasks/DokkatooTask$WithSourceSets : de
 }
 
 public abstract class dev/adamko/dokkatoo/tasks/LogHtmlPublicationLinkTask : dev/adamko/dokkatoo/tasks/DokkatooTask {
+	public static final field Companion Ldev/adamko/dokkatoo/tasks/LogHtmlPublicationLinkTask$Companion;
+	public static final field ENABLE_TASK_PROPERTY_NAME Ljava/lang/String;
 	public final fun exec ()V
 	public abstract fun getIndexHtmlPath ()Lorg/gradle/api/provider/Property;
 	public abstract fun getServerUri ()Lorg/gradle/api/provider/Property;
+}
+
+public final class dev/adamko/dokkatoo/tasks/LogHtmlPublicationLinkTask$Companion {
 }
 

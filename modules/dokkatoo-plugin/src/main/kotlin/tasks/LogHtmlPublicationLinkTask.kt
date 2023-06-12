@@ -25,6 +25,8 @@ import org.gradle.work.DisableCachingByDefault
  * By default, it uses
  * [IntelliJ's built-in server](https://www.jetbrains.com/help/idea/php-built-in-web-server.html)
  * to host the file.
+ *
+ * This task can be disabled using the [ENABLE_TASK_PROPERTY_NAME] project property.
  */
 @DisableCachingByDefault(because = "logging-only task")
 abstract class LogHtmlPublicationLinkTask
@@ -57,20 +59,32 @@ constructor(
    *    ```
    *    my-project/docs/build/dokka/html/index.html
    *    ```
+   * * so that (assuming [serverUri] is `http://localhost:63342`) the logged URL is
+   *    ```
+   *    http://localhost:63342/my-project/docs/build/dokka/html/index.html
+   *    ```
    */
   @get:Console
   abstract val indexHtmlPath: Property<String>
 
   init {
-    // don't assign a group, it doesn't really make sense to display this task prominently.
+    // don't assign a group. This task is a 'finalizer' util task, so it doesn't make sense
+    // to display this task prominently.
     group = "other"
 
     @Suppress("UnstableApiUsage")
     val serverActive = providers.of(ServerActiveCheck::class) {
       parameters.uri.convention(serverUri)
     }
-
     super.onlyIf("server URL is reachable") { serverActive.get() }
+
+    val logHtmlPublicationLinkTaskEnabled = providers
+      .gradleProperty(ENABLE_TASK_PROPERTY_NAME)
+      .orElse("true")
+      .map(String::toBoolean)
+    super.onlyIf("task is enabled via property") {
+      logHtmlPublicationLinkTaskEnabled.get()
+    }
   }
 
   @TaskAction
@@ -87,6 +101,9 @@ constructor(
 
   /**
    * Check if the server URI that can host the generated Dokka HTML publication is accessible.
+   *
+   * Use the [HttpClient] included with Java 11 to avoid bringing in a new dependency for such
+   * a small util.
    *
    * The check uses a [ValueSource] source to attempt to be compatible with Configuration Cache, but
    * I'm not certain that this is necessary, or if a [ValueSource] is the best way to achieve it.
@@ -117,5 +134,24 @@ constructor(
         return false
       }
     }
+  }
+
+  companion object {
+    /**
+     * Control whether the [LogHtmlPublicationLinkTask] task is enabled. Useful for disabling the
+     * task locally, or in CI/CD, or for tests.
+     *
+     * ```properties
+     * #$GRADLE_USER_HOME/gradle.properties
+     * dev.adamko.dokkatoo.tasks.logHtmlPublicationLinkEnabled=false
+     * ```
+     *
+     * or via an environment variable
+     *
+     * ```env
+     * ORG_GRADLE_PROJECT_dev.adamko.dokkatoo.tasks.logHtmlPublicationLinkEnabled=false
+     * ```
+     */
+    const val ENABLE_TASK_PROPERTY_NAME = "dev.adamko.dokkatoo.tasks.logHtmlPublicationLinkEnabled"
   }
 }
