@@ -15,7 +15,7 @@ class GradlePluginProjectIntegrationTest : FunSpec({
     val project = initGradlePluginProject()
 
     val dokkatooBuild = project.runner
-      .withArguments(
+      .addArguments(
         "clean",
         "dokkatooGeneratePublicationHtml",
         "--stacktrace",

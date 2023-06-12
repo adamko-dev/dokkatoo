@@ -27,7 +27,7 @@ class AndroidProjectIntegrationTest : FunSpec({
 
   context("when generating HTML") {
     val dokkaBuild = dokkaProject.runner
-      .withArguments(
+      .addArguments(
         "clean",
         "dokkaHtml",
         "--stacktrace",
@@ -36,7 +36,7 @@ class AndroidProjectIntegrationTest : FunSpec({
       .build()
 
     val dokkatooBuild = dokkatooProject.runner
-      .withArguments(
+      .addArguments(
         "clean",
         "dokkatooGeneratePublicationHtml",
         "--stacktrace",
@@ -98,7 +98,7 @@ class AndroidProjectIntegrationTest : FunSpec({
 
     test("Dokkatoo tasks should be cacheable") {
       dokkatooProject.runner
-        .withArguments(
+        .addArguments(
           "dokkatooGeneratePublicationHtml",
           "--stacktrace",
           "--build-cache",
@@ -117,7 +117,7 @@ class AndroidProjectIntegrationTest : FunSpec({
 
       val configCacheRunner =
         dokkatooProject.runner
-          .withArguments(
+          .addArguments(
             "clean",
             "dokkatooGeneratePublicationHtml",
             "--stacktrace",

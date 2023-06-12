@@ -20,7 +20,7 @@ class DokkatooPluginFunctionalTest : FunSpec({
 
   test("expect Dokka Plugin creates Dokka tasks") {
     val build = testProject.runner
-      .withArguments("tasks", "--group=dokkatoo", "-q")
+      .addArguments("tasks", "--group=dokkatoo", "-q")
       .build()
 
     withClue(build.output) {
@@ -57,7 +57,7 @@ class DokkatooPluginFunctionalTest : FunSpec({
 
   test("expect Dokka Plugin creates Dokka outgoing variants") {
     val build = testProject.runner
-      .withArguments("outgoingVariants", "-q")
+      .addArguments("outgoingVariants", "-q")
       .build()
 
     val variants = build.output.invariantNewlines().replace('\\', '/')
@@ -125,7 +125,7 @@ class DokkatooPluginFunctionalTest : FunSpec({
     val expectedFormats = listOf("Gfm", "Html", "Javadoc", "Jekyll")
 
     val build = testProject.runner
-      .withArguments("resolvableConfigurations", "-q")
+      .addArguments("resolvableConfigurations", "-q")
       .build()
 
     build.output.invariantNewlines().asClue { allConfigurations ->

@@ -27,7 +27,7 @@ class KotlinMultiplatformExampleTest : FunSpec({
   context("compare dokka and dokkatoo HTML generators") {
     test("expect dokka can generate HTML") {
       val dokkaBuild = dokkaProject.runner
-        .withArguments(
+        .addArguments(
           "clean",
           "dokkaHtml",
           "--stacktrace",
@@ -42,7 +42,7 @@ class KotlinMultiplatformExampleTest : FunSpec({
 
     context("when Dokkatoo generates HTML") {
       val build = dokkatooProject.runner
-        .withArguments(
+        .addArguments(
           "clean",
           ":dokkatooGeneratePublicationHtml",
           "--stacktrace",
@@ -92,7 +92,7 @@ class KotlinMultiplatformExampleTest : FunSpec({
 
     context("expect Dokkatoo is compatible with Gradle Build Cache") {
       val build = dokkatooProject.runner
-        .withArguments(
+        .addArguments(
           "clean",
           ":dokkatooGeneratePublicationHtml",
           "--stacktrace",
@@ -119,7 +119,7 @@ class KotlinMultiplatformExampleTest : FunSpec({
 
       test("expect tasks are UP-TO-DATE") {
         dokkatooProject.runner
-          .withArguments(
+          .addArguments(
             ":dokkatooGeneratePublicationHtml",
             "--stacktrace",
             "--info",
@@ -153,7 +153,7 @@ class KotlinMultiplatformExampleTest : FunSpec({
 
       val configCacheRunner =
         dokkatooProject.runner
-          .withArguments(
+          .addArguments(
             "clean",
             ":dokkatooGeneratePublicationHtml",
             "--stacktrace",

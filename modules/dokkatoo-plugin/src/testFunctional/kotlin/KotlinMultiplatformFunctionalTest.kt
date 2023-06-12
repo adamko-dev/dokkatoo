@@ -19,7 +19,7 @@ class KotlinMultiplatformFunctionalTest : FunSpec({
     val project = initKotlinMultiplatformProject()
 
     project.runner
-      .withArguments(
+      .addArguments(
         "clean",
         ":dokkatooGeneratePublicationHtml",
         "--stacktrace",
