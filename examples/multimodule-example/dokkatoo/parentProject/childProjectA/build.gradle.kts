@@ -10,8 +10,10 @@ dokkatoo {
   modulePath.set("childProjectA") // match the original dokka default
 }
 
+//region DON'T COPY - this is only needed for internal Dokkatoo integration tests
 tasks.withType<dev.adamko.dokkatoo.tasks.DokkatooGenerateTask>().configureEach {
   generator.dokkaSourceSets.configureEach {
     sourceSetScope.set(":parentProject:childProjectA:dokkaHtmlPartial")
   }
 }
+//endregion

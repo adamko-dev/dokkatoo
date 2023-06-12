@@ -32,8 +32,8 @@ dokkatoo {
 }
 
 
-
+//region DON'T COPY - this is only needed for internal Dokkatoo integration tests
 dokkatoo {
-  // DON'T COPY - this is only needed for internal Dokkatoo integration tests
-  sourceSetScopeDefault.set( /* DON'T COPY */ ":dokkaHtml")
+  sourceSetScopeDefault.set(":dokkaHtml")
 }
+//endregion
