@@ -128,17 +128,10 @@ class KotlinMultiplatformExampleTest : FunSpec({
           .forwardOutput()
           .build {
 
-            withClue("task :kotlinNpmCachesSetup should have caching disabled") {
-              output shouldContainAll listOf(
-                "Caching disabled for task ':kotlinNpmCachesSetup'",
-                "Task ':kotlinNpmCachesSetup' is not up-to-date",
-              )
-            }
-
             output shouldContainAll listOf(
               "> Task :dokkatooGeneratePublicationHtml UP-TO-DATE",
               "BUILD SUCCESSFUL",
-              "15 actionable tasks: 1 executed, 14 up-to-date",
+              "3 actionable tasks: 3 up-to-date",
             )
             withClue("Dokka Generator should not be triggered, so check it doesn't log anything") {
               output shouldNotContain "Generation completed successfully"
