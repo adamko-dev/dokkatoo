@@ -139,7 +139,7 @@ private fun initKotlinMultiplatformProject(
 
     buildGradleKts = """
       |plugins {
-      |  kotlin("multiplatform") version "1.8.20"
+      |  kotlin("multiplatform") version "1.8.22"
       |  id("dev.adamko.dokkatoo") version "${DokkatooConstants.DOKKATOO_VERSION}"
       |}
       |

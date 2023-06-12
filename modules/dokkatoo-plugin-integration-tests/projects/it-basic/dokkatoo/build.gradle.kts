@@ -2,7 +2,7 @@ import dev.adamko.dokkatoo.dokka.parameters.VisibilityModifier
 import dev.adamko.dokkatoo.dokka.plugins.DokkaHtmlPluginParameters
 
 plugins {
-  kotlin("jvm") version "1.8.20"
+  kotlin("jvm") version "1.8.22"
   id("dev.adamko.dokkatoo") version "1.5.0-SNAPSHOT"
 }
 
