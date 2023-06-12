@@ -22,9 +22,14 @@ class GradleProjectTest(
     baseDir: Path = funcTestTempDir,
   ) : this(projectDir = baseDir.resolve(testProjectName))
 
-  val runner: GradleRunner = GradleRunner.create()
-    .withProjectDir(projectDir.toFile())
-    .withJvmArguments("-XX:MaxMetaspaceSize=512m")
+  val runner: GradleRunner
+    get() = GradleRunner.create()
+      .withProjectDir(projectDir.toFile())
+      .withJvmArguments("-XX:MaxMetaspaceSize=512m")
+      .addArguments(
+        // disable the logging task so the tests work consistently on local machines and CI/CD
+        "-P" + "dev.adamko.dokkatoo.tasks.logHtmlPublicationLinkEnabled=false"
+      )
 
   val testMavenRepoRelativePath: String =
     projectDir.relativize(testMavenRepoDir).toFile().invariantSeparatorsPath
@@ -93,8 +98,8 @@ fun gradleKtsProjectTest(
       |
       |pluginManagement {
       |  repositories {
-      |    gradlePluginPortal()
       |    mavenCentral()
+      |    gradlePluginPortal()
       |    maven(file("$testMavenRepoRelativePath")) {
       |      mavenContent {
       |        includeGroup("dev.adamko.dokkatoo")
@@ -140,8 +145,8 @@ fun gradleGroovyProjectTest(
       |
       |pluginManagement {
       |    repositories {
-      |        gradlePluginPortal()
       |        mavenCentral()
+      |        gradlePluginPortal()
       |        maven { url = file("$testMavenRepoRelativePath") }
       |    }
       |}
@@ -254,7 +259,9 @@ var ProjectDirectoryScope.buildGradle: String by TestProjectFileDelegate("build.
 
 /** Set the content of `gradle.properties` */
 @delegate:Language("properties")
-var ProjectDirectoryScope.gradleProperties: String by TestProjectFileDelegate("gradle.properties")
+var ProjectDirectoryScope.gradleProperties: String by TestProjectFileDelegate(
+  /* language=text */ "gradle.properties"
+)
 
 
 fun ProjectDirectoryScope.createKotlinFile(filePath: String, @Language("kotlin") contents: String) =

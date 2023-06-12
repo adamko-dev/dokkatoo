@@ -28,7 +28,7 @@ class CustomFormatExampleTest : FunSpec({
   context("compare dokka and dokkatoo HTML generators") {
     test("expect dokka can generate HTML") {
       val dokkaBuild = dokkaProject.runner
-        .withArguments(
+        .addArguments(
           "clean",
           "dokkaHtml",
           "--stacktrace",
@@ -43,7 +43,7 @@ class CustomFormatExampleTest : FunSpec({
 
     test("expect dokkatoo can generate HTML") {
       val dokkatooBuild = dokkatooProject.runner
-        .withArguments(
+        .addArguments(
           "clean",
           ":dokkatooGeneratePublicationHtml",
           "--stacktrace",
@@ -84,7 +84,7 @@ class CustomFormatExampleTest : FunSpec({
   context("Gradle caching") {
     test("expect Dokkatoo is compatible with Gradle Build Cache") {
       val dokkatooBuild = dokkatooProject.runner
-        .withArguments(
+        .addArguments(
           "clean",
           ":dokkatooGeneratePublicationHtml",
           "--stacktrace",
@@ -102,7 +102,7 @@ class CustomFormatExampleTest : FunSpec({
       dokkaWorkerLog.readText() shouldContain "Generation completed successfully"
 
       dokkatooProject.runner
-        .withArguments(
+        .addArguments(
           ":dokkatooGeneratePublicationHtml",
           "--stacktrace",
           "--build-cache",
@@ -128,7 +128,7 @@ class CustomFormatExampleTest : FunSpec({
 
       val configCacheRunner =
         dokkatooProject.runner
-          .withArguments(
+          .addArguments(
             "clean",
             ":dokkatooGeneratePublicationHtml",
             "--stacktrace",

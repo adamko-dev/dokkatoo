@@ -1,6 +1,7 @@
 package dev.adamko.dokkatoo.utils
 
 import org.gradle.testkit.runner.BuildResult
+import org.gradle.testkit.runner.BuildTask
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.internal.DefaultGradleRunner
 
@@ -27,3 +28,20 @@ inline fun GradleRunner.buildAndFail(
 fun GradleRunner.withJvmArguments(
   vararg jvmArguments: String
 ): GradleRunner = (this as DefaultGradleRunner).withJvmArguments(*jvmArguments)
+
+
+/**
+ * Helper function to _append_ [arguments] to any existing
+ * [GradleRunner arguments][GradleRunner.getArguments].
+ */
+fun GradleRunner.addArguments(
+  vararg arguments: String
+): GradleRunner =
+  withArguments(this@addArguments.arguments + arguments)
+
+
+/**
+ * Get the name of the task, without the leading [BuildTask.getPath].
+ */
+val BuildTask.name: String
+  get() = path.substringAfterLast(':')

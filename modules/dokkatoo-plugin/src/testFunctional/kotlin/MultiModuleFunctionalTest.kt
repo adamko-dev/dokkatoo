@@ -6,6 +6,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.inspectors.forAll
 import io.kotest.inspectors.shouldForAll
 import io.kotest.matchers.collections.shouldBeIn
+import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.file.shouldBeAFile
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.paths.shouldBeAFile
@@ -21,7 +22,7 @@ class MultiModuleFunctionalTest : FunSpec({
     val project = initDokkatooProject("all-formats")
 
     project.runner
-      .withArguments(
+      .addArguments(
         "clean",
         ":dokkatooGenerate",
         "--stacktrace",
@@ -80,13 +81,13 @@ class MultiModuleFunctionalTest : FunSpec({
       val project = initDokkatooProject("build-cache")
 
       test("expect clean is successful") {
-        project.runner.withArguments("clean").build {
+        project.runner.addArguments("clean").build {
           output shouldContain "BUILD SUCCESSFUL"
         }
       }
 
       project.runner
-        .withArguments(
+        .addArguments(
           //"clean",
           ":dokkatooGenerate",
           "--stacktrace",
@@ -112,7 +113,7 @@ class MultiModuleFunctionalTest : FunSpec({
 
       context("when build cache is enabled") {
         project.runner
-          .withArguments(
+          .addArguments(
             ":dokkatooGenerate",
             "--stacktrace",
             "--build-cache",
@@ -127,11 +128,13 @@ class MultiModuleFunctionalTest : FunSpec({
             }
 
             test("expect all dokkatoo tasks are up-to-date") {
-              tasks.filter {
-                "dokkatoo" in it.path.substringAfterLast(':').toLowerCase()
-              }.shouldForAll {
-                it.outcome.shouldBeIn(FROM_CACHE, UP_TO_DATE)
-              }
+              tasks
+                .filter { task ->
+                  task.name.contains("dokkatoo", ignoreCase = true)
+                }
+                .shouldForAll { task ->
+                  task.outcome.shouldBeIn(FROM_CACHE, UP_TO_DATE, SKIPPED)
+                }
             }
           }
       }
@@ -141,13 +144,13 @@ class MultiModuleFunctionalTest : FunSpec({
       val project = initDokkatooProject("config-cache")
 
       test("expect clean is successful") {
-        project.runner.withArguments("clean").build {
+        project.runner.addArguments("clean").build {
           output shouldContain "BUILD SUCCESSFUL"
         }
       }
 
       project.runner
-        .withArguments(
+        .addArguments(
           //"clean",
           ":dokkatooGenerate",
           "--stacktrace",
@@ -179,14 +182,14 @@ class MultiModuleFunctionalTest : FunSpec({
       val project = initDokkatooProject("submodule-update")
 
       test("expect clean is successful") {
-        project.runner.withArguments("clean").build {
+        project.runner.addArguments("clean").build {
           output shouldContain "BUILD SUCCESSFUL"
         }
       }
 
       test("expect first build is successful") {
         project.runner
-          .withArguments(
+          .addArguments(
             //"clean",
             ":dokkatooGeneratePublicationHtml",
             "--stacktrace",
@@ -218,7 +221,7 @@ class MultiModuleFunctionalTest : FunSpec({
 
         context("expect Dokka re-generates the publication") {
           project.runner
-            .withArguments(
+            .addArguments(
               ":dokkatooGeneratePublicationHtml",
               "--stacktrace",
               "--build-cache",
@@ -268,7 +271,7 @@ class MultiModuleFunctionalTest : FunSpec({
             }
 
             project.runner
-              .withArguments(
+              .addArguments(
                 ":dokkatooGeneratePublicationHtml",
                 "--stacktrace",
                 "--info",
@@ -301,7 +304,7 @@ class MultiModuleFunctionalTest : FunSpec({
     test("expect no logs when built using --quiet log level") {
 
       project.runner
-        .withArguments(
+        .addArguments(
           "clean",
           ":dokkatooGenerate",
           "--no-configuration-cache",
@@ -317,7 +320,7 @@ class MultiModuleFunctionalTest : FunSpec({
     test("expect no Dokkatoo logs when built using lifecycle log level") {
 
       project.runner
-        .withArguments(
+        .addArguments(
           "clean",
           ":dokkatooGenerate",
           "--no-configuration-cache",
@@ -339,37 +342,39 @@ class MultiModuleFunctionalTest : FunSpec({
             """.trimMargin("¦")
           }
 
-          output.lines().sorted().joinToString("\n") shouldContain /*language=text*/ """
-            ¦> Task :clean
-            ¦> Task :dokkatooGenerate
-            ¦> Task :dokkatooGenerateModuleGfm
-            ¦> Task :dokkatooGenerateModuleHtml
-            ¦> Task :dokkatooGenerateModuleJavadoc
-            ¦> Task :dokkatooGenerateModuleJekyll
-            ¦> Task :dokkatooGeneratePublicationGfm
-            ¦> Task :dokkatooGeneratePublicationHtml
-            ¦> Task :dokkatooGeneratePublicationJavadoc
-            ¦> Task :dokkatooGeneratePublicationJekyll
-            ¦> Task :prepareDokkatooParameters UP-TO-DATE
-            ¦> Task :subproject-goodbye:clean
-            ¦> Task :subproject-goodbye:dokkatooGenerateModuleGfm
-            ¦> Task :subproject-goodbye:dokkatooGenerateModuleHtml
-            ¦> Task :subproject-goodbye:dokkatooGenerateModuleJavadoc
-            ¦> Task :subproject-goodbye:dokkatooGenerateModuleJekyll
-            ¦> Task :subproject-goodbye:prepareDokkatooModuleDescriptorGfm
-            ¦> Task :subproject-goodbye:prepareDokkatooModuleDescriptorHtml
-            ¦> Task :subproject-goodbye:prepareDokkatooModuleDescriptorJavadoc
-            ¦> Task :subproject-goodbye:prepareDokkatooModuleDescriptorJekyll
-            ¦> Task :subproject-hello:clean
-            ¦> Task :subproject-hello:dokkatooGenerateModuleGfm
-            ¦> Task :subproject-hello:dokkatooGenerateModuleHtml
-            ¦> Task :subproject-hello:dokkatooGenerateModuleJavadoc
-            ¦> Task :subproject-hello:dokkatooGenerateModuleJekyll
-            ¦> Task :subproject-hello:prepareDokkatooModuleDescriptorGfm
-            ¦> Task :subproject-hello:prepareDokkatooModuleDescriptorHtml
-            ¦> Task :subproject-hello:prepareDokkatooModuleDescriptorJavadoc
-            ¦> Task :subproject-hello:prepareDokkatooModuleDescriptorJekyll
-          """.trimMargin("¦").trim()
+          output.lines()
+            .filter { it.startsWith("> Task :") }
+            .shouldContainAll(
+              "> Task :clean",
+              "> Task :dokkatooGenerate",
+              "> Task :dokkatooGenerateModuleGfm",
+              "> Task :dokkatooGenerateModuleHtml",
+              "> Task :dokkatooGenerateModuleJavadoc",
+              "> Task :dokkatooGenerateModuleJekyll",
+              "> Task :dokkatooGeneratePublicationGfm",
+              "> Task :dokkatooGeneratePublicationHtml",
+              "> Task :dokkatooGeneratePublicationJavadoc",
+              "> Task :dokkatooGeneratePublicationJekyll",
+              "> Task :prepareDokkatooParameters UP-TO-DATE",
+              "> Task :subproject-goodbye:clean",
+              "> Task :subproject-goodbye:dokkatooGenerateModuleGfm",
+              "> Task :subproject-goodbye:dokkatooGenerateModuleHtml",
+              "> Task :subproject-goodbye:dokkatooGenerateModuleJavadoc",
+              "> Task :subproject-goodbye:dokkatooGenerateModuleJekyll",
+              "> Task :subproject-goodbye:prepareDokkatooModuleDescriptorGfm",
+              "> Task :subproject-goodbye:prepareDokkatooModuleDescriptorHtml",
+              "> Task :subproject-goodbye:prepareDokkatooModuleDescriptorJavadoc",
+              "> Task :subproject-goodbye:prepareDokkatooModuleDescriptorJekyll",
+              "> Task :subproject-hello:clean",
+              "> Task :subproject-hello:dokkatooGenerateModuleGfm",
+              "> Task :subproject-hello:dokkatooGenerateModuleHtml",
+              "> Task :subproject-hello:dokkatooGenerateModuleJavadoc",
+              "> Task :subproject-hello:dokkatooGenerateModuleJekyll",
+              "> Task :subproject-hello:prepareDokkatooModuleDescriptorGfm",
+              "> Task :subproject-hello:prepareDokkatooModuleDescriptorHtml",
+              "> Task :subproject-hello:prepareDokkatooModuleDescriptorJavadoc",
+              "> Task :subproject-hello:prepareDokkatooModuleDescriptorJekyll",
+            )
         }
     }
   }

@@ -28,7 +28,7 @@ class MultimoduleExampleTest : FunSpec({
   context("compare dokka and dokkatoo HTML generators") {
     test("expect dokka can generate HTML") {
       val dokkaBuild = dokkaProject.runner
-        .withArguments(
+        .addArguments(
           "clean",
           "dokkaHtmlMultiModule",
           "--stacktrace",
@@ -43,7 +43,7 @@ class MultimoduleExampleTest : FunSpec({
 
     context("when Dokkatoo generates HTML") {
       val build = dokkatooProject.runner
-        .withArguments(
+        .addArguments(
           "clean",
           ":parentProject:dokkatooGeneratePublicationHtml",
           "--stacktrace",
@@ -93,7 +93,7 @@ class MultimoduleExampleTest : FunSpec({
 
     context("expect Dokkatoo is compatible with Gradle Build Cache") {
       val build = dokkatooProject.runner
-        .withArguments(
+        .addArguments(
           "clean",
           ":parentProject:dokkatooGeneratePublicationHtml",
           "--stacktrace",
@@ -120,7 +120,7 @@ class MultimoduleExampleTest : FunSpec({
 
       test("expect tasks are UP-TO-DATE") {
         dokkatooProject.runner
-          .withArguments(
+          .addArguments(
             ":parentProject:dokkatooGeneratePublicationHtml",
             "--stacktrace",
             "--info",
@@ -147,7 +147,7 @@ class MultimoduleExampleTest : FunSpec({
 
       val configCacheRunner =
         dokkatooProject.runner
-          .withArguments(
+          .addArguments(
             "clean",
             ":parentProject:dokkatooGeneratePublicationHtml",
             "--stacktrace",
