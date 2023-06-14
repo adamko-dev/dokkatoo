@@ -3,10 +3,11 @@
   <groupId>dev.adamko.dokkatoo-javadoc</groupId>
   <artifactId>dev.adamko.dokkatoo-javadoc.gradle.plugin</artifactId>
   <versioning>
-    <latest>1.5.0-SNAPSHOT</latest>
+    <latest>1.5.0</latest>
+    <release>1.5.0</release>
     <versions>
-      <version>1.5.0-SNAPSHOT</version>
+      <version>1.5.0</version>
     </versions>
-    <lastUpdated>20230614133813</lastUpdated>
+    <lastUpdated>20230614150633</lastUpdated>
   </versioning>
 </metadata>
