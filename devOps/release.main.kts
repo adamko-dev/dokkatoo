@@ -5,10 +5,19 @@
 import Release_main.SemVer.Companion.SemVer
 import com.github.ajalt.clikt.core.CliktCommand
 import java.io.File
-import java.lang.ProcessBuilder.Redirect.INHERIT
+import java.lang.ProcessBuilder.Redirect.PIPE
+import kotlin.system.exitProcess
 import me.alllex.parsus.parser.*
 import me.alllex.parsus.token.literalToken
 import me.alllex.parsus.token.regexToken
+
+try {
+  Release.main(args)
+  exitProcess(0)
+} catch (ex: Exception) {
+  println("${ex::class.simpleName}: ${ex.message}")
+  exitProcess(1)
+}
 
 /**
  * Release a new version.
@@ -34,36 +43,44 @@ object Release : CliktCommand() {
     check(startBranch == "main") {
       "Must be on the main branch to make a release, but current branch is $startBranch"
     }
+    gh.setRepo("adamko-dev/dokkatoo")
     //endregion
 
     echo("Current version is $currentVersion")
+    echo("git dir is ${git.rootDir}")
 
-    val versionToRelease = prompt(
+    val releaseVersion = prompt(
       text = "version to release?",
-      default = currentVersion.incrementMinor(snapshot = false).toString(),
+      default = currentVersion.copy(snapshot = false).toString(),
       requireConfirmation = true,
     ) {
       SemVer.of(it)
     } ?: error("invalid SemVer")
 
-    check(!versionToRelease.snapshot) {
-      "versionToRelease must not be a snapshot version, but was $versionToRelease"
+    check(!releaseVersion.snapshot) {
+      "versionToRelease must not be a snapshot version, but was $releaseVersion"
     }
 
-    val nextVersion = versionToRelease.incrementMinor(snapshot = true)
+    val nextVersion = prompt(
+      text = "post-release version?",
+      default = releaseVersion.incrementMinor(snapshot = true).toString(),
+      requireConfirmation = true,
+    ) {
+      SemVer.of(it)
+    } ?: error("invalid SemVer")
 
     echo("Current version is $currentVersion")
-    confirm("Release $versionToRelease and bump to $nextVersion?", abort = true)
+    confirm("Release $releaseVersion and bump to $nextVersion?", abort = true)
 
-    updateAndRelease(versionToRelease)
+    updateAndRelease(releaseVersion)
 
     // Tag the release
     git.checkout(startBranch)
     git.pull(startBranch)
-    require(currentVersion == versionToRelease) {
-      "incorrect version after update. Expected $versionToRelease but got $currentVersion"
+    require(currentVersion == releaseVersion) {
+      "incorrect version after update. Expected $releaseVersion but got $currentVersion"
     }
-    val tagName = "v$versionToRelease"
+    val tagName = "v$releaseVersion"
     git.tag(tagName)
     confirm("Push tag $tagName?", abort = true)
     git.push(tagName)
@@ -76,23 +93,28 @@ object Release : CliktCommand() {
     git.checkout(startBranch)
     git.pull(startBranch)
 
-    echo("Released version $versionToRelease")
+    echo("Released version $releaseVersion")
   }
 
   private fun updateAndRelease(version: SemVer) {
     // checkout a release branch
-    val releaseBranch = "release-$version"
+    val releaseBranch = "release/v$version"
+    echo("checkout out new branch...")
     git.checkout(releaseBranch)
 
     // update the version & run tests
     currentVersion = version
+    echo("running Gradle check...")
     gradle.check()
 
     // commit and push
+    echo("committing...")
     git.commit("release $version")
+    echo("pushing...")
     git.push(releaseBranch)
 
     // create a new PR
+    echo("creating PR...")
     gh.createPr(releaseBranch)
 
     confirm("Merge the PR for branch $releaseBranch?", abort = true)
@@ -120,11 +142,14 @@ object Release : CliktCommand() {
 
   /** GitHub commands */
   private val gh = object {
+    fun setRepo(repo: String): String =
+      runCommand("gh repo set-default $repo")
+
     fun prState(branchName: String): String =
       runCommand("gh pr view $branchName --json state --jq .state")
 
     fun createPr(branch: String): String =
-      runCommand("gh pr create --base $branch --fill")
+      runCommand("gh pr create --head $branch --fill")
 
     fun autoMergePr(branch: String): String =
       runCommand("gh pr merge $branch --squash --auto --delete-branch")
@@ -135,19 +160,17 @@ object Release : CliktCommand() {
 
   /** GitHub commands */
   private val gradle = object {
-    fun check(): String = runCommand("gradlew check")
+    fun check(): String = runCommand("./gradlew check --no-daemon")
   }
 
   //  private val currentDir: String get() = System.getProperty("user.dir")
 
-  private val buildGradleKts: File
-    get() {
-      val rootDir = git.rootDir
-      echo("rootDir: $rootDir")
-      return File("$rootDir/build.gradle.kts").apply {
-        require(exists()) { "could not find build.gradle.kts in ${git.rootDir}" }
-      }
+  private val buildGradleKts: File by lazy {
+    val rootDir = git.rootDir
+    File("$rootDir/build.gradle.kts").apply {
+      require(exists()) { "could not find build.gradle.kts in $rootDir" }
     }
+  }
 
   private fun runCommand(
     cmd: String,
@@ -156,7 +179,8 @@ object Release : CliktCommand() {
     val args = parseSpaceSeparatedArgs(cmd)
 
     val process = ProcessBuilder(*args.toTypedArray()).apply {
-      redirectError(INHERIT)
+      redirectOutput(PIPE)
+      redirectError(PIPE)
       if (dir != null) directory(dir)
     }.start()
 
@@ -185,7 +209,7 @@ object Release : CliktCommand() {
     }
     set(value) {
       val updatedFile = buildGradleKts.useLines { lines ->
-        lines.joinToString("\n") { line ->
+        lines.joinToString(separator = "\n", postfix = "\n") { line ->
           if (line.startsWith("version = ")) {
             "version = \"${value}\""
           } else {
@@ -236,10 +260,6 @@ object Release : CliktCommand() {
     return parsedArgs
   }
 }
-
-
-Release.main(args)
-
 
 private data class SemVer(
   val major: Int,
