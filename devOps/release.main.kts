@@ -69,9 +69,6 @@ object Release : CliktCommand() {
       SemVer.of(it)
     } ?: error("invalid SemVer")
 
-    echo("Current version is $currentVersion")
-    confirm("Release $releaseVersion and bump to $nextVersion?", abort = true)
-
     updateAndRelease(releaseVersion)
 
     // Tag the release
@@ -85,6 +82,9 @@ object Release : CliktCommand() {
     confirm("Push tag $tagName?", abort = true)
     git.push(tagName)
     echo("Tag pushed")
+
+    confirm("Publish plugins?", abort = true)
+    gradle.publishPlugins()
 
     // Bump the version to the next snapshot
     updateAndRelease(nextVersion)
@@ -170,6 +170,7 @@ object Release : CliktCommand() {
   /** GitHub commands */
   private val gradle = object {
     fun check(): String = runCommand("./gradlew check --no-daemon")
+    fun publishPlugins(): String = runCommand("./gradlew publishPlugins --no-daemon")
   }
 
   //  private val currentDir: String get() = System.getProperty("user.dir")
