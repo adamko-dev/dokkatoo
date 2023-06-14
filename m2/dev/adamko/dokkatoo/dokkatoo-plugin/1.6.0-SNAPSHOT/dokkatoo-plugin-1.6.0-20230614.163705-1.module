@@ -1,0 +1,136 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "dev.adamko.dokkatoo",
+    "module": "dokkatoo-plugin",
+    "version": "1.6.0-SNAPSHOT",
+    "attributes": {
+      "org.gradle.status": "integration"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "7.6.1"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.environment": "standard-jvm",
+        "org.gradle.jvm.version": 11,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "files": [
+        {
+          "name": "dokkatoo-plugin-1.6.0-SNAPSHOT.jar",
+          "url": "dokkatoo-plugin-1.6.0-SNAPSHOT.jar",
+          "size": 425659,
+          "sha512": "9ed68087bbd76e2dde438f83df4d7c977c5dea92d0d9840014854c3992129b8da716a2c64cef3a3f2ff8339aa96077fadd0b12ced88815b9b490ebaa35aa1396",
+          "sha256": "1c0a9d63b68adea436590c4ed392dcb35197824e40266765b72ea6f58c7f8fd9",
+          "sha1": "58d56d940498f315477a3a37b69014a5d2a55f7a",
+          "md5": "ba0711ba86e6d19ac87a25fdab3b9006"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.environment": "standard-jvm",
+        "org.gradle.jvm.version": 11,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "org.jetbrains.dokka",
+          "module": "dokka-core",
+          "version": {
+            "requires": "1.8.20"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlinx",
+          "module": "kotlinx-serialization-bom",
+          "version": {
+            "requires": "1.5.1"
+          },
+          "attributes": {
+            "org.gradle.category": "platform"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlinx",
+          "module": "kotlinx-serialization-json"
+        }
+      ],
+      "files": [
+        {
+          "name": "dokkatoo-plugin-1.6.0-SNAPSHOT.jar",
+          "url": "dokkatoo-plugin-1.6.0-SNAPSHOT.jar",
+          "size": 425659,
+          "sha512": "9ed68087bbd76e2dde438f83df4d7c977c5dea92d0d9840014854c3992129b8da716a2c64cef3a3f2ff8339aa96077fadd0b12ced88815b9b490ebaa35aa1396",
+          "sha256": "1c0a9d63b68adea436590c4ed392dcb35197824e40266765b72ea6f58c7f8fd9",
+          "sha1": "58d56d940498f315477a3a37b69014a5d2a55f7a",
+          "md5": "ba0711ba86e6d19ac87a25fdab3b9006"
+        }
+      ]
+    },
+    {
+      "name": "sourcesElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "dokkatoo-plugin-1.6.0-SNAPSHOT-sources.jar",
+          "url": "dokkatoo-plugin-1.6.0-SNAPSHOT-sources.jar",
+          "size": 61615,
+          "sha512": "3b3fa9a2990b2d66733228185d04af78a1d022e62cd0b02528cbcee706e8945b7611b1d7d8e3ebc9fb9b7cdaa7ca25440411332a86ce560e079db4c6e95228ff",
+          "sha256": "e5443166bbd8a87364e5479e4d6bceca8f4a27eaba41c8a559baac1f04deaea9",
+          "sha1": "69ee0e0218136870bc91bfd7719b6a5598355f51",
+          "md5": "405d86bcfbba07e67420ff9c3dbb1621"
+        },
+        {
+          "name": "dokkatoo-plugin-1.6.0-SNAPSHOT-sources.jar",
+          "url": "dokkatoo-plugin-1.6.0-SNAPSHOT-sources.jar",
+          "size": 61615,
+          "sha512": "3b3fa9a2990b2d66733228185d04af78a1d022e62cd0b02528cbcee706e8945b7611b1d7d8e3ebc9fb9b7cdaa7ca25440411332a86ce560e079db4c6e95228ff",
+          "sha256": "e5443166bbd8a87364e5479e4d6bceca8f4a27eaba41c8a559baac1f04deaea9",
+          "sha1": "69ee0e0218136870bc91bfd7719b6a5598355f51",
+          "md5": "405d86bcfbba07e67420ff9c3dbb1621"
+        }
+      ]
+    },
+    {
+      "name": "javadocElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "javadoc",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "dokkatoo-plugin-1.6.0-SNAPSHOT-javadoc.jar",
+          "url": "dokkatoo-plugin-1.6.0-SNAPSHOT-javadoc.jar",
+          "size": 261,
+          "sha512": "747d2f00a7f5f379582e33e452f30f3a25732a510971d9ed5161355bf7ef0fc507fef30883960dbfc780d36b6e8215fba01086b4ee053358805686e2f2c1aa85",
+          "sha256": "69e1a62e5752ca3f43fb1607f161379bbe88b64af89c1a543c126160adf7cc53",
+          "sha1": "5b8f86fea035328fc9e8c660773037a3401ce25f",
+          "md5": "e7e9f45eb9d74540092920528bb0abf0"
+        }
+      ]
+    }
+  ]
+}
