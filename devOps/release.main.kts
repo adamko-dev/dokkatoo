@@ -75,7 +75,7 @@ object Release : CliktCommand() {
     updateAndRelease(releaseVersion)
 
     // Tag the release
-    git.checkout(startBranch)
+    git.switch(startBranch)
     git.pull(startBranch)
     require(currentVersion == releaseVersion) {
       "incorrect version after update. Expected $releaseVersion but got $currentVersion"
@@ -90,7 +90,7 @@ object Release : CliktCommand() {
     updateAndRelease(nextVersion)
 
     // Go back and pull the changes
-    git.checkout(startBranch)
+    git.switch(startBranch)
     git.pull(startBranch)
 
     echo("Released version $releaseVersion")
@@ -100,7 +100,7 @@ object Release : CliktCommand() {
     // checkout a release branch
     val releaseBranch = "release/v$version"
     echo("checkout out new branch...")
-    git.checkout(releaseBranch)
+    git.switch(releaseBranch, create = true)
 
     // update the version & run tests
     currentVersion = version
@@ -125,7 +125,16 @@ object Release : CliktCommand() {
   /** git commands */
   private val git = object {
     val rootDir = File(runCommand("git rev-parse --show-toplevel", dir = null))
-    fun checkout(branch: String): String = runCommand("git checkout -b $branch")
+    fun switch(branch: String, create: Boolean = false): String {
+      return runCommand(
+        buildString {
+          append("git switch ")
+          if (create) append("--create ")
+          append(branch)
+        }
+      )
+    }
+
     fun commit(message: String): String = runCommand("git commit -a -m \"$message\"")
     fun currentBranch(): String = runCommand("git symbolic-ref --short HEAD")
     fun pull(ref: String): String = runCommand("git pull origin $ref")
