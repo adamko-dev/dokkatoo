@@ -279,8 +279,7 @@ private data class SemVer(
     /** Non-negative number that is either 0, or does not start with 0 */
     private val number: Parser<Int> by regexToken("""0|[1-9]\d*""").map { it.text.toInt() }
 
-    private val metadata by optional(-dashSeparator * regexToken(""".+"""))
-      .map { it?.text ?: "" }
+    private val snapshot by -dashSeparator * literalToken("SNAPSHOT")
 
     override val root: Parser<SemVer> by parser {
       val major = number()
@@ -288,12 +287,12 @@ private data class SemVer(
       val minor = number()
       dotSeparator()
       val patch = number()
-      val metadata = metadata()
+      val snapshot = checkPresent(snapshot)
       SemVer(
         major = major,
         minor = minor,
         patch = patch,
-        snapshot = metadata == "SNAPSHOT",
+        snapshot = snapshot,
       )
     }
   }
