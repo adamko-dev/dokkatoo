@@ -2,6 +2,7 @@ package dev.adamko.dokkatoo.tasks
 
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import dev.adamko.dokkatoo.internal.appendPath
+import dev.adamko.dokkatoo.tasks.LogHtmlPublicationLinkTask.Companion.ENABLE_TASK_PROPERTY_NAME
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
@@ -72,7 +73,6 @@ constructor(
     // to display this task prominently.
     group = "other"
 
-    @Suppress("UnstableApiUsage")
     val serverActive = providers.of(ServerActiveCheck::class) {
       parameters.uri.convention(serverUri)
     }
@@ -108,7 +108,6 @@ constructor(
    * The check uses a [ValueSource] source to attempt to be compatible with Configuration Cache, but
    * I'm not certain that this is necessary, or if a [ValueSource] is the best way to achieve it.
    */
-  @Suppress("UnstableApiUsage")
   internal abstract class ServerActiveCheck : ValueSource<Boolean, ServerActiveCheck.Parameters> {
 
     interface Parameters : ValueSourceParameters {
@@ -123,7 +122,7 @@ constructor(
         val request = HttpRequest
           .newBuilder()
           .uri(uri)
-          .timeout(Duration.ofMillis(10))
+          .timeout(Duration.ofMillis(200))
           .GET()
           .build()
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())

@@ -40,18 +40,20 @@ dependencies {
   // don't define test dependencies here, instead define them in the testing.suites {} configuration below
 }
 
-tasks.withType<KotlinCompile>().configureEach {
-  kotlinOptions {
-    freeCompilerArgs += listOf(
-      "-opt-in=kotlin.RequiresOptIn",
-      "-opt-in=dev.adamko.dokkatoo.internal.DokkatooInternalApi",
-    )
+kotlin {
+  target {
+    compilations.configureEach {
+      compilerOptions.configure {
+        freeCompilerArgs.addAll(
+          "-opt-in=dev.adamko.dokkatoo.internal.DokkatooInternalApi",
+        )
+      }
+    }
   }
 }
 
 //region Test suites and task configuration
 testing.suites {
-
   withType<JvmTestSuite>().configureEach {
     useJUnitJupiter()
 
@@ -67,6 +69,11 @@ testing.suites {
 
     targets.configureEach {
       testTask.configure {
+        javaLauncher.set(javaToolchains.launcherFor {
+          // Android test project requires Java 17
+          languageVersion.set(JavaLanguageVersion.of(17))
+        })
+
         val projectTestTempDirPath = "$buildDir/test-temp-dir"
         inputs.property("projectTestTempDir", projectTestTempDirPath)
         systemProperty("projectTestTempDir", projectTestTempDirPath)

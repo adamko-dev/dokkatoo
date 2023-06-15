@@ -1,10 +1,11 @@
 plugins {
-  id("com.android.library") version "4.2.2"
+  id("com.android.library") version "8.0.2"
   kotlin("android") version "1.8.22"
   id("dev.adamko.dokkatoo") version "1.6.0-SNAPSHOT"
 }
 
 android {
+  namespace = "org.jetbrains.dokka.it.android"
   defaultConfig {
     minSdkVersion(21)
     setCompileSdkVersion(29)
