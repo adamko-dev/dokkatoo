@@ -67,9 +67,9 @@ constructor(
         is PluginConfigValue.FileValue      -> file.asFile.orNull.convertToJson()
         is PluginConfigValue.FilesValue     -> JsonArray(files.files.map { it.convertToJson() })
 
-        is Primitive.BooleanValue           -> JsonPrimitive(boolean)
-        is Primitive.NumberValue            -> JsonPrimitive(number)
-        is Primitive.StringValue            -> JsonPrimitive(string)
+        is PluginConfigValue.BooleanValue   -> JsonPrimitive(boolean)
+        is PluginConfigValue.NumberValue    -> JsonPrimitive(number)
+        is PluginConfigValue.StringValue    -> JsonPrimitive(string)
 
         is PluginConfigValue.Properties     ->
           JsonObject(values.get().mapValues { (_, value) -> value.convertToJson() })
@@ -79,7 +79,7 @@ constructor(
       }
 
     /** Creates a [JsonPrimitive] from the given [File]. */
-    private fun File?.convertToJson() =
+    private fun File?.convertToJson(): JsonPrimitive =
       JsonPrimitive(this?.canonicalFile?.invariantSeparatorsPath)
   }
 }
@@ -195,15 +195,7 @@ sealed interface PluginConfigValue {
     val values: ListProperty<PluginConfigValue>
   ) : PluginConfigValue
 
-  @Deprecated(
-    "Moved to standalone class",
-    ReplaceWith("dev.adamko.dokkatoo.dokka.plugins.Primitive")
-  )
-  sealed class Primitive
-}
-
-sealed interface Primitive : PluginConfigValue {
-  // I would prefer it if these class weren't nested, but it's a restriction of Kotlin 1.4
+  sealed interface Primitive : PluginConfigValue
 
   /** A basic [String] value */
   class StringValue(@Input val string: String) : Primitive
@@ -216,25 +208,25 @@ sealed interface Primitive : PluginConfigValue {
 }
 
 fun PluginConfigValue(value: String) =
-  Primitive.StringValue(value)
+  PluginConfigValue.StringValue(value)
 
 fun PluginConfigValue(value: Number) =
-  Primitive.NumberValue(value)
+  PluginConfigValue.NumberValue(value)
 
 fun PluginConfigValue(value: Boolean) =
-  Primitive.BooleanValue(value)
+  PluginConfigValue.BooleanValue(value)
 
 @Suppress("FunctionName")
 @JvmName("PluginConfigStringValue")
-fun PluginConfigValue(value: Provider<String>): Provider<Primitive.StringValue> =
+fun PluginConfigValue(value: Provider<String>): Provider<PluginConfigValue.StringValue> =
   value.map { PluginConfigValue(it) }
 
 @Suppress("FunctionName")
 @JvmName("PluginConfigNumberValue")
-fun PluginConfigValue(value: Provider<Number>): Provider<Primitive.NumberValue> =
+fun PluginConfigValue(value: Provider<Number>): Provider<PluginConfigValue.NumberValue> =
   value.map { PluginConfigValue(it) }
 
 @Suppress("FunctionName")
 @JvmName("PluginConfigBooleanValue")
-fun PluginConfigValue(value: Provider<Boolean>): Provider<Primitive.BooleanValue> =
+fun PluginConfigValue(value: Provider<Boolean>): Provider<PluginConfigValue.BooleanValue> =
   value.map { PluginConfigValue(it) }
