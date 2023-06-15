@@ -5,6 +5,8 @@ pluginManagement {
     mavenCentral()
     gradlePluginPortal()
   }
+
+  includeBuild("./devOps/maven-publisher/")
 }
 
 @Suppress("UnstableApiUsage")
