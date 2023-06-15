@@ -1,5 +1,6 @@
 package dev.adamko.dokkatoo.adapters
 
+import com.android.build.api.dsl.CommonExtension
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.LibraryExtension
@@ -22,14 +23,12 @@ import org.gradle.api.artifacts.type.ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIB
 import org.gradle.api.file.FileCollection
 import org.gradle.api.logging.Logging
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.kotlin.dsl.*
 
 @DokkatooInternalApi
 abstract class DokkatooAndroidAdapter @Inject constructor(
   private val objects: ObjectFactory,
-  private val providers: ProviderFactory,
 ) : Plugin<Project> {
 
   override fun apply(project: Project) {
@@ -47,7 +46,12 @@ abstract class DokkatooAndroidAdapter @Inject constructor(
   protected fun configure(project: Project) {
     val dokkatooExtension = project.extensions.getByType<DokkatooExtension>()
 
-    val androidExt = project.extensions.getByType<BaseExtension>()
+    val androidExt = AndroidExtensionWrapper(project)
+
+    if (androidExt == null) {
+      logger.warn("DokkatooAndroidAdapter could not get Android Extension for project ${project.path}")
+      return
+    }
 
     dokkatooExtension.dokkatooSourceSets.configureEach {
 
@@ -59,13 +63,11 @@ abstract class DokkatooAndroidAdapter @Inject constructor(
                 androidExt = androidExt,
                 configurations = project.configurations,
                 objects = objects,
-                providers = providers,
               )
 
             else                      ->
               objects.fileCollection()
           }
-
         }
       )
     }
@@ -74,6 +76,92 @@ abstract class DokkatooAndroidAdapter @Inject constructor(
   @DokkatooInternalApi
   companion object {
     private val logger = Logging.getLogger(DokkatooAndroidAdapter::class.java)
+  }
+}
+
+private fun AndroidExtensionWrapper(
+  project: Project
+): AndroidExtensionWrapper? {
+
+// fetching _all_ configuration names is very brute force and should probably be refined to
+// only fetch those that match a specific DokkaSourceSetSpec
+
+  return runCatching {
+    val androidExt = project.extensions.getByType<BaseExtension>()
+    AndroidExtensionWrapper.forBaseExtension(
+      androidExt = androidExt,
+      providers = project.providers,
+      objects = project.objects
+    )
+  }.recoverCatching {
+    val androidExt = project.extensions.getByType(CommonExtension::class)
+    AndroidExtensionWrapper.forCommonExtension(androidExt)
+  }.getOrNull()
+}
+
+/**
+ * Android Gradle Plugin is having a refactor. Try to wrap the Android extension so that Dokkatoo
+ * can still access the configuration names without caring about which AGP version is in use.
+ */
+private interface AndroidExtensionWrapper {
+  fun variantConfigurationNames(): Set<String>
+
+  companion object {
+
+    @Suppress("DEPRECATION")
+    fun forBaseExtension(
+      androidExt: BaseExtension,
+      providers: ProviderFactory,
+      objects: ObjectFactory,
+    ): AndroidExtensionWrapper {
+      return object : AndroidExtensionWrapper {
+        /** Fetch all configuration names used by all variants. */
+        override fun variantConfigurationNames(): Set<String> {
+          val collector = objects.domainObjectSet(BaseVariant::class)
+
+          val variants: DomainObjectSet<BaseVariant> =
+            collector.apply {
+              addAllLater(providers.provider {
+                when (androidExt) {
+                  is LibraryExtension -> androidExt.libraryVariants
+                  is AppExtension     -> androidExt.applicationVariants
+                  is TestExtension    -> androidExt.applicationVariants
+                  else                -> emptyList()
+                }
+              })
+            }
+
+          return variants.flatMapTo(mutableSetOf()) {
+            setOf(
+              it.compileConfiguration.name,
+              it.runtimeConfiguration.name,
+              it.annotationProcessorConfiguration.name,
+            )
+          }
+        }
+      }
+    }
+
+    fun forCommonExtension(
+      androidExt: CommonExtension<*, *, *, *>
+    ): AndroidExtensionWrapper {
+      return object : AndroidExtensionWrapper {
+        /** Fetch all configuration names used by all variants. */
+        override fun variantConfigurationNames(): Set<String> {
+          return buildSet {
+            @Suppress("UnstableApiUsage")
+            androidExt.sourceSets.forEach {
+              add(it.apiConfigurationName)
+              add(it.compileOnlyConfigurationName)
+              add(it.implementationConfigurationName)
+              add(it.runtimeOnlyConfigurationName)
+              add(it.wearAppConfigurationName)
+              add(it.annotationProcessorConfigurationName)
+            }
+          }
+        }
+      }
+    }
   }
 }
 
@@ -90,10 +178,9 @@ abstract class DokkatooAndroidAdapter @Inject constructor(
 private object AndroidClasspathCollector {
 
   operator fun invoke(
-    androidExt: BaseExtension,
+    androidExt: AndroidExtensionWrapper,
     configurations: ConfigurationContainer,
     objects: ObjectFactory,
-    providers: ProviderFactory,
   ): FileCollection {
     val compilationClasspath = objects.fileCollection()
 
@@ -105,7 +192,7 @@ private object AndroidClasspathCollector {
         ARTIFACT_TYPE_ATTRIBUTE to PROCESSED_JAR.type,
         ARTIFACT_TYPE_ATTRIBUTE to CLASSES_JAR.type,
       ).forEach { (attribute, attributeValue) ->
-        configurations.collectIncomingFiles(named, compilationClasspath) {
+        configurations.collectIncomingFiles(named, collector = compilationClasspath) {
           attributes {
             attribute(attribute, attributeValue)
           }
@@ -117,48 +204,12 @@ private object AndroidClasspathCollector {
     // fetch android.jar
     collectConfiguration(named = VariantDependencies.CONFIG_NAME_ANDROID_APIS)
 
-    val variantConfigurations = collectVariantConfigurationNames(
-      androidExt,
-      objects.domainObjectSet(BaseVariant::class),
-      providers,
-    )
+    val variantConfigurations = androidExt.variantConfigurationNames()
 
-    for (variantConfig in variantConfigurations.get()) {
+    for (variantConfig in variantConfigurations) {
       collectConfiguration(named = variantConfig)
     }
 
     return compilationClasspath
-  }
-
-  /** Fetch all configuration names used by all variants. */
-// fetching _all_ configuration names is very brute force and should probably be refined to
-// only fetch those that match a specific DokkaSourceSetSpec
-  private fun collectVariantConfigurationNames(
-    androidExt: BaseExtension,
-    collector: DomainObjectSet<BaseVariant>,
-    providers: ProviderFactory,
-  ): Provider<List<String>> {
-
-    val variants: DomainObjectSet<BaseVariant> =
-      collector.apply {
-        addAllLater(providers.provider {
-          when (androidExt) {
-            is LibraryExtension -> androidExt.libraryVariants
-            is AppExtension     -> androidExt.applicationVariants
-            is TestExtension    -> androidExt.applicationVariants
-            else                -> emptyList()
-          }
-        })
-      }
-
-    return providers.provider {
-      variants.flatMap {
-        setOf(
-          it.compileConfiguration.name,
-          it.runtimeConfiguration.name,
-          it.annotationProcessorConfiguration.name,
-        )
-      }
-    }
   }
 }

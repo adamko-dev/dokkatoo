@@ -253,9 +253,9 @@ private class KotlinCompilationDetailsBuilder(
 
   private fun KotlinProjectExtension.allKotlinCompilations(): Collection<KotlinCompilation<*>> =
     when (this) {
-      is KotlinMultiplatformExtension -> targets.flatMap { it.compilations }
-      is KotlinSingleTargetExtension  -> target.compilations
-      else                            -> emptyList() // shouldn't happen?
+      is KotlinMultiplatformExtension   -> targets.flatMap { it.compilations }
+      is KotlinSingleTargetExtension<*> -> target.compilations
+      else                              -> emptyList() // shouldn't happen?
     }
 
   /**
@@ -283,10 +283,10 @@ private class KotlinCompilationDetailsBuilder(
       }
     }
 
-    val standardConfigurations = mutableListOf<String>().apply {
+    val standardConfigurations = buildSet {
       addAll(compilation.relatedConfigurationNames)
       addAll(compilation.kotlinSourceSets.flatMap { it.relatedConfigurationNames })
-    }.toSet()
+    }
 
     logger.info("[$projectPath] compilation ${compilation.name} has ${standardConfigurations.size} standard configurations $standardConfigurations")
 

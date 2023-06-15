@@ -6,5 +6,5 @@ import kotlin.reflect.KClass
 
 class NotWindowsCondition : EnabledCondition {
   override fun enabled(kclass: KClass<out Spec>): Boolean =
-    "win" !in System.getProperty("os.name").toLowerCase()
+    "win" !in System.getProperty("os.name").lowercase()
 }

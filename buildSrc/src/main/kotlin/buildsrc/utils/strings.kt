@@ -1,15 +1,13 @@
 package buildsrc.utils
 
+import org.gradle.kotlin.dsl.support.uppercaseFirstChar
 
-/**
- * Title case the first char of a string.
- *
- * (Custom implementation because [toUpperCase]/[uppercase] is deprecated.
- * Can be removed when Gradle is updated)
- */
+
+/** Title case the first char of a string */
 internal fun String.uppercaseFirstChar(): String = mapFirstChar(Character::toTitleCase)
 
 
+/** Lowercase the first char of a string */
 internal fun String.lowercaseFirstChar(): String = mapFirstChar(Character::toLowerCase)
 
 

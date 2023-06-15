@@ -11,6 +11,7 @@ import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import java.io.File
+import kotlin.io.path.deleteIfExists
 
 /**
  * Integration test for the `it-android-0` project in Dokka
@@ -148,6 +149,27 @@ private fun initDokkaProject(
 ): GradleProjectTest {
   return GradleProjectTest(destinationDir.toPath()).apply {
     copyIntegrationTestProject("it-android-0/dokka")
+
+    gradleProperties = gradleProperties
+      .replace(
+        "dokka_it_android_gradle_plugin_version=4.1.3",
+        "dokka_it_android_gradle_plugin_version=8.0.2",
+      )
+
+    file("src/main/AndroidManifest.xml").deleteIfExists()
+
+    buildGradleKts += """
+      
+      android {
+        namespace = "org.jetbrains.dokka.it.android"
+      }
+      
+      java {
+          toolchain {
+              languageVersion.set(JavaLanguageVersion.of(17))
+          }
+      }
+    """.trimIndent()
   }
 }
 

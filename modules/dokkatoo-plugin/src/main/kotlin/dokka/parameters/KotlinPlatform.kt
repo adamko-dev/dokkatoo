@@ -22,7 +22,7 @@ enum class KotlinPlatform(
 
   @Deprecated("Unused", ReplaceWith("name.toLowerCase()"))
   @Suppress("unused")
-  val key: String = name.toLowerCase()
+  val key: String = name.lowercase()
 
   companion object {
     internal val values: Set<KotlinPlatform> = values().toSet()
@@ -37,7 +37,7 @@ enum class KotlinPlatform(
         return keyMatch
       }
 
-      return when (key.toLowerCase()) {
+      return when (key.lowercase()) {
         "android"  -> AndroidJVM
         "metadata" -> Common
         else       -> error("Unrecognized platform: $key")

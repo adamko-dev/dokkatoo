@@ -12,7 +12,6 @@ import dev.adamko.dokkatoo.tasks.DokkatooGenerateTask
 import dev.adamko.dokkatoo.tasks.DokkatooPrepareModuleDescriptorTask
 import dev.adamko.dokkatoo.tasks.DokkatooTask
 import java.io.File
-import java.net.URI
 import javax.inject.Inject
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
@@ -254,14 +253,8 @@ constructor(
   }
 
   private fun TaskContainer.createDokkaLifecycleTasks() {
-    @Suppress("DEPRECATION")
-    val prepareParameters = register<DokkatooTask>(taskNames.prepareParameters) {
-      description = "[DEPRECATED no longer used] Prepares Dokka parameters for all formats"
-    }
-
     register<DokkatooTask>(taskNames.generate) {
       description = "Generates Dokkatoo publications for all formats"
-      dependsOn(prepareParameters)
       dependsOn(withType<DokkatooGenerateTask>())
     }
   }
@@ -355,8 +348,6 @@ constructor(
     val generate = "dokkatooGenerate".appendFormat()
     val generatePublication = "dokkatooGeneratePublication".appendFormat()
     val generateModule = "dokkatooGenerateModule".appendFormat()
-    @Deprecated("parameters are no longer generated separately, use the publication/module generator task instead")
-    val prepareParameters = "prepareDokkatooParameters".appendFormat()
     val prepareModuleDescriptor = "prepareDokkatooModuleDescriptor".appendFormat()
   }
 }

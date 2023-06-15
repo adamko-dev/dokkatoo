@@ -109,15 +109,11 @@ internal fun ConfigurationContainer.collectIncomingFiles(
 ) {
   val conf = findByName(named)
   if (conf != null && conf.isCanBeResolved) {
-
-    @Suppress("UnstableApiUsage") // resolvedArtifacts is incubating
-    val incomingFiles =
-      conf
-        .incoming
-        .artifactView(artifactViewConfiguration)
-        .artifacts
-        .resolvedArtifacts // using 'resolved' might help with triggering artifact transforms?
-        .map { artifacts -> artifacts.map { it.file } }
+    val incomingFiles = conf.incoming
+      .artifactView(artifactViewConfiguration)
+      .artifacts
+      .resolvedArtifacts // using 'resolved' might help with triggering artifact transforms?
+      .map { artifacts -> artifacts.map { it.file } }
 
     collector.from(incomingFiles)
 

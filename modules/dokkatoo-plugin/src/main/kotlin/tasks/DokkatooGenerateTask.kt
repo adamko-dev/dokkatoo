@@ -22,7 +22,7 @@ import org.gradle.kotlin.dsl.*
 import org.gradle.process.JavaForkOptions
 import org.gradle.workers.WorkerExecutor
 import org.jetbrains.dokka.DokkaConfiguration
-import org.jetbrains.dokka.toJsonString
+import org.jetbrains.dokka.toPrettyJsonString
 
 /**
  * Executes the Dokka Generator, and produces documentation.
@@ -138,7 +138,7 @@ constructor(
     destFile.parentFile.mkdirs()
     destFile.createNewFile()
 
-    val compactJson = dokkaConfiguration.toJsonString()
+    val compactJson = dokkaConfiguration.toPrettyJsonString()
     val json = jsonMapper.decodeFromString(JsonElement.serializer(), compactJson)
     val prettyJson = jsonMapper.encodeToString(JsonElement.serializer(), json)
 

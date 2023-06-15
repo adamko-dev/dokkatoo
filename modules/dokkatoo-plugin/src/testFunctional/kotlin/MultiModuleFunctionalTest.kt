@@ -355,7 +355,6 @@ class MultiModuleFunctionalTest : FunSpec({
               "> Task :dokkatooGeneratePublicationHtml",
               "> Task :dokkatooGeneratePublicationJavadoc",
               "> Task :dokkatooGeneratePublicationJekyll",
-              "> Task :prepareDokkatooParameters UP-TO-DATE",
               "> Task :subproject-goodbye:clean",
               "> Task :subproject-goodbye:dokkatooGenerateModuleGfm",
               "> Task :subproject-goodbye:dokkatooGenerateModuleHtml",

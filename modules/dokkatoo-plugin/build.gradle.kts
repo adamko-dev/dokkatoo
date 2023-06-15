@@ -1,7 +1,6 @@
 @file:Suppress("UnstableApiUsage") // jvm test suites & test report aggregation are incubating
 
 import buildsrc.utils.skipTestFixturesPublications
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
   buildsrc.conventions.`kotlin-gradle-plugin`
@@ -28,6 +27,7 @@ dependencies {
 
   compileOnly(libs.gradlePlugin.kotlin)
   compileOnly(libs.gradlePlugin.android)
+  compileOnly(libs.gradlePlugin.androidApi)
 
   implementation(platform(libs.kotlinxSerialization.bom))
   implementation(libs.kotlinxSerialization.json)
@@ -66,7 +66,7 @@ gradlePlugin {
     longName: String = shortName,
   ) {
     plugins.register(pluginClass) {
-      id = "dev.adamko.dokkatoo-${shortName.toLowerCase()}"
+      id = "dev.adamko.dokkatoo-${shortName.lowercase()}"
       displayName = "Dokkatoo $shortName"
       description = "Generates $longName documentation for Kotlin projects (using Dokka)"
       implementationClass = "dev.adamko.dokkatoo.formats.$pluginClass"
@@ -76,38 +76,39 @@ gradlePlugin {
   registerDokkaPlugin("DokkatooHtmlPlugin", "HTML")
   registerDokkaPlugin("DokkatooJavadocPlugin", "Javadoc")
   registerDokkaPlugin("DokkatooJekyllPlugin", "Jekyll")
-}
 
-pluginBundle {
-  website = "https://github.com/adamko-dev/dokkatoo/"
-  vcsUrl = "https://github.com/adamko-dev/dokkatoo.git"
-  tags = listOf(
-    "dokka",
-    "dokkatoo",
-    "kotlin",
-    "kdoc",
-    "android",
-    "documentation",
-    "javadoc",
-    "html",
-    "markdown",
-    "gfm",
-    "website",
-  )
-}
-
-
-tasks.withType<KotlinCompile>().configureEach {
-  kotlinOptions {
-    freeCompilerArgs += listOf(
-      "-opt-in=kotlin.RequiresOptIn",
-      "-opt-in=dev.adamko.dokkatoo.internal.DokkatooInternalApi",
+  plugins.configureEach {
+    website.set("https://github.com/adamko-dev/dokkatoo/")
+    vcsUrl.set("https://github.com/adamko-dev/dokkatoo.git")
+    tags.addAll(
+      "dokka",
+      "dokkatoo",
+      "kotlin",
+      "kdoc",
+      "android",
+      "documentation",
+      "javadoc",
+      "html",
+      "markdown",
+      "gfm",
+      "website",
     )
   }
 }
 
-testing.suites {
+kotlin {
+  target {
+    compilations.configureEach {
+      compilerOptions.configure {
+        freeCompilerArgs.addAll(
+          "-opt-in=dev.adamko.dokkatoo.internal.DokkatooInternalApi",
+        )
+      }
+    }
+  }
+}
 
+testing.suites {
   withType<JvmTestSuite>().configureEach {
     useJUnitJupiter()
 
@@ -189,7 +190,6 @@ binaryCompatibilityValidator {
 }
 
 val dokkatooVersion = provider { project.version.toString() }
-
 
 val dokkatooConstantsProperties = objects.mapProperty<String, String>().apply {
   put("DOKKATOO_VERSION", dokkatooVersion)
