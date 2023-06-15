@@ -247,9 +247,9 @@ public final class dev/adamko/dokkatoo/dokka/plugins/DokkaPluginParametersBuilde
 	public static final fun PluginConfigBooleanValue (Lorg/gradle/api/provider/Provider;)Lorg/gradle/api/provider/Provider;
 	public static final fun PluginConfigNumberValue (Lorg/gradle/api/provider/Provider;)Lorg/gradle/api/provider/Provider;
 	public static final fun PluginConfigStringValue (Lorg/gradle/api/provider/Provider;)Lorg/gradle/api/provider/Provider;
-	public static final fun PluginConfigValue (Ljava/lang/Number;)Ldev/adamko/dokkatoo/dokka/plugins/Primitive$NumberValue;
-	public static final fun PluginConfigValue (Ljava/lang/String;)Ldev/adamko/dokkatoo/dokka/plugins/Primitive$StringValue;
-	public static final fun PluginConfigValue (Z)Ldev/adamko/dokkatoo/dokka/plugins/Primitive$BooleanValue;
+	public static final fun PluginConfigValue (Ljava/lang/Number;)Ldev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$NumberValue;
+	public static final fun PluginConfigValue (Ljava/lang/String;)Ldev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$StringValue;
+	public static final fun PluginConfigValue (Z)Ldev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$BooleanValue;
 	public static final fun add (Ldev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$Values;Ljava/lang/Number;)V
 	public static final fun add (Ldev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$Values;Ljava/lang/String;)V
 	public static final fun add (Ldev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$Values;Z)V
@@ -285,6 +285,11 @@ public final class dev/adamko/dokkatoo/dokka/plugins/DokkaVersioningPluginParame
 public abstract interface class dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue {
 }
 
+public final class dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$BooleanValue : dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$Primitive {
+	public fun <init> (Z)V
+	public final fun getBoolean ()Z
+}
+
 public final class dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$DirectoryValue : dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue {
 	public fun <init> (Lorg/gradle/api/file/DirectoryProperty;)V
 	public final fun getDirectory ()Lorg/gradle/api/file/DirectoryProperty;
@@ -300,7 +305,12 @@ public final class dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$FilesValu
 	public final fun getFiles ()Lorg/gradle/api/file/ConfigurableFileCollection;
 }
 
-public abstract class dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$Primitive {
+public final class dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$NumberValue : dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$Primitive {
+	public fun <init> (Ljava/lang/Number;)V
+	public final fun getNumber ()Ljava/lang/Number;
+}
+
+public abstract interface class dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$Primitive : dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue {
 }
 
 public final class dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$Properties : dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue {
@@ -308,27 +318,14 @@ public final class dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$Propertie
 	public final fun getValues ()Lorg/gradle/api/provider/MapProperty;
 }
 
+public final class dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$StringValue : dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$Primitive {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun getString ()Ljava/lang/String;
+}
+
 public final class dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$Values : dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue {
 	public fun <init> (Lorg/gradle/api/provider/ListProperty;)V
 	public final fun getValues ()Lorg/gradle/api/provider/ListProperty;
-}
-
-public abstract interface class dev/adamko/dokkatoo/dokka/plugins/Primitive : dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue {
-}
-
-public final class dev/adamko/dokkatoo/dokka/plugins/Primitive$BooleanValue : dev/adamko/dokkatoo/dokka/plugins/Primitive {
-	public fun <init> (Z)V
-	public final fun getBoolean ()Z
-}
-
-public final class dev/adamko/dokkatoo/dokka/plugins/Primitive$NumberValue : dev/adamko/dokkatoo/dokka/plugins/Primitive {
-	public fun <init> (Ljava/lang/Number;)V
-	public final fun getNumber ()Ljava/lang/Number;
-}
-
-public final class dev/adamko/dokkatoo/dokka/plugins/Primitive$StringValue : dev/adamko/dokkatoo/dokka/plugins/Primitive {
-	public fun <init> (Ljava/lang/String;)V
-	public final fun getString ()Ljava/lang/String;
 }
 
 public abstract class dev/adamko/dokkatoo/formats/DokkatooFormatPlugin : org/gradle/api/Plugin {
