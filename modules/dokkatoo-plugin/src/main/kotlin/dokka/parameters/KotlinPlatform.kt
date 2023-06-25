@@ -20,10 +20,6 @@ enum class KotlinPlatform(
   WASM("wasm"),
   ;
 
-  @Deprecated("Unused", ReplaceWith("name.toLowerCase()"))
-  @Suppress("unused")
-  val key: String = name.lowercase()
-
   companion object {
     internal val values: Set<KotlinPlatform> = values().toSet()
 

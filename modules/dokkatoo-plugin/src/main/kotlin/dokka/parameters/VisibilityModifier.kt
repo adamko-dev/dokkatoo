@@ -29,10 +29,6 @@ enum class VisibilityModifier {
   companion object {
     internal val entries: Set<VisibilityModifier> = values().toSet()
 
-    @Deprecated("internal value, no longer in use. The default value was moved to DokkaBasePlugin.configureDokkatooSourceSetsDefaults()")
-    @Suppress("unused")
-    internal val DEFAULT: VisibilityModifier = PUBLIC
-
     // Not defined as a property to try and minimize the dependency on Dokka Core types
     internal val VisibilityModifier.dokkaType: DokkaConfiguration.Visibility
       get() = when (this) {

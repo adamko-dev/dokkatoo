@@ -10,9 +10,9 @@ import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.Property
-import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
 import org.gradle.api.tasks.PathSensitivity.RELATIVE
+import org.gradle.work.NormalizeLineEndings
 
 /**
  * Parameters used to run Dokka Generator to produce either a Publication or a Module.
@@ -84,17 +84,9 @@ constructor(
   val dokkaSourceSets: NamedDomainObjectContainer<DokkaSourceSetSpec> =
     extensions.adding("dokkaSourceSets", objects.domainObjectContainer())
 
-  @Deprecated(
-    "Use Gradle function, addAllLater()",
-    ReplaceWith("dokkaSourceSets.addAllLater(sourceSets)")
-  )
-  fun addAllDokkaSourceSets(sourceSets: Provider<Iterable<DokkaSourceSetSpec>>) {
-    dokkaSourceSets.addAllLater(sourceSets)
-  }
-
   /** Dokka Module files from other subprojects. */
   @get:InputFiles
-  //@get:NormalizeLineEndings
+  @get:NormalizeLineEndings
   @get:PathSensitive(RELATIVE)
   @get:Optional
   abstract val dokkaModuleFiles: ConfigurableFileCollection

@@ -60,34 +60,6 @@ class DokkatooFormatDependencyContainers(
     attribute(LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(JAR))
   }
 
-  //<editor-fold desc="Dokka Parameters JSON files">
-  // TODO sharing parameters is required for a 'DokkaCollect' equivalent, but this is not implemented yet
-  /** Fetch Dokka Parameter files from other subprojects */
-  @Suppress("unused", "DEPRECATION")
-  @Deprecated("Not used")
-  val dokkaParametersConsumer: NamedDomainObjectProvider<Configuration> =
-    project.configurations.register(dependencyContainerNames.dokkatooParametersConsumer) {
-      description = "Fetch Dokka Parameters for $formatName from other subprojects"
-      asConsumer()
-      extendsFrom(dokkatooConsumer.get())
-      attributes {
-        dokkaCategory(dokkatooAttributes.dokkaParameters)
-      }
-    }
-
-  /** Provide Dokka Parameter files to other subprojects */
-  @Suppress("unused", "DEPRECATION")
-  @Deprecated("Not used")
-  val dokkaParametersOutgoing: NamedDomainObjectProvider<Configuration> =
-    project.configurations.register(dependencyContainerNames.dokkatooParametersOutgoing) {
-      description = "Provide Dokka Parameters for $formatName to other subprojects"
-      asProvider()
-      attributes {
-        dokkaCategory(dokkatooAttributes.dokkaParameters)
-      }
-    }
-  //</editor-fold>
-
   //<editor-fold desc="Dokka Module files">
   /** Fetch Dokka Module files from other subprojects */
   val dokkaModuleConsumer: NamedDomainObjectProvider<Configuration> =

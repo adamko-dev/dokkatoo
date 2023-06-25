@@ -3,7 +3,6 @@ package dev.adamko.dokkatoo.dokka.parameters
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetIdSpec.Companion.dokkaSourceSetIdSpec
 import dev.adamko.dokkatoo.internal.*
 import java.io.Serializable
-import java.net.URL
 import javax.inject.Inject
 import org.gradle.api.*
 import org.gradle.api.file.ConfigurableFileCollection
@@ -217,8 +216,6 @@ constructor(
 
   /**
    * Allows linking to Dokka/Javadoc documentation of the project's dependencies.
-   *
-   * Prefer using [externalDocumentationLink] action/closure for adding links.
    */
   @get:Nested
   val externalDocumentationLinks: NamedDomainObjectContainer<DokkaExternalDocumentationLinkSpec> =
@@ -313,21 +310,6 @@ constructor(
   @get:Input
   abstract val enableAndroidDocumentationLink: Property<Boolean>
 
-  /** @see enableKotlinStdLibDocumentationLink */
-  @get:Internal
-  @Deprecated("Replaced with enableKotlinStdLibDocumentationLink to match naming conventions - note that the boolean is inverted")
-  abstract val noStdlibLink: Property<Boolean>
-
-  /** @see enableJdkDocumentationLink */
-  @get:Internal
-  @Deprecated("Replaced with enableJdkDocumentationLink to match naming conventions - note that the boolean is inverted")
-  abstract val noJdkLink: Property<Boolean>
-
-  /** @see enableAndroidDocumentationLink */
-  @get:Internal
-  @Deprecated("Replaced with enableAndroidDocumentationLink to match naming conventions - note that the boolean is inverted")
-  abstract val noAndroidSdkLink: Property<Boolean>
-
   /**
    * [Kotlin language version](https://kotlinlang.org/docs/compatibility-modes.html)
    * used for setting up analysis and [`@sample`](https://kotlinlang.org/docs/kotlin-doc.html#sample-identifier)
@@ -386,59 +368,5 @@ constructor(
         action.execute(it)
       }
     )
-  }
-
-  /** @see externalDocumentationLinks */
-  @Deprecated(
-    externalDocumentationLinkDeprecationMessage,
-    ReplaceWith("externalDocumentationLinks.create(\"...\", action)"),
-  )
-  fun externalDocumentationLink(action: Action<in DokkaExternalDocumentationLinkSpec>) {
-    externalDocumentationLinks.create("...", action)
-  }
-
-  /** @see externalDocumentationLinks */
-  @Deprecated(
-    externalDocumentationLinkDeprecationMessage,
-    ReplaceWith(
-      "externalDocumentationLinks.create(TODO(\"<unique name>\")) {\n" +
-          "  this.url(url)\n" +
-          "  if (packageListUrl != null) this.packageListUrl(packageListUrl)\n" +
-          "}"
-    ),
-  )
-  fun externalDocumentationLink(url: String, packageListUrl: String? = null) {
-    externalDocumentationLinks.create("...") {
-      url(url)
-      if (packageListUrl != null) {
-        packageListUrl(packageListUrl)
-      }
-    }
-  }
-
-  /** @see externalDocumentationLinks */
-  @Deprecated(
-    externalDocumentationLinkDeprecationMessage,
-    ReplaceWith(
-      "externalDocumentationLinks.create(TODO(\"<unique name>\")) {\n" +
-          "  this.url.set(url)\n" +
-          "  if (packageListUrl != null) this.packageListUrl.set(packageListUrl)\n" +
-          "}"
-    ),
-  )
-  fun externalDocumentationLink(url: URL, packageListUrl: URL? = null) {
-    externalDocumentationLinks.add(
-      objects.newInstance(DokkaExternalDocumentationLinkSpec::class).also {
-        it.url.set(url.toURI())
-        if (packageListUrl != null) {
-          it.packageListUrl.set(packageListUrl.toURI())
-        }
-      }
-    )
-  }
-
-  private companion object {
-    private const val externalDocumentationLinkDeprecationMessage =
-      "DokkaExternalDocumentationLinkSpecs require a unique name. Helper functions for creating an external doc link have been moved to DokkaExternalDocumentationLinkSpec. Use `externalDocumentationLinks.create(...) { ... } instead."
   }
 }
