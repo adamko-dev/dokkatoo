@@ -123,7 +123,7 @@ constructor(
         val request = HttpRequest
           .newBuilder()
           .uri(uri)
-          .timeout(Duration.ofMillis(10))
+          .timeout(Duration.ofSeconds(1))
           .GET()
           .build()
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
