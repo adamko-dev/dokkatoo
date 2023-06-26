@@ -6,7 +6,7 @@ import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.TestExtension
 import com.android.build.gradle.api.BaseVariant
 import com.android.build.gradle.internal.dependency.VariantDependencies
-import com.android.build.gradle.internal.publishing.AndroidArtifacts
+import com.android.build.gradle.internal.publishing.AndroidArtifacts.ArtifactType.CLASSES_JAR
 import com.android.build.gradle.internal.publishing.AndroidArtifacts.ArtifactType.PROCESSED_JAR
 import dev.adamko.dokkatoo.DokkatooBasePlugin
 import dev.adamko.dokkatoo.DokkatooExtension
@@ -18,6 +18,7 @@ import org.gradle.api.DomainObjectSet
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ConfigurationContainer
+import org.gradle.api.artifacts.type.ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE
 import org.gradle.api.file.FileCollection
 import org.gradle.api.logging.Logging
 import org.gradle.api.model.ObjectFactory
@@ -97,11 +98,19 @@ private object AndroidClasspathCollector {
     val compilationClasspath = objects.fileCollection()
 
     fun collectConfiguration(named: String) {
-      configurations.collectIncomingFiles(named, compilationClasspath) {
-        attributes {
-          attribute(AndroidArtifacts.ARTIFACT_TYPE, PROCESSED_JAR.type)
+      @Suppress("UnstableApiUsage")
+      listOf(
+        // need to fetch multiple different types of files, because AGP is weird and doesn't seem
+        // to have a 'just give me normal JVM classes' option
+        ARTIFACT_TYPE_ATTRIBUTE to PROCESSED_JAR.type,
+        ARTIFACT_TYPE_ATTRIBUTE to CLASSES_JAR.type,
+      ).forEach { (attribute, attributeValue) ->
+        configurations.collectIncomingFiles(named, compilationClasspath) {
+          attributes {
+            attribute(attribute, attributeValue)
+          }
+          lenient(true)
         }
-        lenient(true)
       }
     }
 
