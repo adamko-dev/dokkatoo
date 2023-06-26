@@ -53,26 +53,24 @@ val createAndroidLocalPropertiesFile by tasks.registering {
 val updateAndroidLocalProperties by tasks.registering {
 
   // find all local.properties files
-  val localPropertiesFiles = layout.projectDirectory.dir("projects").asFileTree
-    .matching {
-      include("**/local.properties")
-    }.files
+  val localPropertiesFiles = layout.projectDirectory.dir("projects")
+    .asFileTree
+    .matching { include("**/local.properties") }
+    .files
 
   outputs.files(localPropertiesFiles).withPropertyName("localPropertiesFiles")
 
   val androidSdkDir = androidSdkDir
-
-  // add the relative path as a property for Gradle up-to-date checks (the directory contents don't matter)
-  inputs.property(
-    "androidSdkDirPath",
-    androidSdkDir.map { it.relativeTo(projectDir).invariantSeparatorsPath }
-  )
+  inputs.file(androidSdkDir)
+    .withPropertyName("androidSdkDir")
+    .withNormalizer(IgnoredPathInputNormalizer::class)
 
   doLast {
     val androidSdkDirPath = androidSdkDir.get().invariantSeparatorsPath
 
-    localPropertiesFiles.forEach { file ->
-      if (file.exists()) {
+    localPropertiesFiles
+      .filter { it.exists() }
+      .forEach { file ->
         file.writeText(
           file.useLines { lines ->
             lines.joinToString("\n") { line ->
@@ -84,6 +82,5 @@ val updateAndroidLocalProperties by tasks.registering {
           }
         )
       }
-    }
   }
 }
