@@ -27,7 +27,7 @@ val createAndroidLocalPropertiesFile by tasks.registering {
   outputs.file(localPropertiesFile).withPropertyName("localPropertiesFile")
 
   val androidSdkDir = androidSdkDir
-  inputs.file(androidSdkDir)
+  inputs.dir(androidSdkDir)
     .withPropertyName("androidSdkDir")
     .withNormalizer(IgnoredPathInputNormalizer::class)
 
@@ -61,7 +61,7 @@ val updateAndroidLocalProperties by tasks.registering {
   outputs.files(localPropertiesFiles).withPropertyName("localPropertiesFiles")
 
   val androidSdkDir = androidSdkDir
-  inputs.file(androidSdkDir)
+  inputs.dir(androidSdkDir)
     .withPropertyName("androidSdkDir")
     .withNormalizer(IgnoredPathInputNormalizer::class)
 
