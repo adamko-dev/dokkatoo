@@ -1,12 +1,6 @@
 package buildsrc.conventions
 
-import buildsrc.tasks.SetupDokkaProjects
-import java.io.File
-import java.time.Duration
-import org.gradle.api.provider.Provider
-import org.gradle.kotlin.dsl.*
-import buildsrc.utils.skipTestFixturesPublications
-import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.gradle.internal.fingerprint.IgnoredPathInputNormalizer
 import org.jetbrains.kotlin.util.suffixIfNot
 
 
@@ -27,18 +21,15 @@ val androidSdkDir: Provider<File> = providers
   .orElse(layout.projectDirectory.file("projects/ANDROID_SDK").asFile)
 
 
-
 val createAndroidLocalPropertiesFile by tasks.registering {
 
   val localPropertiesFile = temporaryDir.resolve("local.properties")
   outputs.file(localPropertiesFile).withPropertyName("localPropertiesFile")
 
   val androidSdkDir = androidSdkDir
-  // add the relative path as a property for Gradle up-to-date checks (the directory contents don't matter)
-  inputs.property(
-    "androidSdkDirPath",
-    androidSdkDir.map { it.relativeTo(projectDir).invariantSeparatorsPath }
-  )
+  inputs.file(androidSdkDir)
+    .withPropertyName("androidSdkDir")
+    .withNormalizer(IgnoredPathInputNormalizer::class)
 
   doLast {
     val androidSdkPath = androidSdkDir.get().invariantSeparatorsPath
