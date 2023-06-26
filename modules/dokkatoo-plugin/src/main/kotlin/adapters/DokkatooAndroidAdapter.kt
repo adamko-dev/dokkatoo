@@ -131,12 +131,12 @@ private interface AndroidExtensionWrapper {
               })
             }
 
-          return variants.flatMapTo(mutableSetOf()) {
-            setOf(
-              it.compileConfiguration.name,
-              it.runtimeConfiguration.name,
-              it.annotationProcessorConfiguration.name,
-            )
+          return buildSet {
+            variants.forEach {
+              add(it.compileConfiguration.name)
+              add(it.runtimeConfiguration.name)
+              add(it.annotationProcessorConfiguration.name)
+            }
           }
         }
       }
