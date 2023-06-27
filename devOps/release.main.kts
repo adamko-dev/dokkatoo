@@ -42,8 +42,6 @@ object Release : CliktCommand() {
 
     validateGitStatus(startBranch)
 
-    GitHub.setRepo("adamko-dev/dokkatoo")
-
     echo("Current version is $currentVersion")
     echo("git dir is ${Git.rootDir}")
 
@@ -279,6 +277,11 @@ private object Git : CliTool() {
 
 /** GitHub commands */
 private object GitHub : CliTool() {
+
+  init {
+    setRepo("adamko-dev/dokkatoo")
+  }
+
   fun setRepo(repo: String): String =
     runCommand("gh repo set-default $repo")
 
