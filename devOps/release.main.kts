@@ -4,6 +4,8 @@
 
 import Release_main.SemVer.Companion.SemVer
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.parameters.options.flag
+import com.github.ajalt.clikt.parameters.options.option
 import java.io.File
 import java.lang.ProcessBuilder.Redirect.PIPE
 import kotlin.system.exitProcess
@@ -29,186 +31,129 @@ try {
  */
 // based on https://github.com/apollographql/apollo-kotlin/blob/v4.0.0-dev.2/scripts/release.main.kts
 object Release : CliktCommand() {
+  private val skipGitValidation by option(
+    "--skip-git-validation",
+    help = "skips git status validation"
+  ).flag(default = false)
 
   override fun run() {
 
-    //region Validation
-    check(git.status().isEmpty()) {
-      "git repo is not clean. Stash or commit changes before making a release."
-    }
-    check(currentVersion.snapshot) {
-      "Current version must be a SNAPSHOT, but was $currentVersion"
-    }
-    val startBranch = git.currentBranch()
-    check(startBranch == "main") {
-      "Must be on the main branch to make a release, but current branch is $startBranch"
-    }
-    gh.setRepo("adamko-dev/dokkatoo")
-    //endregion
+    val startBranch = Git.currentBranch()
+
+    validateGitStatus(startBranch)
+
+    GitHub.setRepo("adamko-dev/dokkatoo")
 
     echo("Current version is $currentVersion")
-    echo("git dir is ${git.rootDir}")
+    echo("git dir is ${Git.rootDir}")
 
-    val releaseVersion = prompt(
+    val releaseVersion = semverPrompt(
       text = "version to release?",
-      default = currentVersion.copy(snapshot = false).toString(),
-      requireConfirmation = true,
-    ) {
-      SemVer.of(it)
-    } ?: error("invalid SemVer")
-
+      default = currentVersion.copy(snapshot = false),
+    )
     check(!releaseVersion.snapshot) {
       "versionToRelease must not be a snapshot version, but was $releaseVersion"
     }
-
-    val nextVersion = prompt(
+    val nextVersion = semverPrompt(
       text = "post-release version?",
-      default = releaseVersion.incrementMinor(snapshot = true).toString(),
-      requireConfirmation = true,
-    ) {
-      SemVer.of(it)
-    } ?: error("invalid SemVer")
-
+      default = releaseVersion.incrementMinor(snapshot = true),
+    )
     updateAndRelease(releaseVersion)
 
+    // switch back to the main branch
+    Git.switch(startBranch)
+    Git.pull(startBranch)
+
     // Tag the release
-    git.switch(startBranch)
-    git.pull(startBranch)
     require(currentVersion == releaseVersion) {
       "incorrect version after update. Expected $releaseVersion but got $currentVersion"
     }
     val tagName = "v$releaseVersion"
-    git.tag(tagName)
+    Git.tag(tagName)
     confirm("Push tag $tagName?", abort = true)
-    git.push(tagName)
+    Git.push(tagName)
     echo("Tag pushed")
 
-    confirm("Publish plugins?", abort = true)
-    gradle.publishPlugins()
+    confirm("Publish plugins to Gradle Plugin Portal?", abort = true)
+    Gradle.publishPlugins()
 
     // Bump the version to the next snapshot
     updateAndRelease(nextVersion)
 
     // Go back and pull the changes
-    git.switch(startBranch)
-    git.pull(startBranch)
+    Git.switch(startBranch)
+    Git.pull(startBranch)
 
     echo("Released version $releaseVersion")
+  }
+
+  private fun validateGitStatus(startBranch: String) {
+    if (skipGitValidation) {
+      echo("skipping git status validation")
+      return
+    }
+    check(Git.status().isEmpty()) {
+      "git repo is not clean. Stash or commit changes before making a release."
+    }
+    check(currentVersion.snapshot) {
+      "Current version must be a SNAPSHOT, but was $currentVersion"
+    }
+    check(startBranch == "main") {
+      "Must be on the main branch to make a release, but current branch is $startBranch"
+    }
+  }
+
+  private tailrec fun semverPrompt(
+    text: String,
+    default: SemVer,
+  ): SemVer {
+    val response = prompt(
+      text = text,
+      default = default.toString(),
+      requireConfirmation = true,
+    ) {
+      SemVer.of(it)
+    }
+
+    return if (response != null) {
+      response
+    } else {
+      echo("invalid SemVer")
+      semverPrompt(text, default)
+    }
   }
 
   private fun updateAndRelease(version: SemVer) {
     // checkout a release branch
     val releaseBranch = "release/v$version"
     echo("checkout out new branch...")
-    git.switch(releaseBranch, create = true)
+    Git.switch(releaseBranch, create = true)
 
     // update the version & run tests
     currentVersion = version
     echo("running Gradle check...")
-    gradle.check()
+    Gradle.check()
 
     // commit and push
     echo("committing...")
-    git.commit("release $version")
+    Git.commit("release $version")
     echo("pushing...")
-    git.push(releaseBranch)
+    Git.push(releaseBranch)
 
     // create a new PR
     echo("creating PR...")
-    gh.createPr(releaseBranch)
+    GitHub.createPr(releaseBranch)
 
     confirm("Merge the PR for branch $releaseBranch?", abort = true)
     mergeAndWait(releaseBranch)
     echo("$releaseBranch PR merged")
   }
 
-  /** git commands */
-  private val git = object {
-    val rootDir = File(runCommand("git rev-parse --show-toplevel", dir = null))
-    fun switch(branch: String, create: Boolean = false): String {
-      return runCommand(
-        buildString {
-          append("git switch ")
-          if (create) append("--create ")
-          append(branch)
-        }
-      )
-    }
-
-    fun commit(message: String): String = runCommand("git commit -a -m \"$message\"")
-    fun currentBranch(): String = runCommand("git symbolic-ref --short HEAD")
-    fun pull(ref: String): String = runCommand("git pull origin $ref")
-    fun push(ref: String): String = runCommand("git push origin $ref")
-    fun status(): String {
-      runCommand("git fetch --all")
-      return runCommand("git status --porcelain=v2")
-    }
-
-    fun tag(tag: String): String {
-      return runCommand("git tag $tag")
-    }
-  }
-
-  /** GitHub commands */
-  private val gh = object {
-    fun setRepo(repo: String): String =
-      runCommand("gh repo set-default $repo")
-
-    fun prState(branchName: String): String =
-      runCommand("gh pr view $branchName --json state --jq .state")
-
-    fun createPr(branch: String): String =
-      runCommand("gh pr create --head $branch --fill")
-
-    fun autoMergePr(branch: String): String =
-      runCommand("gh pr merge $branch --squash --auto --delete-branch")
-
-    fun waitForPrChecks(branch: String): String =
-      runCommand("gh pr checks $branch --watch --interval 30")
-  }
-
-  /** GitHub commands */
-  private val gradle = object {
-    fun stopDaemons(): String = runCommand("./gradlew --stop")
-    fun check(): String {
-      stopDaemons()
-      return runCommand("./gradlew check --no-daemon")
-    }
-    fun publishPlugins(): String {
-      stopDaemons()
-      return runCommand("./gradlew publishPlugins --no-daemon")
-    }
-  }
-
-  //  private val currentDir: String get() = System.getProperty("user.dir")
-
   private val buildGradleKts: File by lazy {
-    val rootDir = git.rootDir
+    val rootDir = Git.rootDir
     File("$rootDir/build.gradle.kts").apply {
       require(exists()) { "could not find build.gradle.kts in $rootDir" }
     }
-  }
-
-  private fun runCommand(
-    cmd: String,
-    dir: File? = git.rootDir,
-  ): String {
-    val args = parseSpaceSeparatedArgs(cmd)
-
-    val process = ProcessBuilder(*args.toTypedArray()).apply {
-      redirectOutput(PIPE)
-      redirectError(PIPE)
-      if (dir != null) directory(dir)
-    }.start()
-
-    val ret = process.waitFor()
-
-    val output = process.inputStream.bufferedReader().use { it.readText() }
-    if (ret != 0) {
-      error("command '$cmd' failed:\n$output")
-    }
-
-    return output.trim()
   }
 
   /** Read/write the version set in the root `build.gradle.kts` file */
@@ -238,43 +183,130 @@ object Release : CliktCommand() {
     }
 
   private fun mergeAndWait(branchName: String) {
-    gh.autoMergePr(branchName)
+    GitHub.autoMergePr(branchName)
     echo("Waiting for the PR to be merged...")
-    while (gh.prState(branchName) != "MERGED") {
+    while (GitHub.prState(branchName) != "MERGED") {
       Thread.sleep(1_000)
       echo(".", trailingNewline = false)
     }
   }
+}
 
-  private fun parseSpaceSeparatedArgs(argsString: String): List<String> {
-    val parsedArgs = mutableListOf<String>()
-    var inQuotes = false
-    var currentCharSequence = StringBuilder()
-    fun saveArg(wasInQuotes: Boolean) {
-      if (wasInQuotes || currentCharSequence.isNotBlank()) {
-        parsedArgs.add(currentCharSequence.toString())
-        currentCharSequence = StringBuilder()
-      }
+private abstract class CliTool {
+
+  protected fun runCommand(
+    cmd: String,
+    dir: File? = Git.rootDir,
+  ): String {
+    val args = parseSpaceSeparatedArgs(cmd)
+
+    val process = ProcessBuilder(*args.toTypedArray()).apply {
+      redirectOutput(PIPE)
+      redirectError(PIPE)
+      if (dir != null) directory(dir)
+    }.start()
+
+    val ret = process.waitFor()
+
+    val output = process.inputStream.bufferedReader().use { it.readText() }
+    if (ret != 0) {
+      error("command '$cmd' failed:\n$output")
     }
-    argsString.forEach { char ->
-      if (char == '"') {
-        inQuotes = !inQuotes
-        // Save value which was in quotes.
-        if (!inQuotes) {
-          saveArg(true)
+
+    return output.trim()
+  }
+
+  companion object {
+    private fun parseSpaceSeparatedArgs(argsString: String): List<String> {
+      val parsedArgs = mutableListOf<String>()
+      var inQuotes = false
+      var currentCharSequence = StringBuilder()
+      fun saveArg(wasInQuotes: Boolean) {
+        if (wasInQuotes || currentCharSequence.isNotBlank()) {
+          parsedArgs.add(currentCharSequence.toString())
+          currentCharSequence = StringBuilder()
         }
-      } else if (char.isWhitespace() && !inQuotes) {
-        // Space is separator
-        saveArg(false)
-      } else {
-        currentCharSequence.append(char)
       }
+      argsString.forEach { char ->
+        if (char == '"') {
+          inQuotes = !inQuotes
+          // Save value which was in quotes.
+          if (!inQuotes) {
+            saveArg(true)
+          }
+        } else if (char.isWhitespace() && !inQuotes) {
+          // Space is separator
+          saveArg(false)
+        } else {
+          currentCharSequence.append(char)
+        }
+      }
+      if (inQuotes) {
+        error("No close-quote was found in $currentCharSequence.")
+      }
+      saveArg(false)
+      return parsedArgs
     }
-    if (inQuotes) {
-      error("No close-quote was found in $currentCharSequence.")
-    }
-    saveArg(false)
-    return parsedArgs
+  }
+}
+
+/** git commands */
+private object Git : CliTool() {
+  val rootDir = File(runCommand("git rev-parse --show-toplevel", dir = null))
+  fun switch(branch: String, create: Boolean = false): String {
+    return runCommand(
+      buildString {
+        append("git switch ")
+        if (create) append("--create ")
+        append(branch)
+      }
+    )
+  }
+
+  fun commit(message: String): String = runCommand("git commit -a -m \"$message\"")
+  fun currentBranch(): String = runCommand("git symbolic-ref --short HEAD")
+  fun pull(ref: String): String = runCommand("git pull origin $ref")
+  fun push(ref: String): String = runCommand("git push origin $ref")
+  fun status(): String {
+    runCommand("git fetch --all")
+    return runCommand("git status --porcelain=v2")
+  }
+
+  fun tag(tag: String): String {
+    return runCommand("git tag $tag")
+  }
+}
+
+/** GitHub commands */
+private object GitHub : CliTool() {
+  fun setRepo(repo: String): String =
+    runCommand("gh repo set-default $repo")
+
+  fun prState(branchName: String): String =
+    runCommand("gh pr view $branchName --json state --jq .state")
+
+  fun createPr(branch: String): String =
+    runCommand("gh pr create --head $branch --fill")
+
+  fun autoMergePr(branch: String): String =
+    runCommand("gh pr merge $branch --squash --auto --delete-branch")
+
+  fun waitForPrChecks(branch: String): String =
+    runCommand("gh pr checks $branch --watch --interval 30")
+}
+
+/** GitHub commands */
+private object Gradle : CliTool() {
+  fun stopDaemons(): String = runCommand("./gradlew --stop")
+
+  fun check(): String {
+    stopDaemons()
+    return runCommand("./gradlew check --no-daemon")
+  }
+
+  fun publishPlugins(): String {
+    stopDaemons()
+    return runCommand("./gradlew publishPlugins --no-daemon")
   }
 }
 
