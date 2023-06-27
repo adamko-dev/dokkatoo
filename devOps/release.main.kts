@@ -37,7 +37,6 @@ object Release : CliktCommand() {
   ).flag(default = false)
 
   override fun run() {
-
     val startBranch = Git.currentBranch()
 
     validateGitStatus(startBranch)
@@ -48,35 +47,30 @@ object Release : CliktCommand() {
     val releaseVersion = semverPrompt(
       text = "version to release?",
       default = currentVersion.copy(snapshot = false),
-    )
-    check(!releaseVersion.snapshot) {
-      "versionToRelease must not be a snapshot version, but was $releaseVersion"
+    ) {
+      if (it.snapshot) {
+        echo("versionToRelease must not be a snapshot version, but was $it")
+      }
+      !it.snapshot
     }
     val nextVersion = semverPrompt(
       text = "post-release version?",
       default = releaseVersion.incrementMinor(snapshot = true),
     )
-    updateAndRelease(releaseVersion)
+    updateVersionCreatePR(releaseVersion)
 
     // switch back to the main branch
     Git.switch(startBranch)
     Git.pull(startBranch)
 
     // Tag the release
-    require(currentVersion == releaseVersion) {
-      "incorrect version after update. Expected $releaseVersion but got $currentVersion"
-    }
-    val tagName = "v$releaseVersion"
-    Git.tag(tagName)
-    confirm("Push tag $tagName?", abort = true)
-    Git.push(tagName)
-    echo("Tag pushed")
+    createAndPushTag(releaseVersion)
 
     confirm("Publish plugins to Gradle Plugin Portal?", abort = true)
     Gradle.publishPlugins()
 
     // Bump the version to the next snapshot
-    updateAndRelease(nextVersion)
+    updateVersionCreatePR(nextVersion)
 
     // Go back and pull the changes
     Git.switch(startBranch)
@@ -101,9 +95,14 @@ object Release : CliktCommand() {
     }
   }
 
+  /**
+   * @param[validate] returns `null` if the provided SemVer is valid, or else an error message
+   * explaining why it is invalid.
+   */
   private tailrec fun semverPrompt(
     text: String,
     default: SemVer,
+    validate: (candidate: SemVer) -> Boolean = { true },
   ): SemVer {
     val response = prompt(
       text = text,
@@ -113,15 +112,16 @@ object Release : CliktCommand() {
       SemVer.of(it)
     }
 
-    return if (response != null) {
-      response
+    return if (response == null || !validate(response)) {
+      if (response == null) echo("invalid SemVer")
+
+      semverPrompt(text, default, validate)
     } else {
-      echo("invalid SemVer")
-      semverPrompt(text, default)
+      response
     }
   }
 
-  private fun updateAndRelease(version: SemVer) {
+  private fun updateVersionCreatePR(version: SemVer) {
     // checkout a release branch
     val releaseBranch = "release/v$version"
     echo("checkout out new branch...")
@@ -145,6 +145,21 @@ object Release : CliktCommand() {
     confirm("Merge the PR for branch $releaseBranch?", abort = true)
     mergeAndWait(releaseBranch)
     echo("$releaseBranch PR merged")
+  }
+
+  private fun createAndPushTag(version: SemVer) {
+    // Tag the release
+    require(currentVersion == version) {
+      "tried to create a tag, but project version does not match provided version. Expected $version but got $currentVersion"
+    }
+    val tagName = "v$version"
+    Git.tag(tagName)
+    confirm("Push tag $tagName?", abort = true)
+    Git.push(tagName)
+    echo("Tag pushed")
+
+    confirm("Publish plugins to Gradle Plugin Portal?", abort = true)
+    Gradle.publishPlugins()
   }
 
   private val buildGradleKts: File by lazy {
