@@ -3,11 +3,10 @@
   <groupId>dev.adamko.dokkatoo</groupId>
   <artifactId>dokkatoo-plugin</artifactId>
   <versioning>
-    <latest>1.6.0</latest>
-    <release>1.6.0</release>
+    <latest>1.7.0-SNAPSHOT</latest>
     <versions>
-      <version>1.6.0</version>
+      <version>1.7.0-SNAPSHOT</version>
     </versions>
-    <lastUpdated>20230627153524</lastUpdated>
+    <lastUpdated>20230627161612</lastUpdated>
   </versioning>
 </metadata>
