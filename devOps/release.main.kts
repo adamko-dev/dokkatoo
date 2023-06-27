@@ -169,8 +169,15 @@ object Release : CliktCommand() {
 
   /** GitHub commands */
   private val gradle = object {
-    fun check(): String = runCommand("./gradlew check --no-daemon")
-    fun publishPlugins(): String = runCommand("./gradlew publishPlugins --no-daemon")
+    fun stopDaemons(): String = runCommand("./gradlew --stop")
+    fun check(): String {
+      stopDaemons()
+      return runCommand("./gradlew check --no-daemon")
+    }
+    fun publishPlugins(): String {
+      stopDaemons()
+      return runCommand("./gradlew publishPlugins --no-daemon")
+    }
   }
 
   //  private val currentDir: String get() = System.getProperty("user.dir")
