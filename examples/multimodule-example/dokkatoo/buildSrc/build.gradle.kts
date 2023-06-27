@@ -6,5 +6,5 @@ plugins {
 
 dependencies {
   implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.22")
-  implementation("dev.adamko.dokkatoo:dokkatoo-plugin:1.6.0")
+  implementation("dev.adamko.dokkatoo:dokkatoo-plugin:1.7.0-SNAPSHOT")
 }

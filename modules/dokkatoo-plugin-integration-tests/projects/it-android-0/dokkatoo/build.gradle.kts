@@ -1,7 +1,7 @@
 plugins {
   id("com.android.library") version "4.2.2"
   kotlin("android") version "1.8.22"
-  id("dev.adamko.dokkatoo") version "1.6.0"
+  id("dev.adamko.dokkatoo") version "1.7.0-SNAPSHOT"
 }
 
 android {
