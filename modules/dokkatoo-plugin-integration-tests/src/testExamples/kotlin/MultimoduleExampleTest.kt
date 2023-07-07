@@ -131,7 +131,7 @@ class MultimoduleExampleTest : FunSpec({
             dokkatooBuildCache.output shouldContainAll listOf(
               "> Task :parentProject:dokkatooGeneratePublicationHtml UP-TO-DATE",
               "BUILD SUCCESSFUL",
-              "17 actionable tasks: 17 up-to-date",
+              "15 actionable tasks: 15 up-to-date",
             )
             withClue("Dokka Generator should not be triggered, so check it doesn't log anything") {
               dokkatooBuildCache.output shouldNotContain "Generation completed successfully"

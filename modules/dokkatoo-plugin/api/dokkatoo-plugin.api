@@ -11,6 +11,11 @@ public final class dev/adamko/dokkatoo/DokkatooBasePlugin$Companion {
 	public final fun getTaskNames ()Ldev/adamko/dokkatoo/DokkatooBasePlugin$TaskNames;
 }
 
+public final class dev/adamko/dokkatoo/DokkatooBasePlugin$inlined$sam$i$org_gradle_api_Action$0 : org/gradle/api/Action {
+	public fun <init> (Lkotlin/jvm/functions/Function1;)V
+	public final synthetic fun execute (Ljava/lang/Object;)V
+}
+
 public abstract class dev/adamko/dokkatoo/DokkatooExtension : java/io/Serializable, org/gradle/api/plugins/ExtensionAware {
 	public abstract fun getDokkatooCacheDirectory ()Lorg/gradle/api/file/DirectoryProperty;
 	public abstract fun getDokkatooConfigurationsDirectory ()Lorg/gradle/api/file/DirectoryProperty;
@@ -242,9 +247,9 @@ public final class dev/adamko/dokkatoo/dokka/plugins/DokkaPluginParametersBuilde
 	public static final fun PluginConfigBooleanValue (Lorg/gradle/api/provider/Provider;)Lorg/gradle/api/provider/Provider;
 	public static final fun PluginConfigNumberValue (Lorg/gradle/api/provider/Provider;)Lorg/gradle/api/provider/Provider;
 	public static final fun PluginConfigStringValue (Lorg/gradle/api/provider/Provider;)Lorg/gradle/api/provider/Provider;
-	public static final fun PluginConfigValue (Ljava/lang/Number;)Ldev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$Primitive$NumberValue;
-	public static final fun PluginConfigValue (Ljava/lang/String;)Ldev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$Primitive$StringValue;
-	public static final fun PluginConfigValue (Z)Ldev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$Primitive$BooleanValue;
+	public static final fun PluginConfigValue (Ljava/lang/Number;)Ldev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$NumberValue;
+	public static final fun PluginConfigValue (Ljava/lang/String;)Ldev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$StringValue;
+	public static final fun PluginConfigValue (Z)Ldev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$BooleanValue;
 	public static final fun add (Ldev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$Values;Ljava/lang/Number;)V
 	public static final fun add (Ldev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$Values;Ljava/lang/String;)V
 	public static final fun add (Ldev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$Values;Z)V
@@ -277,7 +282,12 @@ public abstract class dev/adamko/dokkatoo/dokka/plugins/DokkaVersioningPluginPar
 public final class dev/adamko/dokkatoo/dokka/plugins/DokkaVersioningPluginParameters$Companion {
 }
 
-public abstract class dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue {
+public abstract interface class dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue {
+}
+
+public final class dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$BooleanValue : dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$Primitive {
+	public fun <init> (Z)V
+	public final fun getBoolean ()Z
 }
 
 public final class dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$DirectoryValue : dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue {
@@ -295,27 +305,22 @@ public final class dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$FilesValu
 	public final fun getFiles ()Lorg/gradle/api/file/ConfigurableFileCollection;
 }
 
-public abstract class dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$Primitive : dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue {
-}
-
-public final class dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$Primitive$BooleanValue : dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$Primitive {
-	public fun <init> (Z)V
-	public final fun getBoolean ()Z
-}
-
-public final class dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$Primitive$NumberValue : dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$Primitive {
+public final class dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$NumberValue : dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$Primitive {
 	public fun <init> (Ljava/lang/Number;)V
 	public final fun getNumber ()Ljava/lang/Number;
 }
 
-public final class dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$Primitive$StringValue : dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$Primitive {
-	public fun <init> (Ljava/lang/String;)V
-	public final fun getString ()Ljava/lang/String;
+public abstract interface class dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$Primitive : dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue {
 }
 
 public final class dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$Properties : dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue {
 	public fun <init> (Lorg/gradle/api/provider/MapProperty;)V
 	public final fun getValues ()Lorg/gradle/api/provider/MapProperty;
+}
+
+public final class dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$StringValue : dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$Primitive {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun getString ()Ljava/lang/String;
 }
 
 public final class dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$Values : dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue {
@@ -331,12 +336,22 @@ public abstract class dev/adamko/dokkatoo/formats/DokkatooFormatPlugin : org/gra
 	public final fun getFormatName ()Ljava/lang/String;
 }
 
+public final class dev/adamko/dokkatoo/formats/DokkatooFormatTasks$inlined$sam$i$org_gradle_api_Action$0 : org/gradle/api/Action {
+	public fun <init> (Lkotlin/jvm/functions/Function1;)V
+	public final synthetic fun execute (Ljava/lang/Object;)V
+}
+
 public abstract class dev/adamko/dokkatoo/formats/DokkatooGfmPlugin : dev/adamko/dokkatoo/formats/DokkatooFormatPlugin {
 	public fun configure (Ldev/adamko/dokkatoo/formats/DokkatooFormatPlugin$DokkatooFormatPluginContext;)V
 }
 
 public abstract class dev/adamko/dokkatoo/formats/DokkatooHtmlPlugin : dev/adamko/dokkatoo/formats/DokkatooFormatPlugin {
 	public fun configure (Ldev/adamko/dokkatoo/formats/DokkatooFormatPlugin$DokkatooFormatPluginContext;)V
+}
+
+public final class dev/adamko/dokkatoo/formats/DokkatooHtmlPlugin$inlined$sam$i$org_gradle_api_Action$0 : org/gradle/api/Action {
+	public fun <init> (Lkotlin/jvm/functions/Function1;)V
+	public final synthetic fun execute (Ljava/lang/Object;)V
 }
 
 public abstract class dev/adamko/dokkatoo/formats/DokkatooJavadocPlugin : dev/adamko/dokkatoo/formats/DokkatooFormatPlugin {
@@ -379,27 +394,6 @@ public abstract class dev/adamko/dokkatoo/tasks/DokkatooPrepareModuleDescriptorT
 	public abstract fun getModuleDirectory ()Lorg/gradle/api/file/DirectoryProperty;
 	public abstract fun getModuleName ()Lorg/gradle/api/provider/Property;
 	public abstract fun getModulePath ()Lorg/gradle/api/provider/Property;
-}
-
-public abstract class dev/adamko/dokkatoo/tasks/DokkatooPrepareParametersTask : dev/adamko/dokkatoo/tasks/DokkatooTask$WithSourceSets {
-	public abstract fun getCacheRoot ()Lorg/gradle/api/file/DirectoryProperty;
-	public abstract fun getDelayTemplateSubstitution ()Lorg/gradle/api/provider/Property;
-	public abstract fun getDokkaConfigurationJson ()Lorg/gradle/api/file/RegularFileProperty;
-	public abstract fun getDokkaModuleFiles ()Lorg/gradle/api/file/ConfigurableFileCollection;
-	public abstract fun getDokkaSubprojectParameters ()Lorg/gradle/api/file/ConfigurableFileCollection;
-	public abstract fun getFailOnWarning ()Lorg/gradle/api/provider/Property;
-	public abstract fun getFinalizeCoroutines ()Lorg/gradle/api/provider/Property;
-	public abstract fun getIncludes ()Lorg/gradle/api/file/ConfigurableFileCollection;
-	public abstract fun getModuleName ()Lorg/gradle/api/provider/Property;
-	public abstract fun getModuleVersion ()Lorg/gradle/api/provider/Property;
-	public abstract fun getOfflineMode ()Lorg/gradle/api/provider/Property;
-	public final fun getOutputDir ()Lorg/gradle/api/file/DirectoryProperty;
-	protected final fun getOutputDirPath ()Lorg/gradle/api/provider/Provider;
-	public abstract fun getPluginsClasspath ()Lorg/gradle/api/file/ConfigurableFileCollection;
-	public final fun getPluginsConfiguration ()Lorg/gradle/api/ExtensiblePolymorphicDomainObjectContainer;
-	public abstract fun getPublicationEnabled ()Lorg/gradle/api/provider/Property;
-	public abstract fun getSuppressInheritedMembers ()Lorg/gradle/api/provider/Property;
-	public abstract fun getSuppressObviousFunctions ()Lorg/gradle/api/provider/Property;
 }
 
 public abstract class dev/adamko/dokkatoo/tasks/DokkatooTask : org/gradle/api/DefaultTask {

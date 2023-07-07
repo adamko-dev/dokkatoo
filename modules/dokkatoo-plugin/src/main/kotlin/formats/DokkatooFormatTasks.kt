@@ -8,7 +8,6 @@ import dev.adamko.dokkatoo.internal.LocalProjectOnlyFilter
 import dev.adamko.dokkatoo.internal.configuring
 import dev.adamko.dokkatoo.tasks.DokkatooGenerateTask
 import dev.adamko.dokkatoo.tasks.DokkatooPrepareModuleDescriptorTask
-import dev.adamko.dokkatoo.tasks.DokkatooPrepareParametersTask
 import org.gradle.api.Project
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.kotlin.dsl.*
@@ -51,19 +50,6 @@ class DokkatooFormatTasks(
       suppressInheritedMembers.convention(publication.suppressInheritedMembers)
       suppressObviousFunctions.convention(publication.suppressObviousFunctions)
     }
-  }
-
-  @Suppress("DEPRECATION", "unused")
-  @Deprecated("No longer required")
-  val prepareParameters = project.tasks.register<DokkatooPrepareParametersTask>(
-    taskNames.prepareParameters,
-  ).configuring task@{
-    description =
-      "[DEPRECATED no longer used] Prepares Dokka parameters for generating the $formatName publication"
-
-    dokkaConfigurationJson.convention(
-      dokkatooExtension.dokkatooConfigurationsDirectory.file("$formatName/dokka_parameters.json")
-    )
   }
 
   val generatePublication = project.tasks.register<DokkatooGenerateTask>(

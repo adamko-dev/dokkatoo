@@ -1,6 +1,5 @@
 package buildsrc.conventions
 
-import org.gradle.internal.fingerprint.IgnoredPathInputNormalizer
 import org.jetbrains.kotlin.util.suffixIfNot
 
 

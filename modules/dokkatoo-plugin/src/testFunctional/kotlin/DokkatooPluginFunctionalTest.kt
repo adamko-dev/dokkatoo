@@ -45,11 +45,6 @@ class DokkatooPluginFunctionalTest : FunSpec({
         "prepareDokkatooModuleDescriptorHtml"    to "Prepares the Dokka Module Descriptor for html",
         "prepareDokkatooModuleDescriptorJavadoc" to "Prepares the Dokka Module Descriptor for javadoc",
         "prepareDokkatooModuleDescriptorJekyll"  to "Prepares the Dokka Module Descriptor for jekyll",
-        "prepareDokkatooParameters"              to "[DEPRECATED no longer used] Prepares Dokka parameters for all formats",
-        "prepareDokkatooParametersGfm"           to "[DEPRECATED no longer used] Prepares Dokka parameters for generating the gfm publication",
-        "prepareDokkatooParametersHtml"          to "[DEPRECATED no longer used] Prepares Dokka parameters for generating the html publication",
-        "prepareDokkatooParametersJavadoc"       to "[DEPRECATED no longer used] Prepares Dokka parameters for generating the javadoc publication",
-        "prepareDokkatooParametersJekyll"        to "[DEPRECATED no longer used] Prepares Dokka parameters for generating the jekyll publication",
         //@formatter:on
       )
     }
@@ -135,7 +130,7 @@ class DokkatooPluginFunctionalTest : FunSpec({
         .mapNotNull { it.substringAfter("Configuration ", "").takeIf(String::isNotBlank) }
 
       dokkatooConfigurations.shouldContainExactlyInAnyOrder(
-        mutableListOf<String>().apply {
+        buildList {
           add("dokkatoo")
 
           addAll(expectedFormats.map { "dokkatooParameters$it" })
