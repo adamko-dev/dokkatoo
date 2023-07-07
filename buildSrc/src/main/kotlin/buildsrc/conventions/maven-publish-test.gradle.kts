@@ -1,8 +1,7 @@
 package buildsrc.conventions
 
 import buildsrc.settings.MavenPublishTestSettings
-import buildsrc.utils.asConsumer
-import buildsrc.utils.asProvider
+import buildsrc.utils.*
 
 
 /** Utility for publishing a project to a local Maven directory for use in integration tests. */
@@ -31,7 +30,7 @@ plugins.withType<MavenPublishPlugin>().all {
     .publications
     .withType<MavenPublication>().all publication@{
       val publicationName = this@publication.name
-      val installTaskName = "publish${publicationName.capitalize()}PublicationToTestMavenRepo"
+      val installTaskName = "publish${publicationName.uppercaseFirstChar()}PublicationToTestMavenRepo"
 
       // Register a publication task for each publication.
       // Use PublishToMavenLocal, because the PublishToMavenRepository task will *always* create
