@@ -1,7 +1,5 @@
 package buildsrc.utils
 
-import org.gradle.kotlin.dsl.support.uppercaseFirstChar
-
 
 /** Title case the first char of a string */
 internal fun String.uppercaseFirstChar(): String = mapFirstChar(Character::toTitleCase)

@@ -130,7 +130,6 @@ public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceSetIdSpec 
 	public final fun getScopeId ()Ljava/lang/String;
 	public final fun getSourceSetName ()Ljava/lang/String;
 	public fun hashCode ()I
-	public final fun setSourceSetName (Ljava/lang/String;)V
 	public fun toString ()Ljava/lang/String;
 }
 
@@ -159,7 +158,6 @@ public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceSetSpec : 
 	public abstract fun getSkipEmptyPackages ()Lorg/gradle/api/provider/Property;
 	public abstract fun getSourceLinks ()Lorg/gradle/api/DomainObjectSet;
 	public abstract fun getSourceRoots ()Lorg/gradle/api/file/ConfigurableFileCollection;
-	public final fun getSourceSetID ()Lorg/gradle/api/provider/Provider;
 	public final fun getSourceSetId ()Lorg/gradle/api/provider/Provider;
 	public abstract fun getSourceSetScope ()Lorg/gradle/api/provider/Property;
 	public abstract fun getSuppress ()Lorg/gradle/api/provider/Property;

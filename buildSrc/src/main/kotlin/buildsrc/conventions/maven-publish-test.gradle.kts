@@ -68,7 +68,6 @@ plugins.withType<MavenPublishPlugin>().all {
 
 val testMavenPublication by configurations.registering {
   asConsumer()
-  isVisible = false
   attributes {
     attribute(MavenPublishTestSettings.attribute, "testMavenRepo")
   }
@@ -76,7 +75,6 @@ val testMavenPublication by configurations.registering {
 
 val testMavenPublicationElements by configurations.registering {
   asProvider()
-  isVisible = true
   extendsFrom(testMavenPublication.get())
   attributes {
     attribute(MavenPublishTestSettings.attribute, "testMavenRepo")

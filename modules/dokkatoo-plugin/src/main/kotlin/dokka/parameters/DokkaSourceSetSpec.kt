@@ -7,7 +7,6 @@ import javax.inject.Inject
 import org.gradle.api.*
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.model.ReplacedBy
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.*
 import org.gradle.api.tasks.*
@@ -72,11 +71,6 @@ constructor(
   @get:Input
   val sourceSetId: Provider<DokkaSourceSetIdSpec>
     get() = sourceSetScope.map { scope -> objects.dokkaSourceSetIdSpec(scope, getName()) }
-
-  @get:Deprecated("Renamed to meet naming conventions", ReplaceWith("sourceSetId"))
-  @get:ReplacedBy("sourceSetId")
-  @Suppress("unused")
-  val sourceSetID: Provider<DokkaSourceSetIdSpec> by ::sourceSetId
 
   /**
    * Whether this source set should be skipped when generating documentation.
