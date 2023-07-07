@@ -90,13 +90,13 @@ constructor(
 
 //    /** Dokka Configuration files from other subprojects that will be merged into this Dokka Configuration */
 //    @get:InputFiles
-////    @get:NormalizeLineEndings
+//    @get:NormalizeLineEndings
 //    @get:PathSensitive(PathSensitivity.NAME_ONLY)
 //    abstract val dokkaSubprojectConfigurations: ConfigurableFileCollection
 
 //    /** Dokka Module Configuration from other subprojects. */
 //    @get:InputFiles
-////    @get:NormalizeLineEndings
+//    @get:NormalizeLineEndings
 //    @get:PathSensitive(PathSensitivity.NAME_ONLY)
 //    abstract val dokkaModuleDescriptorFiles: ConfigurableFileCollection
 

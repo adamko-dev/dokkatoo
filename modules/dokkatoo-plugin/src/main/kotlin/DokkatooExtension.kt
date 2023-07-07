@@ -114,11 +114,6 @@ constructor(
     val kotlinxHtml: Property<String>
     val kotlinxCoroutines: Property<String>
 
-    companion object {
-      /** @see DokkatooExtension.versions */
-      @Deprecated("explicit `version` property was added")
-      @Suppress("unused")
-      const val VERSIONS_EXTENSION_NAME = "versions"
-    }
+    companion object
   }
 }

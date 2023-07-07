@@ -33,7 +33,6 @@ public abstract class dev/adamko/dokkatoo/DokkatooExtension : java/io/Serializab
 
 public abstract interface class dev/adamko/dokkatoo/DokkatooExtension$Versions : org/gradle/api/plugins/ExtensionAware {
 	public static final field Companion Ldev/adamko/dokkatoo/DokkatooExtension$Versions$Companion;
-	public static final field VERSIONS_EXTENSION_NAME Ljava/lang/String;
 	public abstract fun getFreemarker ()Lorg/gradle/api/provider/Property;
 	public abstract fun getJetbrainsDokka ()Lorg/gradle/api/provider/Property;
 	public abstract fun getJetbrainsMarkdown ()Lorg/gradle/api/provider/Property;
@@ -42,7 +41,6 @@ public abstract interface class dev/adamko/dokkatoo/DokkatooExtension$Versions :
 }
 
 public final class dev/adamko/dokkatoo/DokkatooExtension$Versions$Companion {
-	public static final field VERSIONS_EXTENSION_NAME Ljava/lang/String;
 }
 
 public abstract class dev/adamko/dokkatoo/DokkatooPlugin : org/gradle/api/Plugin {
@@ -80,7 +78,6 @@ public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaExternalDocument
 }
 
 public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaGeneratorParametersSpec : org/gradle/api/plugins/ExtensionAware {
-	public final fun addAllDokkaSourceSets (Lorg/gradle/api/provider/Provider;)V
 	public abstract fun getDokkaModuleFiles ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public final fun getDokkaSourceSets ()Lorg/gradle/api/NamedDomainObjectContainer;
 	public abstract fun getFailOnWarning ()Lorg/gradle/api/provider/Property;
@@ -133,7 +130,6 @@ public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceSetIdSpec 
 	public final fun getScopeId ()Ljava/lang/String;
 	public final fun getSourceSetName ()Ljava/lang/String;
 	public fun hashCode ()I
-	public final fun setSourceSetName (Ljava/lang/String;)V
 	public fun toString ()Ljava/lang/String;
 }
 
@@ -141,11 +137,6 @@ public final class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceSetIdSpec$Com
 }
 
 public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceSetSpec : dev/adamko/dokkatoo/dokka/parameters/HasConfigurableVisibilityModifiers, java/io/Serializable, org/gradle/api/Named, org/gradle/api/plugins/ExtensionAware {
-	public final fun externalDocumentationLink (Ljava/lang/String;Ljava/lang/String;)V
-	public final fun externalDocumentationLink (Ljava/net/URL;Ljava/net/URL;)V
-	public final fun externalDocumentationLink (Lorg/gradle/api/Action;)V
-	public static synthetic fun externalDocumentationLink$default (Ldev/adamko/dokkatoo/dokka/parameters/DokkaSourceSetSpec;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)V
-	public static synthetic fun externalDocumentationLink$default (Ldev/adamko/dokkatoo/dokka/parameters/DokkaSourceSetSpec;Ljava/net/URL;Ljava/net/URL;ILjava/lang/Object;)V
 	public abstract fun getAnalysisPlatform ()Lorg/gradle/api/provider/Property;
 	public abstract fun getApiVersion ()Lorg/gradle/api/provider/Property;
 	public abstract fun getClasspath ()Lorg/gradle/api/file/ConfigurableFileCollection;
@@ -160,9 +151,6 @@ public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceSetSpec : 
 	public abstract fun getJdkVersion ()Lorg/gradle/api/provider/Property;
 	public abstract fun getLanguageVersion ()Lorg/gradle/api/provider/Property;
 	public fun getName ()Ljava/lang/String;
-	public abstract fun getNoAndroidSdkLink ()Lorg/gradle/api/provider/Property;
-	public abstract fun getNoJdkLink ()Lorg/gradle/api/provider/Property;
-	public abstract fun getNoStdlibLink ()Lorg/gradle/api/provider/Property;
 	public abstract fun getPerPackageOptions ()Lorg/gradle/api/DomainObjectSet;
 	public abstract fun getReportUndocumented ()Lorg/gradle/api/provider/Property;
 	public abstract fun getSamples ()Lorg/gradle/api/file/ConfigurableFileCollection;
@@ -170,7 +158,6 @@ public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceSetSpec : 
 	public abstract fun getSkipEmptyPackages ()Lorg/gradle/api/provider/Property;
 	public abstract fun getSourceLinks ()Lorg/gradle/api/DomainObjectSet;
 	public abstract fun getSourceRoots ()Lorg/gradle/api/file/ConfigurableFileCollection;
-	public final fun getSourceSetID ()Lorg/gradle/api/provider/Provider;
 	public final fun getSourceSetId ()Lorg/gradle/api/provider/Provider;
 	public abstract fun getSourceSetScope ()Lorg/gradle/api/provider/Property;
 	public abstract fun getSuppress ()Lorg/gradle/api/provider/Property;
@@ -188,7 +175,6 @@ public final class dev/adamko/dokkatoo/dokka/parameters/KotlinPlatform : java/la
 	public static final field JVM Ldev/adamko/dokkatoo/dokka/parameters/KotlinPlatform;
 	public static final field Native Ldev/adamko/dokkatoo/dokka/parameters/KotlinPlatform;
 	public static final field WASM Ldev/adamko/dokkatoo/dokka/parameters/KotlinPlatform;
-	public final fun getKey ()Ljava/lang/String;
 	public static fun valueOf (Ljava/lang/String;)Ldev/adamko/dokkatoo/dokka/parameters/KotlinPlatform;
 	public static fun values ()[Ldev/adamko/dokkatoo/dokka/parameters/KotlinPlatform;
 }
@@ -367,8 +353,6 @@ public abstract interface annotation class dev/adamko/dokkatoo/internal/Dokkatoo
 
 public abstract class dev/adamko/dokkatoo/tasks/DokkatooGenerateTask : dev/adamko/dokkatoo/tasks/DokkatooTask {
 	public abstract fun getCacheDirectory ()Lorg/gradle/api/file/DirectoryProperty;
-	public final fun getDokkaModuleFiles ()Lorg/gradle/api/file/ConfigurableFileCollection;
-	public abstract fun getDokkaParametersJson ()Lorg/gradle/api/file/RegularFileProperty;
 	public abstract fun getGenerationType ()Lorg/gradle/api/provider/Property;
 	public final fun getGenerator ()Ldev/adamko/dokkatoo/dokka/parameters/DokkaGeneratorParametersSpec;
 	public abstract fun getOutputDirectory ()Lorg/gradle/api/file/DirectoryProperty;
@@ -398,11 +382,6 @@ public abstract class dev/adamko/dokkatoo/tasks/DokkatooPrepareModuleDescriptorT
 
 public abstract class dev/adamko/dokkatoo/tasks/DokkatooTask : org/gradle/api/DefaultTask {
 	public abstract fun getObjects ()Lorg/gradle/api/model/ObjectFactory;
-}
-
-public abstract class dev/adamko/dokkatoo/tasks/DokkatooTask$WithSourceSets : dev/adamko/dokkatoo/tasks/DokkatooTask {
-	public final fun addAllDokkaSourceSets (Lorg/gradle/api/provider/Provider;)V
-	public abstract fun getDokkaSourceSets ()Lorg/gradle/api/NamedDomainObjectContainer;
 }
 
 public abstract class dev/adamko/dokkatoo/tasks/LogHtmlPublicationLinkTask : dev/adamko/dokkatoo/tasks/DokkatooTask {

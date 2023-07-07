@@ -185,7 +185,6 @@ private object AndroidClasspathCollector {
     val compilationClasspath = objects.fileCollection()
 
     fun collectConfiguration(named: String) {
-      @Suppress("UnstableApiUsage")
       listOf(
         // need to fetch multiple different types of files, because AGP is weird and doesn't seem
         // to have a 'just give me normal JVM classes' option

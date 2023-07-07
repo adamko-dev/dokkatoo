@@ -27,7 +27,7 @@ import org.jetbrains.dokka.toPrettyJsonString
 /**
  * Executes the Dokka Generator, and produces documentation.
  *
- * The type of documentation generated is determined by the supplied Dokka Plugins in [dokkaParametersJson].
+ * The type of documentation generated is determined by the supplied Dokka Plugins in [generator].
  */
 @CacheableTask
 abstract class DokkatooGenerateTask
@@ -182,16 +182,4 @@ constructor(
         }
       }
   }
-
-  //region Deprecated Properties
-  @get:Internal
-  @Deprecated("DokkatooPrepareParametersTask has been removed, there is no more JSON file. Properties can be set using the `generator` property")
-  abstract val dokkaParametersJson: RegularFileProperty
-
-  @Suppress("unused")
-  @get:ReplacedBy("generator.dokkaModuleFiles")
-  @Deprecated("moved to nested property", ReplaceWith("generator.dokkaModuleFiles"))
-  val dokkaModuleFiles: ConfigurableFileCollection
-    get() = generator.dokkaModuleFiles
-  //endregion
 }

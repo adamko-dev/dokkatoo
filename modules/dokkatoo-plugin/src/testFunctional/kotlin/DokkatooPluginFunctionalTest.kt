@@ -62,10 +62,6 @@ class DokkatooPluginFunctionalTest : FunSpec({
       .mapNotNull { it.substringAfter("Variant ", "").takeIf(String::isNotBlank) }
 
     dokkatooVariants.shouldContainExactlyInAnyOrder(
-      "dokkatooParametersElementsGfm",
-      "dokkatooParametersElementsHtml",
-      "dokkatooParametersElementsJavadoc",
-      "dokkatooParametersElementsJekyll",
       "dokkatooModuleElementsGfm",
       "dokkatooModuleElementsHtml",
       "dokkatooModuleElementsJavadoc",
@@ -73,22 +69,7 @@ class DokkatooPluginFunctionalTest : FunSpec({
     )
 
     fun checkVariant(format: String) {
-      val formatCapitalized = format.capitalize()
-
-      variants shouldContain /* language=text */ """
-        |--------------------------------------------------
-        |Variant dokkatooParametersElements$formatCapitalized
-        |--------------------------------------------------
-        |Provide Dokka Parameters for $format to other subprojects
-        |
-        |Capabilities
-        |    - :test:unspecified (default capability)
-        |Attributes
-        |    - dev.adamko.dokkatoo.base     = dokkatoo
-        |    - dev.adamko.dokkatoo.category = generator-parameters
-        |    - dev.adamko.dokkatoo.format   = $format
-        |
-      """.trimMargin()
+      val formatCapitalized = format.uppercaseFirstChar()
 
       variants shouldContain /* language=text */ """
         |--------------------------------------------------
@@ -133,7 +114,6 @@ class DokkatooPluginFunctionalTest : FunSpec({
         buildList {
           add("dokkatoo")
 
-          addAll(expectedFormats.map { "dokkatooParameters$it" })
           addAll(expectedFormats.map { "dokkatooModule$it" })
           addAll(expectedFormats.map { "dokkatooGeneratorClasspath$it" })
           addAll(expectedFormats.map { "dokkatooPlugin$it" })
@@ -155,23 +135,7 @@ class DokkatooPluginFunctionalTest : FunSpec({
       }
 
       fun checkConfigurations(format: String) {
-        val formatLowercase = format.toLowerCase()
-
-        allConfigurations shouldContain /* language=text */ """
-          |--------------------------------------------------
-          |Configuration dokkatooParameters$format
-          |--------------------------------------------------
-          |Fetch Dokka Parameters for $formatLowercase from other subprojects
-          |
-          |Attributes
-          |    - dev.adamko.dokkatoo.base     = dokkatoo
-          |    - dev.adamko.dokkatoo.category = generator-parameters
-          |    - dev.adamko.dokkatoo.format   = $formatLowercase
-          |Extended Configurations
-          |    - dokkatoo
-          |
-        """.trimMargin()
-
+        val formatLowercase = format.lowercase()
 
         allConfigurations shouldContain /* language=text */ """
           |--------------------------------------------------
