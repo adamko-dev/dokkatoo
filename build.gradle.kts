@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "dev.adamko.dokkatoo"
-version = "1.7.0-SNAPSHOT"
+version = "2.0.0-SNAPSHOT"
 
 
 idea {
