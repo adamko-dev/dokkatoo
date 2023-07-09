@@ -175,13 +175,6 @@ constructor(
       documentedVisibilities.convention(setOf(VisibilityModifier.PUBLIC))
       jdkVersion.convention(8)
 
-      @Suppress("DEPRECATION")
-      noAndroidSdkLink.convention(true)
-      @Suppress("DEPRECATION")
-      noJdkLink.convention(false)
-      @Suppress("DEPRECATION")
-      noStdlibLink.convention(false)
-
       enableKotlinStdLibDocumentationLink.convention(true)
       enableJdkDocumentationLink.convention(true)
       enableAndroidDocumentationLink.convention(
@@ -310,14 +303,6 @@ constructor(
   class DependencyContainerNames(override val formatName: String?) : HasFormatName() {
 
     val dokkatoo = "dokkatoo".appendFormat()
-
-    /** Name of the [Configuration] that _consumes_ [dev.adamko.dokkatoo.dokka.parameters.DokkaParametersKxs] from projects */
-    @Deprecated("Not used")
-    val dokkatooParametersConsumer = "dokkatooParameters".appendFormat()
-
-    /** Name of the [Configuration] that _provides_ [org.jetbrains.dokka.DokkaConfiguration] to other projects */
-    @Deprecated("Not used")
-    val dokkatooParametersOutgoing = "dokkatooParametersElements".appendFormat()
 
     /** Name of the [Configuration] that _consumes_ all [org.jetbrains.dokka.DokkaConfiguration.DokkaModuleDescription] files */
     val dokkatooModuleFilesConsumer = "dokkatooModule".appendFormat()

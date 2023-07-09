@@ -27,10 +27,7 @@ constructor(
   val scopeId: String,
 
   @get:Input
-  @set:Deprecated(
-    "To support the use of DokkaSourceSetIdSpec in Sets, sourceSetName cannot be modified",
-  )
-  var sourceSetName: String
+  val sourceSetName: String,
 ) : Named, Serializable {
 
   @Internal

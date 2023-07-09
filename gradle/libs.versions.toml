@@ -1,6 +1,6 @@
 [versions]
 
-kotlin = "1.8.10" # should match Gradle's embedded Kotlin version https://docs.gradle.org/current/userguide/compatibility.html#kotlin
+kotlin = "1.8.20" # should match Gradle's embedded Kotlin version https://docs.gradle.org/current/userguide/compatibility.html#kotlin
 kotlin-dokka = "1.8.20"
 kotlinx-serialization = "1.5.1"
 
