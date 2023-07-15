@@ -1,38 +1,18 @@
-import buildsrc.utils.excludeGeneratedGradleDsl
-import buildsrc.utils.initIdeProjectLogo
-
 plugins {
-  buildsrc.conventions.base
-  idea
+  id("buildsrc.conventions.base")
+  id("buildsrc.conventions.ide")
 }
 
 group = "dev.adamko.dokkatoo"
 version = "2.0.0-SNAPSHOT"
 
-
-idea {
-  module {
-    excludeGeneratedGradleDsl(layout)
-
-    excludeDirs.apply {
-      // exclude .gradle, IDE dirs from nested projects (e.g. example & template projects)
-      // so IntelliJ project-wide search isn't cluttered with irrelevant files
-      val excludedDirs = setOf(
-        ".idea",
-        ".gradle",
-        "build",
-        "gradle/wrapper",
-        "ANDROID_SDK",
-      )
-      addAll(
-        projectDir.walk().filter { file ->
-          excludedDirs.any {
-            file.invariantSeparatorsPath.endsWith(it)
-          }
-        }
-      )
-    }
-  }
+tasks.check {
+  val dokkatooComponents = gradle.includedBuild("dokkatoo-components")
+  val dokkatooExamples = gradle.includedBuild("dokkatoo-examples")
+  val dokkatooIntegrationTests = gradle.includedBuild("dokkatoo-integration-tests")
+  dependsOn(
+    dokkatooComponents.task(":check"),
+    dokkatooExamples.task(":check"),
+    dokkatooIntegrationTests.task(":check"),
+  )
 }
-
-initIdeProjectLogo("modules/docs/images/logo-icon.svg")
