@@ -108,9 +108,9 @@ constructor(
    *
    * Defaults to `true`.
    *
-   * @see dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec.noStdlibLink
-   * @see dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec.noJdkLink
-   * @see dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec.noAndroidSdkLink
+   * @see dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec.enableKotlinStdLibDocumentationLink
+   * @see dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec.enableJdkDocumentationLink
+   * @see dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec.enableAndroidDocumentationLink
    */
   @get:Input
   abstract val enabled: Property<Boolean>
