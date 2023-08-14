@@ -78,9 +78,11 @@ constructor(
   abstract val workerDebugEnabled: Property<Boolean>
   /** @see JavaForkOptions.getMinHeapSize */
   @get:Input
+  @get:Optional
   abstract val workerMinHeapSize: Property<String>
   /** @see JavaForkOptions.getMaxHeapSize */
   @get:Input
+  @get:Optional
   abstract val workerMaxHeapSize: Property<String>
   /** @see JavaForkOptions.jvmArgs */
   @get:Input
