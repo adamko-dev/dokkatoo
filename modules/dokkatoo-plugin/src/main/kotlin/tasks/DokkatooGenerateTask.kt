@@ -113,8 +113,8 @@ constructor(
       classpath.from(runtimeClasspath)
       forkOptions {
         defaultCharacterEncoding = "UTF-8"
-        minHeapSize = workerMinHeapSize.get()
-        maxHeapSize = workerMaxHeapSize.get()
+        minHeapSize = workerMinHeapSize.orNull
+        maxHeapSize = workerMaxHeapSize.orNull
         enableAssertions = true
         debug = workerDebugEnabled.get()
         jvmArgs = workerJvmArgs.get()
