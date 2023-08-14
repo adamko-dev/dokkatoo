@@ -58,6 +58,7 @@ class KotlinMultiplatformFunctionalTest : FunSpec({
       test("with element-list") {
         project.projectDir.resolve("build/dokka/html/test/package-list").shouldBeAFile()
         project.projectDir.resolve("build/dokka/html/test/package-list").toFile().readText()
+          .sortLines()
           .shouldContain( /* language=text */ """
               |${'$'}dokka.format:html-v1
               |${'$'}dokka.linkExtension:html
@@ -67,7 +68,6 @@ class KotlinMultiplatformFunctionalTest : FunSpec({
               |${'$'}dokka.location:com.project/Hello/Hello/#/PointingToDeclaration/test/com.project/-hello/-hello.html
               |${'$'}dokka.location:com.project/Hello/sayHello/#kotlinx.serialization.json.JsonObject/PointingToDeclaration/test/com.project/-hello/say-hello.html
               |com.project
-              |
             """.trimMargin()
           )
       }
