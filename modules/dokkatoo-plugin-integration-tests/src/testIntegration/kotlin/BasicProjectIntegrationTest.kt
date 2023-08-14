@@ -1,9 +1,7 @@
 package dev.adamko.dokkatoo.tests.integration
 
-import dev.adamko.dokkatoo.internal.DokkatooConstants.DOKKA_VERSION
 import dev.adamko.dokkatoo.utils.*
 import dev.adamko.dokkatoo.utils.GradleProjectTest.Companion.projectTestTempDir
-import io.kotest.core.annotation.EnabledIf
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.file.shouldBeAFile
 import io.kotest.matchers.file.shouldHaveSameStructureAndContentAs
@@ -19,7 +17,6 @@ import java.io.File
  *
  * Runs Dokka & Dokkatoo, and compares the resulting HTML site.
  */
-@EnabledIf(NotWindowsCondition::class) // https://github.com/adamko-dev/dokkatoo/issues/10
 class BasicProjectIntegrationTest : FunSpec({
 
   val tempDir = projectTestTempDir.resolve("it/it-basic").toFile()

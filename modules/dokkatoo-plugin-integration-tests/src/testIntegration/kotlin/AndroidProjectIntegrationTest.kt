@@ -1,7 +1,6 @@
 package dev.adamko.dokkatoo.tests.integration
 
 import dev.adamko.dokkatoo.utils.*
-import io.kotest.core.annotation.EnabledIf
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.file.shouldBeAFile
 import io.kotest.matchers.file.shouldHaveSameStructureAndContentAs
@@ -18,7 +17,6 @@ import kotlin.io.path.deleteIfExists
  *
  * Runs Dokka & Dokkatoo, and compares the resulting HTML site.
  */
-@EnabledIf(NotWindowsCondition::class) // https://github.com/adamko-dev/dokkatoo/issues/10
 class AndroidProjectIntegrationTest : FunSpec({
 
   val tempDir = GradleProjectTest.projectTestTempDir.resolve("it/it-android-0").toFile()
