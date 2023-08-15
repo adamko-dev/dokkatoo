@@ -2,9 +2,11 @@
 
 package dev.adamko.dokkatoo.utils
 
+import dev.adamko.dokkatoo.dokka.parameters.DokkaExternalDocumentationLinkSpec
 import dev.adamko.dokkatoo.dokka.parameters.DokkaPackageOptionsSpec
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceLinkSpec
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec
+import java.net.URI
 import org.gradle.api.DomainObjectCollection
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.NamedDomainObjectProvider
@@ -77,3 +79,9 @@ fun DokkaSourceSetSpec.sourceLink_(
 fun DokkaSourceSetSpec.perPackageOption_(
   action: DokkaPackageOptionsSpec.() -> Unit
 ): Unit = perPackageOption(action)
+
+
+fun DokkaSourceSetSpec.externalDocumentationLink_(
+  url: URI,
+  action: DokkaExternalDocumentationLinkSpec.() -> Unit = {},
+): DokkaExternalDocumentationLinkSpec = externalDocumentationLink(url) { action() }

@@ -1,14 +1,22 @@
 package dev.adamko.dokkatoo.dokka.parameters
 
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetIdSpec.Companion.dokkaSourceSetIdSpec
-import dev.adamko.dokkatoo.internal.*
+import dev.adamko.dokkatoo.internal.DokkatooInternalApi
+import dev.adamko.dokkatoo.internal.adding
+import dev.adamko.dokkatoo.internal.domainObjectContainer
 import java.io.Serializable
+import java.net.URI
 import javax.inject.Inject
-import org.gradle.api.*
+import org.gradle.api.Action
+import org.gradle.api.DomainObjectSet
+import org.gradle.api.Named
+import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.ExtensionAware
-import org.gradle.api.provider.*
+import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
+import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.*
 import org.gradle.kotlin.dsl.*
 
@@ -350,6 +358,21 @@ constructor(
       }
     )
   }
+
+  /**
+   * Add a new external documentation link to [externalDocumentationLinks].
+   *
+   * @see externalDocumentationLinks
+   * @see DokkaExternalDocumentationLinkSpec
+   */
+  fun externalDocumentationLink(
+    url: URI,
+    configure: Action<in DokkaExternalDocumentationLinkSpec> = Action {}
+  ): DokkaExternalDocumentationLinkSpec =
+    externalDocumentationLinks.create(url.toASCIIString()) {
+      this.url.set(url)
+      configure.execute(this)
+    }
 
   /**
    * Action for configuring package options, appending to [perPackageOptions].
