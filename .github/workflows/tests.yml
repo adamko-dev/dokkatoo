@@ -24,9 +24,14 @@ jobs:
   gradle-check:
     strategy:
       matrix:
-        os: [ macos-latest, ubuntu-latest, windows-latest ]
-        task:
-          - "check --continue"
+        include:
+          - os: macos-latest
+            task: "check --continue"
+          - os: ubuntu-latest
+            task: "check --continue"
+          - os: windows-latest
+            # don't run integration tests on Windows because Gradle OOMs https://github.com/adamko-dev/dokkatoo/issues/10
+            task: "check --continue -x :modules:dokkatoo-plugin-integration-tests:check"
       fail-fast: false
     uses: ./.github/workflows/gradle_task.yml
     with:
