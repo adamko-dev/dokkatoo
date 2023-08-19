@@ -228,6 +228,32 @@ constructor(
           url("https://kotlinlang.org/api/latest/jvm/stdlib/")
         }
 
+        maybeCreate("kotlinxCoroutines") {
+          // TODO link to coroutines docs
+          url("https://kotlinlang.org/api/latest/jvm/stdlib/")
+        }
+
+        maybeCreate("kotlinxDateTime") {
+          // TODO check if this is the right link to kotlinx-datetime docs
+          url("https://kotlinlang.org/api/kotlinx-datetime/")
+        }
+
+        maybeCreate("ktor") {
+          // TODO link to Ktor docs
+          url("https://kotlinlang.org/api/latest/jvm/stdlib/")
+        }
+
+        maybeCreate("gradle") {
+          // TODO link to Gradle docs
+          url("https://kotlinlang.org/api/latest/jvm/stdlib/")
+        }
+
+        // TODO get more links to existing docs
+        //      - Kotlinx Serialization
+
+        // TODO only add these links if source-set has a dependency that indicates the library is present
+        //      (e.g. if kotlinx-serialization-core is present, then enable kxs link)
+
         maybeCreate("androidSdk") {
           enabled.convention(this@dss.enableAndroidDocumentationLink)
           url("https://developer.android.com/reference/kotlin/")
