@@ -3,8 +3,9 @@ package dev.adamko.dokkatoo.tests.examples
 import dev.adamko.dokkatoo.internal.DokkatooConstants.DOKKA_VERSION
 import dev.adamko.dokkatoo.utils.*
 import dev.adamko.dokkatoo.utils.GradleProjectTest.Companion.projectTestTempDir
-import io.kotest.assertions.withClue
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.inspectors.shouldForAll
+import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.file.shouldBeAFile
 import io.kotest.matchers.file.shouldHaveSameStructureAndContentAs
 import io.kotest.matchers.file.shouldHaveSameStructureAs
@@ -14,6 +15,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
 import java.io.File
+import org.gradle.testkit.runner.TaskOutcome.UP_TO_DATE
 
 class MultimoduleExampleTest : FunSpec({
 
@@ -117,27 +119,33 @@ class MultimoduleExampleTest : FunSpec({
         }
       }
 
-      test("expect tasks are UP-TO-DATE") {
-        dokkatooProject.runner
-          .addArguments(
-            ":parentProject:dokkatooGeneratePublicationHtml",
-            "--stacktrace",
-            "--info",
-            "--build-cache",
-          )
-          .forwardOutput()
-          .build().should { dokkatooBuildCache ->
-
-            dokkatooBuildCache.output shouldContainAll listOf(
-              "> Task :parentProject:dokkatooGeneratePublicationHtml UP-TO-DATE",
-              "BUILD SUCCESSFUL",
-              "15 actionable tasks: 15 up-to-date",
-            )
-            withClue("Dokka Generator should not be triggered, so check it doesn't log anything") {
-              dokkatooBuildCache.output shouldNotContain "Generation completed successfully"
-            }
+      dokkatooProject.runner
+        .addArguments(
+          ":parentProject:dokkatooGeneratePublicationHtml",
+          "--stacktrace",
+          "--info",
+          "--build-cache",
+        )
+        .forwardOutput()
+        .build {
+          test("expect build is successful") {
+            output shouldContain "BUILD SUCCESSFUL"
           }
-      }
+
+          test("expect all tasks are UP-TO-DATE") {
+            val nonLoggingTasks =
+              tasks.filter { it.name != "logLinkDokkatooGeneratePublicationHtml" }
+            nonLoggingTasks.shouldForAll {
+              it shouldHaveOutcome UP_TO_DATE
+            }
+            tasks.shouldHaveSize(6)
+          }
+
+          test("expect Dokka Generator is not triggered") {
+            // Dokka Generator shouldn't run, so check it doesn't log anything
+            output shouldNotContain "Generation completed successfully"
+          }
+        }
     }
 
     context("expect Dokkatoo is compatible with Gradle Configuration Cache") {
