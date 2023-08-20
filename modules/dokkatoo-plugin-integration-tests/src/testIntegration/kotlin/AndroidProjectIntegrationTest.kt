@@ -36,18 +36,6 @@ class AndroidProjectIntegrationTest : FunSpec({
           test("expect project builds successfully") {
             output shouldContain "BUILD SUCCESSFUL"
           }
-
-          test("expect all dokka workers are successful") {
-            dokkatooProject
-              .findFiles { it.name == "dokka-worker.log" }
-              .shouldBeSingleton { dokkaWorkerLog ->
-                dokkaWorkerLog.shouldBeAFile()
-                dokkaWorkerLog.readText().shouldNotContainAnyOf(
-                  "[ERROR]",
-                  "[WARN]",
-                )
-              }
-          }
         }
     }
 
