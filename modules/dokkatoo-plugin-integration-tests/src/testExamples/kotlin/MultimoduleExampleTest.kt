@@ -94,30 +94,31 @@ class MultimoduleExampleTest : FunSpec({
   context("Gradle caching") {
 
     context("expect Dokkatoo is compatible with Gradle Build Cache") {
-      val build = dokkatooProject.runner
+      dokkatooProject.runner
         .addArguments(
           "clean",
           ":parentProject:dokkatooGeneratePublicationHtml",
           "--stacktrace",
         )
         .forwardOutput()
-        .build()
+        .build {
+          test("expect build is successful") {
+            output shouldContain "BUILD SUCCESSFUL"
+          }
 
-      test("expect build is successful") {
-        build.output shouldContain "BUILD SUCCESSFUL"
-      }
-
-      test("expect all dokka workers are successful") {
-        build.output.invariantNewlines() shouldContain "BUILD SUCCESSFUL"
-        val dokkaWorkerLogs = dokkatooProject.findFiles { it.name == "dokka-worker.log" }
-        dokkaWorkerLogs.firstOrNull().shouldNotBeNull().should { dokkaWorkerLog ->
-          dokkaWorkerLog.shouldBeAFile()
-          dokkaWorkerLog.readText().shouldNotContainAnyOf(
-            "[ERROR]",
-            "[WARN]",
-          )
+          test("expect all dokka workers are successful") {
+            output.invariantNewlines() shouldContain "BUILD SUCCESSFUL"
+            val dokkaWorkerLogs = dokkatooProject.findFiles { it.name == "dokka-worker.log" }
+            dokkaWorkerLogs.firstOrNull().shouldNotBeNull().should { dokkaWorkerLog ->
+              dokkaWorkerLog.shouldBeAFile()
+              dokkaWorkerLog.readText().shouldNotContainAnyOf(
+                "[ERROR]",
+                "[WARN]",
+              )
+            }
+          }
         }
-      }
+
 
       dokkatooProject.runner
         .addArguments(
@@ -148,6 +149,7 @@ class MultimoduleExampleTest : FunSpec({
         }
     }
 
+
     context("expect Dokkatoo is compatible with Gradle Configuration Cache") {
       dokkatooProject.file(".gradle/configuration-cache").toFile().deleteRecursively()
       dokkatooProject.file("build/reports/configuration-cache").toFile().deleteRecursively()
@@ -172,9 +174,9 @@ class MultimoduleExampleTest : FunSpec({
       }
 
       test("second build should reuse the configuration cache") {
-        configCacheRunner.build().should { buildResult ->
-          buildResult.output shouldContain "BUILD SUCCESSFUL"
-          buildResult.output shouldContain "Configuration cache entry reused"
+        configCacheRunner.build {
+          output shouldContain "BUILD SUCCESSFUL"
+          output shouldContain "Configuration cache entry reused"
         }
       }
     }

@@ -104,8 +104,8 @@ class BasicProjectIntegrationTest : FunSpec({
           "--build-cache",
         )
         .forwardOutput()
-        .build().should { buildResult ->
-          buildResult.output shouldContainAll listOf(
+        .build {
+          output shouldContainAll listOf(
             "Task :dokkatooGeneratePublicationHtml UP-TO-DATE",
           )
         }
@@ -135,9 +135,9 @@ class BasicProjectIntegrationTest : FunSpec({
       }
 
       test("second build should reuse the configuration cache") {
-        configCacheRunner.build().should { buildResult ->
-          buildResult.output shouldContain "BUILD SUCCESSFUL"
-          buildResult.output shouldContain "Configuration cache entry reused"
+        configCacheRunner.build {
+          output shouldContain "BUILD SUCCESSFUL"
+          output shouldContain "Configuration cache entry reused"
         }
       }
     }

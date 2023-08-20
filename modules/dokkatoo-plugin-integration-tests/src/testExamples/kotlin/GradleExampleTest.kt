@@ -10,7 +10,6 @@ import io.kotest.matchers.file.shouldHaveSameStructureAndContentAs
 import io.kotest.matchers.file.shouldHaveSameStructureAs
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.sequences.shouldHaveCount
-import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
@@ -111,15 +110,14 @@ class GradleExampleTest : FunSpec({
           "--build-cache",
         )
         .forwardOutput()
-        .build().should { dokkatooBuildCache ->
-
-          dokkatooBuildCache.output shouldContainAll listOf(
+        .build {
+          output shouldContainAll listOf(
             "> Task :dokkatooGeneratePublicationHtml UP-TO-DATE",
             "BUILD SUCCESSFUL",
             "1 actionable task: 1 up-to-date",
           )
           withClue("Dokka Generator should not be triggered, so check it doesn't log anything") {
-            dokkatooBuildCache.output shouldNotContain "Generation completed successfully"
+            output shouldNotContain "Generation completed successfully"
           }
         }
     }
@@ -148,9 +146,9 @@ class GradleExampleTest : FunSpec({
       }
 
       test("second build should reuse the configuration cache") {
-        configCacheRunner.build().should { buildResult ->
-          buildResult.output shouldContain "BUILD SUCCESSFUL"
-          buildResult.output shouldContain "Configuration cache entry reused"
+        configCacheRunner.build {
+          output shouldContain "BUILD SUCCESSFUL"
+          output shouldContain "Configuration cache entry reused"
         }
       }
     }
