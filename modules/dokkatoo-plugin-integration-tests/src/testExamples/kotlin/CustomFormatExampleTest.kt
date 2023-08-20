@@ -8,7 +8,6 @@ import io.kotest.matchers.file.shouldBeAFile
 import io.kotest.matchers.file.shouldHaveSameStructureAndContentAs
 import io.kotest.matchers.file.shouldHaveSameStructureAs
 import io.kotest.matchers.nulls.shouldNotBeNull
-import io.kotest.matchers.sequences.shouldHaveCount
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
@@ -52,11 +51,12 @@ class CustomFormatExampleTest : FunSpec({
         .build {
           output shouldContain "BUILD SUCCESSFUL"
 
-          val dokkaWorkerLogs = dokkatooProject.findFiles { it.name == "dokka-worker.log" }
-          dokkaWorkerLogs shouldHaveCount 1
-          val dokkaWorkerLog = dokkaWorkerLogs.first()
-          dokkaWorkerLog.shouldNotBeNull().shouldBeAFile()
-          dokkaWorkerLog.readText() shouldContain "Generation completed successfully"
+          dokkatooProject
+            .findFiles { it.name == "dokka-worker.log" }
+            .shouldBeSingleton { dokkaWorkerLog ->
+              dokkaWorkerLog.shouldNotBeNull().shouldBeAFile()
+              dokkaWorkerLog.readText() shouldContain "Generation completed successfully"
+            }
         }
     }
 
@@ -82,7 +82,7 @@ class CustomFormatExampleTest : FunSpec({
 
   context("Gradle caching") {
     test("expect Dokkatoo is compatible with Gradle Build Cache") {
-      val dokkatooBuild = dokkatooProject.runner
+      dokkatooProject.runner
         .addArguments(
           "clean",
           ":dokkatooGeneratePublicationHtml",
@@ -90,15 +90,16 @@ class CustomFormatExampleTest : FunSpec({
           "--info",
         )
         .forwardOutput()
-        .build()
+        .build {
+          output shouldContain "BUILD SUCCESSFUL"
 
-      dokkatooBuild.output shouldContain "BUILD SUCCESSFUL"
-
-      val dokkaWorkerLogs = dokkatooProject.findFiles { it.name == "dokka-worker.log" }
-      dokkaWorkerLogs shouldHaveCount 1
-      val dokkaWorkerLog = dokkaWorkerLogs.first()
-      dokkaWorkerLog.shouldNotBeNull().shouldBeAFile()
-      dokkaWorkerLog.readText() shouldContain "Generation completed successfully"
+          dokkatooProject
+            .findFiles { it.name == "dokka-worker.log" }
+            .shouldBeSingleton { dokkaWorkerLog ->
+              dokkaWorkerLog.shouldNotBeNull().shouldBeAFile()
+              dokkaWorkerLog.readText() shouldContain "Generation completed successfully"
+            }
+        }
 
       dokkatooProject.runner
         .addArguments(

@@ -9,8 +9,6 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.file.shouldBeAFile
 import io.kotest.matchers.file.shouldHaveSameStructureAndContentAs
 import io.kotest.matchers.file.shouldHaveSameStructureAs
-import io.kotest.matchers.nulls.shouldNotBeNull
-import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
@@ -29,7 +27,7 @@ class MultimoduleExampleTest : FunSpec({
 
   context("compare dokka and dokkatoo HTML generators") {
     test("expect dokka can generate HTML") {
-      val dokkaBuild = dokkaProject.runner
+      dokkaProject.runner
         .addArguments(
           "clean",
           "dokkaHtmlMultiModule",
@@ -37,14 +35,14 @@ class MultimoduleExampleTest : FunSpec({
           "--info",
         )
         .forwardOutput()
-        .build()
-
-      dokkaBuild.output shouldContain "BUILD SUCCESSFUL"
-      dokkaBuild.output shouldContain "Generation completed successfully"
+        .build {
+          output shouldContain "BUILD SUCCESSFUL"
+          output shouldContain "Generation completed successfully"
+        }
     }
 
     context("when Dokkatoo generates HTML") {
-      val build = dokkatooProject.runner
+      dokkatooProject.runner
         .addArguments(
           "clean",
           ":parentProject:dokkatooGeneratePublicationHtml",
@@ -52,23 +50,23 @@ class MultimoduleExampleTest : FunSpec({
           "--info",
         )
         .forwardOutput()
-        .build()
+        .build {
+          test("expect build is successful") {
+            output shouldContain "BUILD SUCCESSFUL"
+          }
 
-      test("expect build is successful") {
-        build.output shouldContain "BUILD SUCCESSFUL"
-      }
-
-      test("expect all dokka workers are successful") {
-
-        val dokkaWorkerLogs = dokkatooProject.findFiles { it.name == "dokka-worker.log" }
-        dokkaWorkerLogs.firstOrNull().shouldNotBeNull().should { dokkaWorkerLog ->
-          dokkaWorkerLog.shouldBeAFile()
-          dokkaWorkerLog.readText().shouldNotContainAnyOf(
-            "[ERROR]",
-            "[WARN]",
-          )
+          test("expect all dokka workers are successful") {
+            dokkatooProject
+              .findFiles { it.name == "dokka-worker.log" }
+              .shouldForAll { dokkaWorkerLog ->
+                dokkaWorkerLog.shouldBeAFile()
+                dokkaWorkerLog.readText().shouldNotContainAnyOf(
+                  "[ERROR]",
+                  "[WARN]",
+                )
+              }
+          }
         }
-      }
     }
 
     context("expect dokka and dokkatoo HTML is the same") {
@@ -107,18 +105,17 @@ class MultimoduleExampleTest : FunSpec({
           }
 
           test("expect all dokka workers are successful") {
-            output.invariantNewlines() shouldContain "BUILD SUCCESSFUL"
-            val dokkaWorkerLogs = dokkatooProject.findFiles { it.name == "dokka-worker.log" }
-            dokkaWorkerLogs.firstOrNull().shouldNotBeNull().should { dokkaWorkerLog ->
-              dokkaWorkerLog.shouldBeAFile()
-              dokkaWorkerLog.readText().shouldNotContainAnyOf(
-                "[ERROR]",
-                "[WARN]",
-              )
-            }
+            dokkatooProject
+              .findFiles { it.name == "dokka-worker.log" }
+              .shouldForAll { dokkaWorkerLog ->
+                dokkaWorkerLog.shouldBeAFile()
+                dokkaWorkerLog.readText().shouldNotContainAnyOf(
+                  "[ERROR]",
+                  "[WARN]",
+                )
+              }
           }
         }
-
 
       dokkatooProject.runner
         .addArguments(

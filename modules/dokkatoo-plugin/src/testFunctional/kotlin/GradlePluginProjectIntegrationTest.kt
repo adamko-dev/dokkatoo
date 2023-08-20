@@ -14,36 +14,37 @@ class GradlePluginProjectIntegrationTest : FunSpec({
   context("given a gradle plugin project") {
     val project = initGradlePluginProject()
 
-    val dokkatooBuild = project.runner
+    project.runner
       .addArguments(
         "clean",
         "dokkatooGeneratePublicationHtml",
         "--stacktrace",
       )
       .forwardOutput()
-      .build()
+      .build {
 
-    test("expect project builds successfully") {
-      dokkatooBuild.output shouldContain "BUILD SUCCESSFUL"
-    }
+        test("expect project builds successfully") {
+          output shouldContain "BUILD SUCCESSFUL"
+        }
 
-    test("expect no 'unknown class' message in HTML files") {
-      val htmlFiles = project.projectDir.toFile()
-        .resolve("build/dokka/html")
-        .walk()
-        .filter { it.isFile && it.extension == "html" }
+        test("expect no 'unknown class' message in HTML files") {
+          val htmlFiles = project.projectDir.toFile()
+            .resolve("build/dokka/html")
+            .walk()
+            .filter { it.isFile && it.extension == "html" }
 
-      htmlFiles.shouldNotBeEmpty()
+          htmlFiles.shouldNotBeEmpty()
 
-      htmlFiles.forEach { htmlFile ->
-        val relativePath = htmlFile.relativeTo(project.projectDir.toFile())
-        withClue("$relativePath should not contain Error class: unknown class") {
-          htmlFile.useLines { lines ->
-            lines.shouldForAll { line -> line.shouldNotContain("Error class: unknown class") }
+          htmlFiles.forEach { htmlFile ->
+            val relativePath = htmlFile.relativeTo(project.projectDir.toFile())
+            withClue("$relativePath should not contain Error class: unknown class") {
+              htmlFile.useLines { lines ->
+                lines.shouldForAll { line -> line.shouldNotContain("Error class: unknown class") }
+              }
+            }
           }
         }
       }
-    }
   }
 })
 

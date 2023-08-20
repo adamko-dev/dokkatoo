@@ -9,7 +9,6 @@ import io.kotest.matchers.file.shouldBeAFile
 import io.kotest.matchers.file.shouldHaveSameStructureAndContentAs
 import io.kotest.matchers.file.shouldHaveSameStructureAs
 import io.kotest.matchers.nulls.shouldNotBeNull
-import io.kotest.matchers.sequences.shouldHaveCount
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
@@ -28,7 +27,7 @@ class GradleExampleTest : FunSpec({
 
   context("compare dokka and dokkatoo HTML generators") {
     test("expect dokka can generate HTML") {
-      val dokkaBuild = dokkaProject.runner
+      dokkaProject.runner
         .addArguments(
           "clean",
           "dokkaHtml",
@@ -36,14 +35,14 @@ class GradleExampleTest : FunSpec({
           "--info",
         )
         .forwardOutput()
-        .build()
-
-      dokkaBuild.output shouldContain "BUILD SUCCESSFUL"
-      dokkaBuild.output shouldContain "Generation completed successfully"
+        .build {
+          output shouldContain "BUILD SUCCESSFUL"
+          output shouldContain "Generation completed successfully"
+        }
     }
 
     test("expect dokkatoo can generate HTML") {
-      val dokkatooBuild = dokkatooProject.runner
+      dokkatooProject.runner
         .addArguments(
           "clean",
           ":dokkatooGeneratePublicationHtml",
@@ -51,16 +50,16 @@ class GradleExampleTest : FunSpec({
           "--info",
         )
         .forwardOutput()
-        .build()
+        .build {
+          output shouldContain "BUILD SUCCESSFUL"
 
-
-      dokkatooBuild.output shouldContain "BUILD SUCCESSFUL"
-
-      val dokkaWorkerLogs = dokkatooProject.findFiles { it.name == "dokka-worker.log" }
-      dokkaWorkerLogs shouldHaveCount 1
-      val dokkaWorkerLog = dokkaWorkerLogs.first()
-      dokkaWorkerLog.shouldNotBeNull().shouldBeAFile()
-      dokkaWorkerLog.readText() shouldContain "Generation completed successfully"
+          dokkatooProject
+            .findFiles { it.name == "dokka-worker.log" }
+            .shouldBeSingleton { dokkaWorkerLog ->
+              dokkaWorkerLog.shouldNotBeNull().shouldBeAFile()
+              dokkaWorkerLog.readText() shouldContain "Generation completed successfully"
+            }
+        }
     }
 
     context("expect dokka and dokkatoo HTML is the same") {
@@ -84,7 +83,7 @@ class GradleExampleTest : FunSpec({
 
   context("Gradle caching") {
     test("expect Dokkatoo is compatible with Gradle Build Cache") {
-      val dokkatooBuild = dokkatooProject.runner
+      dokkatooProject.runner
         .addArguments(
           "clean",
           ":dokkatooGeneratePublicationHtml",
@@ -92,15 +91,17 @@ class GradleExampleTest : FunSpec({
           "--info",
         )
         .forwardOutput()
-        .build()
+        .build {
+          output shouldContain "BUILD SUCCESSFUL"
 
-      dokkatooBuild.output shouldContain "BUILD SUCCESSFUL"
 
-      val dokkaWorkerLogs = dokkatooProject.findFiles { it.name == "dokka-worker.log" }
-      dokkaWorkerLogs shouldHaveCount 1
-      val dokkaWorkerLog = dokkaWorkerLogs.first()
-      dokkaWorkerLog.shouldNotBeNull().shouldBeAFile()
-      dokkaWorkerLog.readText() shouldContain "Generation completed successfully"
+          dokkatooProject
+            .findFiles { it.name == "dokka-worker.log" }
+            .shouldBeSingleton { dokkaWorkerLog ->
+              dokkaWorkerLog.shouldNotBeNull().shouldBeAFile()
+              dokkaWorkerLog.readText() shouldContain "Generation completed successfully"
+            }
+        }
 
       dokkatooProject.runner
         .addArguments(
