@@ -3,15 +3,12 @@ package dev.adamko.dokkatoo
 import dev.adamko.dokkatoo.internal.DokkatooConstants.DOKKATOO_VERSION
 import dev.adamko.dokkatoo.utils.*
 import io.kotest.core.spec.style.FunSpec
-import io.kotest.inspectors.forAll
 import io.kotest.inspectors.shouldForAll
 import io.kotest.matchers.collections.shouldBeIn
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.file.shouldBeAFile
-import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.paths.shouldBeAFile
 import io.kotest.matchers.paths.shouldNotExist
-import io.kotest.matchers.should
 import io.kotest.matchers.string.shouldBeEmpty
 import io.kotest.matchers.string.shouldContain
 import org.gradle.testkit.runner.TaskOutcome.*
@@ -35,14 +32,15 @@ class MultiModuleFunctionalTest : FunSpec({
       }
 
     test("expect all dokka workers are successful") {
-      val dokkaWorkerLogs = project.findFiles { it.name == "dokka-worker.log" }
-      dokkaWorkerLogs.firstOrNull().shouldNotBeNull().should { dokkaWorkerLog ->
-        dokkaWorkerLog.shouldBeAFile()
-        dokkaWorkerLog.readText().shouldNotContainAnyOf(
-          "[ERROR]",
-          "[WARN]",
-        )
-      }
+      project
+        .findFiles { it.name == "dokka-worker.log" }
+        .shouldForAll { dokkaWorkerLog ->
+          dokkaWorkerLog.shouldBeAFile()
+          dokkaWorkerLog.readText().shouldNotContainAnyOf(
+            "[ERROR]",
+            "[WARN]",
+          )
+        }
     }
 
     context("expect HTML site is generated") {
@@ -100,14 +98,15 @@ class MultiModuleFunctionalTest : FunSpec({
           }
 
           test("expect all dokka workers are successful") {
-            val dokkaWorkerLogs = project.findFiles { it.name == "dokka-worker.log" }
-            dokkaWorkerLogs.forAll { dokkaWorkerLog ->
-              dokkaWorkerLog.shouldBeAFile()
-              dokkaWorkerLog.readText().shouldNotContainAnyOf(
-                "[ERROR]",
-                "[WARN]",
-              )
-            }
+            project
+              .findFiles { it.name == "dokka-worker.log" }
+              .shouldForAll { dokkaWorkerLog ->
+                dokkaWorkerLog.shouldBeAFile()
+                dokkaWorkerLog.readText().shouldNotContainAnyOf(
+                  "[ERROR]",
+                  "[WARN]",
+                )
+              }
           }
         }
 
@@ -165,14 +164,15 @@ class MultiModuleFunctionalTest : FunSpec({
         }
 
       test("expect all dokka workers are successful") {
-        val dokkaWorkerLogs = project.findFiles { it.name == "dokka-worker.log" }
-        dokkaWorkerLogs.forAll { dokkaWorkerLog ->
-          dokkaWorkerLog.shouldBeAFile()
-          dokkaWorkerLog.readText().shouldNotContainAnyOf(
-            "[ERROR]",
-            "[WARN]",
-          )
-        }
+        project
+          .findFiles { it.name == "dokka-worker.log" }
+          .shouldForAll { dokkaWorkerLog ->
+            dokkaWorkerLog.shouldBeAFile()
+            dokkaWorkerLog.readText().shouldNotContainAnyOf(
+              "[ERROR]",
+              "[WARN]",
+            )
+          }
       }
     }
 

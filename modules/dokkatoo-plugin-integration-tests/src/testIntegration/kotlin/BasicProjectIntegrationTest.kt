@@ -6,10 +6,9 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.file.shouldBeAFile
 import io.kotest.matchers.file.shouldHaveSameStructureAndContentAs
 import io.kotest.matchers.file.shouldHaveSameStructureAs
-import io.kotest.matchers.nulls.shouldNotBeNull
-import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
+import io.kotest.matchers.string.shouldNotContain
 import java.io.File
 
 /**
@@ -25,61 +24,47 @@ class BasicProjectIntegrationTest : FunSpec({
   val dokkaProject = initDokkaProject(tempDir.resolve("dokka"))
 
   context("when generating HTML") {
-    val dokkaBuild = dokkaProject.runner
+    dokkaProject.runner
       .addArguments(
         "clean",
         "dokkaHtml",
         "--stacktrace",
       )
       .forwardOutput()
-      .build()
+      .build {
+        context("with Dokka") {
+          test("expect project builds successfully") {
+            output shouldContain "BUILD SUCCESSFUL"
+          }
+        }
+      }
 
-    val dokkatooBuild = dokkatooProject.runner
+    dokkatooProject.runner
       .addArguments(
         "clean",
         "dokkatooGeneratePublicationHtml",
         "--stacktrace",
       )
       .forwardOutput()
-      .build()
+      .build {
+        context("with Dokkatoo") {
+          test("expect project builds successfully") {
+            output shouldContain "BUILD SUCCESSFUL"
+          }
 
-    test("expect project builds successfully") {
-      dokkatooBuild.output shouldContain "BUILD SUCCESSFUL"
-    }
-
-    context("with Dokka") {
-
-      test("expect project builds successfully") {
-        dokkaBuild.output shouldContain "BUILD SUCCESSFUL"
-      }
-
-      test("expect all dokka workers are successful") {
-
-        val dokkaWorkerLogs = dokkatooProject.findFiles { it.name == "dokka-worker.log" }
-        dokkaWorkerLogs.firstOrNull().shouldNotBeNull().should { dokkaWorkerLog ->
-          dokkaWorkerLog.shouldBeAFile()
-          dokkaWorkerLog.readText().shouldNotContainAnyOf(
-            "[ERROR]",
-            "[WARN]",
-          )
+          test("expect all dokka workers are successful") {
+            dokkatooProject
+              .findFiles { it.name == "dokka-worker.log" }
+              .shouldBeSingleton { dokkaWorkerLog ->
+                dokkaWorkerLog.shouldBeAFile()
+                dokkaWorkerLog.readText().shouldNotContainAnyOf(
+                  "[ERROR]",
+                  "[WARN]",
+                )
+              }
+          }
         }
       }
-    }
-
-    context("with Dokkatoo") {
-
-      test("expect all dokka workers are successful") {
-
-        val dokkaWorkerLogs = dokkatooProject.findFiles { it.name == "dokka-worker.log" }
-        dokkaWorkerLogs.firstOrNull().shouldNotBeNull().should { dokkaWorkerLog ->
-          dokkaWorkerLog.shouldBeAFile()
-          dokkaWorkerLog.readText().shouldNotContainAnyOf(
-            "[ERROR]",
-            "[WARN]",
-          )
-        }
-      }
-    }
 
     test("expect the same HTML is generated") {
 
@@ -103,8 +88,8 @@ class BasicProjectIntegrationTest : FunSpec({
           "--build-cache",
         )
         .forwardOutput()
-        .build().should { buildResult ->
-          buildResult.output shouldContainAll listOf(
+        .build {
+          output shouldContainAll listOf(
             "Task :dokkatooGeneratePublicationHtml UP-TO-DATE",
           )
         }
@@ -126,16 +111,17 @@ class BasicProjectIntegrationTest : FunSpec({
           .forwardOutput()
 
       test("first build should store the configuration cache") {
-        configCacheRunner.build().should { buildResult ->
-          buildResult.output shouldContain "BUILD SUCCESSFUL"
-          buildResult.output shouldContain "0 problems were found storing the configuration cache"
+        configCacheRunner.build {
+          output shouldContain "BUILD SUCCESSFUL"
+          output shouldContain "Configuration cache entry stored"
+          output shouldNotContain "problems were found storing the configuration cache"
         }
       }
 
       test("second build should reuse the configuration cache") {
-        configCacheRunner.build().should { buildResult ->
-          buildResult.output shouldContain "BUILD SUCCESSFUL"
-          buildResult.output shouldContain "Configuration cache entry reused"
+        configCacheRunner.build {
+          output shouldContain "BUILD SUCCESSFUL"
+          output shouldContain "Configuration cache entry reused"
         }
       }
     }

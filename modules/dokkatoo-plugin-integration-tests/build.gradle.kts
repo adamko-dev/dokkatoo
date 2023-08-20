@@ -253,6 +253,16 @@ tasks.setupDokkaTemplateProjects.configure {
   }
 }
 
+tasks.withType<Test>().configureEach {
+  // this seems to help OOM errors in the Worker Daemons
+  //setForkEvery(1)
+  jvmArgs(
+    "-Xmx1g",
+    "-XX:MaxMetaspaceSize=512m",
+    "-XX:+AlwaysPreTouch", // https://github.com/gradle/gradle/issues/3093#issuecomment-387259298
+  )
+}
+
 dokkaSourceDownload {
   dokkaVersion.set(libs.versions.kotlin.dokka)
 }

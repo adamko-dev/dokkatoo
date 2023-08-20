@@ -25,8 +25,10 @@ class GradleProjectTest(
   val runner: GradleRunner
     get() = GradleRunner.create()
       .withProjectDir(projectDir.toFile())
-      .withJvmArguments("-XX:MaxMetaspaceSize=512m")
-      .addArguments(
+      .withJvmArguments(
+        "-XX:MaxMetaspaceSize=512m",
+        "-XX:+AlwaysPreTouch", // https://github.com/gradle/gradle/issues/3093#issuecomment-387259298
+      ).addArguments(
         // disable the logging task so the tests work consistently on local machines and CI/CD
         "-P" + "dev.adamko.dokkatoo.tasks.logHtmlPublicationLinkEnabled=false"
       )
