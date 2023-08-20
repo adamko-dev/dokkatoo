@@ -158,7 +158,8 @@ class KotlinMultiplatformExampleTest : FunSpec({
       test("first build should store the configuration cache") {
         configCacheRunner.build {
           output shouldContain "BUILD SUCCESSFUL"
-          output shouldContain "0 problems were found storing the configuration cache"
+          output shouldContain "Configuration cache entry stored"
+          output shouldNotContain "problems were found storing the configuration cache"
         }
       }
 

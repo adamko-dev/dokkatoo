@@ -138,9 +138,10 @@ class CustomFormatExampleTest : FunSpec({
           .forwardOutput()
 
       test("first build should store the configuration cache") {
-        configCacheRunner.build().should { buildResult ->
-          buildResult.output shouldContain "BUILD SUCCESSFUL"
-          buildResult.output shouldContain "0 problems were found storing the configuration cache"
+        configCacheRunner.build {
+          output shouldContain "BUILD SUCCESSFUL"
+          output shouldContain "Configuration cache entry stored"
+          output shouldNotContain "problems were found storing the configuration cache"
         }
       }
 

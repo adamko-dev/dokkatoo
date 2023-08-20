@@ -10,6 +10,7 @@ import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
+import io.kotest.matchers.string.shouldNotContain
 import java.io.File
 
 /**
@@ -126,9 +127,10 @@ class BasicProjectIntegrationTest : FunSpec({
           .forwardOutput()
 
       test("first build should store the configuration cache") {
-        configCacheRunner.build().should { buildResult ->
-          buildResult.output shouldContain "BUILD SUCCESSFUL"
-          buildResult.output shouldContain "0 problems were found storing the configuration cache"
+        configCacheRunner.build {
+          output shouldContain "BUILD SUCCESSFUL"
+          output shouldContain "Configuration cache entry stored"
+          output shouldNotContain "problems were found storing the configuration cache"
         }
       }
 
