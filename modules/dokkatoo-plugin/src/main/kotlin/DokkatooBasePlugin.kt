@@ -98,7 +98,12 @@ constructor(
       publicationEnabled.convention(true)
       onlyIf("publication must be enabled") { publicationEnabled.getOrElse(true) }
 
-      generator.dokkaSourceSets.addAllLater(providers.provider { dokkatooExtension.dokkatooSourceSets })
+       generator.dokkaSourceSets.addAllLater(
+         providers.provider {
+           // exclude suppressed source sets to avoid unnecessary dependency resolution for them
+           dokkatooExtension.dokkatooSourceSets.filterNot { it.suppress.get() }
+         }
+       )
 
       generator.dokkaSourceSets.configureDefaults(
         sourceSetScopeConvention = dokkatooExtension.sourceSetScopeDefault
