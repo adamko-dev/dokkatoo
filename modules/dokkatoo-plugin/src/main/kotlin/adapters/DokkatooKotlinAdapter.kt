@@ -9,16 +9,14 @@ import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetIdSpec.Companion.dokka
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec
 import dev.adamko.dokkatoo.dokka.parameters.KotlinPlatform
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
-import dev.adamko.dokkatoo.internal.collectIncomingFiles
+import dev.adamko.dokkatoo.internal.KotlinNativeDistributionAccessor
 import dev.adamko.dokkatoo.internal.not
+import dev.adamko.dokkatoo.internal.parseKotlinVersion
 import javax.inject.Inject
 import org.gradle.api.Named
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.artifacts.ConfigurationContainer
-import org.gradle.api.attributes.Usage.JAVA_API
-import org.gradle.api.attributes.Usage.USAGE_ATTRIBUTE
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
 import org.gradle.api.logging.Logging
@@ -35,8 +33,10 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinSingleTargetExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation.Companion.MAIN_COMPILATION_NAME
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
+import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
 import org.jetbrains.kotlin.gradle.plugin.mpp.AbstractKotlinNativeCompilation
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinJvmAndroidCompilation
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinMetadataCompilation
 
 /**
  * The [DokkatooKotlinAdapter] plugin will automatically register Kotlin source sets as Dokka source sets.
@@ -48,7 +48,6 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
   private val objects: ObjectFactory,
   private val providers: ProviderFactory,
 ) : Plugin<Project> {
-
   override fun apply(project: Project) {
     logger.info("applied DokkatooKotlinAdapter to ${project.path}")
 
@@ -75,7 +74,7 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
     val compilationDetailsBuilder = KotlinCompilationDetailsBuilder(
       providers = providers,
       objects = objects,
-      configurations = project.configurations,
+      kotlinGradlePluginVersion = parseKotlinVersion(project.getKotlinPluginVersion()),
       projectPath = project.path,
     )
     val allKotlinCompilationDetails: ListProperty<KotlinCompilationDetails> =
@@ -194,13 +193,14 @@ private data class KotlinCompilationDetails(
   val compileDependencyFiles: FileCollection,
   val dependentSourceSetNames: Set<String>,
   val compilationClasspath: FileCollection,
+  val defaultSourceSetName: String,
 )
 
 /** Utility class, encapsulating logic for building [KotlinCompilationDetails] */
 private class KotlinCompilationDetailsBuilder(
   private val objects: ObjectFactory,
   private val providers: ProviderFactory,
-  private val configurations: ConfigurationContainer,
+  private val kotlinGradlePluginVersion: KotlinVersion?,
   /** Used for logging */
   private val projectPath: String,
 ) {
@@ -248,6 +248,7 @@ private class KotlinCompilationDetailsBuilder(
       compileDependencyFiles = compileDependencyFiles,
       dependentSourceSetNames = dependentSourceSetNames.toSet(),
       compilationClasspath = compilationClasspath,
+      defaultSourceSetName = compilation.defaultSourceSet.name
     )
   }
 
@@ -266,51 +267,25 @@ private class KotlinCompilationDetailsBuilder(
   private fun collectKotlinCompilationClasspath(
     compilation: KotlinCompilation<*>,
   ): FileCollection {
-
     val compilationClasspath = objects.fileCollection()
-    fun collectConfiguration(named: String) {
-      configurations.collectIncomingFiles(named = named, collector = compilationClasspath)
+    compilationClasspath.from(compilation.compileDependencyFiles)
 
-      // need to fetch JAVA_RUNTIME files explicitly, because Android Gradle Plugin is weird and
-      // doesn't seem to register the attributes explicitly on its configurations
-      @Suppress("UnstableApiUsage")
-      configurations.collectIncomingFiles(named = named, collector = compilationClasspath) {
-        withVariantReselection()
-        attributes {
-          attribute(USAGE_ATTRIBUTE, objects.named(JAVA_API))
-        }
-        lenient(true)
+    if (kotlinGradlePluginVersion != null && kotlinGradlePluginVersion <= KotlinVersion(1, 9, 255)) {
+      if (compilation is AbstractKotlinNativeCompilation) {
+        val konanDistribution = KotlinNativeDistributionAccessor(compilation.target.project)
+        // KT-61559: In Kotlin 2.0 this will be part of [compilation.compileDependencyFiles]
+        compilationClasspath.from(konanDistribution.stdlibDir)
+        compilationClasspath.from(konanDistribution.platformDependencies(compilation.konanTarget))
       }
     }
-
-    val standardConfigurations = buildSet {
-      addAll(compilation.relatedConfigurationNames)
-      addAll(compilation.kotlinSourceSets.flatMap { it.relatedConfigurationNames })
-    }
-
-    logger.info("[$projectPath] compilation ${compilation.name} has ${standardConfigurations.size} standard configurations $standardConfigurations")
-
-    standardConfigurations.forEach { collectConfiguration(it) }
-
-    if (compilation is AbstractKotlinNativeCompilation) {
-      // K/N doesn't correctly set task dependencies, the configuration
-      // `defaultSourceSet.implementationMetadataConfigurationName`
-      // will trigger a bunch of Gradle warnings about "using file outputs without task dependencies",
-      // so K/N compilations need to explicitly depend on the compilation tasks
-      // UPDATE: actually I think is wrong, it's a bug with the K/N 'commonize for IDE' tasks
-      // see: https://github.com/Kotlin/dokka/issues/2977
-      collectConfiguration(
-        named = compilation.defaultSourceSet.implementationMetadataConfigurationName,
-//          builtBy = kotlinCompilation.compileKotlinTaskProvider
-      )
-    }
-
     return compilationClasspath
   }
 
   companion object {
     private fun KotlinCompilation<*>.isMain(): Boolean {
       return when (this) {
+        // metadata compilation is considered as 'main' because its outputs is publishable
+        is KotlinMetadataCompilation<*> -> true
         is KotlinJvmAndroidCompilation ->
           androidVariant is LibraryVariant || androidVariant is ApplicationVariant
 
