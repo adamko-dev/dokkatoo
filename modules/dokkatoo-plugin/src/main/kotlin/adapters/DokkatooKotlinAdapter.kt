@@ -190,7 +190,6 @@ private data class KotlinCompilationDetails(
   val kotlinPlatform: KotlinPlatform,
   val allKotlinSourceSetsNames: Set<String>,
   val mainCompilation: Boolean,
-  val compileDependencyFiles: FileCollection,
   val dependentSourceSetNames: Set<String>,
   val compilationClasspath: FileCollection,
   val defaultSourceSetName: String,
@@ -231,9 +230,6 @@ private class KotlinCompilationDetailsBuilder(
     val allKotlinSourceSetsNames =
       compilation.allKotlinSourceSets.map { it.name } + compilation.defaultSourceSet.name
 
-    val compileDependencyFiles = objects.fileCollection()
-      .from(providers.provider { compilation.compileDependencyFiles })
-
     val dependentSourceSetNames =
       compilation.defaultSourceSet.dependsOn.map { it.name }
 
@@ -245,7 +241,6 @@ private class KotlinCompilationDetailsBuilder(
       kotlinPlatform = KotlinPlatform.fromString(compilation.platformType.name),
       allKotlinSourceSetsNames = allKotlinSourceSetsNames.toSet(),
       mainCompilation = compilation.isMain(),
-      compileDependencyFiles = compileDependencyFiles,
       dependentSourceSetNames = dependentSourceSetNames.toSet(),
       compilationClasspath = compilationClasspath,
       defaultSourceSetName = compilation.defaultSourceSet.name
