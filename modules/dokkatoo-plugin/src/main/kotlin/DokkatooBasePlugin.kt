@@ -23,6 +23,7 @@ import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.kotlin.dsl.*
@@ -98,12 +99,12 @@ constructor(
       publicationEnabled.convention(true)
       onlyIf("publication must be enabled") { publicationEnabled.getOrElse(true) }
 
-       generator.dokkaSourceSets.addAllLater(
-         providers.provider {
-           // exclude suppressed source sets to avoid unnecessary dependency resolution for them
-           dokkatooExtension.dokkatooSourceSets.filterNot { it.suppress.get() }
-         }
-       )
+      generator.dokkaSourceSets.addAllLater(
+        providers.provider {
+          // exclude suppressed source sets as early as possible, to avoid unnecessary dependency resolution
+          dokkatooExtension.dokkatooSourceSets.filterNot { it.suppress.get() }
+        }
+      )
 
       generator.dokkaSourceSets.configureDefaults(
         sourceSetScopeConvention = dokkatooExtension.sourceSetScopeDefault
@@ -120,6 +121,15 @@ constructor(
       moduleName.convention(providers.provider { project.name })
       moduleVersion.convention(providers.provider { project.version.toString() })
       modulePath.convention(project.pathAsFilePath())
+      konanHome.convention(
+        providers
+          .provider {
+            // konanHome is set into in extraProperties:
+            // https://github.com/JetBrains/kotlin/blob/v1.9.0/libraries/tools/kotlin-gradle-plugin/src/common/kotlin/org/jetbrains/kotlin/gradle/targets/native/KotlinNativeTargetPreset.kt#L35-L38
+            project.extensions.extraProperties.get("konanHome") as? String?
+          }
+          .map { File(it) }
+      )
 
       sourceSetScopeDefault.convention(project.path)
       dokkatooPublicationDirectory.convention(layout.buildDirectory.dir("dokka"))
@@ -258,6 +268,10 @@ constructor(
   // workaround for https://github.com/gradle/gradle/issues/23708
   private fun RegularFileProperty.convention(file: File): RegularFileProperty =
     convention(objects.fileProperty().fileValue(file))
+
+  // workaround for https://github.com/gradle/gradle/issues/23708
+  private fun RegularFileProperty.convention(file: Provider<File>): RegularFileProperty =
+    convention(objects.fileProperty().fileProvider(file))
 
   companion object {
 
