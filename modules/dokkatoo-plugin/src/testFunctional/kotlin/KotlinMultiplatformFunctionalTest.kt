@@ -172,7 +172,7 @@ private fun initKotlinMultiplatformProject(
       |              "windows-x86_64",
       |            ).forEach { os ->
       |              listOf("dev", "releases").forEach { stage ->
-      |                artifact("${'$'}stage/[revision]${'$'}os/[artifact]-[revision].[ext]")
+                       artifact("${'$'}stage/[revision]/${'$'}os/[artifact]-[revision].[ext]")
       |              }
       |            }
       |          }
@@ -267,34 +267,30 @@ private fun initKotlinMultiplatformProject(
       )
     }
 
-    dir("src/jvmMain/kotlin/") {
-      createKotlinFile(
-        "goodbyeJvm.kt",
-        """
-          |package com.project
-          |
-          |import kotlinx.serialization.json.JsonObject
-          |
-          |/** JVM implementation - prints `goodbye` and [json] to the console */
-          |actual fun goodbye(json: JsonObject) = println("[JVM] goodbye ${'$'}json")
-          |
-        """.trimMargin()
-      )
-    }
+    listOf(
+      "jvm",
+      "js",
+      "linuxX64",
+      "macosX64",
+      "macosArm64",
+      "iosX64",
+      "mingwX64",
+    ).forEach { target ->
 
-    dir("src/jsMain/kotlin/") {
-      createKotlinFile(
-        "goodbyeJs.kt",
-        """
+      dir("src/${target}Main/kotlin/") {
+        createKotlinFile(
+          "goodbye_${target}.kt",
+          """
           |package com.project
           |
           |import kotlinx.serialization.json.JsonObject
           |
-          |/** JS implementation - prints `goodbye` and [json] to the console */
-          |actual fun goodbye(json: JsonObject) = println("[JS] goodbye ${'$'}json")
+          |/** $target implementation - prints `goodbye` and [json] to the console */
+          |actual fun goodbye(json: JsonObject) = println("[target] goodbye ${'$'}json")
           |
         """.trimMargin()
-      )
+        )
+      }
     }
 
     config()
