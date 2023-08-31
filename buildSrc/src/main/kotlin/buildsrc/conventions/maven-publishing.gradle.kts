@@ -62,6 +62,11 @@ val javadocJarStub by tasks.registering(Jar::class) {
   archiveClassifier.set("javadoc")
 }
 
+// workaround for https://github.com/gradle/gradle/issues/19331
+tasks.withType<GenerateModuleMetadata>().configureEach {
+  mustRunAfter(javadocJarStub)
+}
+
 publishing {
   repositories {
     if (mavenPublishing.mavenCentralCredentials.isPresent) {
