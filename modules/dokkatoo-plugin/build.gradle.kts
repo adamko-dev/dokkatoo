@@ -27,6 +27,7 @@ dependencies {
   implementation(libs.kotlin.dokkaCore)
 
   compileOnly(libs.gradlePlugin.kotlin)
+  compileOnly(libs.gradlePlugin.kotlin.klibCommonizerApi)
   compileOnly(libs.gradlePlugin.android)
   compileOnly(libs.gradlePlugin.androidApi)
 
