@@ -9,7 +9,7 @@ plugins {
   dev.adamko.kotlin.`binary-compatibility-validator`
 
   dev.adamko.`dokkatoo-html`
-  buildsrc.conventions.`github-maven-publish`
+  buildsrc.conventions.`maven-publishing`
 
   `java-test-fixtures`
   `jvm-test-suite`
