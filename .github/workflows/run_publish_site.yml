@@ -2,9 +2,10 @@ name: Publish Site
 
 on:
   workflow_dispatch:
-  push:
-    tags:
-      - "v[0-9]+.[0-9]+.[0-9]+"
+  workflow_call:
+#  push:
+#    tags:
+#      - "v[0-9]+.[0-9]+.[0-9]+"
 
 
 concurrency:

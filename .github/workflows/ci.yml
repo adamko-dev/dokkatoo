@@ -7,7 +7,8 @@ on:
   push:
     branches:
       - main
-
+  release:
+    types: [ created ]
 
 concurrency:
   group: "${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}"
@@ -32,5 +33,5 @@ jobs:
 
   publish-site:
     needs: tests
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && github.event_name == 'release' && github.event.action == 'created'
     uses: ./.github/workflows/run_publish_site.yml
