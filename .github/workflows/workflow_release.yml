@@ -1,12 +1,9 @@
-name: CI
+name: Releases
 
 on:
-  pull_request:
   workflow_dispatch:
-  workflow_call:
   push:
-    branches:
-      - main
+    branches: [ main ]
   release:
     types: [ created ]
 
@@ -34,6 +31,7 @@ jobs:
 
   publish-site:
     needs: tests
+    # only publish site when releasing
     if: github.ref == 'refs/heads/main' && github.event_name == 'release' && github.event.action == 'created'
     uses: ./.github/workflows/run_publish_site.yml
     permissions:
