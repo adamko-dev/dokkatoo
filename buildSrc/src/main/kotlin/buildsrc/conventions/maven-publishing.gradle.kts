@@ -87,9 +87,11 @@ signing {
 
   if (keyId != null && key != null && password != null) {
     useInMemoryPgpKeys(keyId, key, password)
-  } else {
-    useGpgCmd()
   }
+
+  setRequired({
+    keyId != null && key != null && password != null
+  })
 }
 
 afterEvaluate {
