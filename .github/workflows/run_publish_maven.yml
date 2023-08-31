@@ -1,11 +1,12 @@
-name: Publish Task
+name: Publish Maven
 
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
+  workflow_call:
+#  push:
+#    branches:
+#      - main
 
 concurrency:
   group: "${{ github.workflow }}"
@@ -91,3 +92,16 @@ jobs:
           git add .
           git commit -a -m "${{ env.CI_COMMIT_MESSAGE }}"
           git push
+
+
+  sonatype-release:
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/run_gradle_task.yml
+    secrets: inherit
+    with:
+      runs-on: macos-latest # only macOS supports building all Kotlin targets
+      gradle-task: >-
+        publishAllPublicationsToSonatypeReleaseRepository --stacktrace

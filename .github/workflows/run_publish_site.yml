@@ -1,4 +1,4 @@
-name: Deploy Site
+name: Publish Site
 
 on:
   workflow_dispatch:

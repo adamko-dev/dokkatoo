@@ -1,12 +1,12 @@
 name: Tests
 
 on:
-  pull_request:
+#  pull_request:
   workflow_dispatch:
   workflow_call:
-  push:
-    branches:
-      - main
+#  push:
+#    branches:
+#      - main
 
 
 concurrency:
@@ -42,7 +42,7 @@ jobs:
               --max-workers=1
               -Dorg.gradle.workers.max=1
       fail-fast: false
-    uses: ./.github/workflows/gradle_task.yml
+    uses: ./.github/workflows/run_gradle_task.yml
     with:
       runs-on: ${{ matrix.os }}
       gradle-task: >-
