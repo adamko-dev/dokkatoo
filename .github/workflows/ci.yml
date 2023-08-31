@@ -28,11 +28,11 @@ jobs:
     uses: ./.github/workflows/run_publish_maven.yml
     secrets: inherit
     permissions:
-      contents: write
+      packages: write
 
   publish-site:
     needs: tests
     if: github.ref == 'refs/heads/main' && github.event_name == 'release' && github.event.action == 'created'
     uses: ./.github/workflows/run_publish_site.yml
     permissions:
-      contents: write
+      packages: write
