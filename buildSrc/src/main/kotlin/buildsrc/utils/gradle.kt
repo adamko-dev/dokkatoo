@@ -1,5 +1,6 @@
 package buildsrc.utils
 
+import java.io.File
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.NamedDomainObjectFactory
 import org.gradle.api.Project
@@ -112,3 +113,6 @@ internal inline fun <reified T : Any> ObjectFactory.domainObjectContainer(
   } else {
     domainObjectContainer(T::class, factory)
   }
+
+/** workaround for the overly verbose replacement for the deprecated [Project.getBuildDir] property */
+val Project.buildDir_: File get() = layout.buildDirectory.get().asFile

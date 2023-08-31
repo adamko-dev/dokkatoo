@@ -1,5 +1,6 @@
 @file:Suppress("UnstableApiUsage") // jvm test suites & test report aggregation are incubating
 
+import buildsrc.utils.buildDir_
 import buildsrc.utils.skipTestFixturesPublications
 
 plugins {
@@ -123,7 +124,7 @@ testing.suites {
 
     targets.configureEach {
       testTask.configure {
-        val projectTestTempDirPath = "$buildDir/test-temp-dir"
+        val projectTestTempDirPath = "$buildDir_/test-temp-dir"
         inputs.property("projectTestTempDir", projectTestTempDirPath)
         systemProperty("projectTestTempDir", projectTestTempDirPath)
 
@@ -176,9 +177,9 @@ val aggregateTestReports by tasks.registering(TestReport::class) {
   dependsOn(tasks.withType<AbstractTestTask>())
 
   // hardcoded dirs is a bit of a hack, but a fileTree just didn't work
-  testResults.from("$buildDir/test-results/test/binary")
-  testResults.from("$buildDir/test-results/testFunctional/binary")
-  testResults.from("$buildDir/test-results/testIntegration/binary")
+  testResults.from("$buildDir_/test-results/test/binary")
+  testResults.from("$buildDir_/test-results/testFunctional/binary")
+  testResults.from("$buildDir_/test-results/testIntegration/binary")
 
   doLast {
     logger.lifecycle("Aggregated test report: file://${destinationDirectory.asFile.get()}/index.html")
