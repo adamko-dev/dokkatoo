@@ -104,6 +104,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+      checks: write
     uses: ./.github/workflows/run_gradle_task.yml
     secrets: inherit
     with:
