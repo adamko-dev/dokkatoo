@@ -16,6 +16,11 @@ env:
   # https://stackoverflow.com/a/71158878/4161471
   GIT_BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
 
+permissions:
+  contents: read
+  packages: write
+  checks: write
+
 jobs:
 
   create-m2-publication:
