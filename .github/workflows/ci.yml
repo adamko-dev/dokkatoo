@@ -14,24 +14,25 @@ concurrency:
   group: "${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}"
   cancel-in-progress: true
 
-
-permissions:
-  contents: read
-  checks: write # required by mikepenz/action-junit-report
-
-
 jobs:
 
   tests:
     uses: ./.github/workflows/run_tests.yml
+    permissions:
+      contents: read
+      checks: write # required by mikepenz/action-junit-report
 
   publish-maven:
     needs: tests
     if: github.ref == 'refs/heads/main'
     uses: ./.github/workflows/run_publish_maven.yml
     secrets: inherit
+    permissions:
+      contents: write
 
   publish-site:
     needs: tests
     if: github.ref == 'refs/heads/main' && github.event_name == 'release' && github.event.action == 'created'
     uses: ./.github/workflows/run_publish_site.yml
+    permissions:
+      contents: write
