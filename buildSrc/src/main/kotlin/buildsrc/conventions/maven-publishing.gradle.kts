@@ -1,7 +1,6 @@
 package buildsrc.conventions
 
 import buildsrc.settings.MavenPublishingSettings
-import org.gradle.api.plugins.JavaBasePlugin.DOCUMENTATION_GROUP
 
 plugins {
   `maven-publish`
@@ -56,16 +55,6 @@ publishing {
 
 
 //region Maven Central publishing/signing
-val javadocJarStub by tasks.registering(Jar::class) {
-  group = DOCUMENTATION_GROUP
-  description = "Empty Javadoc Jar (required by Maven Central)"
-  archiveClassifier.set("javadoc")
-}
-
-// workaround for https://github.com/gradle/gradle/issues/19331
-tasks.withType<GenerateModuleMetadata>().configureEach {
-  mustRunAfter(javadocJarStub)
-}
 
 publishing {
   repositories {
@@ -77,10 +66,12 @@ publishing {
     }
   }
 
-  // Maven Central requires Javadoc JAR, which this project doesn't have because it's not Java, so use an empty jar.
-  publications.withType<MavenPublication>().configureEach {
-    artifact(javadocJarStub)
-  }
+//  // Maven Central requires Javadoc JAR, which this project doesn't have because it's not Java, so use an empty jar.
+//  publications.withType<MavenPublication>().configureEach {
+//    // The Gradle Publish Plugin enables the Javadoc JAR in afterEvaluate, so find it lazily
+//    val javadocJarTask = tasks.withType<Jar>().matching { it.name == "javadocJar" }
+//    artifact(javadocJarTask)
+//  }
 }
 
 signing {
@@ -99,13 +90,13 @@ signing {
   })
 }
 
-afterEvaluate {
-  // Register signatures in afterEvaluate, otherwise the signing plugin creates
-  // the signing tasks too early, before all the publications are added.
-  signing {
-    sign(publishing.publications)
-  }
-}
+//afterEvaluate {
+//  // Register signatures in afterEvaluate, otherwise the signing plugin creates
+//  // the signing tasks too early, before all the publications are added.
+//  signing {
+//    sign(publishing.publications)
+//  }
+//}
 //endregion
 
 
