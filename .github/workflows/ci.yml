@@ -20,7 +20,7 @@ jobs:
     uses: ./.github/workflows/run_tests.yml
     permissions:
       contents: read
-      checks: write # required by mikepenz/action-junit-report
+      checks: write
 
   publish-maven:
     needs: tests
@@ -30,6 +30,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+      checks: write
 
   publish-site:
     needs: tests
@@ -38,3 +39,4 @@ jobs:
     permissions:
       contents: read
       packages: write
+      checks: write
