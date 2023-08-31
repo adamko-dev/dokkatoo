@@ -4,21 +4,19 @@ import com.android.build.gradle.api.ApplicationVariant
 import com.android.build.gradle.api.LibraryVariant
 import dev.adamko.dokkatoo.DokkatooBasePlugin
 import dev.adamko.dokkatoo.DokkatooExtension
+import dev.adamko.dokkatoo.adapters.DokkatooKotlinAdapter.Companion.currentKotlinToolingVersion
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetIdSpec
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetIdSpec.Companion.dokkaSourceSetIdSpec
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec
 import dev.adamko.dokkatoo.dokka.parameters.KotlinPlatform
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
-import dev.adamko.dokkatoo.internal.collectIncomingFiles
 import dev.adamko.dokkatoo.internal.not
+import java.io.File
 import javax.inject.Inject
 import org.gradle.api.Named
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.artifacts.ConfigurationContainer
-import org.gradle.api.attributes.Usage.JAVA_API
-import org.gradle.api.attributes.Usage.USAGE_ATTRIBUTE
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
 import org.gradle.api.logging.Logging
@@ -29,14 +27,21 @@ import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.provider.SetProperty
 import org.gradle.kotlin.dsl.*
+import org.jetbrains.kotlin.commonizer.KonanDistribution
+import org.jetbrains.kotlin.commonizer.platformLibsDir
+import org.jetbrains.kotlin.commonizer.stdlib
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinSingleTargetExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation.Companion.MAIN_COMPILATION_NAME
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
+import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
 import org.jetbrains.kotlin.gradle.plugin.mpp.AbstractKotlinNativeCompilation
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinJvmAndroidCompilation
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinMetadataCompilation
+import org.jetbrains.kotlin.konan.target.KonanTarget
+import org.jetbrains.kotlin.tooling.core.KotlinToolingVersion
 
 /**
  * The [DokkatooKotlinAdapter] plugin will automatically register Kotlin source sets as Dokka source sets.
@@ -75,8 +80,7 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
     val compilationDetailsBuilder = KotlinCompilationDetailsBuilder(
       providers = providers,
       objects = objects,
-      configurations = project.configurations,
-      projectPath = project.path,
+      konanHome = dokkatooExtension.konanHome.asFile,
     )
     val allKotlinCompilationDetails: ListProperty<KotlinCompilationDetails> =
       compilationDetailsBuilder.createCompilationDetails(
@@ -127,7 +131,7 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
     val kssClasspath = determineClasspath(details)
 
     register(details.name) dss@{
-      suppress.set(!details.isMainSourceSet())
+      suppress.set(!details.isPublishedSourceSet())
       sourceRoots.from(details.sourceDirectories)
       classpath.from(kssClasspath)
       analysisPlatform.set(kssPlatform)
@@ -157,9 +161,9 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
 
   @DokkatooInternalApi
   companion object {
-
     private val logger = Logging.getLogger(DokkatooKotlinAdapter::class.java)
 
+    /** Try and get [KotlinProjectExtension], or `null` if it's not present */
     private fun ExtensionContainer.findKotlinExtension(): KotlinProjectExtension? =
       try {
         findByType()
@@ -175,6 +179,13 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
           else                    -> throw e
         }
       }
+
+    /** Get the version of the Kotlin Gradle Plugin currently used to compile the project */
+    // Must be lazy, else tests fail (because the KGP plugin isn't accessible)
+    internal val currentKotlinToolingVersion: KotlinToolingVersion by lazy {
+      val kgpVersion = getKotlinPluginVersion(logger)
+      KotlinToolingVersion(kgpVersion)
+    }
   }
 }
 
@@ -190,21 +201,18 @@ private data class KotlinCompilationDetails(
   val target: String,
   val kotlinPlatform: KotlinPlatform,
   val allKotlinSourceSetsNames: Set<String>,
-  val mainCompilation: Boolean,
-  val compileDependencyFiles: FileCollection,
+  val publishedCompilation: Boolean,
   val dependentSourceSetNames: Set<String>,
   val compilationClasspath: FileCollection,
+  val defaultSourceSetName: String,
 )
 
 /** Utility class, encapsulating logic for building [KotlinCompilationDetails] */
 private class KotlinCompilationDetailsBuilder(
   private val objects: ObjectFactory,
   private val providers: ProviderFactory,
-  private val configurations: ConfigurationContainer,
-  /** Used for logging */
-  private val projectPath: String,
+  private val konanHome: Provider<File>,
 ) {
-  private val logger = Logging.getLogger(KotlinCompilationDetails::class.java)
 
   fun createCompilationDetails(
     kotlinProjectExtension: KotlinProjectExtension,
@@ -231,9 +239,6 @@ private class KotlinCompilationDetailsBuilder(
     val allKotlinSourceSetsNames =
       compilation.allKotlinSourceSets.map { it.name } + compilation.defaultSourceSet.name
 
-    val compileDependencyFiles = objects.fileCollection()
-      .from(providers.provider { compilation.compileDependencyFiles })
-
     val dependentSourceSetNames =
       compilation.defaultSourceSet.dependsOn.map { it.name }
 
@@ -244,10 +249,10 @@ private class KotlinCompilationDetailsBuilder(
       target = compilation.target.name,
       kotlinPlatform = KotlinPlatform.fromString(compilation.platformType.name),
       allKotlinSourceSetsNames = allKotlinSourceSetsNames.toSet(),
-      mainCompilation = compilation.isMain(),
-      compileDependencyFiles = compileDependencyFiles,
+      publishedCompilation = compilation.isPublished(),
       dependentSourceSetNames = dependentSourceSetNames.toSet(),
       compilationClasspath = compilationClasspath,
+      defaultSourceSetName = compilation.defaultSourceSet.name
     )
   }
 
@@ -266,55 +271,66 @@ private class KotlinCompilationDetailsBuilder(
   private fun collectKotlinCompilationClasspath(
     compilation: KotlinCompilation<*>,
   ): FileCollection {
-
     val compilationClasspath = objects.fileCollection()
-    fun collectConfiguration(named: String) {
-      configurations.collectIncomingFiles(named = named, collector = compilationClasspath)
 
-      // need to fetch JAVA_RUNTIME files explicitly, because Android Gradle Plugin is weird and
-      // doesn't seem to register the attributes explicitly on its configurations
-      @Suppress("UnstableApiUsage")
-      configurations.collectIncomingFiles(named = named, collector = compilationClasspath) {
-        withVariantReselection()
-        attributes {
-          attribute(USAGE_ATTRIBUTE, objects.named(JAVA_API))
+    // collect dependency files from 'regular' Kotlin compilations
+    compilationClasspath.from(providers.provider { compilation.compileDependencyFiles })
+
+    // apply workaround for Kotlin/Native, which will be fixed in Kotlin 2.0
+    // (see KT-61559: K/N dependencies will be part of `compilation.compileDependencyFiles`)
+    if (
+      currentKotlinToolingVersion < KotlinToolingVersion("2.0.0")
+      &&
+      compilation is AbstractKotlinNativeCompilation
+    ) {
+      compilationClasspath.from(
+        konanHome.map { konanHome ->
+          kotlinNativeDependencies(konanHome, compilation.konanTarget)
         }
-        lenient(true)
-      }
-    }
-
-    val standardConfigurations = buildSet {
-      addAll(compilation.relatedConfigurationNames)
-      addAll(compilation.kotlinSourceSets.flatMap { it.relatedConfigurationNames })
-    }
-
-    logger.info("[$projectPath] compilation ${compilation.name} has ${standardConfigurations.size} standard configurations $standardConfigurations")
-
-    standardConfigurations.forEach { collectConfiguration(it) }
-
-    if (compilation is AbstractKotlinNativeCompilation) {
-      // K/N doesn't correctly set task dependencies, the configuration
-      // `defaultSourceSet.implementationMetadataConfigurationName`
-      // will trigger a bunch of Gradle warnings about "using file outputs without task dependencies",
-      // so K/N compilations need to explicitly depend on the compilation tasks
-      // UPDATE: actually I think is wrong, it's a bug with the K/N 'commonize for IDE' tasks
-      // see: https://github.com/Kotlin/dokka/issues/2977
-      collectConfiguration(
-        named = compilation.defaultSourceSet.implementationMetadataConfigurationName,
-//          builtBy = kotlinCompilation.compileKotlinTaskProvider
       )
     }
 
     return compilationClasspath
   }
 
+  private fun kotlinNativeDependencies(konanHome: File, target: KonanTarget): FileCollection {
+    val konanDistribution = KonanDistribution(konanHome)
+
+    val dependencies = objects.fileCollection()
+
+    dependencies.from(konanDistribution.stdlib)
+
+    // Konan library files for a specific target
+    dependencies.from(
+      konanDistribution.platformLibsDir
+        .resolve(target.name)
+        .listFiles()
+        .orEmpty()
+        .filter { it.isDirectory || it.extension == "klib" }
+    )
+
+    return dependencies
+  }
+
   companion object {
-    private fun KotlinCompilation<*>.isMain(): Boolean {
+
+    /**
+     * Determine if a [KotlinCompilation] is 'publishable', and so should be enabled by default
+     * when creating a Dokka publication.
+     *
+     * Typically, 'main' compilations are publishable and 'test' compilations should be suppressed.
+     * This can be overridden manually, though.
+     *
+     * @see DokkaSourceSetSpec.suppress
+     */
+    private fun KotlinCompilation<*>.isPublished(): Boolean {
       return when (this) {
-        is KotlinJvmAndroidCompilation ->
+        is KotlinMetadataCompilation<*> -> true
+
+        is KotlinJvmAndroidCompilation  ->
           androidVariant is LibraryVariant || androidVariant is ApplicationVariant
 
-        else                           ->
+        else                            ->
           name == MAIN_COMPILATION_NAME
       }
     }
@@ -340,10 +356,10 @@ private abstract class KotlinSourceSetDetails @Inject constructor(
   /** The specific compilations used to build this source set */
   abstract val compilations: ListProperty<KotlinCompilationDetails>
 
-  /** Estimate if this Kotlin source set are 'main' sources (as opposed to 'test' sources). */
-  fun isMainSourceSet(): Provider<Boolean> =
+  /** Estimate if this Kotlin source set contains 'published' sources */
+  fun isPublishedSourceSet(): Provider<Boolean> =
     compilations.map { values ->
-      values.any { it.mainCompilation }
+      values.any { it.publishedCompilation }
     }
 
   override fun getName(): String = named

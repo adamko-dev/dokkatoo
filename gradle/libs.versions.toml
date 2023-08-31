@@ -43,5 +43,6 @@ gradlePlugin-dokkatoo = { module = "dev.adamko.dokkatoo:dokkatoo-plugin", versio
 gradlePlugin-bcvMu = { module = "dev.adamko.kotlin.binary_compatibility_validator:bcv-gradle-plugin", version.ref = "gradlePlugin-bcvMu" }
 gradlePlugin-gradlePublishPlugin = { module = "com.gradle.publish:plugin-publish-plugin", version.ref = "gradlePlugin-gradlePublishPlugin" }
 gradlePlugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+gradlePlugin-kotlin-klibCommonizerApi = { module = "org.jetbrains.kotlin:kotlin-klib-commonizer-api", version.ref = "kotlin" }
 
 [plugins]
