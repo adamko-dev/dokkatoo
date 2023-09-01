@@ -6,6 +6,7 @@ import dev.adamko.dokkatoo.internal.*
 import java.io.Serializable
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.Property
@@ -44,6 +45,16 @@ constructor(
    * Defaults to [the path of the subproject][org.gradle.api.Project.getPath].
    */
   abstract val sourceSetScopeDefault: Property<String>
+
+  /**
+   * The Konan home directory, which contains libraries for Kotlin/Native development.
+   *
+   * This is only required as a workaround to fetch the compile-time dependencies in Kotlin/Native
+   * projects with a version below 2.0.
+   */
+  // This property should be removed when Dokkatoo only supports KGP 2 or higher.
+  @DokkatooInternalApi
+  abstract val konanHome: RegularFileProperty
 
   /**
    * Configuration for creating Dokka Publications.
