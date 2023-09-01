@@ -75,12 +75,14 @@ signing {
   val key = mavenPublishing.signingKey.orNull
   val password = mavenPublishing.signingPassword.orNull
 
-  if (keyId != null && key != null && password != null) {
+  if (!keyId.isNullOrBlank() && !key.isNullOrBlank() && !password.isNullOrBlank()) {
     useInMemoryPgpKeys(keyId, key, password)
   }
 
   setRequired({
-    keyId != null && key != null && password != null
+    gradle.taskGraph.allTasks.filterIsInstance<PublishToMavenRepository>().any {
+      it.repository.name == "SonatypeRelease"
+    }
   })
 }
 
