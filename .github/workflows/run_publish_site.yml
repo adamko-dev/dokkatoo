@@ -7,7 +7,7 @@ on:
 
 
 concurrency:
-  group: "${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}"
+  group: "Publish Site: ${{ github.workflow }}"
   cancel-in-progress: true
 
 
