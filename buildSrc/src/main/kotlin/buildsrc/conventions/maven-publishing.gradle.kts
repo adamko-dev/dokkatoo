@@ -55,7 +55,6 @@ publishing {
 
 
 //region Maven Central publishing/signing
-
 publishing {
   repositories {
     if (mavenPublishing.mavenCentralCredentials.isPresent) {
@@ -66,12 +65,7 @@ publishing {
     }
   }
 
-//  // Maven Central requires Javadoc JAR, which this project doesn't have because it's not Java, so use an empty jar.
-//  publications.withType<MavenPublication>().configureEach {
-//    // The Gradle Publish Plugin enables the Javadoc JAR in afterEvaluate, so find it lazily
-//    val javadocJarTask = tasks.withType<Jar>().matching { it.name == "javadocJar" }
-//    artifact(javadocJarTask)
-//  }
+  // com.gradle.plugin-publish automatically adds a Javadoc jar
 }
 
 signing {
@@ -91,8 +85,7 @@ signing {
 }
 
 //afterEvaluate {
-//  // Register signatures in afterEvaluate, otherwise the signing plugin creates
-//  // the signing tasks too early, before all the publications are added.
+//  com.gradle.plugin-publish automatically signs tasks in a weird way, that stops this from working:
 //  signing {
 //    sign(publishing.publications)
 //  }

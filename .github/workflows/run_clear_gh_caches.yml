@@ -1,7 +1,9 @@
 name: Clear all GitHub Actions caches
 
+
 on:
   workflow_dispatch:
+
 
 jobs:
   my-job:

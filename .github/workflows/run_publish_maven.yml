@@ -4,22 +4,23 @@ name: Publish Maven
 on:
   workflow_dispatch:
   workflow_call:
-#  push:
-#    branches:
-#      - main
+
 
 concurrency:
   group: "${{ github.workflow }}"
   cancel-in-progress: false
 
+
 env:
   # https://stackoverflow.com/a/71158878/4161471
   GIT_BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+
 
 permissions:
   contents: read
   packages: write
   checks: write
+
 
 jobs:
 

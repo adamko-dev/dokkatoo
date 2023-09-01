@@ -5,7 +5,6 @@ run-name: "Gradle Task ${{ inputs.gradle-task }} @ ${{ inputs.runs-on }}"
 
 on:
   workflow_dispatch:
-
   workflow_call:
     inputs:
       gradle-task:
@@ -27,6 +26,7 @@ concurrency:
 permissions:
   contents: read
   checks: write # required by mikepenz/action-junit-report
+
 
 jobs:
 
