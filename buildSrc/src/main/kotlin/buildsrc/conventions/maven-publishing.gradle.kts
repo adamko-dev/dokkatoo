@@ -57,10 +57,15 @@ publishing {
 //region Maven Central publishing/signing
 publishing {
   repositories {
-    if (mavenPublishing.mavenCentralCredentials.isPresent) {
+    val mavenCentralUsername = mavenPublishing.mavenCentralUsername.orNull
+    val mavenCentralPassword = mavenPublishing.mavenCentralPassword.orNull
+    if (!mavenCentralUsername.isNullOrBlank() && !mavenCentralPassword.isNullOrBlank()) {
       maven(mavenPublishing.sonatypeReleaseUrl) {
         name = "SonatypeRelease"
-        credentials(mavenPublishing.mavenCentralCredentials.get())
+        credentials {
+          username = mavenCentralUsername
+          password = mavenCentralPassword
+        }
       }
     }
   }

@@ -2,9 +2,7 @@ package buildsrc.settings
 
 import java.io.File
 import javax.inject.Inject
-import org.gradle.api.Action
 import org.gradle.api.Project
-import org.gradle.api.artifacts.repositories.PasswordCredentials
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.kotlin.dsl.*
@@ -30,20 +28,12 @@ abstract class MavenPublishingSettings @Inject constructor(
       }
     }
 
-  private val mavenCentralUsername: Provider<String> =
+  val mavenCentralUsername: Provider<String> =
     d2Prop("mavenCentralUsername")
       .orElse(providers.environmentVariable("MAVEN_SONATYPE_USERNAME"))
-  private val mavenCentralPassword: Provider<String> =
+  val mavenCentralPassword: Provider<String> =
     d2Prop("mavenCentralPassword")
       .orElse(providers.environmentVariable("MAVEN_SONATYPE_PASSWORD"))
-
-  val mavenCentralCredentials: Provider<Action<PasswordCredentials>> =
-    providers.zip(mavenCentralUsername, mavenCentralPassword) { user, pass ->
-      Action<PasswordCredentials> {
-        username = user
-        password = pass
-      }
-    }
 
   val signingKeyId: Provider<String> =
     d2Prop("signing.keyId")
