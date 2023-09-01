@@ -63,6 +63,12 @@ jobs:
         with:
           gradle-home-cache-cleanup: true
           arguments: ${{ inputs.gradle-task }}
+        env:
+          MAVEN_SONATYPE_USERNAME: ${{ secrets.MAVEN_SONATYPE_USERNAME }}
+          MAVEN_SONATYPE_PASSWORD: ${{ secrets.MAVEN_SONATYPE_PASSWORD }}
+          MAVEN_SONATYPE_SIGNING_KEY_ID: ${{ secrets.MAVEN_SONATYPE_SIGNING_KEY_ID }}
+          MAVEN_SONATYPE_SIGNING_KEY: ${{ secrets.MAVEN_SONATYPE_SIGNING_KEY }}
+          MAVEN_SONATYPE_SIGNING_PASSWORD: ${{ secrets.MAVEN_SONATYPE_SIGNING_PASSWORD }}
 
       - name: Upload build reports
         if: failure()
