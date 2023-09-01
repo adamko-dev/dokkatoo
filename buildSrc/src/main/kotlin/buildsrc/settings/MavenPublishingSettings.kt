@@ -5,7 +5,6 @@ import javax.inject.Inject
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.artifacts.repositories.PasswordCredentials
-import org.gradle.api.file.ProjectLayout
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.kotlin.dsl.*
@@ -19,23 +18,26 @@ abstract class MavenPublishingSettings @Inject constructor(
   private val providers: ProviderFactory,
 ) {
 
-  private val isReleaseVersion =
+  private val isReleaseVersion: Provider<Boolean> =
     providers.provider { !project.version.toString().endsWith("-SNAPSHOT") }
 
-  val sonatypeReleaseUrl = isReleaseVersion.map { isRelease ->
-    if (isRelease) {
-      "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-    } else {
-      "https://oss.sonatype.org/content/repositories/snapshots/"
+  val sonatypeReleaseUrl: Provider<String> =
+    isReleaseVersion.map { isRelease ->
+      if (isRelease) {
+        "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+      } else {
+        "https://oss.sonatype.org/content/repositories/snapshots/"
+      }
     }
-  }
 
-  private val mavenCentralUsername = d2Prop("mavenCentralUsername")
-    .orElse(providers.environmentVariable("MAVEN_SONATYPE_USERNAME"))
-  private val mavenCentralPassword = d2Prop("mavenCentralPassword")
-    .orElse(providers.environmentVariable("MAVEN_SONATYPE_PASSWORD"))
+  private val mavenCentralUsername: Provider<String> =
+    d2Prop("mavenCentralUsername")
+      .orElse(providers.environmentVariable("MAVEN_SONATYPE_USERNAME"))
+  private val mavenCentralPassword: Provider<String> =
+    d2Prop("mavenCentralPassword")
+      .orElse(providers.environmentVariable("MAVEN_SONATYPE_PASSWORD"))
 
-  val mavenCentralCredentials =
+  val mavenCentralCredentials: Provider<Action<PasswordCredentials>> =
     providers.zip(mavenCentralUsername, mavenCentralPassword) { user, pass ->
       Action<PasswordCredentials> {
         username = user
@@ -43,12 +45,15 @@ abstract class MavenPublishingSettings @Inject constructor(
       }
     }
 
-  val signingKeyId = d2Prop("signing.keyId")
-    .orElse(providers.environmentVariable("MAVEN_SONATYPE_SIGNING_KEY_ID"))
-  val signingKey = d2Prop("signing.key")
-    .orElse(providers.environmentVariable("MAVEN_SONATYPE_SIGNING_KEY"))
-  val signingPassword = d2Prop("signing.password")
-    .orElse(providers.environmentVariable("MAVEN_SONATYPE_SIGNING_PASSWORD"))
+  val signingKeyId: Provider<String> =
+    d2Prop("signing.keyId")
+      .orElse(providers.environmentVariable("MAVEN_SONATYPE_SIGNING_KEY_ID"))
+  val signingKey: Provider<String> =
+    d2Prop("signing.key")
+      .orElse(providers.environmentVariable("MAVEN_SONATYPE_SIGNING_KEY"))
+  val signingPassword: Provider<String> =
+    d2Prop("signing.password")
+      .orElse(providers.environmentVariable("MAVEN_SONATYPE_SIGNING_PASSWORD"))
 
   val githubPublishDir: Provider<File> =
     providers.environmentVariable("GITHUB_PUBLISH_DIR").map { File(it) }
