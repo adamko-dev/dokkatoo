@@ -28,7 +28,7 @@ jobs:
     uses: ./.github/workflows/run_publish_maven.yml
     secrets: inherit
     permissions:
-      contents: read
+      contents: write
       packages: write
       checks: write
 
