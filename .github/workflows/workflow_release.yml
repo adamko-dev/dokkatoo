@@ -1,0 +1,45 @@
+name: Releases
+
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+  release:
+    types: [ created ]
+
+
+concurrency:
+  group: "${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}"
+  cancel-in-progress: true
+
+
+jobs:
+
+  tests:
+    uses: ./.github/workflows/run_tests.yml
+    permissions:
+      contents: read
+      checks: write
+
+  publish-maven:
+    needs: tests
+    if: github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/run_publish_maven.yml
+    secrets: inherit
+    permissions:
+      contents: read
+      packages: write
+      checks: write
+
+  publish-site:
+    needs: tests
+    # only publish site when releasing
+    if: github.ref == 'refs/heads/main' && github.event_name == 'release' && github.event.action == 'created'
+    uses: ./.github/workflows/run_publish_site.yml
+    permissions:
+      contents: read
+      packages: write
+      checks: write
+      pages: write
+      id-token: write

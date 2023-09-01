@@ -1,0 +1,20 @@
+name: Pull Requests
+
+
+on:
+  workflow_dispatch:
+  pull_request:
+
+
+concurrency:
+  group: "${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}"
+  cancel-in-progress: true
+
+
+jobs:
+
+  tests:
+    uses: ./.github/workflows/run_tests.yml
+    permissions:
+      contents: read
+      checks: write
