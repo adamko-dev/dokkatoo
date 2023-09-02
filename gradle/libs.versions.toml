@@ -1,13 +1,13 @@
 [versions]
 
-kotlin = "1.8.20" # should match Gradle's embedded Kotlin version https://docs.gradle.org/current/userguide/compatibility.html#kotlin
-kotlin-dokka = "1.8.20"
-kotlinx-serialization = "1.5.1"
+kotlin = "1.9.0" # should match Gradle's embedded Kotlin version https://docs.gradle.org/current/userguide/compatibility.html#kotlin
+kotlin-dokka = "1.9.0"
+kotlinx-serialization = "1.6.0"
 
 kotest = "5.6.2"
 
 gradlePlugin-android = "8.0.2"
-gradlePlugin-dokkatoo = "1.5.0"
+gradlePlugin-dokkatoo = "1.6.0"
 gradlePlugin-gradlePublishPlugin = "1.2.1"
 gradlePlugin-bcvMu = "0.0.4"
 

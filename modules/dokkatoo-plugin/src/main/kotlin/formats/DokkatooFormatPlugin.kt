@@ -155,11 +155,9 @@ abstract class DokkatooFormatPlugin(
         version.map { v -> create("$this:$v") }
 
       with(dokkatooExtension.versions) {
-        dokkaPlugin(dokka("dokka-analysis"))
+        dokkaPlugin(dokka("analysis-kotlin-descriptors"))
         dokkaPlugin(dokka("templating-plugin"))
         dokkaPlugin(dokka("dokka-base"))
-        dokkaPlugin(dokka("kotlin-analysis-intellij"))
-        dokkaPlugin(dokka("kotlin-analysis-compiler"))
 //        dokkaPlugin(dokka("all-modules-page-plugin"))
 
         dokkaPlugin("org.jetbrains.kotlinx:kotlinx-html" version kotlinxHtml)
