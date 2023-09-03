@@ -136,7 +136,7 @@ private fun initDokkaProject(
 
     gradleProperties = gradleProperties
       .replace(
-        "dokka_it_android_gradle_plugin_version=4.1.3",
+        "dokka_it_android_gradle_plugin_version=4.2.2",
         "dokka_it_android_gradle_plugin_version=8.0.2",
       )
 

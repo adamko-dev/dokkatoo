@@ -14,7 +14,7 @@ pluginManagement {
     resolutionStrategy {
         eachPlugin {
             if (requested.id.id == "org.jetbrains.dokka") {
-                useModule("org.jetbrains.dokka:dokka-gradle-plugin:1.8.20")
+                useModule("org.jetbrains.dokka:dokka-gradle-plugin:1.9.0")
             }
 
             if (requested.id.id == "com.android.library") {
