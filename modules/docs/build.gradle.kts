@@ -22,10 +22,6 @@ dokkatoo {
       "./images/logo-icon.svg",
     )
   }
-
-  versions {
-    jetbrainsDokka.set(libs.versions.kotlin.dokka)
-  }
 }
 
 tasks.dokkatooGeneratePublicationHtml {
