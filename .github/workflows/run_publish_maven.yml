@@ -111,4 +111,4 @@ jobs:
     with:
       runs-on: macos-latest # only macOS supports building all Kotlin targets
       gradle-task: >-
-        publishAllPublicationsToSonatypeReleaseRepository --stacktrace
+        publishAllPublicationsToSonatypeReleaseRepository --stacktrace --no-configuration-cache --no-parallel
