@@ -22,9 +22,9 @@ abstract class MavenPublishingSettings @Inject constructor(
   val sonatypeReleaseUrl: Provider<String> =
     isReleaseVersion.map { isRelease ->
       if (isRelease) {
-        "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+        "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
       } else {
-        "https://oss.sonatype.org/content/repositories/snapshots/"
+        "https://s01.oss.sonatype.org/content/repositories/snapshots/"
       }
     }
 
