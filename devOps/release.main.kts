@@ -9,12 +9,10 @@ import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import java.io.File
 import java.util.concurrent.TimeUnit.MINUTES
-import kotlin.coroutines.resume
 import kotlin.system.exitProcess
-import kotlinx.coroutines.Dispatchers
+import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.withContext
 import me.alllex.parsus.parser.*
 import me.alllex.parsus.token.literalToken
 import me.alllex.parsus.token.regexToken
@@ -193,11 +191,11 @@ object Release : CliktCommand() {
       buildGradleKts.writeText(updatedFile)
     }
 
-  private fun mergeAndWait(branchName: String) {
+  private fun mergeAndWait(branchName: String): Unit = runBlocking {
     GitHub.autoMergePr(branchName)
     echo("Waiting for the PR to be merged...")
     while (GitHub.prState(branchName) != "MERGED") {
-      Thread.sleep(1_000)
+      delay(1.seconds)
       echo(".", trailingNewline = false)
     }
   }
@@ -208,7 +206,8 @@ private abstract class CliTool {
   protected fun runCommand(
     cmd: String,
     dir: File? = Git.rootDir,
-  ): String = runBlocking {
+    logOutput: Boolean = true,
+  ): String {
     val args = parseSpaceSeparatedArgs(cmd)
 
     val process = ProcessBuilder(args).apply {
@@ -216,35 +215,24 @@ private abstract class CliTool {
       redirectInput(ProcessBuilder.Redirect.PIPE)
       redirectErrorStream(true)
       if (dir != null) directory(dir)
-    }.launch()
+    }.start()
 
-    if (process.exitCode != 0) {
-      error("command '$cmd' failed:\n${process.output}")
+    val processOutput = process.inputStream
+      .bufferedReader()
+      .lineSequence()
+      .onEach { if (logOutput) println("\t$it") }
+      .joinToString("\n")
+      .trim()
+
+    process.waitFor(10, MINUTES)
+
+    val exitCode = process.exitValue()
+
+    if (exitCode != 0) {
+      error("command '$cmd' failed:\n${processOutput}")
     }
 
-    process.output.trim()
-  }
-
-  private suspend fun ProcessBuilder.launch(): ProcessResult = withContext(Dispatchers.IO) {
-    suspendCancellableCoroutine { continuation ->
-      val process = start()
-
-      val processOutput = process.inputStream
-        .bufferedReader()
-        .lineSequence()
-        .onEach { println("\t$it") }
-        .joinToString("\n")
-
-      process.waitFor(10, MINUTES)
-
-      val result = ProcessResult(
-        exitCode = process.exitValue(),
-        output = processOutput,
-      )
-
-      continuation.invokeOnCancellation { process.destroy() }
-      continuation.resume(result)
-    }
+    return processOutput
   }
 
   private data class ProcessResult(
@@ -329,7 +317,7 @@ private object GitHub : CliTool() {
     runCommand("gh repo set-default $repo")
 
   fun prState(branchName: String): String =
-    runCommand("gh pr view $branchName --json state --jq .state")
+    runCommand("gh pr view $branchName --json state --jq .state", logOutput = false)
 
   fun createPr(branch: String): String =
     runCommand("gh pr create --head $branch --fill")
@@ -365,7 +353,7 @@ private object Gradle : CliTool() {
 
   fun publishPlugins(): String {
     stopDaemons()
-    return runCommand("$gradlew publishPlugins --no-daemon")
+    return runCommand("$gradlew publishPlugins --no-daemon --no-configuration-cache")
   }
 }
 
