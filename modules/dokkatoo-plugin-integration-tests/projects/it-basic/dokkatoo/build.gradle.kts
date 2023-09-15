@@ -3,7 +3,7 @@ import dev.adamko.dokkatoo.dokka.plugins.DokkaHtmlPluginParameters
 
 plugins {
   kotlin("jvm") version "1.9.0"
-  id("dev.adamko.dokkatoo") version "2.0.0-SNAPSHOT"
+  id("dev.adamko.dokkatoo") version "2.0.0"
 }
 
 version = "1.9.0-SNAPSHOT"
