@@ -1,14 +1,20 @@
 #!/usr/bin/env kotlin
 @file:DependsOn("com.github.ajalt.clikt:clikt-jvm:3.5.2")
 @file:DependsOn("me.alllex.parsus:parsus-jvm:0.4.0")
+@file:DependsOn("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.7.3")
 
 import Release_main.SemVer.Companion.SemVer
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import java.io.File
-import java.lang.ProcessBuilder.Redirect.PIPE
+import java.util.concurrent.TimeUnit.MINUTES
+import kotlin.coroutines.resume
 import kotlin.system.exitProcess
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
 import me.alllex.parsus.parser.*
 import me.alllex.parsus.token.literalToken
 import me.alllex.parsus.token.regexToken
@@ -37,16 +43,16 @@ object Release : CliktCommand() {
   ).flag(default = false)
 
   override fun run() {
+    echo("Current Dokkatoo version is $dokkatooVersion")
+    echo("git dir is ${Git.rootDir}")
+
     val startBranch = Git.currentBranch()
 
     validateGitStatus(startBranch)
 
-    echo("Current version is $currentVersion")
-    echo("git dir is ${Git.rootDir}")
-
     val releaseVersion = semverPrompt(
       text = "version to release?",
-      default = currentVersion.copy(snapshot = false),
+      default = dokkatooVersion.copy(snapshot = false),
     ) {
       if (it.snapshot) {
         echo("versionToRelease must not be a snapshot version, but was $it")
@@ -87,8 +93,8 @@ object Release : CliktCommand() {
     check(Git.status().isEmpty()) {
       "git repo is not clean. Stash or commit changes before making a release."
     }
-    check(currentVersion.snapshot) {
-      "Current version must be a SNAPSHOT, but was $currentVersion"
+    check(dokkatooVersion.snapshot) {
+      "Current version must be a SNAPSHOT, but was $dokkatooVersion"
     }
     check(startBranch == "main") {
       "Must be on the main branch to make a release, but current branch is $startBranch"
@@ -114,7 +120,6 @@ object Release : CliktCommand() {
 
     return if (response == null || !validate(response)) {
       if (response == null) echo("invalid SemVer")
-
       semverPrompt(text, default, validate)
     } else {
       response
@@ -128,7 +133,7 @@ object Release : CliktCommand() {
     Git.switch(releaseBranch, create = true)
 
     // update the version & run tests
-    currentVersion = version
+    dokkatooVersion = version
     echo("running Gradle check...")
     Gradle.check()
 
@@ -149,8 +154,8 @@ object Release : CliktCommand() {
 
   private fun createAndPushTag(version: SemVer) {
     // Tag the release
-    require(currentVersion == version) {
-      "tried to create a tag, but project version does not match provided version. Expected $version but got $currentVersion"
+    require(dokkatooVersion == version) {
+      "tried to create a tag, but project version does not match provided version. Expected $version but got $dokkatooVersion"
     }
     val tagName = "v$version"
     Git.tag(tagName)
@@ -170,16 +175,9 @@ object Release : CliktCommand() {
   }
 
   /** Read/write the version set in the root `build.gradle.kts` file */
-  private var currentVersion: SemVer
+  private var dokkatooVersion: SemVer
     get() {
-      val versionLine = buildGradleKts.useLines { lines ->
-        lines.firstOrNull { it.startsWith("version = ") }
-      }
-
-      requireNotNull(versionLine) { "cannot find version in $buildGradleKts" }
-
-      val rawVersion = versionLine.substringAfter("\"").substringBefore("\"")
-
+      val rawVersion = Gradle.dokkatooVersion()
       return SemVer(rawVersion)
     }
     set(value) {
@@ -210,24 +208,49 @@ private abstract class CliTool {
   protected fun runCommand(
     cmd: String,
     dir: File? = Git.rootDir,
-  ): String {
+  ): String = runBlocking {
     val args = parseSpaceSeparatedArgs(cmd)
 
-    val process = ProcessBuilder(*args.toTypedArray()).apply {
-      redirectOutput(PIPE)
-      redirectError(PIPE)
+    val process = ProcessBuilder(args).apply {
+      redirectOutput(ProcessBuilder.Redirect.PIPE)
+      redirectInput(ProcessBuilder.Redirect.PIPE)
+      redirectErrorStream(true)
       if (dir != null) directory(dir)
-    }.start()
+    }.launch()
 
-    val ret = process.waitFor()
-
-    val output = process.inputStream.bufferedReader().use { it.readText() }
-    if (ret != 0) {
-      error("command '$cmd' failed:\n$output")
+    if (process.exitCode != 0) {
+      error("command '$cmd' failed:\n${process.output}")
     }
 
-    return output.trim()
+    process.output.trim()
   }
+
+  private suspend fun ProcessBuilder.launch(): ProcessResult = withContext(Dispatchers.IO) {
+    suspendCancellableCoroutine { continuation ->
+      val process = start()
+
+      val processOutput = process.inputStream
+        .bufferedReader()
+        .lineSequence()
+        .onEach { println("\t$it") }
+        .joinToString("\n")
+
+      process.waitFor(10, MINUTES)
+
+      val result = ProcessResult(
+        exitCode = process.exitValue(),
+        output = processOutput,
+      )
+
+      continuation.invokeOnCancellation { process.destroy() }
+      continuation.resume(result)
+    }
+  }
+
+  private data class ProcessResult(
+    val exitCode: Int,
+    val output: String,
+  )
 
   companion object {
     private fun parseSpaceSeparatedArgs(argsString: String): List<String> {
@@ -266,6 +289,11 @@ private abstract class CliTool {
 /** git commands */
 private object Git : CliTool() {
   val rootDir = File(runCommand("git rev-parse --show-toplevel", dir = null))
+
+  init {
+    require(rootDir.exists()) { "could not determine root git directory" }
+  }
+
   fun switch(branch: String, create: Boolean = false): String {
     return runCommand(
       buildString {
@@ -315,16 +343,29 @@ private object GitHub : CliTool() {
 
 /** GitHub commands */
 private object Gradle : CliTool() {
-  fun stopDaemons(): String = runCommand("./gradlew --stop")
+
+  val gradlew: String
+
+  init {
+    val osName = System.getProperty("os.name").lowercase()
+    gradlew = if ("win" in osName) "./gradlew.bat" else "./gradlew"
+  }
+
+  fun stopDaemons(): String = runCommand("$gradlew --stop")
+
+  fun dokkatooVersion(): String {
+    stopDaemons()
+    return runCommand("$gradlew :dokkatooVersion --quiet --no-daemon")
+  }
 
   fun check(): String {
     stopDaemons()
-    return runCommand("./gradlew check --no-daemon")
+    return runCommand("$gradlew check --no-daemon")
   }
 
   fun publishPlugins(): String {
     stopDaemons()
-    return runCommand("./gradlew publishPlugins --no-daemon")
+    return runCommand("$gradlew publishPlugins --no-daemon")
   }
 }
 
