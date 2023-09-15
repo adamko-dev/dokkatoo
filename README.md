@@ -1,6 +1,7 @@
 [![GitHub license](https://img.shields.io/github/license/adamko-dev/dokkatoo?style=for-the-badge)](https://github.com/adamko-dev/dokkatoo/blob/main/LICENSE)
 [![Gradle Plugin Portal](https://img.shields.io/gradle-plugin-portal/v/dev.adamko.dokkatoo?style=for-the-badge&logo=gradle)](https://plugins.gradle.org/search?term=dokkatoo)
-[![Maven metadata URL](https://img.shields.io/maven-metadata/v?label=MAVEN%20SNAPSHOT&metadataUrl=https%3A%2F%2Fraw.githubusercontent.com%2Fadamko-dev%2Fdokkatoo%2Fartifacts%2Fm2%2Fdev%2Fadamko%2Fdokkatoo%2Fdokkatoo-plugin%2Fmaven-metadata.xml&style=for-the-badge&logo=apache-maven)](https://github.com/adamko-dev/dokkatoo/tree/artifacts#readme)
+[![Maven metadata URL](https://img.shields.io/maven-metadata/v?label=MAVEN%20RELEASE&metadataUrl=https%3A%2F%2Fs01.oss.sonatype.org%2Fcontent%2Frepositories%2Freleases%2Fdev%2Fadamko%2Fdokkatoo%2Fdokkatoo-plugin%2Fmaven-metadata.xml&style=for-the-badge&logo=apache-maven)](https://s01.oss.sonatype.org/content/repositories/snapshots/dev/adamko/dokkatoo/dokkatoo-plugin/)
+[![Maven metadata URL](https://img.shields.io/maven-metadata/v?label=MAVEN%20SNAPSHOT&metadataUrl=https%3A%2F%2Fs01.oss.sonatype.org%2Fcontent%2Frepositories%2Fsnapshots%2Fdev%2Fadamko%2Fdokkatoo%2Fdokkatoo-plugin%2Fmaven-metadata.xml&style=for-the-badge&logo=apache-maven)](https://s01.oss.sonatype.org/content/repositories/snapshots/dev/adamko/dokkatoo/dokkatoo-plugin/)
 [![Slack](https://img.shields.io/badge/slack-%23dokka-white.svg?&style=for-the-badge&logo=slack)](https://slack-chats.kotlinlang.org/c/dokka)
 
 <picture>
@@ -196,9 +197,7 @@ dokkatoo {
 
 ### Snapshot releases
 
-Snapshot versions of Dokkatoo are available. They are published to a GitHub branch, which must be
-added as a
-[custom Gradle Plugin repository](https://docs.gradle.org/current/userguide/plugins.html#sec:custom_plugin_repositories)
+Snapshot versions of Dokkatoo are available on Maven Central.
 
 ```kts
 // settings.gradle.kts
@@ -209,17 +208,9 @@ pluginManagement {
     mavenCentral()
 
     // add the Dokkatoo snapshot repository
-    maven("https://raw.githubusercontent.com/adamko-dev/dokkatoo/artifacts/m2/") {
-      name = "Dokkatoo Snapshots"
-      // only include Dokkatoo snapshots
-      mavenContent {
-        includeGroup("dev.adamko.dokkatoo")
-        includeGroup("dev.adamko.dokkatoo-html")
-        includeGroup("dev.adamko.dokkatoo-javadoc")
-        includeGroup("dev.adamko.dokkatoo-jekyll")
-        includeGroup("dev.adamko.dokkatoo-markdown")
-        snapshotsOnly()
-      }
+    maven("https://s01.oss.sonatype.org/content/repositories/snapshots/") {
+      name = "MavenCentralSnapshots"
+      mavenContent { snapshotsOnly() }
     }
   }
 }
