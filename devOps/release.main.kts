@@ -315,16 +315,24 @@ private object GitHub : CliTool() {
 
 /** GitHub commands */
 private object Gradle : CliTool() {
-  fun stopDaemons(): String = runCommand("./gradlew --stop")
+
+  val gradlew: String
+
+  init {
+    val osName = System.getProperty("os.name").lowercase()
+    gradlew = if ("win" in osName) "./gradlew.bat" else "./gradlew"
+  }
+
+  fun stopDaemons(): String = runCommand("$gradlew --stop")
 
   fun check(): String {
     stopDaemons()
-    return runCommand("./gradlew check --no-daemon")
+    return runCommand("$gradlew check --no-daemon")
   }
 
   fun publishPlugins(): String {
     stopDaemons()
-    return runCommand("./gradlew publishPlugins --no-daemon")
+    return runCommand("$gradlew publishPlugins --no-daemon")
   }
 }
 
