@@ -27,6 +27,6 @@ tasks.withType<dev.adamko.dokkatoo.tasks.DokkatooGenerateTask>().configureEach {
     // sourceSetScope renaming is fine, I'm not worried about it. The default comes from the
     // Gradle Task name, so a name difference doesn't matter.
     // We can just manually force the Dokkatoo name to match Dokka.
-    sourceSetScope.set(":dokkaHtml")
+    sourceSetScope = ":dokkaHtml"
   }
 }
