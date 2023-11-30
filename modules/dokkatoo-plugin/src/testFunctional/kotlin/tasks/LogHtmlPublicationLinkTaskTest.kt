@@ -19,39 +19,10 @@ class LogHtmlPublicationLinkTaskTest : FunSpec({
     val serverPort = server.resolvedConnectors().first().port
 
     val validServerUri = "http://localhost:$serverPort"
-    val invalidServerUri = "http://localhost:$serverPort/wrong/path/"
     val validServerUriParam = `-P`("testServerUri=$validServerUri")
-    val invalidServerUriParam = `-P`("testServerUri=$invalidServerUri")
 
     context("and a Kotlin project") {
       val project = initDokkatooProject()
-
-      context("when generate task is run with incorrect server URI") {
-        project.runner
-          .addArguments(
-            "clean",
-            "dokkatooGeneratePublicationHtml",
-            "--stacktrace",
-            "--info",
-            invalidServerUriParam,
-          )
-          .forwardOutput()
-          .build {
-            test("expect project builds successfully") {
-              output shouldContain "BUILD SUCCESSFUL"
-            }
-            test("LogHtmlPublicationLinkTask should run") {
-              shouldHaveTasksWithAnyOutcome(
-                ":logLinkDokkatooGeneratePublicationHtml" to listOf(SUCCESS)
-              )
-            }
-            test("expect invalid link is logged, with warning") {
-              output shouldContain "Generated Dokka HTML publication: $invalidServerUri"
-              output shouldContain "Warning: ${invalidServerUri}log-html-publication-link-task/build/dokka/html/index.html returned unsuccessful status code 404"
-              output shouldContain "Does the index.html file exist, or is the server misconfigured?"
-            }
-          }
-      }
 
       context("when generate task is run with correct server URI") {
         project.runner

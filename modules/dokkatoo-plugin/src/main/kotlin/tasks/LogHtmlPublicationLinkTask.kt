@@ -116,14 +116,6 @@ constructor(
     val link = URI(serverUri).appendPath(indexHtmlPath)
 
     logger.lifecycle("Generated Dokka HTML publication: $link")
-
-    val statusCode = httpGet(link).statusCode()
-    if (statusCode !in 200..299) {
-      logger.warn(
-        "Warning: $link returned unsuccessful status code $statusCode. " +
-            "Does the index.html file exist, or is the server misconfigured?"
-      )
-    }
   }
 
   /**
