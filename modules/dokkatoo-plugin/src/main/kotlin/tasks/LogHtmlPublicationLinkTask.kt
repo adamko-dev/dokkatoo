@@ -17,6 +17,7 @@ import org.gradle.api.tasks.Console
 import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.*
 import org.gradle.work.DisableCachingByDefault
+import org.slf4j.LoggerFactory
 
 /**
  * Prints an HTTP link in the console when the HTML publication is generated.
@@ -24,10 +25,16 @@ import org.gradle.work.DisableCachingByDefault
  * The HTML publication requires a web server, since it loads resources via javascript.
  *
  * By default, it uses
- * [IntelliJ's built-in server](https://www.jetbrains.com/help/idea/php-built-in-web-server.html)
+ * [IntelliJ's built-in server](https://www.jetbrains.com/help/phpstorm/php-built-in-web-server.html#ws_html_preview_output_built_in_browser)†
  * to host the file.
  *
+ *
  * This task can be disabled using the [ENABLE_TASK_PROPERTY_NAME] project property.
+ *
+ * ---
+ *
+ * † For some reason there only doc page for the built-in server I could find is for PhpStorm,
+ * but the built-in server is also available in IntelliJ IDEA.)
  */
 @DisableCachingByDefault(because = "logging-only task")
 abstract class LogHtmlPublicationLinkTask
@@ -56,7 +63,7 @@ constructor(
    *    ```
    *    /Users/rachel/projects/my-project/docs/build/dokka/html/index.html
    *    ````
-   * * then IntelliJ requires the [indexHtmlPath] is
+   * * then IntelliJ requires [indexHtmlPath] is
    *    ```
    *    my-project/docs/build/dokka/html/index.html
    *    ```
@@ -85,18 +92,30 @@ constructor(
     super.onlyIf("task is enabled via property") {
       logHtmlPublicationLinkTaskEnabled.get()
     }
+
+    super.onlyIf("${::serverUri.name} is present") {
+      !serverUri.orNull.isNullOrBlank()
+    }
+
+    super.onlyIf("${::indexHtmlPath.name} is present") {
+      !indexHtmlPath.orNull.isNullOrBlank()
+    }
   }
 
   @TaskAction
   fun exec() {
-    val serverUri = serverUri.orNull
-    val filePath = indexHtmlPath.orNull
+    val serverUri = serverUri.get()
+    val indexHtmlPath = indexHtmlPath.get()
 
-    if (serverUri != null && !filePath.isNullOrBlank()) {
-      val link = URI(serverUri).appendPath(filePath).toString()
+    logger.info(
+      "LogHtmlPublicationLinkTask received variables " +
+          "serverUri:$serverUri, " +
+          "indexHtmlPath:$indexHtmlPath"
+    )
 
-      logger.lifecycle("Generated Dokka HTML publication: $link")
-    }
+    val link = URI(serverUri).appendPath(indexHtmlPath)
+
+    logger.lifecycle("Generated Dokka HTML publication: $link")
   }
 
   /**
@@ -110,8 +129,13 @@ constructor(
    */
   internal abstract class ServerActiveCheck : ValueSource<Boolean, ServerActiveCheck.Parameters> {
 
+    private val logger = LoggerFactory.getLogger(ServerActiveCheck::class.java)
+
     interface Parameters : ValueSourceParameters {
-      /** E.g. `http://localhost:63342` */
+      /**
+       * IntelliJ built-in server's default address is `http://localhost:63342`
+       * See https://www.jetbrains.com/help/idea/settings-debugger.html
+       */
       val uri: Property<String>
     }
 
@@ -126,11 +150,12 @@ constructor(
           .GET()
           .build()
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
-
         // don't care about the status - only if the server is available
+        logger.info("got ${response.statusCode()} from $uri")
         return response.statusCode() > 0
       } catch (ex: Exception) {
-        return false
+        logger.info("could not reach URI ${parameters.uri.get()}: $ex")
+        return  false
       }
     }
   }
@@ -140,8 +165,10 @@ constructor(
      * Control whether the [LogHtmlPublicationLinkTask] task is enabled. Useful for disabling the
      * task locally, or in CI/CD, or for tests.
      *
+     * It can be set in any `gradle.properties` file. For example, on a specific machine:
+     *
      * ```properties
-     * #$GRADLE_USER_HOME/gradle.properties
+     * # $GRADLE_USER_HOME/gradle.properties
      * dev.adamko.dokkatoo.tasks.logHtmlPublicationLinkEnabled=false
      * ```
      *

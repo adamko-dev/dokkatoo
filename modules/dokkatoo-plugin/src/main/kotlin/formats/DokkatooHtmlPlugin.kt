@@ -53,7 +53,9 @@ constructor() : DokkatooFormatPlugin(formatName = "html") {
   private fun DokkatooFormatPluginContext.registerLogHtmlUrlTask():
       TaskProvider<LogHtmlPublicationLinkTask> {
 
-    val indexHtmlFile = dokkatooTasks.generatePublication
+    val generatePublicationTask = dokkatooTasks.generatePublication
+
+    val indexHtmlFile = generatePublicationTask
       .flatMap { it.outputDirectory.file("index.html") }
 
     val indexHtmlPath = indexHtmlFile.map { indexHtml ->
@@ -63,8 +65,10 @@ constructor() : DokkatooFormatPlugin(formatName = "html") {
     }
 
     return project.tasks.register<LogHtmlPublicationLinkTask>(
-      "logLink" + dokkatooTasks.generatePublication.name.uppercaseFirstChar()
+      "logLink" + generatePublicationTask.name.uppercaseFirstChar()
     ) {
+      // default port of IntelliJ built-in server is defined in the docs
+      // https://www.jetbrains.com/help/idea/settings-debugger.html#24aabda8
       serverUri.convention("http://localhost:63342")
       this.indexHtmlPath.convention(indexHtmlPath)
     }

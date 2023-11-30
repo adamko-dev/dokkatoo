@@ -5,7 +5,7 @@ import dev.adamko.dokkatoo.DokkatooExtension
 import dev.adamko.dokkatoo.adapters.DokkatooAndroidAdapter
 import dev.adamko.dokkatoo.adapters.DokkatooJavaAdapter
 import dev.adamko.dokkatoo.adapters.DokkatooKotlinAdapter
-import dev.adamko.dokkatoo.internal.*
+import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import javax.inject.Inject
 import org.gradle.api.Plugin
 import org.gradle.api.Project

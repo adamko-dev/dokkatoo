@@ -164,6 +164,12 @@ testing.suites {
         shouldRunAfter(test)
       }
     }
+
+    dependencies {
+      implementation(project.dependencies.platform(libs.ktor.bom))
+      implementation(libs.ktorServer.core)
+      implementation(libs.ktorServer.cio)
+    }
   }
 
   tasks.check { dependsOn(test, testFunctional) }

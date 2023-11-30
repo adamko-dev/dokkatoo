@@ -51,7 +51,7 @@ class DokkatooPluginFunctionalTest : FunSpec({
   }
 
   test("expect Dokka Plugin creates Dokka outgoing variants") {
-    val build = testProject.runner
+    testProject.runner
       .addArguments("outgoingVariants", "-q")
       .build {
         val variants = output.invariantNewlines().replace('\\', '/')

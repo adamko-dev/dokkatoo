@@ -4,6 +4,8 @@ kotlin = "1.9.0" # should match Gradle's embedded Kotlin version https://docs.gr
 kotlin-dokka = "1.9.0"
 kotlinx-serialization = "1.6.0"
 
+ktor = "2.3.6"
+
 kotest = "5.6.2"
 
 gradlePlugin-android = "8.0.2"
@@ -23,6 +25,13 @@ kotlin-dokkaPlugin-templating = { module = "org.jetbrains.dokka:templating-plugi
 kotlinxSerialization-bom = { module = "org.jetbrains.kotlinx:kotlinx-serialization-bom", version.ref = "kotlinx-serialization" }
 kotlinxSerialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json" }
 #kotlinxSerialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
+
+##region ktor
+ktor-bom = { group = "io.ktor", name = "ktor-bom", version.ref = "ktor" }
+
+ktorServer-core = { group = "io.ktor", name = "ktor-server-core" }
+ktorServer-cio = { group = "io.ktor", name = "ktor-server-cio" }
+##endregion
 
 
 ### Test libraries ###
