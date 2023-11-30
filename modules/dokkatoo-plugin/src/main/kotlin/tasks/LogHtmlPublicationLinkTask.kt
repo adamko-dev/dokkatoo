@@ -140,16 +140,22 @@ constructor(
     }
 
     override fun obtain(): Boolean {
-      return try {
+      try {
         val uri = URI.create(parameters.uri.get())
-        val response = httpGet(uri)
-
+        val client = HttpClient.newHttpClient()
+        val request = HttpRequest
+          .newBuilder()
+          .uri(uri)
+          .timeout(Duration.ofSeconds(1))
+          .GET()
+          .build()
+        val response = client.send(request, HttpResponse.BodyHandlers.ofString())
         // don't care about the status - only if the server is available
         logger.info("got ${response.statusCode()} from $uri")
-        response.statusCode() > 0
+        return response.statusCode() > 0
       } catch (ex: Exception) {
         logger.info("could not reach URI ${parameters.uri.get()}: $ex")
-        false
+        return  false
       }
     }
   }
@@ -173,16 +179,5 @@ constructor(
      * ```
      */
     const val ENABLE_TASK_PROPERTY_NAME = "dev.adamko.dokkatoo.tasks.logHtmlPublicationLinkEnabled"
-
-    private fun httpGet(uri: URI): HttpResponse<String> {
-      val client = HttpClient.newHttpClient()
-      val request = HttpRequest
-        .newBuilder()
-        .uri(uri)
-        .timeout(Duration.ofSeconds(1))
-        .GET()
-        .build()
-      return client.send(request, HttpResponse.BodyHandlers.ofString())
-    }
   }
 }
