@@ -11,6 +11,7 @@ import io.kotest.matchers.paths.shouldBeAFile
 import io.kotest.matchers.paths.shouldNotExist
 import io.kotest.matchers.string.shouldBeEmpty
 import io.kotest.matchers.string.shouldContain
+import io.kotest.matchers.string.shouldNotContain
 import org.gradle.testkit.runner.TaskOutcome.*
 
 class MultiModuleFunctionalTest : FunSpec({
@@ -302,7 +303,6 @@ class MultiModuleFunctionalTest : FunSpec({
     val project = initDokkatooProject("logging")
 
     test("expect no logs when built using --quiet log level") {
-
       project.runner
         .addArguments(
           "clean",
@@ -318,7 +318,6 @@ class MultiModuleFunctionalTest : FunSpec({
     }
 
     test("expect no Dokkatoo logs when built using lifecycle log level") {
-
       project.runner
         .addArguments(
           "clean",
@@ -374,6 +373,31 @@ class MultiModuleFunctionalTest : FunSpec({
               "> Task :subproject-hello:prepareDokkatooModuleDescriptorJavadoc",
               "> Task :subproject-hello:prepareDokkatooModuleDescriptorJekyll",
             )
+        }
+    }
+  }
+
+  context("KotlinProjectExtension failure warning") {
+    val project = initDokkatooProject("kpe-warning") {
+      buildGradleKts = buildGradleKts.lines().joinToString("\n") { line ->
+        when {
+          line.startsWith("""  kotlin("jvm")""") -> "//$line"
+
+          else                                   -> line
+        }
+      }
+    }
+
+    test("expect warning regarding KotlinProjectExtension") {
+      project.runner
+        .addArguments("clean")
+        .forwardOutput()
+        .build {
+          // the root project doesn't have the KGP applied, so KotlinProjectExtension shouldn't be applied
+          output shouldNotContain "DokkatooKotlinAdapter failed to get KotlinProjectExtension in :\n"
+
+          output shouldContain "DokkatooKotlinAdapter failed to get KotlinProjectExtension in :subproject-hello\n"
+          output shouldContain "DokkatooKotlinAdapter failed to get KotlinProjectExtension in :subproject-goodbye\n"
         }
     }
   }

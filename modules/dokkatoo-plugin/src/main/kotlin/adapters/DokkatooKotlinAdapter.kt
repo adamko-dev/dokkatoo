@@ -11,6 +11,7 @@ import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec
 import dev.adamko.dokkatoo.dokka.parameters.KotlinPlatform
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import dev.adamko.dokkatoo.internal.not
+import dev.adamko.dokkatoo.internal.warn
 import java.io.File
 import javax.inject.Inject
 import org.gradle.api.Named
@@ -55,7 +56,7 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
 ) : Plugin<Project> {
 
   override fun apply(project: Project) {
-    logger.info("applied DokkatooKotlinAdapter to ${project.path}")
+    logger.info("Applying $dkaName to ${project.path}")
 
     project.plugins.withType<DokkatooBasePlugin>().configureEach {
       project.pluginManager.apply {
@@ -68,11 +69,28 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
   }
 
   private fun exec(project: Project) {
-    val kotlinExtension = project.extensions.findKotlinExtension() ?: run {
-      logger.info("could not find Kotlin Extension")
+    val kotlinExtension = project.extensions.findKotlinExtension()
+    if (kotlinExtension == null) {
+      if (project.extensions.findByName("kotlin") != null) {
+        // uh oh - the Kotlin extension is present but findKotlinExtension() failed.
+        // Is there a class loader issue? https://github.com/gradle/gradle/issues/27218
+        logger.warn {
+          val allPlugins =
+            project.plugins.joinToString { it::class.qualifiedName ?: "${it::class}" }
+          val allExtensions =
+            project.extensions.extensionsSchema.elements.joinToString { "${it.name} ${it.publicType}" }
+
+          /* language=TEXT */ """
+            |$dkaName failed to get KotlinProjectExtension in ${project.path}
+            |  Applied plugins: $allPlugins
+            |  Available extensions: $allExtensions
+          """.trimMargin()
+        }
+      }
+      logger.info("Skipping applying $dkaName in ${project.path} - could not find KotlinProjectExtension")
       return
     }
-    logger.info("Configuring Dokkatoo in Gradle Kotlin Project ${project.path}")
+    logger.info("Configuring $dkaName in Gradle Kotlin Project ${project.path}")
 
     val dokkatooExtension = project.extensions.getByType<DokkatooExtension>()
 
@@ -161,6 +179,8 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
 
   @DokkatooInternalApi
   companion object {
+    private val dkaName: String = DokkatooKotlinAdapter::class.simpleName!!
+
     private val logger = Logging.getLogger(DokkatooKotlinAdapter::class.java)
 
     /** Try and get [KotlinProjectExtension], or `null` if it's not present */
@@ -174,7 +194,10 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
         when (e) {
           is TypeNotPresentException,
           is ClassNotFoundException,
-          is NoClassDefFoundError -> null
+          is NoClassDefFoundError -> {
+            logger.info("$dkaName failed to find KotlinExtension ${e::class} ${e.message}")
+            null
+          }
 
           else                    -> throw e
         }
@@ -258,9 +281,9 @@ private class KotlinCompilationDetailsBuilder(
 
   private fun KotlinProjectExtension.allKotlinCompilations(): Collection<KotlinCompilation<*>> =
     when (this) {
-      is KotlinMultiplatformExtension   -> targets.flatMap { it.compilations }
+      is KotlinMultiplatformExtension -> targets.flatMap { it.compilations }
       is KotlinSingleTargetExtension<*> -> target.compilations
-      else                              -> emptyList() // shouldn't happen?
+      else -> emptyList() // shouldn't happen?
     }
 
   /**
