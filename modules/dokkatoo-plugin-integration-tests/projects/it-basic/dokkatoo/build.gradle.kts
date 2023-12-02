@@ -2,11 +2,11 @@ import dev.adamko.dokkatoo.dokka.parameters.VisibilityModifier
 import dev.adamko.dokkatoo.dokka.plugins.DokkaHtmlPluginParameters
 
 plugins {
-  kotlin("jvm") version "1.9.0"
+  kotlin("jvm") version "1.9.10"
   id("dev.adamko.dokkatoo") version "2.1.0-SNAPSHOT"
 }
 
-version = "1.9.0-SNAPSHOT"
+version = "1.9.10-SNAPSHOT"
 
 dependencies {
   testImplementation(kotlin("test-junit"))

@@ -1,5 +1,5 @@
 plugins {
-  kotlin("multiplatform") version "1.9.0"
+  kotlin("multiplatform") version "1.9.10"
   id("dev.adamko.dokkatoo") version "2.1.0-SNAPSHOT"
 }
 
