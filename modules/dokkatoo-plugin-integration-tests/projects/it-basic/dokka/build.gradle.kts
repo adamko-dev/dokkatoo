@@ -1,3 +1,7 @@
+/*
+ * Copyright 2014-2023 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license.
+ */
+
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.dokka.gradle.kotlinSourceSet
 import org.jetbrains.dokka.base.DokkaBase
@@ -12,11 +16,11 @@ plugins {
 
 buildscript {
     dependencies {
-        classpath("org.jetbrains.dokka:dokka-base:1.9.0")
+        classpath("org.jetbrains.dokka:dokka-base:1.9.10")
     }
 }
 
-version = "1.9.0-SNAPSHOT"
+version = "1.9.10-SNAPSHOT"
 
 apply(from = "./template.root.gradle.kts")
 

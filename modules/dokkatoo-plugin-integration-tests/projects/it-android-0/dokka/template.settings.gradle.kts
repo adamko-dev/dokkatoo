@@ -1,3 +1,7 @@
+/*
+ * Copyright 2014-2023 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license.
+ */
+
 @file:Suppress("LocalVariableName", "UnstableApiUsage")
 
 pluginManagement {
@@ -14,7 +18,7 @@ pluginManagement {
     resolutionStrategy {
         eachPlugin {
             if (requested.id.id == "org.jetbrains.dokka") {
-                useModule("org.jetbrains.dokka:dokka-gradle-plugin:1.9.0")
+                useModule("org.jetbrains.dokka:dokka-gradle-plugin:1.9.10")
             }
 
             if (requested.id.id == "com.android.library") {
@@ -28,11 +32,8 @@ pluginManagement {
     }
     repositories {
         mavenLocal()
-        maven("https://cache-redirector.jetbrains.com/jcenter.bintray.com")
         mavenCentral()
         gradlePluginPortal()
         google()
-        maven("https://cache-redirector.jetbrains.com/dl.bintray.com/kotlin/kotlin-eap")
-        maven("https://cache-redirector.jetbrains.com/dl.bintray.com/kotlin/kotlin-dev")
     }
 }
