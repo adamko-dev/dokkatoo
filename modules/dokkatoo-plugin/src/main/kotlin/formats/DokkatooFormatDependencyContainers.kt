@@ -90,7 +90,7 @@ class DokkatooFormatDependencyContainers(
    *
    * Users can add plugins to this dependency.
    *
-   * Should not contain runtime dependencies.
+   * Should not contain runtime dependencies - use [dokkaGeneratorClasspath].
    */
   val dokkaPluginsClasspath: NamedDomainObjectProvider<Configuration> =
     project.configurations.register(dependencyContainerNames.dokkaPluginsClasspath) {

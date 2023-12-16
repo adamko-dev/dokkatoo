@@ -131,6 +131,10 @@ dokkatoo {
     suppressObviousFunctions.set(true)
     suppressObviousFunctions.set(false)
   }
+  // The default versions that Dokkatoo uses can be overridden:
+  versions {
+    jetbrainsDokka.set("1.9.10")
+  }
 }
 ```
 
@@ -156,12 +160,9 @@ dependencies {
   dokkatoo(projects(":subproject-hello"))
   dokkatoo(projects(":subproject-world"))
 
-  // This is required at the moment, see https://github.com/adamko-dev/dokkatoo/issues/14
-  dokkatooPluginHtml(
-    dokkatoo.versions.jetbrainsDokka.map { dokkaVersion ->
-      "org.jetbrains.dokka:all-modules-page-plugin:$dokkaVersion"
-    }
-  )
+  // A dependency on all-modules-page-plugin is required at the moment, see https://github.com/adamko-dev/dokkatoo/issues/14
+  // A version is not required, Dokkatoo will automatically add one.
+  dokkatooPluginHtml("org.jetbrains.dokka:all-modules-page-plugin")
 }
 ```
 
