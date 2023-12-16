@@ -336,6 +336,7 @@ public abstract class dev/adamko/dokkatoo/formats/DokkatooGfmPlugin : dev/adamko
 }
 
 public abstract class dev/adamko/dokkatoo/formats/DokkatooHtmlPlugin : dev/adamko/dokkatoo/formats/DokkatooFormatPlugin {
+	public static final field Companion Ldev/adamko/dokkatoo/formats/DokkatooHtmlPlugin$Companion;
 	public fun configure (Ldev/adamko/dokkatoo/formats/DokkatooFormatPlugin$DokkatooFormatPluginContext;)V
 }
 

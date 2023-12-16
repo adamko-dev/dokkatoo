@@ -105,7 +105,6 @@ private fun initDokkatooProject(
       |}
       |
       |dependencies {
-      |  dokkatooPluginHtml("org.jetbrains.dokka:all-modules-page-plugin")
       |}
       |
       |tasks.withType<dev.adamko.dokkatoo.tasks.LogHtmlPublicationLinkTask>().configureEach {
