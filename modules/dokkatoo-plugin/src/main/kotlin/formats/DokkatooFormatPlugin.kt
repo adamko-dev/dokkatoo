@@ -12,6 +12,7 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.api.file.FileSystemOperations
+import org.gradle.api.logging.Logging
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
@@ -104,6 +105,29 @@ abstract class DokkatooFormatPlugin(
           addDefaultDokkaDependencies()
         }
       }
+
+      if (context.enableVersionAlignment) {
+        //region version alignment
+        listOf(
+          dependencyContainers.dokkaPluginsClasspath,
+          dependencyContainers.dokkaPluginsIntransitiveClasspath,
+          dependencyContainers.dokkaGeneratorClasspath,
+        ).forEach {
+          // Add a version if one is missing, which will allow defining a org.jetbrains.dokka
+          // dependency without a version.
+          // (It would be nice to do this with a virtual-platform, but Gradle is bugged:
+          // https://github.com/gradle/gradle/issues/27435)
+          it.configure {
+            resolutionStrategy.eachDependency {
+              if (requested.group == "org.jetbrains.dokka" && requested.version.isNullOrBlank()) {
+                logger.info("adding version of dokka dependency '$requested'")
+                useVersion(dokkatooExtension.versions.jetbrainsDokka.get())
+              }
+            }
+          }
+        }
+        //endregion
+      }
     }
   }
 
@@ -122,6 +146,7 @@ abstract class DokkatooFormatPlugin(
     private val dependencyContainerNames = DokkatooBasePlugin.DependencyContainerNames(formatName)
 
     var addDefaultDokkaDependencies = true
+    var enableVersionAlignment = true
 
     /** Create a [Dependency] for a Dokka module */
     fun DependencyHandler.dokka(module: String): Provider<Dependency> =
@@ -171,4 +196,7 @@ abstract class DokkatooFormatPlugin(
     }
   }
 
+  companion object {
+    private val logger = Logging.getLogger(DokkatooFormatPlugin::class.java)
+  }
 }

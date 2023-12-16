@@ -105,11 +105,7 @@ private fun initDokkatooProject(
       |}
       |
       |dependencies {
-      |  dokkatooPluginHtml(
-      |    dokkatoo.versions.jetbrainsDokka.map { dokkaVersion ->
-      |      "org.jetbrains.dokka:all-modules-page-plugin:${'$'}dokkaVersion"
-      |    }
-      |  )
+      |  dokkatooPluginHtml("org.jetbrains.dokka:all-modules-page-plugin")
       |}
       |
       |tasks.withType<dev.adamko.dokkatoo.tasks.LogHtmlPublicationLinkTask>().configureEach {

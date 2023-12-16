@@ -315,11 +315,15 @@ public final class dev/adamko/dokkatoo/dokka/plugins/PluginConfigValue$Values : 
 }
 
 public abstract class dev/adamko/dokkatoo/formats/DokkatooFormatPlugin : org/gradle/api/Plugin {
+	public static final field Companion Ldev/adamko/dokkatoo/formats/DokkatooFormatPlugin$Companion;
 	public fun <init> (Ljava/lang/String;)V
 	public synthetic fun apply (Ljava/lang/Object;)V
 	public fun apply (Lorg/gradle/api/Project;)V
 	public fun configure (Ldev/adamko/dokkatoo/formats/DokkatooFormatPlugin$DokkatooFormatPluginContext;)V
 	public final fun getFormatName ()Ljava/lang/String;
+}
+
+public final class dev/adamko/dokkatoo/formats/DokkatooFormatPlugin$Companion {
 }
 
 public final class dev/adamko/dokkatoo/formats/DokkatooFormatTasks$inlined$sam$i$org_gradle_api_Action$0 : org/gradle/api/Action {
