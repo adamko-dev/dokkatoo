@@ -95,6 +95,7 @@ abstract class DokkatooFormatPlugin(
         project = target,
         dokkatooExtension = dokkatooExtension,
         dokkatooTasks = dokkatooTasks,
+        dependencyContainers = dependencyContainers,
         formatName = formatName,
       )
 
@@ -141,6 +142,7 @@ abstract class DokkatooFormatPlugin(
     val project: Project,
     val dokkatooExtension: DokkatooExtension,
     val dokkatooTasks: DokkatooFormatTasks,
+    val dependencyContainers: DokkatooFormatDependencyContainers,
     formatName: String,
   ) {
     private val dependencyContainerNames = DokkatooBasePlugin.DependencyContainerNames(formatName)
@@ -183,7 +185,7 @@ abstract class DokkatooFormatPlugin(
         dokkaPlugin(dokka("analysis-kotlin-descriptors"))
         dokkaPlugin(dokka("templating-plugin"))
         dokkaPlugin(dokka("dokka-base"))
-//        dokkaPlugin(dokka("all-modules-page-plugin"))
+        //dokkaPlugin(dokka("all-modules-page-plugin"))
 
         dokkaPlugin("org.jetbrains.kotlinx:kotlinx-html" version kotlinxHtml)
         dokkaPlugin("org.freemarker:freemarker" version freemarker)

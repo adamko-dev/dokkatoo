@@ -427,7 +427,6 @@ private fun initDokkatooProject(
       |dependencies {
       |  dokkatoo(project(":subproject-hello"))
       |  dokkatoo(project(":subproject-goodbye"))
-      |  dokkatooPluginHtml("org.jetbrains.dokka:all-modules-page-plugin")
       |}
       |
     """.trimMargin()

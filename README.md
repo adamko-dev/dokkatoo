@@ -163,11 +163,11 @@ dependencies {
   dokkatoo(projects(":subproject-hello"))
   dokkatoo(projects(":subproject-world"))
 
-  // A dependency on all-modules-page-plugin is required at the moment, see https://github.com/adamko-dev/dokkatoo/issues/14
-  // If using Dokkatoo v2.1.0+ version is not required, Dokkatoo will automatically add one.
-  dokkatooPluginHtml("org.jetbrains.dokka:all-modules-page-plugin") 
+  // If using Dokkatoo v2.1.0+ a dependency on all-modules-page-plugin is no longer required,
+  // see https://github.com/adamko-dev/dokkatoo/issues/14
+  //dokkatooPluginHtml("org.jetbrains.dokka:all-modules-page-plugin") 
 
-  // Earlier versions of Dokkatoo must add a dependency:
+  // Earlier versions of Dokkatoo must manually add a dependency:
   dokkatooPluginHtml(
      dokkatoo.versions.jetbrainsDokka.map { dokkaVersion ->
         "org.jetbrains.dokka:all-modules-page-plugin:$dokkaVersion"

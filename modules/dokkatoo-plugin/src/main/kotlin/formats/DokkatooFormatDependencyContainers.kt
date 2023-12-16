@@ -36,7 +36,7 @@ import org.gradle.kotlin.dsl.*
 @DokkatooInternalApi
 class DokkatooFormatDependencyContainers(
   private val formatName: String,
-  dokkatooConsumer: NamedDomainObjectProvider<Configuration>,
+  val dokkatooConsumer: NamedDomainObjectProvider<Configuration>,
   project: Project,
 ) {
 
