@@ -7,6 +7,8 @@ import dev.adamko.dokkatoo.dokka.plugins.DokkaVersioningPluginParameters.Compani
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import dev.adamko.dokkatoo.internal.uppercaseFirstChar
 import dev.adamko.dokkatoo.tasks.LogHtmlPublicationLinkTask
+import org.gradle.api.artifacts.component.ProjectComponentIdentifier
+import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.*
 
@@ -23,6 +25,26 @@ constructor() : DokkatooFormatPlugin(formatName = "html") {
     dokkatooTasks.generatePublication.configure {
       finalizedBy(logHtmlUrlTask)
     }
+
+    //region automatically depend on all-modules-page-plugin if aggregating multiple projects
+    val dokkatooIsAggregatingSubprojects = dependencyContainers.dokkatooConsumer.map { dokkatoo ->
+      dokkatoo.incoming.artifacts.artifacts.any { artifact ->
+        logger.info("${dokkatoo.name} depends on ${artifact.id}, project:${artifact.id.componentIdentifier is ProjectComponentIdentifier}")
+        artifact.id.componentIdentifier is ProjectComponentIdentifier
+      }
+    }
+
+    dependencyContainers.dokkaPluginsClasspath.configure {
+      dependencies.addAllLater(dokkatooIsAggregatingSubprojects.map { aggregating ->
+        buildList {
+          if (aggregating) {
+            logger.info("Automatically adding dependency on all-modules-page-plugin")
+            add("org.jetbrains.dokka:all-modules-page-plugin")
+          }
+        }.map { project.dependencies.create(it) }
+      })
+    }
+    //endregion
   }
 
   private fun DokkatooFormatPluginContext.registerDokkaBasePluginConfiguration() {
@@ -72,5 +94,10 @@ constructor() : DokkatooFormatPlugin(formatName = "html") {
       serverUri.convention("http://localhost:63342")
       this.indexHtmlPath.convention(indexHtmlPath)
     }
+  }
+
+  @DokkatooInternalApi
+  companion object {
+    private val logger = Logging.getLogger(DokkatooHtmlPlugin::class.java)
   }
 }
