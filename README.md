@@ -99,6 +99,7 @@ plugins {
 
 dokkatoo {
   moduleName.set("Basic Project")
+
   dokkatooSourceSets.configureEach {
     documentedVisibilities(
       VisibilityModifier.PUBLIC,
@@ -127,10 +128,12 @@ dokkatoo {
     )
     footerMessage.set("(C) The Owner")
   }
+
   dokkatooPublications.configureEach {
     suppressObviousFunctions.set(true)
     suppressObviousFunctions.set(false)
   }
+
   // The default versions that Dokkatoo uses can be overridden:
   versions {
     jetbrainsDokka.set("1.9.10")
@@ -161,8 +164,15 @@ dependencies {
   dokkatoo(projects(":subproject-world"))
 
   // A dependency on all-modules-page-plugin is required at the moment, see https://github.com/adamko-dev/dokkatoo/issues/14
-  // A version is not required, Dokkatoo will automatically add one.
-  dokkatooPluginHtml("org.jetbrains.dokka:all-modules-page-plugin")
+  // If using Dokkatoo v2.1.0+ version is not required, Dokkatoo will automatically add one.
+  dokkatooPluginHtml("org.jetbrains.dokka:all-modules-page-plugin") 
+
+  // Earlier versions of Dokkatoo must add a dependency:
+  dokkatooPluginHtml(
+     dokkatoo.versions.jetbrainsDokka.map { dokkaVersion ->
+        "org.jetbrains.dokka:all-modules-page-plugin:$dokkaVersion"
+     }
+  )
 }
 ```
 
