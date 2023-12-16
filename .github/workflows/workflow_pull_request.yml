@@ -4,6 +4,7 @@ name: Pull Requests
 on:
   workflow_dispatch:
   pull_request:
+  merge_group:
 
 
 concurrency:

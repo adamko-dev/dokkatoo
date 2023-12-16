@@ -3,7 +3,17 @@ name: Publish Maven
 
 on:
   workflow_dispatch:
+    inputs:
+      checkout-ref:
+        description: "The repository reference to checkout"
+        required: false
+        type: string
   workflow_call:
+    inputs:
+      checkout-ref:
+        description: "The repository reference to checkout"
+        required: false
+        type: string
 
 
 concurrency:
@@ -31,3 +41,4 @@ jobs:
       runs-on: macos-latest # only macOS supports building all Kotlin targets
       gradle-task: >-
         publishAllPublicationsToSonatypeReleaseRepository --stacktrace --no-configuration-cache --no-parallel
+      checkout-ref: ${{ inputs.checkout-ref || github.event.repository.default_branch }}

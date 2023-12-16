@@ -1,0 +1,52 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  extends: [
+    "config:base"
+  ],
+  enabled: true,
+  enabledManagers: [
+    "npm",
+    "gradle",
+    "gradle-wrapper",
+    "github-actions",
+  ],
+
+  // Will auto-merge directly, without a PR, if tests pass - else, makes a PR.
+  // Must add Renovate to 'Allow specified actors to bypass required pull requests'
+  // in branch protection rule
+  automergeType: "branch",
+  platformAutomerge: true,
+  ignoreTests: false,
+  packageRules: [
+    {
+      description: "auto-merge all but major releases",
+      matchUpdateTypes: [
+        "minor",
+        "patch",
+        "pin",
+        "digest",
+      ],
+      automerge: true,
+    }
+  ],
+
+  timezone: "Etc/UTC",
+  schedule: [
+    //"on the first day of the month",
+    "after 10am",
+  ],
+
+  stabilityDays: 14,
+  //  suppressNotifications: [
+  //    "artifactErrors",
+  //    "branchAutomergeFailure",
+  //    "configErrorIssue",
+  //    "deprecationWarningIssues",
+  //    "lockFileErrors",
+  //    "onboardingClose",
+  //    "prEditedNotification",
+  //    "prIgnoreNotification",
+  //  ],
+  prCreation: "status-success",
+  semanticCommits: "disabled",
+}

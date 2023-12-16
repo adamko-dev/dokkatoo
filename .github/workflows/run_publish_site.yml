@@ -3,7 +3,17 @@ name: Publish Site
 
 on:
   workflow_dispatch:
+    inputs:
+      checkout-ref:
+        description: "The repository reference to checkout"
+        required: false
+        type: string
   workflow_call:
+    inputs:
+      checkout-ref:
+        description: "The repository reference to checkout"
+        required: false
+        type: string
 
 
 concurrency:
@@ -18,6 +28,8 @@ jobs:
     steps:
       - name: Checkout the repo
         uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.checkout-ref || github.event.repository.default_branch }}
 
       - name: Setup JDK
         uses: actions/setup-java@v3
