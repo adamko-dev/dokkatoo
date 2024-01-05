@@ -12,7 +12,6 @@ import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import org.gradle.api.tasks.PathSensitivity.RELATIVE
-import org.gradle.work.NormalizeLineEndings
 
 /**
  * Parameters used to run Dokka Generator to produce either a
@@ -84,9 +83,11 @@ constructor(
     extensions.adding("dokkaSourceSets", objects.domainObjectContainer())
 
   /** Dokka Module files from other subprojects. */
-  @get:InputFiles
-  @get:NormalizeLineEndings
-  @get:PathSensitive(RELATIVE)
-  @get:Optional
+  @get:Internal
+  @Deprecated("DokkatooPrepareModuleDescriptorTask was not compatible with relocatable Gradle Build Cache and has been replaced with a dark Gradle devilry. All references to DokkatooPrepareModuleDescriptorTask must be removed.")
+  @Suppress("unused")
   abstract val dokkaModuleFiles: ConfigurableFileCollection
+
+  @get:Nested
+  abstract val moduleDescriptors: NamedDomainObjectContainer<DokkaModuleDescriptionSpec>
 }

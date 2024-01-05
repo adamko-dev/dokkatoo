@@ -3,7 +3,9 @@ package dev.adamko.dokkatoo.dokka.parameters
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import java.io.Serializable
 import java.net.URI
+import javax.inject.Inject
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.ProjectLayout
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
@@ -28,7 +30,10 @@ import org.intellij.lang.annotations.Language
  */
 abstract class DokkaSourceLinkSpec
 @DokkatooInternalApi
-constructor() : Serializable {
+@Inject
+constructor(
+  private val layout: ProjectLayout
+) : Serializable {
 
   /**
    * Path to the local source directory. The path must be relative to the root of current project.
@@ -53,7 +58,9 @@ constructor() : Serializable {
   @get:Input
   @DokkatooInternalApi
   protected val localDirectoryPath: Provider<String>
-    get() = localDirectory.map { it.asFile.invariantSeparatorsPath }
+    get() = localDirectory.map {
+      it.asFile.toRelativeString(layout.projectDirectory.asFile)
+    }
 
   /**
    * URL of source code hosting service that can be accessed by documentation readers,

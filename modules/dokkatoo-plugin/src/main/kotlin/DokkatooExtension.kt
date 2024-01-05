@@ -1,5 +1,6 @@
 package dev.adamko.dokkatoo
 
+import dev.adamko.dokkatoo.dependencies.BaseDependencyManager
 import dev.adamko.dokkatoo.dokka.DokkaPublication
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec
 import dev.adamko.dokkatoo.internal.*

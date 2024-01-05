@@ -1,62 +1,46 @@
+@file:Suppress("unused")
+
 package dev.adamko.dokkatoo.tasks
 
-import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.jsonMapper
-import dev.adamko.dokkatoo.dokka.parameters.DokkaModuleDescriptionKxs
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import javax.inject.Inject
-import kotlinx.serialization.encodeToString
-import org.gradle.api.file.*
+import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.tasks.*
-import org.gradle.api.tasks.PathSensitivity.RELATIVE
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.TaskAction
+import org.gradle.work.DisableCachingByDefault
 
 /**
- * Produces a Dokka Configuration that describes a single module of a multimodule Dokka configuration.
+ * Deprecated: DokkatooPrepareModuleDescriptorTask was not compatible with relocatable Gradle Build Cache and has been replaced with a dark Gradle devilry. All references to DokkatooPrepareModuleDescriptorTask must be removed.
  *
- * @see dev.adamko.dokkatoo.dokka.parameters.DokkaModuleDescriptionKxs
+ * Produces a Dokka Configuration that describes a single module of a multimodule Dokka configuration.
  */
-@CacheableTask
+@DisableCachingByDefault
+@Deprecated("DokkatooPrepareModuleDescriptorTask was not compatible with relocatable Gradle Build Cache and has been replaced with a dark Gradle devilry. All references to DokkatooPrepareModuleDescriptorTask must be removed.")
 abstract class DokkatooPrepareModuleDescriptorTask
 @DokkatooInternalApi
 @Inject
 constructor() : DokkatooTask() {
 
-  @get:OutputFile
+  @get:Internal
   abstract val dokkaModuleDescriptorJson: RegularFileProperty
 
-  @get:Input
+  @get:Internal
   abstract val moduleName: Property<String>
 
-  @get:Input
+  @get:Internal
   abstract val modulePath: Property<String>
 
-  @get:InputDirectory
-  @get:PathSensitive(RELATIVE)
+  @get:Internal
   abstract val moduleDirectory: DirectoryProperty
 
-  @get:InputFiles
-  @get:Optional
-  @get:PathSensitive(RELATIVE)
+  @get:Internal
   abstract val includes: ConfigurableFileCollection
 
   @TaskAction
   internal fun generateModuleConfiguration() {
-    val moduleName = moduleName.get()
-    val moduleDirectory = moduleDirectory.asFile.get()
-    val includes = includes.files
-    val modulePath = modulePath.get()
-
-    val moduleDesc = DokkaModuleDescriptionKxs(
-      name = moduleName,
-      sourceOutputDirectory = moduleDirectory,
-      includes = includes,
-      modulePath = modulePath,
-    )
-
-    val encodedModuleDesc = jsonMapper.encodeToString(moduleDesc)
-
-    logger.info("encodedModuleDesc: $encodedModuleDesc")
-
-    dokkaModuleDescriptorJson.get().asFile.writeText(encodedModuleDesc)
+    logger.warn("DokkatooPrepareModuleDescriptorTask was not compatible with relocatable Gradle Build Cache and has been replaced with a dark Gradle devilry. All references to DokkatooPrepareModuleDescriptorTask must be removed.")
   }
 }

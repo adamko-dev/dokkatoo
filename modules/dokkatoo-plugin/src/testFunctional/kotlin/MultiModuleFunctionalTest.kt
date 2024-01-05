@@ -60,14 +60,16 @@ class MultiModuleFunctionalTest : FunSpec({
       test("with element-list") {
         project.file("build/dokka/html/package-list").shouldBeAFile()
         project.file("build/dokka/html/package-list").toFile().readText()
+          .lines()
+          .sorted()
+          .joinToString("\n")
           .shouldContain( /* language=text */ """
               |${'$'}dokka.format:html-v1
               |${'$'}dokka.linkExtension:html
-              |
-              |module:subproject-hello
+              |com.project.goodbye
               |com.project.hello
               |module:subproject-goodbye
-              |com.project.goodbye
+              |module:subproject-hello
             """.trimMargin()
           )
       }
@@ -123,7 +125,7 @@ class MultiModuleFunctionalTest : FunSpec({
             test("expect build is successful") {
               output shouldContainAll listOf(
                 "BUILD SUCCESSFUL",
-                "24 actionable tasks: 24 up-to-date",
+                "16 actionable tasks: 16 up-to-date",
               )
             }
 
@@ -237,7 +239,6 @@ class MultiModuleFunctionalTest : FunSpec({
               test("expect :subproject-goodbye tasks are up-to-date, because no files changed") {
                 shouldHaveTasksWithOutcome(
                   ":subproject-goodbye:dokkatooGenerateModuleHtml" to UP_TO_DATE,
-                  ":subproject-goodbye:prepareDokkatooModuleDescriptorHtml" to UP_TO_DATE,
                 )
               }
 
@@ -245,7 +246,6 @@ class MultiModuleFunctionalTest : FunSpec({
               test("expect :subproject-hello tasks should be re-run, since a file changed") {
                 shouldHaveTasksWithAnyOutcome(
                   ":subproject-hello:dokkatooGenerateModuleHtml" to successfulOutcomes,
-                  ":subproject-hello:prepareDokkatooModuleDescriptorHtml" to successfulOutcomes,
                 )
               }
 
@@ -259,8 +259,8 @@ class MultiModuleFunctionalTest : FunSpec({
                 output shouldContain "BUILD SUCCESSFUL"
               }
 
-              test("expect 5 tasks are run") {
-                output shouldContain "5 actionable tasks"
+              test("expect 3 actionable tasks") {
+                output shouldContain "3 actionable tasks"
               }
             }
 
@@ -359,19 +359,11 @@ class MultiModuleFunctionalTest : FunSpec({
               "> Task :subproject-goodbye:dokkatooGenerateModuleHtml",
               "> Task :subproject-goodbye:dokkatooGenerateModuleJavadoc",
               "> Task :subproject-goodbye:dokkatooGenerateModuleJekyll",
-              "> Task :subproject-goodbye:prepareDokkatooModuleDescriptorGfm",
-              "> Task :subproject-goodbye:prepareDokkatooModuleDescriptorHtml",
-              "> Task :subproject-goodbye:prepareDokkatooModuleDescriptorJavadoc",
-              "> Task :subproject-goodbye:prepareDokkatooModuleDescriptorJekyll",
               "> Task :subproject-hello:clean",
               "> Task :subproject-hello:dokkatooGenerateModuleGfm",
               "> Task :subproject-hello:dokkatooGenerateModuleHtml",
               "> Task :subproject-hello:dokkatooGenerateModuleJavadoc",
               "> Task :subproject-hello:dokkatooGenerateModuleJekyll",
-              "> Task :subproject-hello:prepareDokkatooModuleDescriptorGfm",
-              "> Task :subproject-hello:prepareDokkatooModuleDescriptorHtml",
-              "> Task :subproject-hello:prepareDokkatooModuleDescriptorJavadoc",
-              "> Task :subproject-hello:prepareDokkatooModuleDescriptorJekyll",
             )
         }
     }

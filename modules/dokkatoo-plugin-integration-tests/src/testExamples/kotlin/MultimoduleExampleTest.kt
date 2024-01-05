@@ -136,7 +136,7 @@ class MultimoduleExampleTest : FunSpec({
             nonLoggingTasks.shouldForAll {
               it shouldHaveOutcome UP_TO_DATE
             }
-            tasks.shouldHaveSize(6)
+            tasks.shouldHaveSize(4)
           }
 
           test("expect Dokka Generator is not triggered") {

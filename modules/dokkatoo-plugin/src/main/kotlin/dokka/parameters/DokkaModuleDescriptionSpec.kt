@@ -4,10 +4,10 @@ import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import javax.inject.Inject
 import org.gradle.api.Named
 import org.gradle.api.file.ConfigurableFileCollection
-import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.*
+import org.gradle.api.tasks.PathSensitivity.RELATIVE
 import org.jetbrains.dokka.DokkaConfiguration
 
 /**
@@ -29,13 +29,15 @@ abstract class DokkaModuleDescriptionSpec
    *
    * @see DokkaConfiguration.DokkaModuleDescription.sourceOutputDirectory
    */
-  @get:Input
-  abstract val sourceOutputDirectory: RegularFileProperty
+  @get:InputDirectory
+  @get:PathSensitive(RELATIVE)
+  abstract val moduleDirectory: DirectoryProperty
 
   /**
    * @see DokkaConfiguration.DokkaModuleDescription.includes
    */
-  @get:Input
+  @get:InputFiles
+  @get:PathSensitive(RELATIVE)
   abstract val includes: ConfigurableFileCollection
 
   /**
@@ -49,6 +51,16 @@ abstract class DokkaModuleDescriptionSpec
    */
   @get:Input
   abstract val projectPath: Property<String>
+
+  /**
+   * The full Gradle path (e.g. `:a:b:some-subproject:dokkatooGenerateModuleHtml`)
+   * of the task that generates this Dokka Module.
+   *
+   * ugly hack workaround for https://github.com/gradle/gradle/issues/13590
+   */
+  @get:Internal
+  @DokkatooInternalApi
+  abstract val moduleGenerateTaskPath: Property<String>
 
   @Internal
   override fun getName(): String = moduleName

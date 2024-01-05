@@ -5,13 +5,34 @@ import dev.adamko.dokkatoo.DokkatooExtension
 import dev.adamko.dokkatoo.adapters.DokkatooAndroidAdapter
 import dev.adamko.dokkatoo.adapters.DokkatooJavaAdapter
 import dev.adamko.dokkatoo.adapters.DokkatooKotlinAdapter
+import dev.adamko.dokkatoo.dependencies.BaseDependencyManager
+import dev.adamko.dokkatoo.dependencies.DependencyContainerNames
+import dev.adamko.dokkatoo.dependencies.DokkatooAttribute.Companion.DokkatooClasspathAttribute
+import dev.adamko.dokkatoo.dependencies.DokkatooAttribute.Companion.DokkatooFormatAttribute
+import dev.adamko.dokkatoo.dependencies.DokkatooAttribute.Companion.DokkatooModuleGenerateTaskPathAttribute
+import dev.adamko.dokkatoo.dependencies.DokkatooAttribute.Companion.DokkatooModuleNameAttribute
+import dev.adamko.dokkatoo.dependencies.DokkatooAttribute.Companion.DokkatooModulePathAttribute
+import dev.adamko.dokkatoo.dependencies.FormatDependenciesManager
+import dev.adamko.dokkatoo.dokka.parameters.DokkaModuleDescriptionSpec
+import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
+import dev.adamko.dokkatoo.internal.domainObjectContainer
+import dev.adamko.dokkatoo.internal.get
+import dev.adamko.dokkatoo.internal.toMap
+import java.io.File
 import javax.inject.Inject
+import org.gradle.api.Action
+import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Dependency
+import org.gradle.api.artifacts.ExternalModuleDependency
 import org.gradle.api.artifacts.dsl.DependencyHandler
+import org.gradle.api.artifacts.result.ResolvedArtifactResult
+import org.gradle.api.attributes.AttributeContainer
+import org.gradle.api.file.FileSystemLocation
 import org.gradle.api.file.FileSystemOperations
+import org.gradle.api.file.ProjectLayout
 import org.gradle.api.logging.Logging
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
@@ -39,6 +60,9 @@ abstract class DokkatooFormatPlugin(
   @get:Inject
   @DokkatooInternalApi
   protected abstract val files: FileSystemOperations
+  @get:Inject
+  @DokkatooInternalApi
+  protected abstract val layout: ProjectLayout
 
 
   override fun apply(target: Project) {
@@ -56,33 +80,75 @@ abstract class DokkatooFormatPlugin(
 
       val publication = dokkatooExtension.dokkatooPublications.create(formatName)
 
-      val dokkatooConsumer =
-        target.configurations.named(DokkatooBasePlugin.dependencyContainerNames.dokkatoo)
+      val baseDependencyManager = target.extensions.getByType<BaseDependencyManager>()
 
-      val dependencyContainers = DokkatooFormatDependencyContainers(
-        formatName = formatName,
-        dokkatooConsumer = dokkatooConsumer,
+      val depsManager = FormatDependenciesManager(
         project = target,
+        baseDependencyManager = baseDependencyManager,
+        formatName = formatName,
+        objects = objects,
       )
+
+      val moduleDescriptors = createModuleDescriptors(depsManager)
 
       val dokkatooTasks = DokkatooFormatTasks(
         project = target,
         publication = publication,
         dokkatooExtension = dokkatooExtension,
-        dependencyContainers = dependencyContainers,
+        depsManager = depsManager,
         providers = providers,
+        moduleDescriptors = moduleDescriptors,
       )
 
-      dependencyContainers.dokkaModuleOutgoing.configure {
-        outgoing {
-          artifact(dokkatooTasks.prepareModuleDescriptor.flatMap { it.dokkaModuleDescriptorJson })
-        }
-        outgoing {
-          artifact(dokkatooTasks.generateModule.flatMap { it.outputDirectory }) {
-            type = "directory"
+      depsManager
+        .moduleIncludes
+        .outgoing
+        .configure {
+          outgoing.artifacts(
+            providers.provider { publication.includes }
+          ) {
+            builtBy(dokkatooTasks.generateModule)
+            attributes {
+              attributeProvider(
+                // provide the full task path of the task that generates this module
+                // ugly hack workaround for https://github.com/gradle/gradle/issues/13590
+                DokkatooModuleGenerateTaskPathAttribute,
+                dokkatooTasks.generateModule.map { objects.named(it.path) }
+              )
+            }
+          }
+          outgoing.artifacts(
+            objects.fileCollection()
+              .from(
+                providers.provider {
+                  dokkatooExtension
+                    .dokkatooSourceSets
+                    .map(DokkaSourceSetSpec::includes)
+                }
+              ).elements
+              .map { it.map(FileSystemLocation::getAsFile) }
+          ) {
+            builtBy(dokkatooTasks.generateModule)
           }
         }
-      }
+
+      depsManager
+        .moduleDirectory
+        .outgoing
+        .configure {
+          outgoing
+            .artifact(dokkatooTasks.generateModule) {
+              type = "directory"
+              attributes {
+                attributeProvider(
+                  // provide the full task path of the task that generates this module
+                  // ugly hack workaround for https://github.com/gradle/gradle/issues/13590
+                  DokkatooModuleGenerateTaskPathAttribute,
+                  dokkatooTasks.generateModule.map { objects.named(it.path) }
+                )
+              }
+            }
+        }
 
       // TODO DokkaCollect replacement - share raw files without first generating a Dokka Module
       //dependencyCollections.dokkaParametersOutgoing.configure {
@@ -95,7 +161,7 @@ abstract class DokkatooFormatPlugin(
         project = target,
         dokkatooExtension = dokkatooExtension,
         dokkatooTasks = dokkatooTasks,
-        dependencyContainers = dependencyContainers,
+        depsManager = depsManager,
         formatName = formatName,
       )
 
@@ -110,15 +176,14 @@ abstract class DokkatooFormatPlugin(
       if (context.enableVersionAlignment) {
         //region version alignment
         listOf(
-          dependencyContainers.dokkaPluginsClasspath,
-          dependencyContainers.dokkaPluginsIntransitiveClasspath,
-          dependencyContainers.dokkaGeneratorClasspath,
-        ).forEach {
+          depsManager.dokkaPluginsIntransitiveClasspathResolver,
+          depsManager.dokkaGeneratorClasspathResolver,
+        ).forEach { dependenciesContainer ->
           // Add a version if one is missing, which will allow defining a org.jetbrains.dokka
           // dependency without a version.
           // (It would be nice to do this with a virtual-platform, but Gradle is bugged:
           // https://github.com/gradle/gradle/issues/27435)
-          it.configure {
+          dependenciesContainer.configure {
             resolutionStrategy.eachDependency {
               if (requested.group == "org.jetbrains.dokka" && requested.version.isNullOrBlank()) {
                 logger.info("adding version of dokka dependency '$requested'")
@@ -132,6 +197,55 @@ abstract class DokkatooFormatPlugin(
     }
   }
 
+  private fun createModuleDescriptors(
+    depsManager: FormatDependenciesManager
+  ): NamedDomainObjectContainer<DokkaModuleDescriptionSpec> {
+    val incomingModuleDescriptors =
+      depsManager.moduleDirectory.incomingArtifacts.map { moduleOutputDirectoryArtifact ->
+        moduleOutputDirectoryArtifact.map { moduleDirArtifact ->
+          createModuleDescriptor(depsManager, moduleDirArtifact)
+        }
+      }
+
+    val dokkaModuleDescriptors = objects.domainObjectContainer<DokkaModuleDescriptionSpec>()
+    dokkaModuleDescriptors.addAllLater(incomingModuleDescriptors)
+    return dokkaModuleDescriptors
+  }
+
+  private fun createModuleDescriptor(
+    depsManager: FormatDependenciesManager,
+    moduleDirArtifact: ResolvedArtifactResult,
+  ): DokkaModuleDescriptionSpec {
+    fun missingAttributeError(name: String): Nothing =
+      error("missing $name in artifact:$moduleDirArtifact, variant:${moduleDirArtifact.variant}, attributes: ${moduleDirArtifact.variant.attributes.toMap()}")
+
+    val moduleName = moduleDirArtifact.variant.attributes[DokkatooModuleNameAttribute]
+      ?: missingAttributeError("DokkatooModuleNameAttribute")
+
+    val projectPath = moduleDirArtifact.variant.attributes[DokkatooModulePathAttribute]
+      ?: missingAttributeError("DokkatooModulePathAttribute")
+
+    val moduleGenerateTaskPath =
+      moduleDirArtifact.variant.attributes[DokkatooModuleGenerateTaskPathAttribute]
+        ?: missingAttributeError("DokkatooModuleGenerateTaskPathAttribute")
+
+    val moduleDirectory = moduleDirArtifact.file
+
+    val includes: Provider<List<File>> =
+      depsManager.moduleIncludes.incomingArtifacts.map { artifacts ->
+        artifacts
+          .filter { artifact -> artifact.variant.attributes[DokkatooModuleNameAttribute] == moduleName }
+          .map(ResolvedArtifactResult::getFile)
+      }
+
+    return objects.newInstance<DokkaModuleDescriptionSpec>(moduleName.name).apply {
+      this.moduleDirectory.convention(layout.dir(providers.provider { moduleDirectory })) // https://github.com/gradle/gradle/issues/23708
+      this.includes.from(includes)
+      this.projectPath.convention(projectPath.name)
+      this.moduleGenerateTaskPath.convention(moduleGenerateTaskPath.name)
+    }
+  }
+
 
   /** Format specific configuration - to be implemented by subclasses */
   open fun DokkatooFormatPluginContext.configure() {}
@@ -142,10 +256,11 @@ abstract class DokkatooFormatPlugin(
     val project: Project,
     val dokkatooExtension: DokkatooExtension,
     val dokkatooTasks: DokkatooFormatTasks,
-    val dependencyContainers: DokkatooFormatDependencyContainers,
+    val depsManager: FormatDependenciesManager,
     formatName: String,
   ) {
-    private val dependencyContainerNames = DokkatooBasePlugin.DependencyContainerNames(formatName)
+    private val objects = project.objects
+    private val dependencyContainerNames = DependencyContainerNames(formatName)
 
     var addDefaultDokkaDependencies = true
     var enableVersionAlignment = true
@@ -154,23 +269,47 @@ abstract class DokkatooFormatPlugin(
     fun DependencyHandler.dokka(module: String): Provider<Dependency> =
       dokkatooExtension.versions.jetbrainsDokka.map { version -> create("org.jetbrains.dokka:$module:$version") }
 
+    private fun AttributeContainer.dokkaPluginsClasspath() {
+//      attribute(USAGE_ATTRIBUTE, depsManager.dokkatooUsage)
+      attribute(DokkatooFormatAttribute, depsManager.dokkatooFormat)
+      attribute(DokkatooClasspathAttribute, objects.named("dokka-plugins"))
+    }
+
+    private fun AttributeContainer.dokkaGeneratorClasspath() {
+//      attribute(USAGE_ATTRIBUTE, depsManager.dokkatooUsage)
+      attribute(DokkatooFormatAttribute, depsManager.dokkatooFormat)
+      attribute(DokkatooClasspathAttribute, objects.named("dokka-generator"))
+    }
+
     /** Add a dependency to the Dokka plugins classpath */
     fun DependencyHandler.dokkaPlugin(dependency: Provider<Dependency>): Unit =
-      addProvider(dependencyContainerNames.dokkaPluginsClasspath, dependency)
+      addProvider(
+        dependencyContainerNames.pluginsClasspath,
+        dependency,
+        Action<ExternalModuleDependency> {
+          attributes { dokkaPluginsClasspath() }
+        })
 
     /** Add a dependency to the Dokka plugins classpath */
     fun DependencyHandler.dokkaPlugin(dependency: String) {
-      add(dependencyContainerNames.dokkaPluginsClasspath, dependency)
+      add(dependencyContainerNames.pluginsClasspath, dependency) {
+        attributes { dokkaPluginsClasspath() }
+      }
     }
 
     /** Add a dependency to the Dokka Generator classpath */
     fun DependencyHandler.dokkaGenerator(dependency: Provider<Dependency>) {
-      addProvider(dependencyContainerNames.dokkaGeneratorClasspath, dependency)
+      addProvider(dependencyContainerNames.generatorClasspath, dependency,
+        Action<ExternalModuleDependency> {
+          attributes { dokkaGeneratorClasspath() }
+        })
     }
 
     /** Add a dependency to the Dokka Generator classpath */
     fun DependencyHandler.dokkaGenerator(dependency: String) {
-      add(dependencyContainerNames.dokkaGeneratorClasspath, dependency)
+      add(dependencyContainerNames.generatorClasspath, dependency) {
+        attributes { dokkaGeneratorClasspath() }
+      }
     }
   }
 

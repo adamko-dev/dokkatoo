@@ -27,14 +27,14 @@ constructor() : DokkatooFormatPlugin(formatName = "html") {
     }
 
     //region automatically depend on all-modules-page-plugin if aggregating multiple projects
-    val dokkatooIsAggregatingSubprojects = dependencyContainers.dokkatooConsumer.map { dokkatoo ->
+    val dokkatooIsAggregatingSubprojects = depsManager.incoming.map { dokkatoo ->
       dokkatoo.incoming.artifacts.artifacts.any { artifact ->
         logger.info("${dokkatoo.name} depends on ${artifact.id}, project:${artifact.id.componentIdentifier is ProjectComponentIdentifier}")
         artifact.id.componentIdentifier is ProjectComponentIdentifier
       }
     }
 
-    dependencyContainers.dokkaPluginsClasspath.configure {
+    depsManager.dokkaPluginsClasspath.configure {
       dependencies.addAllLater(dokkatooIsAggregatingSubprojects.map { aggregating ->
         buildList {
           if (aggregating) {

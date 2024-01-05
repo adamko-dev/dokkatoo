@@ -1,15 +1,14 @@
 package dev.adamko.dokkatoo.dokka.parameters.builders
 
 import dev.adamko.dokkatoo.dokka.parameters.DokkaGeneratorParametersSpec
-import dev.adamko.dokkatoo.dokka.parameters.DokkaModuleDescriptionKxs
+import dev.adamko.dokkatoo.dokka.parameters.DokkaModuleDescriptionSpec
 import dev.adamko.dokkatoo.dokka.plugins.DokkaPluginParametersBaseSpec
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
+import dev.adamko.dokkatoo.internal.mapToSet
 import java.io.File
+import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
-import org.jetbrains.dokka.DokkaConfiguration
-import org.jetbrains.dokka.DokkaConfigurationImpl
-import org.jetbrains.dokka.DokkaSourceSetImpl
-import org.jetbrains.dokka.PluginConfigurationImpl
+import org.jetbrains.dokka.*
 
 /**
  * Convert the Gradle-focused [DokkaGeneratorParametersSpec] into a [DokkaSourceSetImpl] instance,
@@ -24,9 +23,9 @@ internal object DokkaParametersBuilder {
   fun build(
     spec: DokkaGeneratorParametersSpec,
     delayTemplateSubstitution: Boolean,
-    modules: List<DokkaModuleDescriptionKxs>,
     outputDirectory: File,
     cacheDirectory: File? = null,
+    moduleDescriptors: NamedDomainObjectContainer<DokkaModuleDescriptionSpec>,
   ): DokkaConfiguration {
     val moduleName = spec.moduleName.get()
     val moduleVersion = spec.moduleVersion.orNull?.takeIf { it != Project.DEFAULT_VERSION }
@@ -50,19 +49,52 @@ internal object DokkaParametersBuilder {
       sourceSets = sourceSets,
       pluginsClasspath = pluginsClasspath,
       pluginsConfiguration = pluginsConfiguration.map(::build),
-      modules = modules.map(DokkaModuleDescriptionKxs::convert),
-//      modules = modules.map {
-//        it.convert(
-//          moduleDescriptionFiles.get(it.name)
-//            ?: error("missing module description files for ${it.name}")
-//        )
-//      },
+      modules = build(moduleDescriptors),
       failOnWarning = failOnWarning,
       delayTemplateSubstitution = delayTemplateSubstitution,
       suppressObviousFunctions = suppressObviousFunctions,
       includes = includes,
       suppressInheritedMembers = suppressInheritedMembers,
       finalizeCoroutines = finalizeCoroutines,
+    )
+  }
+
+  private fun build(
+    moduleDescriptors: NamedDomainObjectContainer<DokkaModuleDescriptionSpec>
+  ): List<DokkaModuleDescriptionImpl> =
+    moduleDescriptors
+      .map(::build)
+      // Sort so the output is stable.
+      // `relativePathToOutputDirectory` is better than `name` since it's guaranteed to be unique
+      // across all modules (otherwise they'd be generated into the same directory), and even
+      // though it's a file - it's a _relative_ file, so the ordering should be stable across
+      // machines (which is important for relocatable Build Cache).
+      .sortedBy { it.relativePathToOutputDirectory }
+
+  private fun build(spec: DokkaModuleDescriptionSpec): DokkaModuleDescriptionImpl {
+    val moduleDirectory = spec.moduleDirectory
+      .asFile.orNull
+      ?: error("missing required moduleDirectory in DokkaModuleDescriptionSpec(${spec.name})")
+
+    val moduleIncludes = spec.includes
+      .elements.orNull
+      ?.mapToSet { it.asFile }
+      ?: emptySet() // 'include' files are optional
+
+    val projectPath = spec.projectPath.orNull?.ifBlank { null }
+      ?: error("missing required projectPath in DokkaModuleDescriptionSpec(${spec.name})")
+
+    // `relativeOutputDir` is the path where the Dokka Module should be located within the final
+    // Dokka Publication.
+    // Convert a project path e.g. `:x:y:z:my-cool-subproject` to a relative path e.g. `x/y/z/my-cool-subproject`.
+    // The path has to be unique per module - using the project path is a useful way to achieve this.
+    val relativeOutputDir = File(projectPath.removePrefix(":").replace(':', '/'))
+
+    return DokkaModuleDescriptionImpl(
+      name = spec.moduleName,
+      relativePathToOutputDirectory = relativeOutputDir,
+      includes = moduleIncludes,
+      sourceOutputDirectory = moduleDirectory,
     )
   }
 

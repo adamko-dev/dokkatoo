@@ -2,12 +2,10 @@ package dev.adamko.dokkatoo.tasks
 
 import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.jsonMapper
 import dev.adamko.dokkatoo.dokka.parameters.DokkaGeneratorParametersSpec
-import dev.adamko.dokkatoo.dokka.parameters.DokkaModuleDescriptionKxs
 import dev.adamko.dokkatoo.dokka.parameters.builders.DokkaParametersBuilder
 import dev.adamko.dokkatoo.internal.DokkaPluginParametersContainer
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import dev.adamko.dokkatoo.workers.DokkaGeneratorWorker
-import java.io.IOException
 import javax.inject.Inject
 import kotlinx.serialization.json.JsonElement
 import org.gradle.api.file.ConfigurableFileCollection
@@ -157,30 +155,12 @@ constructor(
       null                       -> error("missing GenerationType")
     }
 
-    val dokkaModuleDescriptors = dokkaModuleDescriptors()
-
     return DokkaParametersBuilder.build(
       spec = generator,
       delayTemplateSubstitution = delayTemplateSubstitution,
       outputDirectory = outputDirectory,
-      modules = dokkaModuleDescriptors,
+      moduleDescriptors = generator.moduleDescriptors,
       cacheDirectory = cacheDirectory.asFile.orNull,
     )
-  }
-
-  private fun dokkaModuleDescriptors(): List<DokkaModuleDescriptionKxs> {
-    return generator.dokkaModuleFiles.asFileTree
-      .matching { include("**/module_descriptor.json") }
-      .files.map { file ->
-        try {
-          val fileContent = file.readText()
-          jsonMapper.decodeFromString(
-            DokkaModuleDescriptionKxs.serializer(),
-            fileContent,
-          )
-        } catch (ex: Exception) {
-          throw IOException("Could not parse DokkaModuleDescriptionKxs from $file", ex)
-        }
-      }
   }
 }

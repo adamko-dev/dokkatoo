@@ -1,9 +1,10 @@
 package dev.adamko.dokkatoo.dokka.parameters
 
 import io.kotest.core.spec.style.FunSpec
-import io.kotest.engine.spec.tempdir
 import io.kotest.matchers.shouldBe
+import javax.inject.Inject
 import org.gradle.api.Project
+import org.gradle.api.file.ProjectLayout
 import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.*
 import org.gradle.testfixtures.ProjectBuilder
@@ -13,13 +14,11 @@ class DokkaSourceLinkSpecTest : FunSpec({
 
   context("expect localDirectoryPath") {
     test("is the invariantSeparatorsPath of localDirectory") {
-      val tempDir = tempdir()
-
       val actual = project.createDokkaSourceLinkSpec {
-        localDirectory.set(tempDir)
+        localDirectory.set(project.rootDir.resolve("some/nested/dir"))
       }
 
-      actual.localDirectoryPath2.get() shouldBe tempDir.invariantSeparatorsPath
+      actual.localDirectoryPath2.get() shouldBe "some/nested/dir"
     }
   }
 
@@ -44,7 +43,9 @@ class DokkaSourceLinkSpecTest : FunSpec({
 }) {
 
   /** Re-implement [DokkaSourceLinkSpec] to make [localDirectoryPath] accessible in tests */
-  abstract class DokkaSourceLinkSpec2 : DokkaSourceLinkSpec() {
+  abstract class DokkaSourceLinkSpec2 @Inject constructor(
+    layout: ProjectLayout
+  ) : DokkaSourceLinkSpec(layout) {
     val localDirectoryPath2: Provider<String>
       get() = super.localDirectoryPath
   }
