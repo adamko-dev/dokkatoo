@@ -7,6 +7,7 @@ import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
 import org.jetbrains.dokka.DokkaConfiguration
 
 /**
@@ -48,4 +49,7 @@ abstract class DokkaModuleDescriptionSpec
    */
   @get:Input
   abstract val projectPath: Property<String>
+
+  @Internal
+  override fun getName(): String = moduleName
 }
