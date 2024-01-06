@@ -20,7 +20,7 @@ class DokkatooFormatTasks(
   project: Project,
   private val publication: DokkaPublication,
   private val dokkatooExtension: DokkatooExtension,
-  private val depsManager: FormatDependenciesManager,
+  private val formatDependencies: FormatDependenciesManager,
 
   private val providers: ProviderFactory,
   private val moduleDescriptors: NamedDomainObjectContainer<DokkaModuleDescriptionSpec>,
@@ -31,7 +31,7 @@ class DokkatooFormatTasks(
 
   private fun DokkatooGenerateTask.applyFormatSpecificConfiguration() {
     runtimeClasspath.from(
-      depsManager.dokkaGeneratorClasspathResolver
+      formatDependencies.dokkaGeneratorClasspathResolver
     )
     generator.apply {
       publicationEnabled.convention(publication.enabled)
@@ -44,7 +44,7 @@ class DokkatooFormatTasks(
       offlineMode.convention(publication.offlineMode)
       pluginsConfiguration.addAllLater(providers.provider { publication.pluginsConfiguration })
       pluginsClasspath.from(
-        depsManager.dokkaPluginsIntransitiveClasspathResolver
+        formatDependencies.dokkaPluginsIntransitiveClasspathResolver
       )
       suppressInheritedMembers.convention(publication.suppressInheritedMembers)
       suppressObviousFunctions.convention(publication.suppressObviousFunctions)

@@ -17,7 +17,6 @@ import org.gradle.api.attributes.Category.CATEGORY_ATTRIBUTE
 import org.gradle.api.attributes.Category.LIBRARY
 import org.gradle.api.attributes.LibraryElements.JAR
 import org.gradle.api.attributes.LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE
-import org.gradle.api.attributes.Usage
 import org.gradle.api.attributes.Usage.JAVA_RUNTIME
 import org.gradle.api.attributes.Usage.USAGE_ATTRIBUTE
 import org.gradle.api.attributes.java.TargetJvmEnvironment.STANDARD_JVM
@@ -40,22 +39,21 @@ import org.gradle.kotlin.dsl.*
  */
 @DokkatooInternalApi
 class FormatDependenciesManager(
-  formatName: String,
-  baseDependencyManager: BaseDependencyManager,
+  private val formatName: String,
+  private val baseDependencyManager: BaseDependencyManager,
   private val project: Project,
   private val objects: ObjectFactory,
 ) {
 
   private val configurationNames = DependencyContainerNames(formatName)
 
+  internal val baseAttributes: BaseAttributes = baseDependencyManager.baseAttributes
 
-  //region variant attributes
-  private val dokkatooUsage: Usage = baseDependencyManager.dokkatooUsage
-  internal val dokkatooFormat: DokkatooAttribute.Format = objects.named(formatName)
-  private val moduleName: Provider<DokkatooAttribute.ModuleName> =
-    baseDependencyManager.moduleName
-  private val modulePath: Provider<DokkatooAttribute.ModulePath> =
-    baseDependencyManager.modulePath
+  internal val formatAttributes: FormatAttributes =
+    FormatAttributes(
+      formatName = formatName,
+      objects = objects,
+    )
 
   private fun AttributeContainer.jvmJar() {
     attribute(USAGE_ATTRIBUTE, objects.named(JAVA_RUNTIME))
@@ -64,7 +62,6 @@ class FormatDependenciesManager(
     attribute(TARGET_JVM_ENVIRONMENT_ATTRIBUTE, objects.named(STANDARD_JVM))
     attribute(LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(JAR))
   }
-  //endregion
 
 
   /** Contains dependencies declared in a [Project.dependencies] block. */
@@ -83,10 +80,10 @@ class FormatDependenciesManager(
       resolvable()
       extendsFrom(declaredDependencies.get())
       attributes {
-        attribute(USAGE_ATTRIBUTE, dokkatooUsage)
-        attribute(DokkatooFormatAttribute, dokkatooFormat)
-        attributeProvider(DokkatooModulePathAttribute, modulePath)
-        attributeProvider(DokkatooModuleNameAttribute, moduleName)
+        attribute(USAGE_ATTRIBUTE, baseAttributes.dokkatooUsage)
+        attribute(DokkatooFormatAttribute, formatAttributes.format)
+        attributeProvider(DokkatooModulePathAttribute, baseAttributes.modulePath)
+        attributeProvider(DokkatooModuleNameAttribute, baseAttributes.moduleName)
       }
     }
 
@@ -120,8 +117,8 @@ class FormatDependenciesManager(
       isTransitive = false
       attributes {
         jvmJar()
-        attribute(DokkatooFormatAttribute, dokkatooFormat)
-        attribute(DokkatooClasspathAttribute, objects.named("dokka-plugins"))
+        attribute(DokkatooFormatAttribute, formatAttributes.format)
+        attribute(DokkatooClasspathAttribute, baseAttributes.dokkaPlugins)
       }
     }
   //endregion
@@ -167,8 +164,8 @@ class FormatDependenciesManager(
 
       attributes {
         jvmJar()
-        attribute(DokkatooFormatAttribute, dokkatooFormat)
-        attribute(DokkatooClasspathAttribute, objects.named("dokka-generator"))
+        attribute(DokkatooFormatAttribute, formatAttributes.format)
+        attribute(DokkatooClasspathAttribute, baseAttributes.dokkaGenerator)
       }
     }
   //endregion
@@ -177,43 +174,42 @@ class FormatDependenciesManager(
   @DokkatooInternalApi
   class ModuleComponent(
     project: Project,
-    private val moduleAttribute: DokkatooAttribute.ModuleComponent,
-    private val dokkatooUsage: Usage,
-    private val moduleName: Provider<DokkatooAttribute.ModuleName>,
-    private val modulePath: Provider<DokkatooAttribute.ModulePath>,
-    private val dokkatooFormat: DokkatooAttribute.Format,
+    private val component: DokkatooAttribute.ModuleComponent,
+    private val baseAttributes: BaseAttributes,
+    private val formatAttributes: FormatAttributes,
     baseIncoming: NamedDomainObjectProvider<Configuration>,
     baseConfigurationName: String,
   ) {
-    private val componentName: String get() = moduleAttribute.name
+    private val formatName: String get() = formatAttributes.format.name
+    private val componentName: String get() = component.name
 
     private val resolver: NamedDomainObjectProvider<Configuration> =
       project.configurations.register("${baseConfigurationName}${componentName}Resolver") {
         description =
-          "Resolves Dokkatoo ${dokkatooFormat.name} $componentName files."
+          "Resolves Dokkatoo $formatName $componentName files."
         resolvable()
         extendsFrom(baseIncoming.get())
         attributes {
-          attribute(USAGE_ATTRIBUTE, dokkatooUsage)
-          attribute(DokkatooFormatAttribute, dokkatooFormat)
-          attribute(DokkatooModuleComponentAttribute, moduleAttribute)
-          attributeProvider(DokkatooModulePathAttribute, modulePath)
-          attributeProvider(DokkatooModuleNameAttribute, moduleName)
+          attribute(USAGE_ATTRIBUTE, baseAttributes.dokkatooUsage)
+          attribute(DokkatooFormatAttribute, formatAttributes.format)
+          attribute(DokkatooModuleComponentAttribute, component)
+          attributeProvider(DokkatooModulePathAttribute, baseAttributes.modulePath)
+          attributeProvider(DokkatooModuleNameAttribute, baseAttributes.moduleName)
         }
       }
 
     val outgoing: NamedDomainObjectProvider<Configuration> =
       project.configurations.register("${baseConfigurationName}${componentName}Consumable") {
         description =
-          "Provides Dokkatoo ${dokkatooFormat.name} $componentName files for consumption by other subprojects."
+          "Provides Dokkatoo $formatName $componentName files for consumption by other subprojects."
         consumable()
         extendsFrom(resolver.get())
         attributes {
-          attribute(USAGE_ATTRIBUTE, dokkatooUsage)
-          attribute(DokkatooFormatAttribute, dokkatooFormat)
-          attribute(DokkatooModuleComponentAttribute, moduleAttribute)
-          attributeProvider(DokkatooModulePathAttribute, modulePath)
-          attributeProvider(DokkatooModuleNameAttribute, moduleName)
+          attribute(USAGE_ATTRIBUTE, baseAttributes.dokkatooUsage)
+          attribute(DokkatooFormatAttribute, formatAttributes.format)
+          attribute(DokkatooModuleComponentAttribute, component)
+          attributeProvider(DokkatooModulePathAttribute, baseAttributes.modulePath)
+          attributeProvider(DokkatooModuleNameAttribute, baseAttributes.moduleName)
         }
       }
 
@@ -222,8 +218,10 @@ class FormatDependenciesManager(
      *
      * The artifacts will be filtered to ensure that
      *
-     * * [DokkatooModuleComponentAttribute] equals [moduleAttribute]
-     * * [DokkatooFormatAttribute] equals [dokkatooFormat]
+     * * [DokkatooModuleComponentAttribute] equals [component]
+     * * [DokkatooFormatAttribute] equals [FormatAttributes.format]
+     *
+     * This filtering should prevent a Gradle bug where it fetches random unrequested files.
      */
     val incomingArtifacts: Provider<List<ResolvedArtifactResult>> =
       baseIncoming.incomingArtifacts()
@@ -235,28 +233,29 @@ class FormatDependenciesManager(
             @Suppress("UnstableApiUsage")
             withVariantReselection()
             attributes {
-              attribute(USAGE_ATTRIBUTE, dokkatooUsage)
-              attribute(DokkatooFormatAttribute, dokkatooFormat)
-              attribute(DokkatooModuleComponentAttribute, moduleAttribute)
+              attribute(USAGE_ATTRIBUTE, baseAttributes.dokkatooUsage)
+              attribute(DokkatooFormatAttribute, formatAttributes.format)
+              attribute(DokkatooModuleComponentAttribute, component)
             }
             lenient(true)
           }
           .artifacts
           .artifacts
           .filter { artifact ->
+            val variantAttributes = artifact.variant.attributes
             when {
-              artifact.variant.attributes[DokkatooModuleComponentAttribute] != moduleAttribute -> {
-                logger.info("[${incoming.name}] ignoring artifact $artifact - DokkatooModuleComponentAttribute != $moduleAttribute | attributes:${artifact.variant.attributes.toMap()}")
+              variantAttributes[DokkatooModuleComponentAttribute] != component      -> {
+                logger.info("[${incoming.name}] ignoring artifact $artifact - DokkatooModuleComponentAttribute != $component | attributes:${variantAttributes.toMap()}")
                 false
               }
 
-              artifact.variant.attributes[DokkatooFormatAttribute] != dokkatooFormat           -> {
-                logger.info("[${incoming.name}] ignoring artifact $artifact - DokkatooFormatAttribute != $dokkatooFormat | attributes:${artifact.variant.attributes.toMap()}")
+              variantAttributes[DokkatooFormatAttribute] != formatAttributes.format -> {
+                logger.info("[${incoming.name}] ignoring artifact $artifact - DokkatooFormatAttribute != ${formatAttributes.format} | attributes:${variantAttributes.toMap()}")
                 false
               }
 
-              else                                                                             -> {
-                logger.info("[${incoming.name}] found valid artifact $artifact | attributes:${artifact.variant.attributes.toMap()}")
+              else                                                                  -> {
+                logger.info("[${incoming.name}] found valid artifact $artifact | attributes:${variantAttributes.toMap()}")
                 true
               }
             }
@@ -271,14 +270,12 @@ class FormatDependenciesManager(
   }
 
 
-  private fun ModuleComponent(componentName: String): ModuleComponent =
+  private fun ModuleComponent(component: DokkatooAttribute.ModuleComponent): ModuleComponent =
     ModuleComponent(
       project = project,
-      moduleAttribute = objects.named(componentName),
-      dokkatooUsage = dokkatooUsage,
-      moduleName = moduleName,
-      modulePath = modulePath,
-      dokkatooFormat = dokkatooFormat,
+      component = component,
+      baseAttributes = baseAttributes,
+      formatAttributes = formatAttributes,
       baseIncoming = incoming,
       baseConfigurationName = configurationNames.dokkatoo,
     )
@@ -286,11 +283,11 @@ class FormatDependenciesManager(
   /**
    * @see org.jetbrains.dokka.DokkaConfiguration.DokkaModuleDescription.sourceOutputDirectory
    */
-  val moduleDirectory = ModuleComponent("ModuleDirectory")
+  val moduleDirectory = ModuleComponent(formatAttributes.moduleDirectory)
   /**
    * Module includes (might not be used?)
    *
    * @see org.jetbrains.dokka.DokkaConfiguration.DokkaModuleDescription.includes
    */
-  val moduleIncludes = ModuleComponent("ModuleIncludes")
+  val moduleIncludes = ModuleComponent(formatAttributes.moduleIncludes)
 }

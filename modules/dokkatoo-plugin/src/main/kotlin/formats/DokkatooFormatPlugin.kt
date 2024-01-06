@@ -82,25 +82,25 @@ abstract class DokkatooFormatPlugin(
 
       val baseDependencyManager = target.extensions.getByType<BaseDependencyManager>()
 
-      val depsManager = FormatDependenciesManager(
+      val formatDependencies = FormatDependenciesManager(
         project = target,
         baseDependencyManager = baseDependencyManager,
         formatName = formatName,
         objects = objects,
       )
 
-      val moduleDescriptors = createModuleDescriptors(depsManager)
+      val moduleDescriptors = createModuleDescriptors(formatDependencies)
 
       val dokkatooTasks = DokkatooFormatTasks(
         project = target,
         publication = publication,
         dokkatooExtension = dokkatooExtension,
-        depsManager = depsManager,
+        formatDependencies = formatDependencies,
         providers = providers,
         moduleDescriptors = moduleDescriptors,
       )
 
-      depsManager
+      formatDependencies
         .moduleIncludes
         .outgoing
         .configure {
@@ -132,7 +132,7 @@ abstract class DokkatooFormatPlugin(
           }
         }
 
-      depsManager
+      formatDependencies
         .moduleDirectory
         .outgoing
         .configure {
@@ -161,7 +161,7 @@ abstract class DokkatooFormatPlugin(
         project = target,
         dokkatooExtension = dokkatooExtension,
         dokkatooTasks = dokkatooTasks,
-        depsManager = depsManager,
+        formatDependencies = formatDependencies,
         formatName = formatName,
       )
 
@@ -176,8 +176,8 @@ abstract class DokkatooFormatPlugin(
       if (context.enableVersionAlignment) {
         //region version alignment
         listOf(
-          depsManager.dokkaPluginsIntransitiveClasspathResolver,
-          depsManager.dokkaGeneratorClasspathResolver,
+          formatDependencies.dokkaPluginsIntransitiveClasspathResolver,
+          formatDependencies.dokkaGeneratorClasspathResolver,
         ).forEach { dependenciesContainer ->
           // Add a version if one is missing, which will allow defining a org.jetbrains.dokka
           // dependency without a version.
@@ -198,12 +198,12 @@ abstract class DokkatooFormatPlugin(
   }
 
   private fun createModuleDescriptors(
-    depsManager: FormatDependenciesManager
+    formatDependencies: FormatDependenciesManager
   ): NamedDomainObjectContainer<DokkaModuleDescriptionSpec> {
     val incomingModuleDescriptors =
-      depsManager.moduleDirectory.incomingArtifacts.map { moduleOutputDirectoryArtifact ->
+      formatDependencies.moduleDirectory.incomingArtifacts.map { moduleOutputDirectoryArtifact ->
         moduleOutputDirectoryArtifact.map { moduleDirArtifact ->
-          createModuleDescriptor(depsManager, moduleDirArtifact)
+          createModuleDescriptor(formatDependencies, moduleDirArtifact)
         }
       }
 
@@ -213,7 +213,7 @@ abstract class DokkatooFormatPlugin(
   }
 
   private fun createModuleDescriptor(
-    depsManager: FormatDependenciesManager,
+    formatDependencies: FormatDependenciesManager,
     moduleDirArtifact: ResolvedArtifactResult,
   ): DokkaModuleDescriptionSpec {
     fun missingAttributeError(name: String): Nothing =
@@ -232,7 +232,7 @@ abstract class DokkatooFormatPlugin(
     val moduleDirectory = moduleDirArtifact.file
 
     val includes: Provider<List<File>> =
-      depsManager.moduleIncludes.incomingArtifacts.map { artifacts ->
+      formatDependencies.moduleIncludes.incomingArtifacts.map { artifacts ->
         artifacts
           .filter { artifact -> artifact.variant.attributes[DokkatooModuleNameAttribute] == moduleName }
           .map(ResolvedArtifactResult::getFile)
@@ -256,10 +256,9 @@ abstract class DokkatooFormatPlugin(
     val project: Project,
     val dokkatooExtension: DokkatooExtension,
     val dokkatooTasks: DokkatooFormatTasks,
-    val depsManager: FormatDependenciesManager,
+    val formatDependencies: FormatDependenciesManager,
     formatName: String,
   ) {
-    private val objects = project.objects
     private val dependencyContainerNames = DependencyContainerNames(formatName)
 
     var addDefaultDokkaDependencies = true
@@ -270,15 +269,13 @@ abstract class DokkatooFormatPlugin(
       dokkatooExtension.versions.jetbrainsDokka.map { version -> create("org.jetbrains.dokka:$module:$version") }
 
     private fun AttributeContainer.dokkaPluginsClasspath() {
-//      attribute(USAGE_ATTRIBUTE, depsManager.dokkatooUsage)
-      attribute(DokkatooFormatAttribute, depsManager.dokkatooFormat)
-      attribute(DokkatooClasspathAttribute, objects.named("dokka-plugins"))
+      attribute(DokkatooFormatAttribute, formatDependencies.formatAttributes.format)
+      attribute(DokkatooClasspathAttribute, formatDependencies.baseAttributes.dokkaPlugins)
     }
 
     private fun AttributeContainer.dokkaGeneratorClasspath() {
-//      attribute(USAGE_ATTRIBUTE, depsManager.dokkatooUsage)
-      attribute(DokkatooFormatAttribute, depsManager.dokkatooFormat)
-      attribute(DokkatooClasspathAttribute, objects.named("dokka-generator"))
+      attribute(DokkatooFormatAttribute, formatDependencies.formatAttributes.format)
+      attribute(DokkatooClasspathAttribute, formatDependencies.baseAttributes.dokkaGenerator)
     }
 
     /** Add a dependency to the Dokka plugins classpath */

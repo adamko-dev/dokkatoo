@@ -65,8 +65,8 @@ constructor(
 
     val baseDependencyManager = BaseDependencyManager(
       project = target,
-      moduleNameString = dokkatooExtension.moduleName,
-      modulePathString = dokkatooExtension.modulePath,
+      moduleName = dokkatooExtension.moduleName,
+      modulePath = dokkatooExtension.modulePath,
       objects = objects,
     )
     target.extensions.adding(
