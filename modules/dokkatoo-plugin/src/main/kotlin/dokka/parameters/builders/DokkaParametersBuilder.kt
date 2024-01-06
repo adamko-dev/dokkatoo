@@ -4,9 +4,8 @@ import dev.adamko.dokkatoo.dokka.parameters.DokkaGeneratorParametersSpec
 import dev.adamko.dokkatoo.dokka.parameters.DokkaModuleDescriptionKxs
 import dev.adamko.dokkatoo.dokka.plugins.DokkaPluginParametersBaseSpec
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
-import dev.adamko.dokkatoo.internal.mapNotNullToSet
 import java.io.File
-import org.gradle.api.logging.Logging
+import org.gradle.api.Project
 import org.jetbrains.dokka.DokkaConfiguration
 import org.jetbrains.dokka.DokkaConfigurationImpl
 import org.jetbrains.dokka.DokkaSourceSetImpl
@@ -30,7 +29,7 @@ internal object DokkaParametersBuilder {
     cacheDirectory: File? = null,
   ): DokkaConfiguration {
     val moduleName = spec.moduleName.get()
-    val moduleVersion = spec.moduleVersion.orNull?.takeIf { it != "unspecified" }
+    val moduleVersion = spec.moduleVersion.orNull?.takeIf { it != Project.DEFAULT_VERSION }
     val offlineMode = spec.offlineMode.get()
     val sourceSets = DokkaSourceSetBuilder.buildAll(spec.dokkaSourceSets)
     val failOnWarning = spec.failOnWarning.get()
