@@ -15,9 +15,8 @@ import org.gradle.api.tasks.PathSensitivity.RELATIVE
 import org.gradle.work.NormalizeLineEndings
 
 /**
- * Parameters used to run Dokka Generator to produce either a Publication or a Module.
- *
- *
+ * Parameters used to run Dokka Generator to produce either a
+ * Dokka Publication or a Dokka Module.
  */
 abstract class DokkaGeneratorParametersSpec
 @DokkatooInternalApi

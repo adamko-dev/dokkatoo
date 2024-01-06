@@ -11,8 +11,6 @@ import kotlin.annotation.AnnotationTarget.*
  * [`public` visibility](https://kotlinlang.org/docs/visibility-modifiers.html)
  * for technical reasons.
  *
- * Any code that is annotated with this may be used
- *
  * Anyone is welcome to
  * [opt in](https://kotlinlang.org/docs/opt-in-requirements.html#opt-in-to-using-api)
  * to use this API, but be aware that it might change unexpectedly and without warning or migration
@@ -22,7 +20,7 @@ import kotlin.annotation.AnnotationTarget.*
  * [the Dokkatoo issue tracker](https://github.com/adamko-dev/dokkatoo/issues).
  */
 @RequiresOptIn(
-  "Internal API - may change at any time without notice",
+  message = "Internal API - may change at any time without notice",
   level = WARNING
 )
 @Retention(BINARY)

@@ -24,6 +24,8 @@ abstract class DokkaModuleDescriptionSpec
 ) : Named {
 
   /**
+   * Location of the generated Dokka Module.
+   *
    * @see DokkaConfiguration.DokkaModuleDescription.sourceOutputDirectory
    */
   @get:Input

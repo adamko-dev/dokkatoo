@@ -4,7 +4,10 @@ import org.jetbrains.dokka.Platform
 
 
 /**
- * The Kotlin
+ * The Kotlin Platform that code is compiled to.
+ *
+ * This is a separate implementation of [org.jetbrains.dokka.Platform] to avoid requiring Dokka
+ * classes in build scripts.
  *
  * @see org.jetbrains.dokka.Platform
  * @param[displayName] The display name, eventually used in the rendered Dokka publication.
