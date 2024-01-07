@@ -6,6 +6,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.inspectors.shouldForAll
 import io.kotest.matchers.collections.shouldBeIn
 import io.kotest.matchers.collections.shouldContainAll
+import io.kotest.matchers.file.shouldBeAFile
 import io.kotest.matchers.paths.shouldNotExist
 import io.kotest.matchers.string.shouldBeEmpty
 import io.kotest.matchers.string.shouldContain
@@ -34,7 +35,7 @@ class MultiModuleFunctionalTest : FunSpec({
       project
         .findFiles { it.name == "dokka-worker.log" }
         .shouldForAll { dokkaWorkerLog ->
-          dokkaWorkerLog.shouldBeAnExistingFile()
+          dokkaWorkerLog.shouldBeAFile()
           dokkaWorkerLog.readText().shouldNotContainAnyOf(
             "[ERROR]",
             "[WARN]",
@@ -100,7 +101,7 @@ class MultiModuleFunctionalTest : FunSpec({
             project
               .findFiles { it.name == "dokka-worker.log" }
               .shouldForAll { dokkaWorkerLog ->
-                dokkaWorkerLog.shouldBeAnExistingFile()
+                dokkaWorkerLog.shouldBeAFile()
                 dokkaWorkerLog.readText().shouldNotContainAnyOf(
                   "[ERROR]",
                   "[WARN]",
@@ -166,7 +167,7 @@ class MultiModuleFunctionalTest : FunSpec({
         project
           .findFiles { it.name == "dokka-worker.log" }
           .shouldForAll { dokkaWorkerLog ->
-            dokkaWorkerLog.shouldBeAnExistingFile()
+            dokkaWorkerLog.shouldBeAFile()
             dokkaWorkerLog.readText().shouldNotContainAnyOf(
               "[ERROR]",
               "[WARN]",

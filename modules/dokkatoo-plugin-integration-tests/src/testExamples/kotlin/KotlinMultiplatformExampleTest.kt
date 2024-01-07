@@ -11,7 +11,6 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
 import java.io.File
-import shouldBeAnExistingFile
 
 class KotlinMultiplatformExampleTest : FunSpec({
 
@@ -106,7 +105,7 @@ class KotlinMultiplatformExampleTest : FunSpec({
             dokkatooProject
               .findFiles { it.name == "dokka-worker.log" }
               .shouldBeSingleton { dokkaWorkerLog ->
-                dokkaWorkerLog.shouldBeAnExistingFile()
+                dokkaWorkerLog.shouldBeAFile()
                 dokkaWorkerLog.readText().shouldNotContainAnyOf(
                   "[ERROR]",
                   "[WARN]",

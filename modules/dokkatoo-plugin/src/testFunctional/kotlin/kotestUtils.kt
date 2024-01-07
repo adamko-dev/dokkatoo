@@ -11,8 +11,3 @@ internal fun Path.shouldBeAnExistingFile(): Unit = run {
   shouldExist()
   shouldBeAFile()
 }
-
-internal fun File.shouldBeAnExistingFile(): Unit = run {
-  shouldExist()
-  shouldBeAFile()
-}

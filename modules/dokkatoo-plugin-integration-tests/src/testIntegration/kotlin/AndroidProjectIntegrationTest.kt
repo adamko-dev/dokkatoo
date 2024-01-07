@@ -2,7 +2,7 @@ package dev.adamko.dokkatoo.tests.integration
 
 import dev.adamko.dokkatoo.utils.*
 import io.kotest.core.spec.style.FunSpec
-import io.kotest.matchers.file.shouldBeAnExistingFile
+import io.kotest.matchers.file.shouldBeAFile
 import io.kotest.matchers.file.shouldHaveSameStructureAndContentAs
 import io.kotest.matchers.file.shouldHaveSameStructureAs
 import io.kotest.matchers.shouldBe
@@ -56,7 +56,7 @@ class AndroidProjectIntegrationTest : FunSpec({
             dokkatooProject
               .findFiles { it.name == "dokka-worker.log" }
               .shouldBeSingleton { dokkaWorkerLog ->
-                dokkaWorkerLog.shouldBeAnExistingFile()
+                dokkaWorkerLog.shouldBeAFile()
                 dokkaWorkerLog.readText().shouldNotContainAnyOf(
                   "[ERROR]",
                   "[WARN]",

@@ -3,7 +3,7 @@ package dev.adamko.dokkatoo.tests.integration
 import dev.adamko.dokkatoo.utils.*
 import dev.adamko.dokkatoo.utils.GradleProjectTest.Companion.projectTestTempDir
 import io.kotest.core.spec.style.FunSpec
-import io.kotest.matchers.file.shouldBeAnExistingFile
+import io.kotest.matchers.file.shouldBeAFile
 import io.kotest.matchers.file.shouldHaveSameStructureAndContentAs
 import io.kotest.matchers.file.shouldHaveSameStructureAs
 import io.kotest.matchers.shouldBe
@@ -56,7 +56,7 @@ class BasicProjectIntegrationTest : FunSpec({
             dokkatooProject
               .findFiles { it.name == "dokka-worker.log" }
               .shouldBeSingleton { dokkaWorkerLog ->
-                dokkaWorkerLog.shouldBeAnExistingFile()
+                dokkaWorkerLog.shouldBeAFile()
                 dokkaWorkerLog.readText().shouldNotContainAnyOf(
                   "[ERROR]",
                   "[WARN]",
