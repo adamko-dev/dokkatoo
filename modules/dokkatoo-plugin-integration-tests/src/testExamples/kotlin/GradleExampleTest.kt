@@ -5,7 +5,7 @@ import dev.adamko.dokkatoo.utils.*
 import dev.adamko.dokkatoo.utils.GradleProjectTest.Companion.projectTestTempDir
 import io.kotest.assertions.withClue
 import io.kotest.core.spec.style.FunSpec
-import io.kotest.matchers.file.shouldBeAFile
+import io.kotest.matchers.file.shouldBeAnExistingFile
 import io.kotest.matchers.file.shouldHaveSameStructureAndContentAs
 import io.kotest.matchers.file.shouldHaveSameStructureAs
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -56,7 +56,7 @@ class GradleExampleTest : FunSpec({
           dokkatooProject
             .findFiles { it.name == "dokka-worker.log" }
             .shouldBeSingleton { dokkaWorkerLog ->
-              dokkaWorkerLog.shouldNotBeNull().shouldBeAFile()
+              dokkaWorkerLog.shouldNotBeNull().shouldBeAnExistingFile()
               dokkaWorkerLog.readText() shouldContain "Generation completed successfully"
             }
         }
@@ -98,7 +98,7 @@ class GradleExampleTest : FunSpec({
           dokkatooProject
             .findFiles { it.name == "dokka-worker.log" }
             .shouldBeSingleton { dokkaWorkerLog ->
-              dokkaWorkerLog.shouldNotBeNull().shouldBeAFile()
+              dokkaWorkerLog.shouldNotBeNull().shouldBeAnExistingFile()
               dokkaWorkerLog.readText() shouldContain "Generation completed successfully"
             }
         }

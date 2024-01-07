@@ -4,7 +4,7 @@ import dev.adamko.dokkatoo.internal.DokkatooConstants.DOKKA_VERSION
 import dev.adamko.dokkatoo.utils.*
 import io.kotest.assertions.withClue
 import io.kotest.core.spec.style.FunSpec
-import io.kotest.matchers.file.shouldBeAFile
+import io.kotest.matchers.file.shouldBeAnExistingFile
 import io.kotest.matchers.file.shouldHaveSameStructureAndContentAs
 import io.kotest.matchers.file.shouldHaveSameStructureAs
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -54,7 +54,7 @@ class CustomFormatExampleTest : FunSpec({
           dokkatooProject
             .findFiles { it.name == "dokka-worker.log" }
             .shouldBeSingleton { dokkaWorkerLog ->
-              dokkaWorkerLog.shouldNotBeNull().shouldBeAFile()
+              dokkaWorkerLog.shouldNotBeNull().shouldBeAnExistingFile()
               dokkaWorkerLog.readText() shouldContain "Generation completed successfully"
             }
         }
@@ -96,7 +96,7 @@ class CustomFormatExampleTest : FunSpec({
           dokkatooProject
             .findFiles { it.name == "dokka-worker.log" }
             .shouldBeSingleton { dokkaWorkerLog ->
-              dokkaWorkerLog.shouldNotBeNull().shouldBeAFile()
+              dokkaWorkerLog.shouldNotBeNull().shouldBeAnExistingFile()
               dokkaWorkerLog.readText() shouldContain "Generation completed successfully"
             }
         }

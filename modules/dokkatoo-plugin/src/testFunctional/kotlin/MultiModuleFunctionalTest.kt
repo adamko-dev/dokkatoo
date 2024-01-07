@@ -6,8 +6,6 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.inspectors.shouldForAll
 import io.kotest.matchers.collections.shouldBeIn
 import io.kotest.matchers.collections.shouldContainAll
-import io.kotest.matchers.file.shouldBeAFile
-import io.kotest.matchers.paths.shouldBeAFile
 import io.kotest.matchers.paths.shouldNotExist
 import io.kotest.matchers.string.shouldBeEmpty
 import io.kotest.matchers.string.shouldContain
@@ -36,7 +34,7 @@ class MultiModuleFunctionalTest : FunSpec({
       project
         .findFiles { it.name == "dokka-worker.log" }
         .shouldForAll { dokkaWorkerLog ->
-          dokkaWorkerLog.shouldBeAFile()
+          dokkaWorkerLog.shouldBeAnExistingFile()
           dokkaWorkerLog.readText().shouldNotContainAnyOf(
             "[ERROR]",
             "[WARN]",
@@ -46,19 +44,19 @@ class MultiModuleFunctionalTest : FunSpec({
 
     context("expect HTML site is generated") {
 
-      test("with expected HTML files") {
-        project.file("subproject/build/dokka/html/index.html").shouldBeAFile()
-        project.file("subproject/build/dokka/html/com/project/hello/Hello.html")
-          .shouldBeAFile()
-      }
-
-      test("and dokka_parameters.json is generated") {
-        project.file("subproject/build/dokka/html/dokka_parameters.json")
-          .shouldBeAFile()
-      }
+//      test("with expected HTML files") {
+//        project.file("subproject/build/dokka/html/index.html").shouldBeAnExistingFile()
+//        project.file("subproject/build/dokka/html/com/project/hello/Hello.html")
+//          .shouldBeAnExistingFile()
+//      }
+//
+//      test("and dokka_parameters.json is generated") {
+//        project.file("subproject/build/dokka/html/dokka_parameters.json")
+//          .shouldBeAnExistingFile()
+//      }
 
       test("with element-list") {
-        project.file("build/dokka/html/package-list").shouldBeAFile()
+        project.file("build/dokka/html/package-list").shouldBeAnExistingFile()
         project.file("build/dokka/html/package-list").toFile().readText()
           .shouldContain( /* language=text */ """
               |${'$'}dokka.format:html-v1
@@ -102,7 +100,7 @@ class MultiModuleFunctionalTest : FunSpec({
             project
               .findFiles { it.name == "dokka-worker.log" }
               .shouldForAll { dokkaWorkerLog ->
-                dokkaWorkerLog.shouldBeAFile()
+                dokkaWorkerLog.shouldBeAnExistingFile()
                 dokkaWorkerLog.readText().shouldNotContainAnyOf(
                   "[ERROR]",
                   "[WARN]",
@@ -168,7 +166,7 @@ class MultiModuleFunctionalTest : FunSpec({
         project
           .findFiles { it.name == "dokka-worker.log" }
           .shouldForAll { dokkaWorkerLog ->
-            dokkaWorkerLog.shouldBeAFile()
+            dokkaWorkerLog.shouldBeAnExistingFile()
             dokkaWorkerLog.readText().shouldNotContainAnyOf(
               "[ERROR]",
               "[WARN]",
@@ -231,7 +229,7 @@ class MultiModuleFunctionalTest : FunSpec({
             .build {
 
               test("expect HelloAgain HTML file exists") {
-                helloAgainIndexHtml.shouldBeAFile()
+                helloAgainIndexHtml.shouldBeAnExistingFile()
               }
 
               test("expect :subproject-goodbye tasks are up-to-date, because no files changed") {

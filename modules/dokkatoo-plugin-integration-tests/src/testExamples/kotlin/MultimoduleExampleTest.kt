@@ -6,7 +6,6 @@ import dev.adamko.dokkatoo.utils.GradleProjectTest.Companion.projectTestTempDir
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.inspectors.shouldForAll
 import io.kotest.matchers.collections.shouldHaveSize
-import io.kotest.matchers.file.shouldBeAFile
 import io.kotest.matchers.file.shouldHaveSameStructureAndContentAs
 import io.kotest.matchers.file.shouldHaveSameStructureAs
 import io.kotest.matchers.shouldBe
@@ -14,6 +13,7 @@ import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
 import java.io.File
 import org.gradle.testkit.runner.TaskOutcome.UP_TO_DATE
+import shouldBeAnExistingFile
 
 class MultimoduleExampleTest : FunSpec({
 
@@ -59,7 +59,7 @@ class MultimoduleExampleTest : FunSpec({
             dokkatooProject
               .findFiles { it.name == "dokka-worker.log" }
               .shouldForAll { dokkaWorkerLog ->
-                dokkaWorkerLog.shouldBeAFile()
+                dokkaWorkerLog.shouldBeAnExistingFile()
                 dokkaWorkerLog.readText().shouldNotContainAnyOf(
                   "[ERROR]",
                   "[WARN]",
@@ -108,7 +108,7 @@ class MultimoduleExampleTest : FunSpec({
             dokkatooProject
               .findFiles { it.name == "dokka-worker.log" }
               .shouldForAll { dokkaWorkerLog ->
-                dokkaWorkerLog.shouldBeAFile()
+                dokkaWorkerLog.shouldBeAnExistingFile()
                 dokkaWorkerLog.readText().shouldNotContainAnyOf(
                   "[ERROR]",
                   "[WARN]",

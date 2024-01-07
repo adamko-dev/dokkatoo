@@ -25,6 +25,7 @@ dependencies {
   // that would be used as an implementation dependency, while dokka-core would be used as a compileOnly dependency
   // https://github.com/Kotlin/dokka/issues/2933
   implementation(libs.kotlin.dokkaCore)
+  testImplementation(project(":modules:dokkatoo-plugin-integration-tests"))
 
   compileOnly(libs.gradlePlugin.kotlin)
   compileOnly(libs.gradlePlugin.kotlin.klibCommonizerApi)
