@@ -160,8 +160,8 @@ plugins {
 dependencies {
   // aggregate both subproject-hello and subproject-world
   // the subprojects must also have Dokkatoo applied
-  dokkatoo(projects(":subproject-hello"))
-  dokkatoo(projects(":subproject-world"))
+  dokkatoo(project(":subproject-hello"))
+  dokkatoo(project(":subproject-world"))
 
   // If using Dokkatoo v2.1.0+ a dependency on all-modules-page-plugin is no longer required,
   // see https://github.com/adamko-dev/dokkatoo/issues/14
