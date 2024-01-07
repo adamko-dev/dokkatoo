@@ -83,10 +83,16 @@ constructor(
   @get:Optional
   abstract val renderVersionsNavigationOnAllPages: Property<Boolean>
 
+  init {
+    versionsOrdering.convention(null)
+  }
+
   override fun jsonEncode(): String =
     buildJsonObject {
       putIfNotNull("version", version.orNull)
-      putJsonArray("versionsOrdering") { addAllIfNotNull(versionsOrdering.orNull) }
+      versionsOrdering.orNull?.let {
+        putJsonArray("versionsOrdering") { addAll(it) }
+      }
       putIfNotNull("olderVersionsDir", olderVersionsDir.orNull?.asFile)
       putJsonArray("olderVersions") {
         addAll(olderVersions.files)
