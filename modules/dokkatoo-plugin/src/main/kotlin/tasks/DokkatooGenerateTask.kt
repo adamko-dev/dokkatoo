@@ -72,20 +72,6 @@ constructor(
   @get:Nested
   val generator: DokkaGeneratorParametersSpec = objects.newInstance(pluginsConfiguration)
 
-  /** @see JavaForkOptions.getDebug */
-  @get:Input
-  abstract val workerDebugEnabled: Property<Boolean>
-  /** @see JavaForkOptions.getMinHeapSize */
-  @get:Input
-  @get:Optional
-  abstract val workerMinHeapSize: Property<String>
-  /** @see JavaForkOptions.getMaxHeapSize */
-  @get:Input
-  @get:Optional
-  abstract val workerMaxHeapSize: Property<String>
-  /** @see JavaForkOptions.jvmArgs */
-  @get:Input
-  abstract val workerJvmArgs: ListProperty<String>
   @get:Internal
   abstract val workerLogFile: RegularFileProperty
 
@@ -110,16 +96,8 @@ constructor(
 
     logger.info("DokkaGeneratorWorker runtimeClasspath: ${runtimeClasspath.asPath}")
 
-    val workQueue = workers.processIsolation {
+    val workQueue = workers.classLoaderIsolation {
       classpath.from(runtimeClasspath)
-      forkOptions {
-        defaultCharacterEncoding = "UTF-8"
-        minHeapSize = workerMinHeapSize.orNull
-        maxHeapSize = workerMaxHeapSize.orNull
-        enableAssertions = true
-        debug = workerDebugEnabled.get()
-        jvmArgs = workerJvmArgs.get()
-      }
     }
 
     workQueue.submit(DokkaGeneratorWorker::class) {
