@@ -99,6 +99,22 @@ constructor(
       generator.dokkaSourceSets.configureDefaults(
         sourceSetScopeConvention = dokkatooExtension.sourceSetScopeDefault
       )
+
+      workerLogFile.convention(temporaryDir.resolve("dokka-worker.log"))
+//      workerIsolation.convention(ProcessIsolation {
+//        debug.convention(false)
+//        jvmArgs.convention(
+//          listOf(
+//            //"-XX:MaxMetaspaceSize=512m",
+//            "-XX:+HeapDumpOnOutOfMemoryError",
+//            "-XX:+AlwaysPreTouch", // https://github.com/gradle/gradle/issues/3093#issuecomment-387259298
+//            //"-XX:StartFlightRecording=disk=true,name={path.drop(1).map { if (it.isLetterOrDigit()) it else '-' }.joinToString("")},dumponexit=true,duration=30s",
+//            //"-XX:FlightRecorderOptions=repository=$baseDir/jfr,stackdepth=512",
+//          )
+//        )
+//      })
+      // TODO setting classloader isolation causes many test failures due to metaspace limits.
+      workerIsolation.set(ClassLoaderIsolation())
     }
 
     dokkatooExtension.dokkatooSourceSets.configureDefaults(

@@ -6,7 +6,10 @@ import dev.adamko.dokkatoo.dokka.parameters.DokkaModuleDescriptionKxs
 import dev.adamko.dokkatoo.dokka.parameters.builders.DokkaParametersBuilder
 import dev.adamko.dokkatoo.internal.DokkaPluginParametersContainer
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
+import dev.adamko.dokkatoo.workers.ClassLoaderIsolation
 import dev.adamko.dokkatoo.workers.DokkaGeneratorWorker
+import dev.adamko.dokkatoo.workers.ProcessIsolation
+import dev.adamko.dokkatoo.workers.WorkerIsolation
 import java.io.IOException
 import javax.inject.Inject
 import kotlinx.serialization.json.JsonElement
@@ -72,6 +75,34 @@ constructor(
   @get:Nested
   val generator: DokkaGeneratorParametersSpec = objects.newInstance(pluginsConfiguration)
 
+  @get:Nested
+  abstract val workerIsolation: Property<WorkerIsolation>
+
+  /**
+   * Create a new [ClassLoaderIsolation] options.
+   *
+   * The resulting options must be set into [workerIsolation].
+   */
+  fun ClassLoaderIsolation(configure: ClassLoaderIsolation.() -> Unit = {}): ClassLoaderIsolation =
+    objects.newInstance<ClassLoaderIsolation>().apply(configure)
+
+  /**
+   * Create a new [ProcessIsolation] options.
+   *
+   * The resulting options must be set into [workerIsolation].
+   */
+  fun ProcessIsolation(configure: ProcessIsolation.() -> Unit = {}): ProcessIsolation =
+    objects.newInstance<ProcessIsolation>().apply {
+      @Suppress("DEPRECATION")
+      run {
+        this.debug.convention(workerDebugEnabled.orElse(false))
+        this.minHeapSize.convention(workerMinHeapSize)
+        this.maxHeapSize.convention(workerMaxHeapSize)
+        this.jvmArgs.convention(workerJvmArgs)
+      }
+      configure()
+    }
+
   @get:Internal
   abstract val workerLogFile: RegularFileProperty
 
@@ -96,8 +127,26 @@ constructor(
 
     logger.info("DokkaGeneratorWorker runtimeClasspath: ${runtimeClasspath.asPath}")
 
-    val workQueue = workers.classLoaderIsolation {
-      classpath.from(runtimeClasspath)
+    val workQueue = when (val isolation = workerIsolation.get()) {
+      is ClassLoaderIsolation ->
+        workers.classLoaderIsolation {
+          classpath.from(runtimeClasspath)
+        }
+
+      is ProcessIsolation     ->
+        workers.processIsolation {
+          classpath.from(runtimeClasspath)
+          forkOptions {
+            isolation.defaultCharacterEncoding.orNull?.let(this::setDefaultCharacterEncoding)
+            isolation.debug.orNull?.let(this::setDebug)
+            isolation.enableAssertions.orNull?.let(this::setEnableAssertions)
+            isolation.maxHeapSize.orNull?.let(this::setMaxHeapSize)
+            isolation.minHeapSize.orNull?.let(this::setMinHeapSize)
+            isolation.jvmArgs.orNull?.let(this::setJvmArgs)
+            isolation.systemProperties.orNull?.let(this::systemProperties)
+            isolation.allJvmArgs.orNull?.let(this::setAllJvmArgs)
+          }
+        }
     }
 
     workQueue.submit(DokkaGeneratorWorker::class) {
@@ -161,4 +210,23 @@ constructor(
         }
       }
   }
+
+  //region Deprecated Properties
+  /** @see JavaForkOptions.getDebug */
+  @get:Internal
+  @Deprecated("moved to TODO") // TODO
+  abstract val workerDebugEnabled: Property<Boolean>
+  /** @see JavaForkOptions.getMinHeapSize */
+  @get:Internal
+  @Deprecated("moved to TODO") // TODO
+  abstract val workerMinHeapSize: Property<String>
+  /** @see JavaForkOptions.getMaxHeapSize */
+  @get:Internal
+  @Deprecated("moved to TODO") // TODO
+  abstract val workerMaxHeapSize: Property<String>
+  /** @see JavaForkOptions.jvmArgs */
+  @get:Internal
+  @Deprecated("moved to TODO") // TODO
+  abstract val workerJvmArgs: ListProperty<String>
+  //endregion
 }
