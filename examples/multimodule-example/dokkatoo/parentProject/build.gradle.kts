@@ -11,5 +11,5 @@ dependencies {
 }
 
 dokkatoo {
-  moduleName.set("Dokka MultiModule Example")
+  moduleName = "Dokka MultiModule Example"
 }
