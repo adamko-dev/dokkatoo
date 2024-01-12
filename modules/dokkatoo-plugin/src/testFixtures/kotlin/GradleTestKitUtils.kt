@@ -59,19 +59,6 @@ class GradleProjectTest(
 }
 
 
-///**
-// * Load a project from the [GradleProjectTest.dokkaSrcIntegrationTestProjectsDir]
-// */
-//fun gradleKtsProjectIntegrationTest(
-//  testProjectName: String,
-//  build: GradleProjectTest.() -> Unit,
-//): GradleProjectTest =
-//  GradleProjectTest(
-//    baseDir = GradleProjectTest.dokkaSrcIntegrationTestProjectsDir,
-//    testProjectName = testProjectName,
-//  ).apply(build)
-
-
 /**
  * Builder for testing a Gradle project that uses Kotlin script DSL and creates default
  * `settings.gradle.kts` and `gradle.properties` files.
@@ -88,10 +75,10 @@ fun gradleKtsProjectTest(
     settingsGradleKts = """
       |rootProject.name = "test"
       |
-      |@Suppress("UnstableApiUsage")
-      |dependencyResolutionManagement {
+      |pluginManagement {
       |  repositories {
       |    mavenCentral()
+      |    gradlePluginPortal()
       |    maven(file("$testMavenRepoRelativePath")) {
       |      mavenContent {
       |        includeGroup("dev.adamko.dokkatoo")
@@ -101,10 +88,10 @@ fun gradleKtsProjectTest(
       |  }
       |}
       |
-      |pluginManagement {
+      |@Suppress("UnstableApiUsage")
+      |dependencyResolutionManagement {
       |  repositories {
       |    mavenCentral()
-      |    gradlePluginPortal()
       |    maven(file("$testMavenRepoRelativePath")) {
       |      mavenContent {
       |        includeGroup("dev.adamko.dokkatoo")
@@ -161,6 +148,8 @@ fun gradleGroovyProjectTest(
     gradleProperties = """
       |kotlin.mpp.stability.nowarn=true
       |org.gradle.cache=true
+      |org.gradle.daemon=false
+      |
     """.trimMargin()
 
     build()
@@ -244,12 +233,16 @@ fun ProjectDirectoryScope.findFiles(matcher: (File) -> Boolean): Sequence<File> 
 
 /** Set the content of `settings.gradle.kts` */
 @delegate:Language("kts")
-var ProjectDirectoryScope.settingsGradleKts: String by TestProjectFileDelegate("settings.gradle.kts")
+var ProjectDirectoryScope.settingsGradleKts: String by TestProjectFileDelegate(
+  /* language=text */ "settings.gradle.kts"
+)
 
 
 /** Set the content of `build.gradle.kts` */
 @delegate:Language("kts")
-var ProjectDirectoryScope.buildGradleKts: String by TestProjectFileDelegate("build.gradle.kts")
+var ProjectDirectoryScope.buildGradleKts: String by TestProjectFileDelegate(
+  /* language=text */ "build.gradle.kts"
+)
 
 
 /** Set the content of `settings.gradle` */
