@@ -8,9 +8,11 @@ import io.kotest.matchers.collections.shouldBeIn
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.file.shouldBeAFile
 import io.kotest.matchers.paths.shouldNotExist
+import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldBeEmpty
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
+import kotlin.io.path.readText
 import org.gradle.testkit.runner.TaskOutcome.*
 
 class MultiModuleFunctionalTest : FunSpec({
@@ -29,48 +31,70 @@ class MultiModuleFunctionalTest : FunSpec({
         test("expect build is successful") {
           output shouldContain "BUILD SUCCESSFUL"
         }
-      }
 
-    test("expect all dokka workers are successful") {
-      project
-        .findFiles { it.name == "dokka-worker.log" }
-        .shouldForAll { dokkaWorkerLog ->
-          dokkaWorkerLog.shouldBeAFile()
-          dokkaWorkerLog.readText().shouldNotContainAnyOf(
-            "[ERROR]",
-            "[WARN]",
-          )
+        test("expect all dokka workers are successful") {
+          project
+            .findFiles { it.name == "dokka-worker.log" }
+            .shouldForAll { dokkaWorkerLog ->
+              dokkaWorkerLog.shouldBeAFile()
+              dokkaWorkerLog.readText().shouldNotContainAnyOf(
+                "[ERROR]",
+                "[WARN]",
+              )
+            }
         }
-    }
 
-    context("expect HTML site is generated") {
+        context("expect HTML site is generated") {
 
-//      test("with expected HTML files") {
-//        project.file("subproject/build/dokka/html/index.html").shouldBeAnExistingFile()
-//        project.file("subproject/build/dokka/html/com/project/hello/Hello.html")
-//          .shouldBeAnExistingFile()
-//      }
-//
-//      test("and dokka_parameters.json is generated") {
-//        project.file("subproject/build/dokka/html/dokka_parameters.json")
-//          .shouldBeAnExistingFile()
-//      }
+          test("with expected HTML files") {
+            project.projectDir
+              .resolve("build/dokka/html/")
+              .toTreeString { it.extension == "html" } shouldBe /* language=text */ """
+                ¦html/
+                ¦├── subproject-hello/
+                ¦│   ├── index.html
+                ¦│   ├── com.project.hello/
+                ¦│   │   ├── index.html
+                ¦│   │   └── -hello/
+                ¦│   │       ├── say-hello.html
+                ¦│   │       ├── index.html
+                ¦│   │       └── -hello.html
+                ¦│   ├── scripts/
+                ¦│   └── navigation.html
+                ¦├── index.html
+                ¦├── subproject-goodbye/
+                ¦│   ├── index.html
+                ¦│   ├── com.project.goodbye/
+                ¦│   │   ├── index.html
+                ¦│   │   └── -goodbye/
+                ¦│   │       ├── say-hello.html
+                ¦│   │       ├── index.html
+                ¦│   │       └── -goodbye.html
+                ¦│   ├── scripts/
+                ¦│   └── navigation.html
+                ¦├── images/
+                ¦│   └── nav-icons/
+                ¦├── styles/
+                ¦├── scripts/
+                ¦└── navigation.html""".trimMargin("¦")
+          }
 
-      test("with element-list") {
-        project.file("build/dokka/html/package-list").shouldBeAnExistingFile()
-        project.file("build/dokka/html/package-list").toFile().readText()
-          .shouldContain( /* language=text */ """
-              |${'$'}dokka.format:html-v1
-              |${'$'}dokka.linkExtension:html
-              |
-              |module:subproject-hello
-              |com.project.hello
-              |module:subproject-goodbye
-              |com.project.goodbye
-            """.trimMargin()
-          )
+          test("with element-list") {
+            project.file("build/dokka/html/package-list").toFile().shouldBeAFile()
+            project.file("build/dokka/html/package-list").readText()
+              .shouldContain( /* language=text */ """
+                |${'$'}dokka.format:html-v1
+                |${'$'}dokka.linkExtension:html
+                |
+                |module:subproject-hello
+                |com.project.hello
+                |module:subproject-goodbye
+                |com.project.goodbye
+              """.trimMargin()
+              )
+          }
+        }
       }
-    }
   }
 
   context("Gradle caching") {
@@ -230,7 +254,7 @@ class MultiModuleFunctionalTest : FunSpec({
             .build {
 
               test("expect HelloAgain HTML file exists") {
-                helloAgainIndexHtml.shouldBeAnExistingFile()
+                helloAgainIndexHtml.toFile().shouldBeAFile()
               }
 
               test("expect :subproject-goodbye tasks are up-to-date, because no files changed") {
