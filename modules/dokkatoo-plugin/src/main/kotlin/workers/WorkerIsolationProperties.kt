@@ -6,20 +6,26 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 import org.gradle.process.JavaForkOptions
+import org.gradle.workers.WorkerExecutor
 
 
 /**
  * Configure how a Gradle Worker is created using [org.gradle.workers.WorkerExecutor].
+ *
+ * @see WorkerExecutor.classLoaderIsolation
+ * @see WorkerExecutor.processIsolation
  */
 sealed interface WorkerIsolation
 
 
 /**
- * Create a Worker in the current Gradle process, with an isolated classpath.
+ * Execute a Worker in the current Gradle process, with an
+ * [isolated classpath][WorkerExecutor.classLoaderIsolation].
  *
  * Presently there are no options to configure the behaviour of a classloader-isolated worker.
  *
  * @see org.gradle.workers.ClassLoaderWorkerSpec
+ * @see WorkerExecutor.classLoaderIsolation
  */
 interface ClassLoaderIsolation : WorkerIsolation {
   // no options yet...
@@ -27,11 +33,14 @@ interface ClassLoaderIsolation : WorkerIsolation {
 
 
 /**
- * Create a Worker using process isolation.
+ * Create a Worker using [process isolation][WorkerExecutor.processIsolation].
  *
- * Gradle will launch new Java process specifically for Dokka.
+ * Gradle will launch
+ * [new Worker Daemon](https://docs.gradle.org/8.5/userguide/worker_api.html#creating_a_worker_daemon)
+ * re-using it across builds.
  *
  * @see org.gradle.workers.ProcessWorkerSpec
+ * @see WorkerExecutor.processIsolation
  */
 interface ProcessIsolation : WorkerIsolation {
   /** @see JavaForkOptions.setDebug */

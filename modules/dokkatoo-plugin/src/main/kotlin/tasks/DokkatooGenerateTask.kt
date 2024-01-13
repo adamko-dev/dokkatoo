@@ -75,6 +75,35 @@ constructor(
   @get:Nested
   val generator: DokkaGeneratorParametersSpec = objects.newInstance(pluginsConfiguration)
 
+  /**
+   * Dokkatoo runs Dokka Generator in a separate
+   * [Gradle Worker](https://docs.gradle.org/8.5/userguide/worker_api.html).
+   *
+   * You can control whether Dokkatoo launches Dokka Generator in
+   * * a new process, using [ProcessIsolation],
+   * * or the current process with an isolated classpath, using [ClassLoaderIsolation].
+   *
+   * _Aside: Launching [without isolation][WorkerExecutor.noIsolation] is not an option, because
+   * Dokka **requires** an isolated classpath._
+   *
+   * ```kotlin
+   * dokkatoo {
+   *   // use the current Gradle process, but with an isolated classpath
+   *   workerIsolation = ClassLoaderIsolation()
+   *
+   *   // launch a new process, optionally controlling the standard JVM options
+   *   workerIsolation = ProcessIsolation {
+   *     minHeapSize = "2g" // increase minimum heap size
+   *     systemProperties.add("someCustomProperty", 123)
+   *   }
+   * }
+   * ```
+   *
+   * @see WorkerIsolation
+   * @see dev.adamko.dokkatoo.workers.ProcessIsolation
+   * @see dev.adamko.dokkatoo.workers.ClassLoaderIsolation
+   *
+   */
   @get:Nested
   abstract val workerIsolation: Property<WorkerIsolation>
 
@@ -89,7 +118,7 @@ constructor(
   /**
    * Create a new [ProcessIsolation] options.
    *
-   * The resulting options must be set into [workerIsolation].
+   * The resulting options instance must be set into [workerIsolation].
    */
   fun ProcessIsolation(configure: ProcessIsolation.() -> Unit = {}): ProcessIsolation =
     objects.newInstance<ProcessIsolation>().apply {
@@ -214,19 +243,19 @@ constructor(
   //region Deprecated Properties
   /** @see JavaForkOptions.getDebug */
   @get:Internal
-  @Deprecated("moved to TODO") // TODO
+  @Deprecated("worker options were moved to `workerIsolation` property to allow for configuring worker isolation")
   abstract val workerDebugEnabled: Property<Boolean>
   /** @see JavaForkOptions.getMinHeapSize */
   @get:Internal
-  @Deprecated("moved to TODO") // TODO
+  @Deprecated("worker options were moved to `workerIsolation` property to allow for configuring worker isolation")
   abstract val workerMinHeapSize: Property<String>
   /** @see JavaForkOptions.getMaxHeapSize */
   @get:Internal
-  @Deprecated("moved to TODO") // TODO
+  @Deprecated("worker options were moved to `workerIsolation` property to allow for configuring worker isolation")
   abstract val workerMaxHeapSize: Property<String>
   /** @see JavaForkOptions.jvmArgs */
   @get:Internal
-  @Deprecated("moved to TODO") // TODO
+  @Deprecated("worker options were moved to `workerIsolation` property to allow for configuring worker isolation")
   abstract val workerJvmArgs: ListProperty<String>
   //endregion
 }
