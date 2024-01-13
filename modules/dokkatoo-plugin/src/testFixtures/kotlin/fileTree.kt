@@ -6,18 +6,36 @@ import java.nio.file.Path
 // based on https://gist.github.com/mfwgenerics/d1ec89eb80c95da9d542a03b49b5e15b
 // context: https://kotlinlang.slack.com/archives/C0B8MA7FA/p1676106647658099
 
-fun Path.toTreeString(): String = toFile().toTreeString()
 
-fun File.toTreeString(): String = when {
-  isDirectory -> name + "/\n" + buildTreeString(this)
+fun Path.toTreeString(
+  fileFilter: FileFilter = FileFilter { true },
+): String =
+  toFile().toTreeString(fileFilter = fileFilter)
+
+
+fun File.toTreeString(
+  fileFilter: FileFilter = FileFilter { true },
+): String = when {
+  isDirectory -> name + "/\n" + buildTreeString(dir = this, fileFilter = fileFilter)
   else        -> name
 }
 
+
+/**
+ * Optionally include/exclude files. Directories will always be included.
+ */
+fun interface FileFilter {
+  operator fun invoke(file: File): Boolean
+}
+
+
 private fun buildTreeString(
   dir: File,
+  fileFilter: FileFilter = FileFilter { true },
   margin: String = "",
 ): String {
   val entries = dir.listDirectoryEntries()
+    .filter { it.isDirectory || fileFilter(it) }
 
   return entries.joinToString("\n") { entry ->
     val (currentPrefix, nextPrefix) = when (entry) {
@@ -30,10 +48,10 @@ private fun buildTreeString(
 
       if (entry.isDirectory) {
         append("/")
-        if (entry.countDirectoryEntries() > 0) {
+        if (entry.countDirectoryEntries(fileFilter) > 0) {
           append("\n")
         }
-        append(buildTreeString(entry, margin + nextPrefix))
+        append(buildTreeString(entry, fileFilter, margin + nextPrefix))
       }
     }
   }
@@ -43,8 +61,13 @@ private fun File.listDirectoryEntries(): Sequence<File> =
   walkTopDown().maxDepth(1).filter { it != this@listDirectoryEntries }
 
 
-private fun File.countDirectoryEntries(): Int =
-  listDirectoryEntries().count()
+private fun File.countDirectoryEntries(
+  fileFilter: FileFilter,
+): Int =
+  listDirectoryEntries()
+    .filter { it.isDirectory || fileFilter(it) }
+    .count()
+
 
 private data class PrefixPair(
   /** The current entry should be prefixed with this */
