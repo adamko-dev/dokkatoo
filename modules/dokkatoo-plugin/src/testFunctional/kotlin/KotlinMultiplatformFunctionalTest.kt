@@ -59,10 +59,6 @@ class KotlinMultiplatformFunctionalTest : FunSpec({
             ¦    │           ├── say-hello.html
             ¦    │           ├── index.html
             ¦    │           └── -hello.html
-            ¦    ├── images/
-            ¦    │   └── nav-icons/
-            ¦    ├── styles/
-            ¦    ├── scripts/
             ¦    └── navigation.html
           """.trimMargin("¦")
       }

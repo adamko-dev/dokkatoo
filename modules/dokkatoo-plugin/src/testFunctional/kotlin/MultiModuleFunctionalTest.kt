@@ -59,7 +59,6 @@ class MultiModuleFunctionalTest : FunSpec({
                 ¦│   │       ├── say-hello.html
                 ¦│   │       ├── index.html
                 ¦│   │       └── -hello.html
-                ¦│   ├── scripts/
                 ¦│   └── navigation.html
                 ¦├── index.html
                 ¦├── subproject-goodbye/
@@ -70,12 +69,7 @@ class MultiModuleFunctionalTest : FunSpec({
                 ¦│   │       ├── say-hello.html
                 ¦│   │       ├── index.html
                 ¦│   │       └── -goodbye.html
-                ¦│   ├── scripts/
                 ¦│   └── navigation.html
-                ¦├── images/
-                ¦│   └── nav-icons/
-                ¦├── styles/
-                ¦├── scripts/
                 ¦└── navigation.html""".trimMargin("¦")
           }
 
@@ -254,6 +248,7 @@ class MultiModuleFunctionalTest : FunSpec({
             .build {
 
               test("expect HelloAgain HTML file exists") {
+                // convert to file, workaround https://github.com/kotest/kotest/issues/3825
                 helloAgainIndexHtml.toFile().shouldBeAFile()
               }
 

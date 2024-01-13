@@ -29,13 +29,22 @@ fun interface FileFilter {
 }
 
 
+private fun FileFilter.matches(file: File): Boolean =
+  if (file.isDirectory) {
+    // don't include directories that have no matches
+    file.walk().any { it.isFile && invoke(it) }
+  } else {
+    invoke(file)
+  }
+
+
 private fun buildTreeString(
   dir: File,
   fileFilter: FileFilter = FileFilter { true },
   margin: String = "",
 ): String {
   val entries = dir.listDirectoryEntries()
-    .filter { it.isDirectory || fileFilter(it) }
+    .filter { file -> fileFilter.matches(file) }
 
   return entries.joinToString("\n") { entry ->
     val (currentPrefix, nextPrefix) = when (entry) {
@@ -65,7 +74,7 @@ private fun File.countDirectoryEntries(
   fileFilter: FileFilter,
 ): Int =
   listDirectoryEntries()
-    .filter { it.isDirectory || fileFilter(it) }
+    .filter { file -> fileFilter.matches(file) }
     .count()
 
 
