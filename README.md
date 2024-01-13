@@ -43,8 +43,11 @@ Until JetBrains releases a version of Dokkatoo, continue to use this version and
 
 ## Usage
 
-Dokkatoo is published on
-the [Gradle Plugin Portal](https://plugins.gradle.org/search?term=dokkatoo).
+Dokkatoo is published on the 
+[Gradle Plugin Portal](https://plugins.gradle.org/search?term=dokkatoo)
+and
+[Maven Central](https://search.maven.org/search?q=g:dev.adamko.dokkatoo).
+[Snapshot releases](#snapshot-releases) are also available.
 
 
 ### Quick start
