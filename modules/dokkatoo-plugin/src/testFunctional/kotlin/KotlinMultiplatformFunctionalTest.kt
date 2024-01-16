@@ -5,11 +5,12 @@ import dev.adamko.dokkatoo.utils.*
 import io.kotest.assertions.withClue
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.inspectors.shouldForAll
+import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.file.shouldBeAFile
 import io.kotest.matchers.sequences.shouldNotBeEmpty
-import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
+import kotlin.io.path.extension
 import kotlin.io.path.readText
 
 class KotlinMultiplatformFunctionalTest : FunSpec({
@@ -47,20 +48,16 @@ class KotlinMultiplatformFunctionalTest : FunSpec({
       test("with expected HTML files") {
         project.projectDir
           .resolve("build/dokka/")
-          .toTreeString { it.extension == "html" } shouldBe /* language=text */ """
-            ¦dokka/
-            ¦└── html/
-            ¦    ├── index.html
-            ¦    ├── test/
-            ¦    │   └── com.project/
-            ¦    │       ├── index.html
-            ¦    │       ├── goodbye.html
-            ¦    │       └── -hello/
-            ¦    │           ├── say-hello.html
-            ¦    │           ├── index.html
-            ¦    │           └── -hello.html
-            ¦    └── navigation.html
-          """.trimMargin("¦")
+          .listRelativePathsMatching { it.extension == "html" }
+          .shouldContainExactlyInAnyOrder(
+            "html/index.html",
+            "html/navigation.html",
+            "html/test/com.project/-hello/-hello.html",
+            "html/test/com.project/-hello/index.html",
+            "html/test/com.project/-hello/say-hello.html",
+            "html/test/com.project/goodbye.html",
+            "html/test/com.project/index.html",
+          )
       }
 
       test("with element-list") {

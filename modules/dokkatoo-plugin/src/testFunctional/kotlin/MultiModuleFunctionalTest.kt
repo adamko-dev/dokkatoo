@@ -6,12 +6,13 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.inspectors.shouldForAll
 import io.kotest.matchers.collections.shouldBeIn
 import io.kotest.matchers.collections.shouldContainAll
+import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.file.shouldBeAFile
 import io.kotest.matchers.paths.shouldNotExist
-import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldBeEmpty
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
+import kotlin.io.path.extension
 import kotlin.io.path.readText
 import org.gradle.testkit.runner.TaskOutcome.*
 
@@ -47,30 +48,26 @@ class MultiModuleFunctionalTest : FunSpec({
         context("expect HTML site is generated") {
 
           test("with expected HTML files") {
+
             project.projectDir
-              .resolve("build/dokka/html/")
-              .toTreeString { it.extension == "html" } shouldBe /* language=text */ """
-                ¦html/
-                ¦├── subproject-hello/
-                ¦│   ├── index.html
-                ¦│   ├── com.project.hello/
-                ¦│   │   ├── index.html
-                ¦│   │   └── -hello/
-                ¦│   │       ├── say-hello.html
-                ¦│   │       ├── index.html
-                ¦│   │       └── -hello.html
-                ¦│   └── navigation.html
-                ¦├── index.html
-                ¦├── subproject-goodbye/
-                ¦│   ├── index.html
-                ¦│   ├── com.project.goodbye/
-                ¦│   │   ├── index.html
-                ¦│   │   └── -goodbye/
-                ¦│   │       ├── say-hello.html
-                ¦│   │       ├── index.html
-                ¦│   │       └── -goodbye.html
-                ¦│   └── navigation.html
-                ¦└── navigation.html""".trimMargin("¦")
+              .resolve("build/dokka/")
+              .listRelativePathsMatching { it.extension == "html" }
+              .shouldContainExactlyInAnyOrder(
+                "html/index.html",
+                "html/navigation.html",
+                "html/subproject-goodbye/com.project.goodbye/-goodbye/-goodbye.html",
+                "html/subproject-goodbye/com.project.goodbye/-goodbye/index.html",
+                "html/subproject-goodbye/com.project.goodbye/-goodbye/say-hello.html",
+                "html/subproject-goodbye/com.project.goodbye/index.html",
+                "html/subproject-goodbye/index.html",
+                "html/subproject-goodbye/navigation.html",
+                "html/subproject-hello/com.project.hello/-hello/-hello.html",
+                "html/subproject-hello/com.project.hello/-hello/index.html",
+                "html/subproject-hello/com.project.hello/-hello/say-hello.html",
+                "html/subproject-hello/com.project.hello/index.html",
+                "html/subproject-hello/index.html",
+                "html/subproject-hello/navigation.html",
+              )
           }
 
           test("with element-list") {
