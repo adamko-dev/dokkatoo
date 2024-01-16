@@ -58,7 +58,7 @@ jobs:
       - name: Checkout the repo
         uses: actions/checkout@v3
         with:
-          ref: ${{ inputs.checkout-ref || github.event.repository.default_branch }}
+          ref: ${{ inputs.checkout-ref || github.ref }}
 
       - name: Validate Gradle Wrapper
         uses: gradle/wrapper-validation-action@v1

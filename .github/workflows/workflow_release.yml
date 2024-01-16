@@ -37,7 +37,7 @@ jobs:
       packages: write
       checks: write
     with:
-      checkout-ref: ${{ inputs.checkout-ref || github.event.repository.default_branch }}
+      checkout-ref: ${{ inputs.checkout-ref }}
 
   publish-site:
     needs: tests
@@ -51,4 +51,4 @@ jobs:
       pages: write
       id-token: write
     with:
-      checkout-ref: ${{ inputs.checkout-ref || github.event.repository.default_branch }}
+      checkout-ref: ${{ inputs.checkout-ref }}
