@@ -2,7 +2,6 @@ package dev.adamko.dokkatoo.dokka.plugins
 
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import dev.adamko.dokkatoo.internal.addAll
-import dev.adamko.dokkatoo.internal.addAllIfNotNull
 import dev.adamko.dokkatoo.internal.putIfNotNull
 import javax.inject.Inject
 import kotlinx.serialization.json.buildJsonObject
@@ -48,6 +47,9 @@ constructor(
    * dropdown menu.
    *
    * Must match [version] string exactly. The first item in the list is at the top of the dropdown.
+   * Any versions not in this list will be excluded from the dropdown.
+   *
+   * If no versions are supplied the versions will be ordered using SemVer ordering.
    */
   @get:Input
   @get:Optional
@@ -83,16 +85,23 @@ constructor(
   @get:Optional
   abstract val renderVersionsNavigationOnAllPages: Property<Boolean>
 
-  override fun jsonEncode(): String =
-    buildJsonObject {
+  override fun jsonEncode(): String {
+    val versionsOrdering = versionsOrdering.orNull.orEmpty()
+
+    return buildJsonObject {
       putIfNotNull("version", version.orNull)
-      putJsonArray("versionsOrdering") { addAllIfNotNull(versionsOrdering.orNull) }
+      if (versionsOrdering.isNotEmpty()) {
+        // only create versionsOrdering values are present, otherwise Dokka interprets
+        // an empty list as "no versions, show nothing".
+        putJsonArray("versionsOrdering") { addAll(versionsOrdering) }
+      }
       putIfNotNull("olderVersionsDir", olderVersionsDir.orNull?.asFile)
       putJsonArray("olderVersions") {
         addAll(olderVersions.files)
       }
       putIfNotNull("renderVersionsNavigationOnAllPages", renderVersionsNavigationOnAllPages.orNull)
     }.toString()
+  }
 
   companion object {
     const val DOKKA_VERSIONING_PLUGIN_PARAMETERS_NAME = "versioning"

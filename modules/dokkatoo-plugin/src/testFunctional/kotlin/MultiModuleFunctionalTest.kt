@@ -6,12 +6,14 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.inspectors.shouldForAll
 import io.kotest.matchers.collections.shouldBeIn
 import io.kotest.matchers.collections.shouldContainAll
+import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.file.shouldBeAFile
-import io.kotest.matchers.paths.shouldBeAFile
 import io.kotest.matchers.paths.shouldNotExist
 import io.kotest.matchers.string.shouldBeEmpty
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
+import kotlin.io.path.extension
+import kotlin.io.path.readText
 import org.gradle.testkit.runner.TaskOutcome.*
 
 class MultiModuleFunctionalTest : FunSpec({
@@ -30,50 +32,62 @@ class MultiModuleFunctionalTest : FunSpec({
         test("expect build is successful") {
           output shouldContain "BUILD SUCCESSFUL"
         }
-      }
 
-    test("expect all dokka workers are successful") {
-      project
-        .findFiles { it.name == "dokka-worker.log" }
-        .shouldForAll { dokkaWorkerLog ->
-          dokkaWorkerLog.shouldBeAFile()
-          dokkaWorkerLog.readText().shouldNotContainAnyOf(
-            "[ERROR]",
-            "[WARN]",
-          )
+        test("expect all dokka workers are successful") {
+          project
+            .findFiles { it.name == "dokka-worker.log" }
+            .shouldForAll { dokkaWorkerLog ->
+              dokkaWorkerLog.shouldBeAFile()
+              dokkaWorkerLog.readText().shouldNotContainAnyOf(
+                "[ERROR]",
+                "[WARN]",
+              )
+            }
         }
-    }
 
-    context("expect HTML site is generated") {
+        context("expect HTML site is generated") {
 
-      test("with expected HTML files") {
-        project.file("subproject/build/dokka/html/index.html").shouldBeAFile()
-        project.file("subproject/build/dokka/html/com/project/hello/Hello.html")
-          .shouldBeAFile()
-      }
+          test("with expected HTML files") {
 
-      test("and dokka_parameters.json is generated") {
-        project.file("subproject/build/dokka/html/dokka_parameters.json")
-          .shouldBeAFile()
-      }
+            project.projectDir
+              .resolve("build/dokka/")
+              .listRelativePathsMatching { it.extension == "html" }
+              .shouldContainExactlyInAnyOrder(
+                "html/index.html",
+                "html/navigation.html",
+                "html/subproject-goodbye/com.project.goodbye/-goodbye/-goodbye.html",
+                "html/subproject-goodbye/com.project.goodbye/-goodbye/index.html",
+                "html/subproject-goodbye/com.project.goodbye/-goodbye/say-hello.html",
+                "html/subproject-goodbye/com.project.goodbye/index.html",
+                "html/subproject-goodbye/index.html",
+                "html/subproject-goodbye/navigation.html",
+                "html/subproject-hello/com.project.hello/-hello/-hello.html",
+                "html/subproject-hello/com.project.hello/-hello/index.html",
+                "html/subproject-hello/com.project.hello/-hello/say-hello.html",
+                "html/subproject-hello/com.project.hello/index.html",
+                "html/subproject-hello/index.html",
+                "html/subproject-hello/navigation.html",
+              )
+          }
 
-      test("with element-list") {
-        project.file("build/dokka/html/package-list").shouldBeAFile()
-        project.file("build/dokka/html/package-list").toFile().readText()
-          .lines()
+          test("with element-list") {
+            project.file("build/dokka/html/package-list").toFile().shouldBeAFile()
+            project.file("build/dokka/html/package-list").readText()
+              .lines()
           .sorted()
           .joinToString("\n")
           .shouldContain( /* language=text */ """
               |${'$'}dokka.format:html-v1
               |${'$'}dokka.linkExtension:html
               |com.project.goodbye
-              |com.project.hello
-              |module:subproject-goodbye
-              |module:subproject-hello
-            """.trimMargin()
-          )
+                |com.project.hello
+                |module:subproject-goodbye
+                |module:subproject-hello
+              """.trimMargin()
+              )
+          }
+        }
       }
-    }
   }
 
   context("Gradle caching") {
@@ -233,7 +247,8 @@ class MultiModuleFunctionalTest : FunSpec({
             .build {
 
               test("expect HelloAgain HTML file exists") {
-                helloAgainIndexHtml.shouldBeAFile()
+                // convert to file, workaround https://github.com/kotest/kotest/issues/3825
+                helloAgainIndexHtml.toFile().shouldBeAFile()
               }
 
               test("expect :subproject-goodbye tasks are up-to-date, because no files changed") {

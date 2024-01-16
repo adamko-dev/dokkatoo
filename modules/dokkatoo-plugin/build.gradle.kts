@@ -99,13 +99,10 @@ gradlePlugin {
 }
 
 kotlin {
-  target {
-    compilations.configureEach {
-      compilerOptions.configure {
-        freeCompilerArgs.addAll(
-          "-opt-in=dev.adamko.dokkatoo.internal.DokkatooInternalApi",
-        )
-      }
+  sourceSets.configureEach {
+    languageSettings {
+      optIn("dev.adamko.dokkatoo.internal.DokkatooInternalApi")
+      optIn("kotlin.io.path.ExperimentalPathApi")
     }
   }
 }

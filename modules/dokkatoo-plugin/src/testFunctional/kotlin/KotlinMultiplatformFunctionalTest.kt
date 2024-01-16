@@ -5,11 +5,13 @@ import dev.adamko.dokkatoo.utils.*
 import io.kotest.assertions.withClue
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.inspectors.shouldForAll
+import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.file.shouldBeAFile
-import io.kotest.matchers.paths.shouldBeAFile
 import io.kotest.matchers.sequences.shouldNotBeEmpty
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
+import kotlin.io.path.extension
+import kotlin.io.path.readText
 
 class KotlinMultiplatformFunctionalTest : FunSpec({
 
@@ -44,19 +46,23 @@ class KotlinMultiplatformFunctionalTest : FunSpec({
     context("expect HTML site is generated") {
 
       test("with expected HTML files") {
-        project.projectDir.resolve("build/dokka/html/index.html").shouldBeAFile()
-        project.projectDir.resolve("build/dokka/html/com/project/hello/Hello.html")
-          .shouldBeAFile()
-      }
-
-      test("and dokka_parameters.json is generated") {
-        project.projectDir.resolve("build/dokka/html/dokka_parameters.json")
-          .shouldBeAFile()
+        project.projectDir
+          .resolve("build/dokka/")
+          .listRelativePathsMatching { it.extension == "html" }
+          .shouldContainExactlyInAnyOrder(
+            "html/index.html",
+            "html/navigation.html",
+            "html/test/com.project/-hello/-hello.html",
+            "html/test/com.project/-hello/index.html",
+            "html/test/com.project/-hello/say-hello.html",
+            "html/test/com.project/goodbye.html",
+            "html/test/com.project/index.html",
+          )
       }
 
       test("with element-list") {
-        project.projectDir.resolve("build/dokka/html/test/package-list").shouldBeAFile()
-        project.projectDir.resolve("build/dokka/html/test/package-list").toFile().readText()
+        project.projectDir.resolve("build/dokka/html/test/package-list").toFile().shouldBeAFile()
+        project.projectDir.resolve("build/dokka/html/test/package-list").readText()
           .sortLines()
           .shouldContain( /* language=text */ """
               |${'$'}dokka.format:html-v1

@@ -44,4 +44,4 @@ jobs:
       runs-on: ${{ matrix.os }}
       gradle-task: >-
         ${{ matrix.task }} --stacktrace
-      checkout-ref: ${{ inputs.checkout-ref || github.event.repository.default_branch }}
+      checkout-ref: ${{ inputs.checkout-ref }}
