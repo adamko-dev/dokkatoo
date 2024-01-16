@@ -41,4 +41,4 @@ jobs:
       runs-on: macos-latest # only macOS supports building all Kotlin targets
       gradle-task: >-
         publishAllPublicationsToSonatypeReleaseRepository --stacktrace --no-configuration-cache --no-parallel
-      checkout-ref: ${{ inputs.checkout-ref || github.event.repository.default_branch }}
+      checkout-ref: ${{ inputs.checkout-ref }}
