@@ -85,7 +85,6 @@ constructor(
       workerLogFile.convention(temporaryDir.resolve("dokka-worker.log"))
       dokkaConfigurationJsonFile.convention(temporaryDir.resolve("dokka-configuration.json"))
 
-      workerLogFile.convention(temporaryDir.resolve("dokka-worker.log"))
       workerIsolation.convention(dokkatooExtension.dokkaGeneratorIsolation.map { src ->
         when (src) {
           is ClassLoaderIsolation -> {}
