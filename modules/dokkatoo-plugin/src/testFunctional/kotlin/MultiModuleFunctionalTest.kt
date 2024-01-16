@@ -259,11 +259,16 @@ class MultiModuleFunctionalTest : FunSpec({
                 )
               }
 
+              test("expect :subproject-hello:prepareDokkatooModuleDescriptorHtml is up-to-date because it does not use the contents") {
+                shouldHaveTasksWithAnyOutcome(
+                  ":subproject-hello:prepareDokkatooModuleDescriptorHtml" to listOf(UP_TO_DATE),
+                )
+              }
+
               val successfulOutcomes = listOf(SUCCESS, FROM_CACHE)
-              test("expect :subproject-hello tasks should be re-run, since a file changed") {
+              test("expect :subproject-hello:dokkatooGenerateModuleHtml should be re-run, since a file changed") {
                 shouldHaveTasksWithAnyOutcome(
                   ":subproject-hello:dokkatooGenerateModuleHtml" to successfulOutcomes,
-                  ":subproject-hello:prepareDokkatooModuleDescriptorHtml" to successfulOutcomes,
                 )
               }
 
@@ -313,6 +318,29 @@ class MultiModuleFunctionalTest : FunSpec({
               }
           }
         }
+
+        val project2 = initDokkatooProject("project/in/subdir")
+        context("expect Dokka build cache is relocatable") {
+          project2.runner
+            .addArguments(
+              ":dokkatooGeneratePublicationHtml",
+              "--stacktrace",
+              "--build-cache",
+            )
+            .forwardOutput()
+            .build {
+              test("everything is rebuild from cache") {
+                shouldHaveTasksWithOutcome(
+                  ":dokkatooGeneratePublicationHtml" to FROM_CACHE,
+                  ":subproject-hello:dokkatooGenerateModuleHtml" to FROM_CACHE,
+                  ":subproject-hello:prepareDokkatooModuleDescriptorHtml" to FROM_CACHE,
+                  ":subproject-goodbye:dokkatooGenerateModuleHtml" to FROM_CACHE,
+                  ":subproject-goodbye:prepareDokkatooModuleDescriptorHtml" to FROM_CACHE,
+                )
+              }
+            }
+        }
+
       }
     }
   }
@@ -425,12 +453,19 @@ private fun initDokkatooProject(
   testName: String,
   config: GradleProjectTest.() -> Unit = {},
 ): GradleProjectTest {
-  return gradleKtsProjectTest("multi-module-hello-goodbye/$testName") {
+  val baseDir = GradleProjectTest.funcTestTempDir
+  return gradleKtsProjectTest(baseDir= baseDir, testProjectName = "multi-module-hello-goodbye/$testName") {
 
     settingsGradleKts += """
       |
       |include(":subproject-hello")
       |include(":subproject-goodbye")
+      |
+      |buildCache { 
+      |  local { 
+      |    directory = "$baseDir/buildCache"
+      |  }
+      |}
       |
     """.trimMargin()
 
