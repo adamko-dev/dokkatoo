@@ -6,6 +6,7 @@ import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import javax.inject.Inject
 import kotlinx.serialization.encodeToString
 import org.gradle.api.file.*
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import org.gradle.api.tasks.PathSensitivity.RELATIVE
@@ -24,26 +25,26 @@ constructor() : DokkatooTask() {
   @get:OutputFile
   abstract val dokkaModuleDescriptorJson: RegularFileProperty
 
+  @get:Internal
+  abstract val rootDirectory: Property<String>
+
   @get:Input
   abstract val moduleName: Property<String>
 
   @get:Input
   abstract val modulePath: Property<String>
 
-  @get:InputDirectory
-  @get:PathSensitive(RELATIVE)
-  abstract val moduleDirectory: DirectoryProperty
+  @get:Input
+  abstract val moduleDirectory: Property<String>
 
-  @get:InputFiles
-  @get:Optional
-  @get:PathSensitive(RELATIVE)
-  abstract val includes: ConfigurableFileCollection
+  @get:Input
+  abstract val includes: ListProperty<String>
 
   @TaskAction
   internal fun generateModuleConfiguration() {
     val moduleName = moduleName.get()
-    val moduleDirectory = moduleDirectory.asFile.get()
-    val includes = includes.files
+    val moduleDirectory = moduleDirectory.get()
+    val includes = includes.get().toSet()
     val modulePath = modulePath.get()
 
     val moduleDesc = DokkaModuleDescriptionKxs(

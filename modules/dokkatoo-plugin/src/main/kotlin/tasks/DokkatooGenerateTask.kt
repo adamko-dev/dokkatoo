@@ -97,6 +97,9 @@ constructor(
   @get:Internal
   abstract val dokkaConfigurationJsonFile: RegularFileProperty
 
+  @get:Internal
+  abstract val rootDirectory: Property<String>
+
   enum class GenerationType {
     MODULE,
     PUBLICATION,
@@ -165,6 +168,7 @@ constructor(
       outputDirectory = outputDirectory,
       modules = dokkaModuleDescriptors,
       cacheDirectory = cacheDirectory.asFile.orNull,
+      rootDirectory = rootDirectory.get(),
     )
   }
 

@@ -27,6 +27,7 @@ internal object DokkaParametersBuilder {
     modules: List<DokkaModuleDescriptionKxs>,
     outputDirectory: File,
     cacheDirectory: File? = null,
+    rootDirectory: String
   ): DokkaConfiguration {
     val moduleName = spec.moduleName.get()
     val moduleVersion = spec.moduleVersion.orNull?.takeIf { it != Project.DEFAULT_VERSION }
@@ -50,7 +51,7 @@ internal object DokkaParametersBuilder {
       sourceSets = sourceSets,
       pluginsClasspath = pluginsClasspath,
       pluginsConfiguration = pluginsConfiguration.map(::build),
-      modules = modules.map(DokkaModuleDescriptionKxs::convert),
+      modules = modules.map{ it.convert(rootDirectory) },
 //      modules = modules.map {
 //        it.convert(
 //          moduleDescriptionFiles.get(it.name)

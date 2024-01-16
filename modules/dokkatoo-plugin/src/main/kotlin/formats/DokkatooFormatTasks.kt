@@ -58,6 +58,7 @@ class DokkatooFormatTasks(
   ).configuring task@{
     description = "Executes the Dokka Generator, generating the $formatName publication"
     generationType.set(DokkatooGenerateTask.GenerationType.PUBLICATION)
+    rootDirectory.set(project.rootProject.rootDir.absolutePath)
 
     outputDirectory.convention(dokkatooExtension.dokkatooPublicationDirectory.dir(formatName))
 
@@ -81,6 +82,7 @@ class DokkatooFormatTasks(
   ).configuring task@{
     description = "Executes the Dokka Generator, generating a $formatName module"
     generationType.set(DokkatooGenerateTask.GenerationType.MODULE)
+    rootDirectory.set(project.rootProject.rootDir.absolutePath)
 
     outputDirectory.convention(dokkatooExtension.dokkatooModuleDirectory.dir(formatName))
 
@@ -91,11 +93,14 @@ class DokkatooFormatTasks(
     taskNames.prepareModuleDescriptor
   ) task@{
     description = "Prepares the Dokka Module Descriptor for $formatName"
-    includes.from(publication.includes)
+    val rootDirectoryFile = project.rootProject.rootDir
+    rootDirectory.set(rootDirectoryFile.absolutePath)
+
+    includes.addAll(publication.includes.map { it.relativeTo(rootDirectoryFile).path })
     dokkaModuleDescriptorJson.convention(
       dokkatooExtension.dokkatooConfigurationsDirectory.file("$formatName/module_descriptor.json")
     )
-    moduleDirectory.set(generateModule.flatMap { it.outputDirectory })
+    moduleDirectory.set(generateModule.flatMap { it.outputDirectory.asFile.map { it.relativeTo(rootDirectoryFile).path } })
 
 //      dokkaSourceSets.addAllLater(providers.provider { dokkatooExtension.dokkatooSourceSets })
 //      dokkaSourceSets.configureEach {

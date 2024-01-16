@@ -89,8 +89,9 @@ constructor(
     }
 
     target.tasks.withType<DokkatooPrepareModuleDescriptorTask>().configureEach {
+      val rootDirectoryFile = project.rootProject.rootDir
       moduleName.convention(dokkatooExtension.moduleName)
-      includes.from(providers.provider { dokkatooExtension.dokkatooSourceSets.flatMap { it.includes } })
+      includes.addAll(providers.provider { dokkatooExtension.dokkatooSourceSets.flatMap { it.includes.map { it.relativeTo(rootDirectoryFile).path } } })
       modulePath.convention(dokkatooExtension.modulePath)
     }
 

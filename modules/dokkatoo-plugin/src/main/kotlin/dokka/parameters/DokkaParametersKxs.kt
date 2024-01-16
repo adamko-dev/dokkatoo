@@ -7,6 +7,7 @@ package dev.adamko.dokkatoo.dokka.parameters
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import java.io.File
 import java.nio.file.Paths
+import kotlin.io.path.Path
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
@@ -42,23 +43,29 @@ data class DokkaModuleDescriptionKxs(
   /** @see DokkaConfiguration.DokkaModuleDescription.name */
   val name: String,
   /**
-   * Location of the Dokka Module directory for a subproject.
+   * Location of the Dokka Module directory for a subproject, relative to the rootProject directory.
    *
    * @see DokkaConfiguration.DokkaModuleDescription.sourceOutputDirectory
    */
-  val sourceOutputDirectory: File,
-  /** @see DokkaConfiguration.DokkaModuleDescription.includes */
-  val includes: Set<File>,
+  val sourceOutputDirectory: String,
+  /**
+   * Location of the includes, relative to the rootProject directory.
+   *
+   * @see DokkaConfiguration.DokkaModuleDescription.includes
+   */
+  val includes: Set<String>,
   /** @see [org.gradle.api.Project.getPath] */
   val modulePath: String,
 ) {
-  internal fun convert() =
-    DokkaModuleDescriptionImpl(
+  internal fun convert(rootDirectory: String): DokkaModuleDescriptionImpl {
+    val rootPath = Path(rootDirectory)
+    return DokkaModuleDescriptionImpl(
       name = name,
       relativePathToOutputDirectory = File(modulePath.removePrefix(":").replace(':', '/')),
-      includes = includes,
-      sourceOutputDirectory = sourceOutputDirectory,
+      includes = includes.map { rootPath.resolve(it).normalize().toFile() }.toSet(),
+      sourceOutputDirectory = rootPath.resolve(sourceOutputDirectory).normalize().toFile(),
     )
+  }
 }
 
 
