@@ -86,22 +86,28 @@ constructor(
       dokkaConfigurationJsonFile.convention(temporaryDir.resolve("dokka-configuration.json"))
 
       workerLogFile.convention(temporaryDir.resolve("dokka-worker.log"))
-      workerIsolation.convention(dokkatooExtension.dokkaGeneratorIsolation.map { iso ->
-        when (iso) {
+      workerIsolation.convention(dokkatooExtension.dokkaGeneratorIsolation.map { src ->
+        when (src) {
           is ClassLoaderIsolation -> {}
           is ProcessIsolation     -> {
-            // Copy old properties, to maintain backwards compatibility.
+            // Complicated workaround to copy old properties, to maintain backwards compatibility.
             // Remove when the deprecated task properties are deleted.
-            @Suppress("DEPRECATION")
-            run {
-              iso.debug.convention(workerDebugEnabled)
-              iso.minHeapSize.convention(workerMinHeapSize)
-              iso.maxHeapSize.convention(workerMaxHeapSize)
-              iso.jvmArgs.convention(workerJvmArgs)
+            dokkatooExtension.ProcessIsolation {
+              @Suppress("DEPRECATION")
+              run {
+                debug.convention(workerDebugEnabled.orElse(src.debug))
+                enableAssertions.convention(src.enableAssertions)
+                minHeapSize.convention(workerMinHeapSize.orElse(src.minHeapSize))
+                maxHeapSize.convention(workerMaxHeapSize.orElse(src.maxHeapSize))
+                jvmArgs.convention(workerJvmArgs.orElse(src.jvmArgs))
+                allJvmArgs.convention(src.allJvmArgs)
+                defaultCharacterEncoding.convention(src.defaultCharacterEncoding)
+                systemProperties.convention(src.systemProperties)
+              }
             }
           }
         }
-        iso
+        src
       })
 
       publicationEnabled.convention(true)
