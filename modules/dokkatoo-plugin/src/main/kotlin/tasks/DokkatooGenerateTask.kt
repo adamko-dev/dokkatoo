@@ -199,19 +199,19 @@ constructor(
   //region Deprecated Properties
   /** @see JavaForkOptions.getDebug */
   @get:Internal
-  @Deprecated("worker options were moved to `workerIsolation` property to allow for configuring worker isolation")
+  @Deprecated("Please move worker options to `DokkatooExtension.dokkaGeneratorIsolation`. Worker options were moved to allow for configuring worker isolation")
   abstract val workerDebugEnabled: Property<Boolean>
   /** @see JavaForkOptions.getMinHeapSize */
   @get:Internal
-  @Deprecated("worker options were moved to `workerIsolation` property to allow for configuring worker isolation")
+  @Deprecated("Please move worker options to `DokkatooExtension.dokkaGeneratorIsolation`. Worker options were moved to allow for configuring worker isolation")
   abstract val workerMinHeapSize: Property<String>
   /** @see JavaForkOptions.getMaxHeapSize */
   @get:Internal
-  @Deprecated("worker options were moved to `workerIsolation` property to allow for configuring worker isolation")
+  @Deprecated("Please move worker options to `DokkatooExtension.dokkaGeneratorIsolation`. Worker options were moved to allow for configuring worker isolation")
   abstract val workerMaxHeapSize: Property<String>
   /** @see JavaForkOptions.jvmArgs */
   @get:Internal
-  @Deprecated("worker options were moved to `workerIsolation` property to allow for configuring worker isolation")
+  @Deprecated("Please move worker options to `DokkatooExtension.dokkaGeneratorIsolation`. Worker options were moved to allow for configuring worker isolation")
   abstract val workerJvmArgs: ListProperty<String>
   //endregion
 }
