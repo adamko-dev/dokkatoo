@@ -87,7 +87,7 @@ constructor(
 
       workerIsolation.convention(dokkatooExtension.dokkaGeneratorIsolation.map { src ->
         when (src) {
-          is ClassLoaderIsolation -> {}
+          is ClassLoaderIsolation -> src
           is ProcessIsolation     -> {
             // Complicated workaround to copy old properties, to maintain backwards compatibility.
             // Remove when the deprecated task properties are deleted.
@@ -106,7 +106,6 @@ constructor(
             }
           }
         }
-        src
       })
 
       publicationEnabled.convention(true)
