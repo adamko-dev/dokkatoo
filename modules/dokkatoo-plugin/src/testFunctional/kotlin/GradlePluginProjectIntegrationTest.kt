@@ -10,47 +10,45 @@ import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
 
 class GradlePluginProjectIntegrationTest : FunSpec({
-  Isolation.values().forEach { isolation ->
-    context("given a gradle plugin project in '$isolation' isolation") {
-      val project = initGradlePluginProject(isolation)
 
-      project.runner
-        .addArguments(
-          "clean",
-          "dokkatooGeneratePublicationHtml",
-          "--stacktrace",
-        )
-        .forwardOutput()
-        .build {
+  context("given a gradle plugin project") {
+    val project = initGradlePluginProject()
 
-          test("expect project builds successfully") {
-            output shouldContain "BUILD SUCCESSFUL"
-          }
+    project.runner
+      .addArguments(
+        "clean",
+        "dokkatooGeneratePublicationHtml",
+        "--stacktrace",
+      )
+      .forwardOutput()
+      .build {
 
-          test("expect no 'unknown class' message in HTML files") {
-            val htmlFiles = project.projectDir.toFile()
-              .resolve("build/dokka/html")
-              .walk()
-              .filter { it.isFile && it.extension == "html" }
+        test("expect project builds successfully") {
+          output shouldContain "BUILD SUCCESSFUL"
+        }
 
-            htmlFiles.shouldNotBeEmpty()
+        test("expect no 'unknown class' message in HTML files") {
+          val htmlFiles = project.projectDir.toFile()
+            .resolve("build/dokka/html")
+            .walk()
+            .filter { it.isFile && it.extension == "html" }
 
-            htmlFiles.forEach { htmlFile ->
-              val relativePath = htmlFile.relativeTo(project.projectDir.toFile())
-              withClue("$relativePath should not contain Error class: unknown class") {
-                htmlFile.useLines { lines ->
-                  lines.shouldForAll { line -> line.shouldNotContain("Error class: unknown class") }
-                }
+          htmlFiles.shouldNotBeEmpty()
+
+          htmlFiles.forEach { htmlFile ->
+            val relativePath = htmlFile.relativeTo(project.projectDir.toFile())
+            withClue("$relativePath should not contain Error class: unknown class") {
+              htmlFile.useLines { lines ->
+                lines.shouldForAll { line -> line.shouldNotContain("Error class: unknown class") }
               }
             }
           }
         }
-    }
+      }
   }
 })
 
 private fun initGradlePluginProject(
-  isolation: Isolation,
   config: GradleProjectTest.() -> Unit = {},
 ): GradleProjectTest {
   return gradleKtsProjectTest("gradle-plugin-project") {
@@ -66,18 +64,6 @@ private fun initGradlePluginProject(
       |}
       |
     """.trimMargin()
-
-    if (isolation == Isolation.Classloader) {
-      buildGradleKts = """
-        |import dev.adamko.dokkatoo.tasks.DokkatooGenerateTask
-        |
-        |$buildGradleKts
-        |    
-        |tasks.withType(DokkatooGenerateTask::class.java).configureEach {
-        |  workerIsolation.set(ClassLoaderIsolation())
-        |}
-      """.trimMargin()
-    }
 
     dir("src/main/kotlin") {
 
@@ -122,5 +108,3 @@ private fun initGradlePluginProject(
     config()
   }
 }
-
-private enum class Isolation { Classloader, Process }

@@ -1,7 +1,10 @@
 package dev.adamko.dokkatoo
 
+import dev.adamko.dokkatoo.WorkerIsolation.ClassLoader
+import dev.adamko.dokkatoo.WorkerIsolation.Process
 import dev.adamko.dokkatoo.internal.DokkatooConstants.DOKKATOO_VERSION
 import dev.adamko.dokkatoo.utils.*
+import io.kotest.assertions.withClue
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.inspectors.shouldForAll
 import io.kotest.matchers.collections.shouldBeIn
@@ -9,6 +12,8 @@ import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.file.shouldBeAFile
 import io.kotest.matchers.paths.shouldNotExist
+import io.kotest.matchers.sequences.shouldNotBeEmpty
+import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldBeEmpty
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
@@ -416,6 +421,120 @@ class MultiModuleFunctionalTest : FunSpec({
         }
     }
   }
+
+  WorkerIsolation.values().forEach { isolation ->
+    context("DokkatooGenerateTask worker $isolation") {
+
+      val project = initDokkatooProject("worker-$isolation") {
+        val workerIsolationConfig = when (isolation) {
+          ClassLoader -> { // language=kts
+            """
+              |
+              |dokkatoo {
+              |  dokkaGeneratorIsolation.set(
+              |    ClassLoaderIsolation()
+              |  )
+              |}
+              |
+            """.trimMargin()
+          }
+
+          Process     ->  // language=kts
+            """
+              |
+              |dokkatoo {
+              |  dokkaGeneratorIsolation.set(
+              |    ProcessIsolation {
+              |       debug.set(false)
+              |       enableAssertions.set(true)
+              |       minHeapSize.set("64m")
+              |       maxHeapSize.set("512m")
+              |       jvmArgs.set(listOf("a"))
+              |       //allJvmArgs.set(listOf("b"))
+              |       defaultCharacterEncoding.set("UTF-8")
+              |       systemProperties.set(mapOf("a" to "b"))
+              |     }
+              |  )
+              |}
+              |
+            """.trimMargin()
+        }
+
+        // language=kts
+        val tasksLogWorkerIsolation = """
+          |
+          |tasks.withType<dev.adamko.dokkatoo.tasks.DokkatooGenerateTask>().configureEach {
+          |  doFirst {
+          |    val isolation = workerIsolation.get()
+          |    logger.lifecycle(path + " - running with workerIsolation " + isolation)
+          |  }
+          |}
+          |
+        """.trimMargin()
+
+        buildGradleKts += workerIsolationConfig + tasksLogWorkerIsolation
+        dir("subproject-hello") {
+          buildGradleKts += workerIsolationConfig + tasksLogWorkerIsolation
+        }
+        dir("subproject-goodbye") {
+          buildGradleKts += workerIsolationConfig + tasksLogWorkerIsolation
+        }
+      }
+
+      project.runner
+        .addArguments(
+          "clean",
+          ":dokkatooGeneratePublicationHtml",
+          "--stacktrace",
+        )
+        .forwardOutput()
+        .build {
+
+          test("expect project builds successfully") {
+            output shouldContain "BUILD SUCCESSFUL"
+          }
+
+          val expectedIsolationClassFqn = when (isolation) {
+            ClassLoader -> "dev.adamko.dokkatoo.workers.ClassLoaderIsolation"
+            Process     -> "dev.adamko.dokkatoo.workers.ProcessIsolation"
+          }
+
+          listOf(
+            ":subproject-goodbye:dokkatooGenerateModuleHtml",
+            ":subproject-hello:dokkatooGenerateModuleHtml",
+            ":dokkatooGeneratePublicationHtml",
+          ).forEach { dokkatooTaskPath ->
+            test("expect $dokkatooTaskPath runs with isolation $isolation") {
+              output shouldContain "$dokkatooTaskPath - running with workerIsolation $expectedIsolationClassFqn"
+            }
+          }
+
+          test("expect 3 tasks log worker isolation mode") {
+            withClue(output) {
+              output.lines().count { "running with workerIsolation" in it } shouldBe 3
+            }
+          }
+
+          test("expect no 'unknown class' message in HTML files") {
+            val htmlFiles = project.projectDir.toFile()
+              .resolve("build/dokka/html")
+              .walk()
+              .filter { it.isFile && it.extension == "html" }
+
+            htmlFiles.shouldNotBeEmpty()
+
+            htmlFiles.forEach { htmlFile ->
+              val relativePath = htmlFile.relativeTo(project.projectDir.toFile())
+              withClue("$relativePath should not contain Error class: unknown class") {
+                htmlFile.useLines { lines ->
+                  lines.shouldForAll { line -> line.shouldNotContain("Error class: unknown class") }
+                }
+              }
+            }
+          }
+        }
+    }
+  }
 })
 
 private fun initDokkatooProject(
@@ -500,3 +619,5 @@ private fun initDokkatooProject(
     config()
   }
 }
+
+private enum class WorkerIsolation { ClassLoader, Process }

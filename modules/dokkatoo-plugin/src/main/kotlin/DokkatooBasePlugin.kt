@@ -11,6 +11,8 @@ import dev.adamko.dokkatoo.internal.*
 import dev.adamko.dokkatoo.tasks.DokkatooGenerateTask
 import dev.adamko.dokkatoo.tasks.DokkatooPrepareModuleDescriptorTask
 import dev.adamko.dokkatoo.tasks.DokkatooTask
+import dev.adamko.dokkatoo.workers.ClassLoaderIsolation
+import dev.adamko.dokkatoo.workers.ProcessIsolation
 import java.io.File
 import javax.inject.Inject
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -84,17 +86,22 @@ constructor(
       dokkaConfigurationJsonFile.convention(temporaryDir.resolve("dokka-configuration.json"))
 
       workerLogFile.convention(temporaryDir.resolve("dokka-worker.log"))
-      workerIsolation.convention(ProcessIsolation {
-        debug.convention(false)
-        jvmArgs.convention(
-          listOf(
-            //"-XX:MaxMetaspaceSize=512m",
-            "-XX:+HeapDumpOnOutOfMemoryError",
-            "-XX:+AlwaysPreTouch", // https://github.com/gradle/gradle/issues/3093#issuecomment-387259298
-            //"-XX:StartFlightRecording=disk=true,name={path.drop(1).map { if (it.isLetterOrDigit()) it else '-' }.joinToString("")},dumponexit=true,duration=30s",
-            //"-XX:FlightRecorderOptions=repository=$baseDir/jfr,stackdepth=512",
-          )
-        )
+      workerIsolation.convention(dokkatooExtension.dokkaGeneratorIsolation.map { iso ->
+        when (iso) {
+          is ClassLoaderIsolation -> {}
+          is ProcessIsolation     -> {
+            // Copy old properties, to maintain backwards compatibility.
+            // Remove when the deprecated task properties are deleted.
+            @Suppress("DEPRECATION")
+            run {
+              iso.debug.convention(workerDebugEnabled)
+              iso.minHeapSize.convention(workerMinHeapSize)
+              iso.maxHeapSize.convention(workerMaxHeapSize)
+              iso.jvmArgs.convention(workerJvmArgs)
+            }
+          }
+        }
+        iso
       })
 
       publicationEnabled.convention(true)
@@ -145,6 +152,21 @@ constructor(
       kotlinxHtml.convention("0.8.0")
       kotlinxCoroutines.convention("1.6.4")
     }
+
+    dokkatooExtension.dokkaGeneratorIsolation.convention(
+      dokkatooExtension.ProcessIsolation {
+        debug.convention(false)
+        jvmArgs.convention(
+          listOf(
+            //"-XX:MaxMetaspaceSize=512m",
+            "-XX:+HeapDumpOnOutOfMemoryError",
+            "-XX:+AlwaysPreTouch", // https://github.com/gradle/gradle/issues/3093#issuecomment-387259298
+            //"-XX:StartFlightRecording=disk=true,name={path.drop(1).map { if (it.isLetterOrDigit()) it else '-' }.joinToString("")},dumponexit=true,duration=30s",
+            //"-XX:FlightRecorderOptions=repository=$baseDir/jfr,stackdepth=512",
+          )
+        )
+      }
+    )
 
     return dokkatooExtension
   }

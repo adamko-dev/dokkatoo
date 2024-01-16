@@ -76,61 +76,15 @@ constructor(
   val generator: DokkaGeneratorParametersSpec = objects.newInstance(pluginsConfiguration)
 
   /**
-   * Dokkatoo runs Dokka Generator in a separate
-   * [Gradle Worker](https://docs.gradle.org/8.5/userguide/worker_api.html).
+   * Control whether Dokkatoo launches Dokka Generator.
    *
-   * You can control whether Dokkatoo launches Dokka Generator in
-   * * a new process, using [ProcessIsolation],
-   * * or the current process with an isolated classpath, using [ClassLoaderIsolation].
+   * Defaults to [dev.adamko.dokkatoo.DokkatooExtension.dokkaGeneratorIsolation].
    *
-   * _Aside: Launching [without isolation][WorkerExecutor.noIsolation] is not an option, because
-   * Dokka **requires** an isolated classpath._
-   *
-   * ```kotlin
-   * dokkatoo {
-   *   // use the current Gradle process, but with an isolated classpath
-   *   workerIsolation = ClassLoaderIsolation()
-   *
-   *   // launch a new process, optionally controlling the standard JVM options
-   *   workerIsolation = ProcessIsolation {
-   *     minHeapSize = "2g" // increase minimum heap size
-   *     systemProperties.add("someCustomProperty", 123)
-   *   }
-   * }
-   * ```
-   *
-   * @see WorkerIsolation
+   * @see dev.adamko.dokkatoo.DokkatooExtension.dokkaGeneratorIsolation
    * @see dev.adamko.dokkatoo.workers.ProcessIsolation
-   * @see dev.adamko.dokkatoo.workers.ClassLoaderIsolation
-   *
    */
   @get:Nested
   abstract val workerIsolation: Property<WorkerIsolation>
-
-  /**
-   * Create a new [ClassLoaderIsolation] options.
-   *
-   * The resulting options must be set into [workerIsolation].
-   */
-  fun ClassLoaderIsolation(configure: ClassLoaderIsolation.() -> Unit = {}): ClassLoaderIsolation =
-    objects.newInstance<ClassLoaderIsolation>().apply(configure)
-
-  /**
-   * Create a new [ProcessIsolation] options.
-   *
-   * The resulting options instance must be set into [workerIsolation].
-   */
-  fun ProcessIsolation(configure: ProcessIsolation.() -> Unit = {}): ProcessIsolation =
-    objects.newInstance<ProcessIsolation>().apply {
-      @Suppress("DEPRECATION")
-      run {
-        this.debug.convention(workerDebugEnabled.orElse(false))
-        this.minHeapSize.convention(workerMinHeapSize)
-        this.maxHeapSize.convention(workerMaxHeapSize)
-        this.jvmArgs.convention(workerJvmArgs)
-      }
-      configure()
-    }
 
   @get:Internal
   abstract val workerLogFile: RegularFileProperty
@@ -156,7 +110,9 @@ constructor(
 
     logger.info("DokkaGeneratorWorker runtimeClasspath: ${runtimeClasspath.asPath}")
 
-    val workQueue = when (val isolation = workerIsolation.get()) {
+    val isolation = workerIsolation.get()
+    logger.info("[$path] running with workerIsolation $isolation")
+    val workQueue = when (isolation) {
       is ClassLoaderIsolation ->
         workers.classLoaderIsolation {
           classpath.from(runtimeClasspath)
