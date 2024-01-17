@@ -11,6 +11,8 @@ import dev.adamko.dokkatoo.internal.*
 import dev.adamko.dokkatoo.tasks.DokkatooGenerateTask
 import dev.adamko.dokkatoo.tasks.DokkatooPrepareModuleDescriptorTask
 import dev.adamko.dokkatoo.tasks.DokkatooTask
+import dev.adamko.dokkatoo.workers.ClassLoaderIsolation
+import dev.adamko.dokkatoo.workers.ProcessIsolation
 import java.io.File
 import javax.inject.Inject
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -72,22 +74,6 @@ constructor(
       sourceSetScopeConvention = dokkatooExtension.sourceSetScopeDefault
     )
 
-    target.tasks.withType<DokkatooGenerateTask>().configureEach {
-      cacheDirectory.convention(dokkatooExtension.dokkatooCacheDirectory)
-      workerDebugEnabled.convention(false)
-      workerLogFile.convention(temporaryDir.resolve("dokka-worker.log"))
-      workerJvmArgs.set(
-        listOf(
-          //"-XX:MaxMetaspaceSize=512m",
-          "-XX:+HeapDumpOnOutOfMemoryError",
-          "-XX:+AlwaysPreTouch", // https://github.com/gradle/gradle/issues/3093#issuecomment-387259298
-          //"-XX:StartFlightRecording=disk=true,name={path.drop(1).map { if (it.isLetterOrDigit()) it else '-' }.joinToString("")},dumponexit=true,duration=30s",
-          //"-XX:FlightRecorderOptions=repository=$baseDir/jfr,stackdepth=512",
-        )
-      )
-      dokkaConfigurationJsonFile.convention(temporaryDir.resolve("dokka-configuration.json"))
-    }
-
     target.tasks.withType<DokkatooPrepareModuleDescriptorTask>().configureEach {
       moduleName.convention(dokkatooExtension.moduleName)
       includes.from(providers.provider { dokkatooExtension.dokkatooSourceSets.flatMap { it.includes } })
@@ -95,6 +81,32 @@ constructor(
     }
 
     target.tasks.withType<DokkatooGenerateTask>().configureEach {
+      cacheDirectory.convention(dokkatooExtension.dokkatooCacheDirectory)
+      workerLogFile.convention(temporaryDir.resolve("dokka-worker.log"))
+      dokkaConfigurationJsonFile.convention(temporaryDir.resolve("dokka-configuration.json"))
+
+      workerIsolation.convention(dokkatooExtension.dokkaGeneratorIsolation.map { src ->
+        when (src) {
+          is ClassLoaderIsolation -> src
+          is ProcessIsolation     -> {
+            // Complicated workaround to copy old properties, to maintain backwards compatibility.
+            // Remove when the deprecated task properties are deleted.
+            dokkatooExtension.ProcessIsolation {
+              @Suppress("DEPRECATION")
+              run {
+                debug.convention(workerDebugEnabled.orElse(src.debug))
+                enableAssertions.convention(src.enableAssertions)
+                minHeapSize.convention(workerMinHeapSize.orElse(src.minHeapSize))
+                maxHeapSize.convention(workerMaxHeapSize.orElse(src.maxHeapSize))
+                jvmArgs.convention(workerJvmArgs.orElse(src.jvmArgs))
+                allJvmArgs.convention(src.allJvmArgs)
+                defaultCharacterEncoding.convention(src.defaultCharacterEncoding)
+                systemProperties.convention(src.systemProperties)
+              }
+            }
+          }
+        }
+      })
 
       publicationEnabled.convention(true)
       onlyIf("publication must be enabled") { publicationEnabled.getOrElse(true) }
@@ -144,6 +156,21 @@ constructor(
       kotlinxHtml.convention("0.8.0")
       kotlinxCoroutines.convention("1.6.4")
     }
+
+    dokkatooExtension.dokkaGeneratorIsolation.convention(
+      dokkatooExtension.ProcessIsolation {
+        debug.convention(false)
+        jvmArgs.convention(
+          listOf(
+            //"-XX:MaxMetaspaceSize=512m",
+            "-XX:+HeapDumpOnOutOfMemoryError",
+            "-XX:+AlwaysPreTouch", // https://github.com/gradle/gradle/issues/3093#issuecomment-387259298
+            //"-XX:StartFlightRecording=disk=true,name={path.drop(1).map { if (it.isLetterOrDigit()) it else '-' }.joinToString("")},dumponexit=true,duration=30s",
+            //"-XX:FlightRecorderOptions=repository=$baseDir/jfr,stackdepth=512",
+          )
+        )
+      }
+    )
 
     return dokkatooExtension
   }
