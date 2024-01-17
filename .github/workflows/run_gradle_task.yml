@@ -56,7 +56,7 @@ jobs:
       ### Gradle task ###
 
       - name: Checkout the repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{ inputs.checkout-ref || github.ref }}
 
