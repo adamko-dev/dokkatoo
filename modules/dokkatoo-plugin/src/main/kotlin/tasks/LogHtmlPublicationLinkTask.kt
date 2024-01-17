@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory
 /**
  * Prints an HTTP link in the console when the HTML publication is generated.
  *
- * The HTML publication requires a web server, since it loads resources via javascript.
+ * The HTML publication requires a web server since it loads resources via JavaScript.
  *
  * By default, it uses
  * [IntelliJ's built-in server](https://www.jetbrains.com/help/phpstorm/php-built-in-web-server.html#ws_html_preview_output_built_in_browser)†
@@ -33,8 +33,8 @@ import org.slf4j.LoggerFactory
  *
  * ---
  *
- * † For some reason there only doc page for the built-in server I could find is for PhpStorm,
- * but the built-in server is also available in IntelliJ IDEA.)
+ * † For some reason, the only doc page for the built-in server I could find is for PhpStorm,
+ * but the built-in server is also available in IntelliJ IDEA.
  */
 @DisableCachingByDefault(because = "logging-only task")
 abstract class LogHtmlPublicationLinkTask
@@ -76,7 +76,7 @@ constructor(
   abstract val indexHtmlPath: Property<String>
 
   init {
-    // don't assign a group. This task is a 'finalizer' util task, so it doesn't make sense
+    // Don't assign a group - this task is a 'finalizer' util task, so it doesn't make sense
     // to display this task prominently.
     group = "other"
 
@@ -155,7 +155,7 @@ constructor(
         return response.statusCode() > 0
       } catch (ex: Exception) {
         logger.info("could not reach URI ${parameters.uri.get()}: $ex")
-        return  false
+        return false
       }
     }
   }
