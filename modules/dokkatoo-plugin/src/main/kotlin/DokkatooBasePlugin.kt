@@ -1,6 +1,5 @@
 package dev.adamko.dokkatoo
 
-import dev.adamko.dokkatoo.dependencies.BaseDependencyManager
 import dev.adamko.dokkatoo.dependencies.DependencyContainerNames
 import dev.adamko.dokkatoo.dependencies.DokkatooAttribute.Companion.DokkatooClasspathAttribute
 import dev.adamko.dokkatoo.dependencies.DokkatooAttribute.Companion.DokkatooFormatAttribute
@@ -29,7 +28,6 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
-import org.gradle.api.tasks.TaskContainer
 import org.gradle.kotlin.dsl.*
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 
@@ -52,69 +50,11 @@ constructor(
 
     val dokkatooExtension = createExtension(target)
 
-    target.tasks.createDokkaLifecycleTasks()
-
-    target.dependencies.attributesSchema {
-      attribute(DokkatooFormatAttribute)
-      attribute(DokkatooModuleNameAttribute)
-      attribute(DokkatooModulePathAttribute)
-      attribute(DokkatooModuleGenerateTaskPathAttribute)
-      attribute(DokkatooModuleComponentAttribute)
-      attribute(DokkatooClasspathAttribute)
-    }
-
-    val baseDependencyManager = BaseDependencyManager(
-      project = target,
-      moduleName = dokkatooExtension.moduleName,
-      modulePath = dokkatooExtension.modulePath,
-      objects = objects,
-    )
-    target.extensions.adding(
-      "dokkatooBaseDependencyManager$INTERNAL_MARKER",
-      baseDependencyManager
-    )
+    configureDependencyAttributes(target)
 
     configureDokkaPublicationsDefaults(dokkatooExtension)
-    dokkatooExtension.dokkatooSourceSets.configureDefaults(
-      sourceSetScopeConvention = dokkatooExtension.sourceSetScopeDefault
-    )
 
-    target.tasks.withType<DokkatooGenerateTask>().configureEach {
-      cacheDirectory.convention(dokkatooExtension.dokkatooCacheDirectory)
-      workerDebugEnabled.convention(false)
-      workerLogFile.convention(temporaryDir.resolve("dokka-worker.log"))
-      workerJvmArgs.set(
-        listOf(
-          //"-XX:MaxMetaspaceSize=512m",
-          "-XX:+HeapDumpOnOutOfMemoryError",
-          "-XX:+AlwaysPreTouch", // https://github.com/gradle/gradle/issues/3093#issuecomment-387259298
-          //"-XX:StartFlightRecording=disk=true,name={path.drop(1).map { if (it.isLetterOrDigit()) it else '-' }.joinToString("")},dumponexit=true,duration=30s",
-          //"-XX:FlightRecorderOptions=repository=$baseDir/jfr,stackdepth=512",
-        )
-      )
-      dokkaConfigurationJsonFile.convention(temporaryDir.resolve("dokka-configuration.json"))
-    }
-
-    target.tasks.withType<DokkatooGenerateTask>().configureEach {
-
-      publicationEnabled.convention(true)
-      onlyIf("publication must be enabled") { publicationEnabled.getOrElse(true) }
-
-      generator.dokkaSourceSets.addAllLater(
-        providers.provider {
-          // exclude suppressed source sets as early as possible, to avoid unnecessary dependency resolution
-          dokkatooExtension.dokkatooSourceSets.filterNot { it.suppress.get() }
-        }
-      )
-
-      generator.dokkaSourceSets.configureDefaults(
-        sourceSetScopeConvention = dokkatooExtension.sourceSetScopeDefault
-      )
-    }
-
-    dokkatooExtension.dokkatooSourceSets.configureDefaults(
-      sourceSetScopeConvention = dokkatooExtension.sourceSetScopeDefault
-    )
+    initDokkatooTasks(target, dokkatooExtension)
   }
 
   private fun createExtension(project: Project): DokkatooExtension {
@@ -146,8 +86,25 @@ constructor(
       kotlinxCoroutines.convention("1.6.4")
     }
 
+    dokkatooExtension.dokkatooSourceSets.configureDefaults(
+      sourceSetScopeConvention = dokkatooExtension.sourceSetScopeDefault
+    )
+
     return dokkatooExtension
   }
+
+
+  private fun configureDependencyAttributes(target: Project) {
+    target.dependencies.attributesSchema {
+      attribute(DokkatooFormatAttribute)
+      attribute(DokkatooModuleNameAttribute)
+      attribute(DokkatooModulePathAttribute)
+      attribute(DokkatooModuleGenerateTaskPathAttribute)
+      attribute(DokkatooModuleComponentAttribute)
+      attribute(DokkatooClasspathAttribute)
+    }
+  }
+
 
   /** Set defaults in all [DokkatooExtension.dokkatooPublications]s */
   private fun configureDokkaPublicationsDefaults(
@@ -167,6 +124,7 @@ constructor(
       suppressObviousFunctions.convention(true)
     }
   }
+
 
   /** Set conventions for all [DokkaSourceSetSpec] properties */
   private fun NamedDomainObjectContainer<DokkaSourceSetSpec>.configureDefaults(
@@ -259,20 +217,58 @@ constructor(
     }
   }
 
-  private fun TaskContainer.createDokkaLifecycleTasks() {
-    register<DokkatooTask>(taskNames.generate) {
+
+  private fun initDokkatooTasks(
+    target: Project,
+    dokkatooExtension: DokkatooExtension,
+  ) {
+    target.tasks.register<DokkatooTask>(taskNames.generate) {
       description = "Generates Dokkatoo publications for all formats"
-      dependsOn(withType<DokkatooGenerateTask>())
+      dependsOn(target.tasks.withType<DokkatooGenerateTask>())
+    }
+
+    target.tasks.withType<DokkatooGenerateTask>().configureEach {
+      cacheDirectory.convention(dokkatooExtension.dokkatooCacheDirectory)
+      workerDebugEnabled.convention(false)
+      workerLogFile.convention(temporaryDir.resolve("dokka-worker.log"))
+      workerJvmArgs.set(
+        listOf(
+          //"-XX:MaxMetaspaceSize=512m",
+          "-XX:+HeapDumpOnOutOfMemoryError",
+          "-XX:+AlwaysPreTouch", // https://github.com/gradle/gradle/issues/3093#issuecomment-387259298
+          //"-XX:StartFlightRecording=disk=true,name={path.drop(1).map { if (it.isLetterOrDigit()) it else '-' }.joinToString("")},dumponexit=true,duration=30s",
+          //"-XX:FlightRecorderOptions=repository=$baseDir/jfr,stackdepth=512",
+        )
+      )
+      dokkaConfigurationJsonFile.convention(temporaryDir.resolve("dokka-configuration.json"))
+    }
+
+    target.tasks.withType<DokkatooGenerateTask>().configureEach {
+
+      publicationEnabled.convention(true)
+      onlyIf("publication must be enabled") { publicationEnabled.getOrElse(true) }
+
+      generator.dokkaSourceSets.addAllLater(
+        providers.provider {
+          // exclude suppressed source sets as early as possible, to avoid unnecessary dependency resolution
+          dokkatooExtension.dokkatooSourceSets.matching { !it.suppress.get() }
+        }
+      )
+
+      generator.dokkaSourceSets.configureDefaults(
+        sourceSetScopeConvention = dokkatooExtension.sourceSetScopeDefault
+      )
     }
   }
 
-  // workaround for https://github.com/gradle/gradle/issues/23708
+
+  //region workaround for https://github.com/gradle/gradle/issues/23708
   private fun RegularFileProperty.convention(file: File): RegularFileProperty =
     convention(objects.fileProperty().fileValue(file))
 
-  // workaround for https://github.com/gradle/gradle/issues/23708
   private fun RegularFileProperty.convention(file: Provider<File>): RegularFileProperty =
     convention(objects.fileProperty().fileProvider(file))
+  //endregion
 
   companion object {
     const val EXTENSION_NAME = "dokkatoo"
