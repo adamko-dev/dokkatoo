@@ -11,11 +11,11 @@ on:
         required: true
         type: string
       runs-on:
-        description: "OSes to run the task on"
+        description: "OS to run the task on"
         required: true
         type: string
       checkout-ref:
-        description: "The repository reference to checkout"
+        description: "The branch, tag or SHA to checkout. See actions/checkout 'ref'."
         required: false
         type: string
   workflow_call:
@@ -25,11 +25,11 @@ on:
         required: true
         type: string
       runs-on:
-        description: "OSes to run the task on"
+        description: "OS to run the task on"
         required: true
         type: string
       checkout-ref:
-        description: "The repository reference to checkout"
+        description: "The branch, tag or SHA to checkout. See actions/checkout 'ref'."
         required: false
         type: string
 
