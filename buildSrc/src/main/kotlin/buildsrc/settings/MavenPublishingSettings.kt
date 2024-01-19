@@ -35,6 +35,22 @@ abstract class MavenPublishingSettings @Inject constructor(
     d2Prop("mavenCentralPassword")
       .orElse(providers.environmentVariable("MAVEN_SONATYPE_PASSWORD"))
 
+  val jetBrainsSpaceReleaseUrl: Provider<String> =
+    isReleaseVersion.map { isRelease ->
+      if (isRelease) {
+        "https://maven.pkg.jetbrains.space/adamkodev/p/main/maven-releases/"
+      } else {
+        "https://maven.pkg.jetbrains.space/adamkodev/p/main/maven-snapshots/"
+      }
+    }
+
+  val jbSpaceUsername: Provider<String> =
+    d2Prop("jbSpaceUsername")
+      .orElse(providers.environmentVariable("MAVEN_JB_SPACE_USERNAME"))
+  val jbSpacePassword: Provider<String> =
+    d2Prop("jbSpacePassword")
+      .orElse(providers.environmentVariable("MAVEN_JB_SPACE_PASSWORD"))
+
   val signingKeyId: Provider<String> =
     d2Prop("signing.keyId")
       .orElse(providers.environmentVariable("MAVEN_SONATYPE_SIGNING_KEY_ID"))
