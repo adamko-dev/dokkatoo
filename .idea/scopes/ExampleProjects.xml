@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="ExampleProjects" pattern="file[dokkatoo.examples]:*/dokka//*||file[dokkatoo.examples]:*/dokkatoo//*||file[dokkatoo.modules.dokkatoo-plugin-integration-tests]:projects/*/dokka//*||file[dokkatoo.modules.dokkatoo-plugin-integration-tests]:projects/*/dokkatoo//*" />
+</component>
