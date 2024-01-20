@@ -1,5 +1,6 @@
 package dev.adamko.dokkatoo
 
+import dev.adamko.dokkatoo.dependencies.BaseDependencyManager
 import dev.adamko.dokkatoo.dependencies.DependencyContainerNames
 import dev.adamko.dokkatoo.dependencies.DokkatooAttribute.Companion.DokkatooClasspathAttribute
 import dev.adamko.dokkatoo.dependencies.DokkatooAttribute.Companion.DokkatooFormatAttribute
@@ -50,6 +51,8 @@ constructor(
 
     val dokkatooExtension = createExtension(target)
 
+    createBaseDependencyManager(target, dokkatooExtension)
+
     configureDependencyAttributes(target)
 
     configureDokkaPublicationsDefaults(dokkatooExtension)
@@ -91,6 +94,23 @@ constructor(
     )
 
     return dokkatooExtension
+  }
+
+
+  private fun createBaseDependencyManager(
+    target: Project,
+    dokkatooExtension: DokkatooExtension,
+  ) {
+    val baseDependencyManager = BaseDependencyManager(
+      project = target,
+      moduleName = dokkatooExtension.moduleName,
+      modulePath = dokkatooExtension.modulePath,
+      objects = objects,
+    )
+    target.extensions.adding(
+      "dokkatooBaseDependencyManager$INTERNAL_MARKER",
+      baseDependencyManager
+    )
   }
 
 
