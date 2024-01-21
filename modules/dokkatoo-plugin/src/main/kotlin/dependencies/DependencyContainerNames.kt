@@ -20,7 +20,7 @@ class DependencyContainerNames(override val formatName: String?) : HasFormatName
   val dokkatooResolver = "${dokkatoo}Resolver"
 
   /**
-   * Dokka Plugins
+   * ### Dokka Plugins
    *
    * Includes transitive dependencies, so this can be passed to the Dokka Generator Worker classpath.
    *
@@ -29,7 +29,9 @@ class DependencyContainerNames(override val formatName: String?) : HasFormatName
   val pluginsClasspath = "dokkatooPlugin".appendFormat()
 
   /**
-   * Dokka Plugins (excluding transitive dependencies) will be used to create Dokka Generator Parameters
+   * ### Dokka Plugins (excluding transitive dependencies)
+   *
+   * Will be used to create Dokka Generator Parameters
    *
    * Extends [pluginsClasspath]
    *
@@ -39,6 +41,8 @@ class DependencyContainerNames(override val formatName: String?) : HasFormatName
     "${dokkatoo}PluginsClasspathIntransitiveResolver"
 
   /**
+   * ### Dokka Generator Classpath
+   *
    * Classpath used to execute the Dokka Generator.
    *
    * Extends [pluginsClasspath], so Dokka plugins and their dependencies are included.
