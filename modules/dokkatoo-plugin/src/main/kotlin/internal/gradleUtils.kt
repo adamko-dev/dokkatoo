@@ -7,6 +7,8 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.artifacts.component.ComponentIdentifier
 import org.gradle.api.artifacts.component.ProjectComponentIdentifier
+import org.gradle.api.attributes.Attribute
+import org.gradle.api.attributes.AttributeContainer
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.ExtensionAware
@@ -184,4 +186,23 @@ internal fun ObjectFactory.dokkaPluginParametersContainer(): DokkaPluginParamete
     (container as ExtensionAware).extensions.add(name, this)
   }
   return container
+}
+
+
+/**
+ * Creates a new attribute of the given name with the given type.
+ *
+ * @see Attribute.of
+ */
+internal inline fun <reified T> Attribute(
+  name: String
+): Attribute<T> =
+  Attribute.of(name, T::class.java)
+
+
+internal val ArtifactTypeAttribute: Attribute<String> = Attribute("artifactType")
+
+
+internal fun AttributeContainer.artifactType(value: String) {
+  attribute(ArtifactTypeAttribute, value)
 }

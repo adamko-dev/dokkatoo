@@ -1,7 +1,5 @@
 package dev.adamko.dokkatoo.adapters
 
-import com.android.build.gradle.api.ApplicationVariant
-import com.android.build.gradle.api.LibraryVariant
 import dev.adamko.dokkatoo.DokkatooBasePlugin
 import dev.adamko.dokkatoo.DokkatooExtension
 import dev.adamko.dokkatoo.adapters.DokkatooKotlinAdapter.Companion.currentKotlinToolingVersion
@@ -10,10 +8,12 @@ import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetIdSpec.Companion.dokka
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec
 import dev.adamko.dokkatoo.dokka.parameters.KotlinPlatform
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
+import dev.adamko.dokkatoo.internal.artifactType
 import dev.adamko.dokkatoo.internal.not
 import dev.adamko.dokkatoo.internal.warn
 import java.io.File
 import javax.inject.Inject
+import kotlin.reflect.jvm.jvmName
 import org.gradle.api.Named
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
@@ -36,6 +36,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinSingleTargetExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation.Companion.MAIN_COMPILATION_NAME
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
 import org.jetbrains.kotlin.gradle.plugin.mpp.AbstractKotlinNativeCompilation
@@ -99,6 +100,7 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
       providers = providers,
       objects = objects,
       konanHome = dokkatooExtension.konanHome.asFile,
+      project = project,
     )
     val allKotlinCompilationDetails: ListProperty<KotlinCompilationDetails> =
       compilationDetailsBuilder.createCompilationDetails(
@@ -166,8 +168,6 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
       if (compilations.isNotEmpty()) {
         compilations.fold(classpath) { acc, compilation ->
           acc.from(compilation.compilationClasspath)
-          // can't use compileDependencyFiles, it causes weird dependency resolution errors in Android projects
-          //acc.from(providers.provider { compilation.compileDependencyFiles })
         }
       } else {
         classpath
@@ -230,11 +230,13 @@ private data class KotlinCompilationDetails(
   val defaultSourceSetName: String,
 )
 
+
 /** Utility class, encapsulating logic for building [KotlinCompilationDetails] */
 private class KotlinCompilationDetailsBuilder(
   private val objects: ObjectFactory,
   private val providers: ProviderFactory,
   private val konanHome: Provider<File>,
+  private val project: Project,
 ) {
 
   fun createCompilationDetails(
@@ -296,8 +298,26 @@ private class KotlinCompilationDetailsBuilder(
   ): FileCollection {
     val compilationClasspath = objects.fileCollection()
 
-    // collect dependency files from 'regular' Kotlin compilations
-    compilationClasspath.from(providers.provider { compilation.compileDependencyFiles })
+    val compileDependencies: Provider<FileCollection> =
+      if (compilation.target.platformType == KotlinPlatformType.androidJvm) {
+        project.configurations
+          .named(compilation.compileDependencyConfigurationName)
+          .map {
+            it.incoming
+              .artifactView {
+                // Android publishes many variants, which can cause Gradle to get confused,
+                // so specify that we need a JAR and resolve leniently
+                attributes { artifactType("jar") }
+                lenient(true)
+              }
+              .artifacts
+              .artifactFiles
+          }
+      } else {
+        // collect dependency files from 'regular' Kotlin compilations
+        providers.provider { compilation.compileDependencyFiles }
+      }
+    compilationClasspath.from(compileDependencies)
 
     // apply workaround for Kotlin/Native, which will be fixed in Kotlin 2.0
     // (see KT-61559: K/N dependencies will be part of `compilation.compileDependencyFiles`)
@@ -350,8 +370,13 @@ private class KotlinCompilationDetailsBuilder(
       return when (this) {
         is KotlinMetadataCompilation<*> -> true
 
-        is KotlinJvmAndroidCompilation  ->
-          androidVariant is LibraryVariant || androidVariant is ApplicationVariant
+        is KotlinJvmAndroidCompilation  -> {
+          // use string-based comparison, not the actual classes, because AGP has deprecated and
+          // moved the Library/Application classes to a different package.
+          // Using strings is more widely compatible.
+          val variantName = androidVariant::class.jvmName
+          "LibraryVariant" in variantName || "ApplicationVariant" in variantName
+        }
 
         else                            ->
           name == MAIN_COMPILATION_NAME
@@ -387,6 +412,7 @@ private abstract class KotlinSourceSetDetails @Inject constructor(
 
   override fun getName(): String = named
 }
+
 
 /** Utility class, encapsulating logic for building [KotlinCompilationDetails] */
 private class KotlinSourceSetDetailsBuilder(
@@ -462,6 +488,7 @@ private class KotlinSourceSetDetailsBuilder(
       this.compilations.addAll(compilations)
     }
   }
+
 
   /**
    * Return a list containing _all_ source sets that this source set depends on,

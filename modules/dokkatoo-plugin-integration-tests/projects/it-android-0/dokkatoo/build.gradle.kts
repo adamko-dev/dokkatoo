@@ -1,5 +1,6 @@
 plugins {
   id("com.android.library") version "8.0.2"
+//  id("com.android.library") version "8.2.1"
   kotlin("android") version "1.9.0"
   id("dev.adamko.dokkatoo") version "2.1.0-SNAPSHOT"
 }
@@ -8,6 +9,7 @@ android {
   namespace = "org.jetbrains.dokka.it.android"
   defaultConfig {
     minSdkVersion(21)
+//    minSdk = 21
     setCompileSdkVersion(29)
   }
 }
@@ -24,9 +26,6 @@ tasks.withType<dev.adamko.dokkatoo.tasks.DokkatooGenerateTask>().configureEach {
   // So, forcibly rename the SourceSetId.
 
   generator.dokkaSourceSets.configureEach {
-    // sourceSetScope renaming is fine, I'm not worried about it. The default comes from the
-    // Gradle Task name, so a name difference doesn't matter.
-    // We can just manually force the Dokkatoo name to match Dokka.
     sourceSetScope.set(":dokkaHtml")
   }
 }
