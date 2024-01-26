@@ -107,7 +107,7 @@ jobs:
           if-no-files-found: ignore
 
       - name: Publish Test Reports
-        uses: mikepenz/action-junit-report@v3
+        uses: mikepenz/action-junit-report@v4
         if: always()
         with:
           report_paths: |
