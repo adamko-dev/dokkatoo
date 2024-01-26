@@ -80,6 +80,18 @@ publishing {
         }
       }
     }
+
+    val adamkoDevUsername = mavenPublishing.adamkoDevUsername.orNull
+    val adamkoDevPassword = mavenPublishing.adamkoDevPassword.orNull
+    if (!adamkoDevUsername.isNullOrBlank() && !adamkoDevPassword.isNullOrBlank()) {
+      maven(mavenPublishing.adamkoDevReleaseUrl) {
+        name = "AdamkoDev"
+        credentials {
+          username = adamkoDevUsername
+          password = adamkoDevPassword
+        }
+      }
+    }
   }
 
   // com.gradle.plugin-publish automatically adds a Javadoc jar
@@ -103,6 +115,7 @@ signing {
         it.repository.name in setOf(
           "SonatypeRelease",
           "JetBrainsSpace",
+          "AdamkoDev",
         )
       }
   })

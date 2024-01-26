@@ -19,6 +19,7 @@ abstract class MavenPublishingSettings @Inject constructor(
   private val isReleaseVersion: Provider<Boolean> =
     providers.provider { !project.version.toString().endsWith("-SNAPSHOT") }
 
+
   val sonatypeReleaseUrl: Provider<String> =
     isReleaseVersion.map { isRelease ->
       if (isRelease) {
@@ -27,13 +28,13 @@ abstract class MavenPublishingSettings @Inject constructor(
         "https://s01.oss.sonatype.org/content/repositories/snapshots/"
       }
     }
-
   val mavenCentralUsername: Provider<String> =
     d2Prop("mavenCentralUsername")
       .orElse(providers.environmentVariable("MAVEN_SONATYPE_USERNAME"))
   val mavenCentralPassword: Provider<String> =
     d2Prop("mavenCentralPassword")
       .orElse(providers.environmentVariable("MAVEN_SONATYPE_PASSWORD"))
+
 
   val jetBrainsSpaceReleaseUrl: Provider<String> =
     isReleaseVersion.map { isRelease ->
@@ -43,13 +44,29 @@ abstract class MavenPublishingSettings @Inject constructor(
         "https://maven.pkg.jetbrains.space/adamkodev/p/main/maven-snapshots/"
       }
     }
-
   val jbSpaceUsername: Provider<String> =
     d2Prop("jbSpaceUsername")
       .orElse(providers.environmentVariable("MAVEN_JB_SPACE_USERNAME"))
   val jbSpacePassword: Provider<String> =
     d2Prop("jbSpacePassword")
       .orElse(providers.environmentVariable("MAVEN_JB_SPACE_PASSWORD"))
+
+
+  val adamkoDevReleaseUrl: Provider<String> =
+    isReleaseVersion.map { isRelease ->
+      if (isRelease) {
+        "https://europe-west4-maven.pkg.dev/adamko-dev/adamko-dev-releases"
+      } else {
+        "https://europe-west4-maven.pkg.dev/adamko-dev/adamko-dev-snapshots"
+      }
+    }
+  val adamkoDevUsername: Provider<String> =
+    d2Prop("adamkoDevUsername")
+      .orElse(providers.environmentVariable("MAVEN_ADAMKO_DEV_USERNAME"))
+  val adamkoDevPassword: Provider<String> =
+    d2Prop("adamkoDevPassword")
+      .orElse(providers.environmentVariable("MAVEN_ADAMKO_DEV_PASSWORD"))
+
 
   val signingKeyId: Provider<String> =
     d2Prop("signing.keyId")
@@ -60,6 +77,7 @@ abstract class MavenPublishingSettings @Inject constructor(
   val signingPassword: Provider<String> =
     d2Prop("signing.password")
       .orElse(providers.environmentVariable("MAVEN_SONATYPE_SIGNING_PASSWORD"))
+
 
   val githubPublishDir: Provider<File> =
     providers.environmentVariable("GITHUB_PUBLISH_DIR").map { File(it) }
@@ -73,11 +91,11 @@ abstract class MavenPublishingSettings @Inject constructor(
   companion object {
     const val EXTENSION_NAME = "mavenPublishing"
 
-    /** Retrieve the [KayrayBuildProperties] extension. */
+    /** Retrieve the [MavenPublishingSettings] extension. */
     internal val Project.mavenPublishing: MavenPublishingSettings
       get() = extensions.getByType()
 
-    /** Configure the [KayrayBuildProperties] extension. */
+    /** Configure the [MavenPublishingSettings] extension. */
     internal fun Project.mavenPublishing(configure: MavenPublishingSettings.() -> Unit) =
       extensions.configure(configure)
   }
