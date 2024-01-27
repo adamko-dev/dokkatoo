@@ -9,7 +9,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
 import java.io.File
-import kotlin.io.path.deleteIfExists
+import kotlin.io.path.*
 
 /**
  * Integration test for the `it-android-0` project in Dokka
@@ -69,15 +69,99 @@ class AndroidProjectIntegrationTest : FunSpec({
     test("expect the same HTML is generated") {
 
       val dokkaHtmlDir = dokkaProject.projectDir.resolve("build/dokka/html")
+
       val dokkatooHtmlDir = dokkatooProject.projectDir.resolve("build/dokka/html")
 
       val expectedFileTree = dokkaHtmlDir.toTreeString()
       val actualFileTree = dokkatooHtmlDir.toTreeString()
       println((actualFileTree to expectedFileTree).sideBySide())
-      expectedFileTree shouldBe actualFileTree
 
-      dokkatooHtmlDir.toFile().shouldHaveSameStructureAs(dokkaHtmlDir.toFile())
-      dokkatooHtmlDir.toFile().shouldHaveSameStructureAndContentAs(dokkaHtmlDir.toFile())
+
+      // Dokka doesn't seem to generate all output https://github.com/Kotlin/dokka/issues/3474,
+      // so only compare Dokkatoo with Dokka if Dokka contains the expected function.
+      // Of course, it's possible that Dokka is correct and the function shouldn't be generated!
+      val dokkaWorks = dokkaHtmlDir.walk()
+        .filter { it.isRegularFile() && it.extension == "html" }
+        .any { file ->
+          file.useLines { lines ->
+            lines.any { line -> "Will show a small happy text" in line }
+          }
+        }
+
+      if (dokkaWorks) {
+        expectedFileTree shouldBe actualFileTree
+
+        dokkatooHtmlDir.toFile().shouldHaveSameStructureAs(dokkaHtmlDir.toFile())
+        dokkatooHtmlDir.toFile().shouldHaveSameStructureAndContentAs(dokkaHtmlDir.toFile())
+      } else {
+        // remove this else branch if Dokka starts generating onCreate() function
+
+        actualFileTree shouldBe /* language=text */ """
+          html/
+          ├── index.html
+          ├── images/
+          │   ├── copy-icon.svg
+          │   ├── footer-go-to-link.svg
+          │   ├── logo-icon.svg
+          │   ├── nav-icons/
+          │   │   ├── function.svg
+          │   │   ├── interface.svg
+          │   │   ├── enum.svg
+          │   │   ├── typealias-kotlin.svg
+          │   │   ├── field-value.svg
+          │   │   ├── abstract-class.svg
+          │   │   ├── class-kotlin.svg
+          │   │   ├── class.svg
+          │   │   ├── exception-class.svg
+          │   │   ├── annotation-kotlin.svg
+          │   │   ├── field-variable.svg
+          │   │   ├── abstract-class-kotlin.svg
+          │   │   ├── enum-kotlin.svg
+          │   │   ├── object.svg
+          │   │   ├── interface-kotlin.svg
+          │   │   └── annotation.svg
+          │   ├── burger.svg
+          │   ├── go-to-top-icon.svg
+          │   ├── arrow_down.svg
+          │   ├── copy-successful-icon.svg
+          │   ├── theme-toggle.svg
+          │   └── anchor-copy-button.svg
+          ├── styles/
+          │   ├── font-jb-sans-auto.css
+          │   ├── main.css
+          │   ├── prism.css
+          │   ├── style.css
+          │   └── logo-styles.css
+          ├── it-android-0/
+          │   ├── it.android/
+          │   │   ├── index.html
+          │   │   ├── -integration-test-activity/
+          │   │   │   ├── index.html
+          │   │   │   ├── -integration-test-activity.html
+          │   │   │   └── on-create.html
+          │   │   └── -android-specific-class/
+          │   │       ├── index.html
+          │   │       ├── create-view.html
+          │   │       ├── -android-specific-class.html
+          │   │       └── sparse-int-array.html
+          │   └── package-list
+          ├── scripts/
+          │   ├── prism.js
+          │   ├── platform-content-handler.js
+          │   ├── symbol-parameters-wrapper_deferred.js
+          │   ├── navigation-loader.js
+          │   ├── main.js
+          │   ├── clipboard.js
+          │   ├── sourceset_dependencies.js
+          │   └── pages.json
+          └── navigation.html
+        """.trimIndent()
+
+        val onCreateHtml =
+          dokkatooHtmlDir.resolve("it-android-0/it.android/-integration-test-activity/on-create.html")
+        onCreateHtml.toFile().shouldBeAFile()
+        onCreateHtml.readText() shouldContain "Will show a small happy text"
+      }
     }
 
     test("Dokkatoo tasks should be cacheable") {
