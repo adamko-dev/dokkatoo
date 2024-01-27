@@ -410,7 +410,6 @@ public abstract interface class dev/adamko/dokkatoo/workers/ClassLoaderIsolation
 }
 
 public abstract interface class dev/adamko/dokkatoo/workers/ProcessIsolation : dev/adamko/dokkatoo/workers/WorkerIsolation {
-	public abstract fun getAllJvmArgs ()Lorg/gradle/api/provider/ListProperty;
 	public abstract fun getDebug ()Lorg/gradle/api/provider/Property;
 	public abstract fun getDefaultCharacterEncoding ()Lorg/gradle/api/provider/Property;
 	public abstract fun getEnableAssertions ()Lorg/gradle/api/provider/Property;
