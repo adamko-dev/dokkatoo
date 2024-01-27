@@ -21,7 +21,6 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import org.gradle.kotlin.dsl.*
-import org.gradle.process.JavaForkOptions
 import org.gradle.workers.WorkerExecutor
 import org.jetbrains.dokka.DokkaConfiguration
 import org.jetbrains.dokka.toPrettyJsonString
@@ -129,7 +128,6 @@ constructor(
             isolation.minHeapSize.orNull?.let(this::setMinHeapSize)
             isolation.jvmArgs.orNull?.let(this::setJvmArgs)
             isolation.systemProperties.orNull?.let(this::systemProperties)
-            isolation.allJvmArgs.orNull?.let(this::setAllJvmArgs)
           }
         }
     }
@@ -197,19 +195,89 @@ constructor(
   }
 
   //region Deprecated Properties
-  /** @see JavaForkOptions.getDebug */
+  /**
+   * Please move worker options:
+   *
+   * ```kotlin
+   * // build.gradle.kts
+   *
+   * dokkatoo {
+   *   dokkaGeneratorIsolation = ProcessIsolation {
+   *     debug = true
+   *   }
+   * }
+   * ```
+   *
+   * Worker options were moved to allow for configuring worker isolation.
+   *
+   * @see dev.adamko.dokkatoo.DokkatooExtension.dokkaGeneratorIsolation
+   * @see dev.adamko.dokkatoo.workers.ProcessIsolation.debug
+   */
   @get:Internal
   @Deprecated("Please move worker options to `DokkatooExtension.dokkaGeneratorIsolation`. Worker options were moved to allow for configuring worker isolation")
   abstract val workerDebugEnabled: Property<Boolean>
-  /** @see JavaForkOptions.getMinHeapSize */
+  /**
+   * Please move worker options:
+   *
+   * ```kotlin
+   * // build.gradle.kts
+   *
+   * dokkatoo {
+   *   dokkaGeneratorIsolation = ProcessIsolation {
+   *     minHeapSize = "512m"
+   *   }
+   * }
+   * ```
+   *
+   * Worker options were moved to allow for configuring worker isolation.
+   *
+   * @see dev.adamko.dokkatoo.DokkatooExtension.dokkaGeneratorIsolation
+   * @see dev.adamko.dokkatoo.workers.ProcessIsolation.minHeapSize
+   */
   @get:Internal
   @Deprecated("Please move worker options to `DokkatooExtension.dokkaGeneratorIsolation`. Worker options were moved to allow for configuring worker isolation")
   abstract val workerMinHeapSize: Property<String>
-  /** @see JavaForkOptions.getMaxHeapSize */
+  /**
+   * Please move worker options:
+   *
+   * ```kotlin
+   * // build.gradle.kts
+   *
+   * dokkatoo {
+   *   dokkaGeneratorIsolation = ProcessIsolation {
+   *     maxHeapSize = "1g"
+   *   }
+   * }
+   * ```
+   *
+   * Worker options were moved to allow for configuring worker isolation.
+   *
+   * @see dev.adamko.dokkatoo.DokkatooExtension.dokkaGeneratorIsolation
+   * @see dev.adamko.dokkatoo.workers.ProcessIsolation.maxHeapSize
+   */
   @get:Internal
   @Deprecated("Please move worker options to `DokkatooExtension.dokkaGeneratorIsolation`. Worker options were moved to allow for configuring worker isolation")
   abstract val workerMaxHeapSize: Property<String>
-  /** @see JavaForkOptions.jvmArgs */
+  /**
+   * Please move worker options:
+   *
+   * ```kotlin
+   * // build.gradle.kts
+   *
+   * dokkatoo {
+   *   dokkaGeneratorIsolation = ProcessIsolation {
+   *     jvmArgs = listOf(
+   *       "-XX:+UseStringDeduplication",
+   *     )
+   *   }
+   * }
+   * ```
+   *
+   * Worker options were moved to allow for configuring worker isolation.
+   *
+   * @see dev.adamko.dokkatoo.DokkatooExtension.dokkaGeneratorIsolation
+   * @see dev.adamko.dokkatoo.workers.ProcessIsolation.jvmArgs
+   */
   @get:Internal
   @Deprecated("Please move worker options to `DokkatooExtension.dokkaGeneratorIsolation`. Worker options were moved to allow for configuring worker isolation")
   abstract val workerJvmArgs: ListProperty<String>

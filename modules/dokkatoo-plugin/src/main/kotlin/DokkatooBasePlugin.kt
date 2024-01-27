@@ -99,7 +99,6 @@ constructor(
                 minHeapSize.convention(workerMinHeapSize.orElse(src.minHeapSize))
                 maxHeapSize.convention(workerMaxHeapSize.orElse(src.maxHeapSize))
                 jvmArgs.convention(workerJvmArgs.orElse(src.jvmArgs))
-                allJvmArgs.convention(src.allJvmArgs)
                 defaultCharacterEncoding.convention(src.defaultCharacterEncoding)
                 systemProperties.convention(src.systemProperties)
               }
