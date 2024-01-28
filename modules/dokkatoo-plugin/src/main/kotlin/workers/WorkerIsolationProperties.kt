@@ -68,11 +68,6 @@ interface ProcessIsolation : WorkerIsolation {
   @get:Optional
   val jvmArgs: ListProperty<String>
 
-  /** @see JavaForkOptions.setAllJvmArgs */
-  @get:Input
-  @get:Optional
-  val allJvmArgs: ListProperty<String>
-
   /** @see JavaForkOptions.setDefaultCharacterEncoding */
   @get:Input
   @get:Optional
