@@ -41,11 +41,12 @@ dependencies {
 }
 
 kotlin {
-  target {
-    compilations.configureEach {
-      compilerOptions.configure {
-        freeCompilerArgs.addAll(
-          "-opt-in=dev.adamko.dokkatoo.internal.DokkatooInternalApi",
+  sourceSets {
+    configureEach {
+      compilerOptions {
+        optIn.addAll(
+          "dev.adamko.dokkatoo.internal.DokkatooInternalApi",
+          "kotlin.io.path.ExperimentalPathApi",
         )
       }
     }

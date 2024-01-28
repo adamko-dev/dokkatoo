@@ -67,7 +67,10 @@ private fun buildTreeString(
 }
 
 private fun File.listDirectoryEntries(): Sequence<File> =
-  walkTopDown().maxDepth(1).filter { it != this@listDirectoryEntries }
+  walkTopDown()
+    .maxDepth(1)
+    .filter { it != this@listDirectoryEntries }
+    .sortedWith(FileSorter)
 
 
 private fun File.countDirectoryEntries(
@@ -89,5 +92,19 @@ private data class PrefixPair(
     val INTERMEDIATE = PrefixPair("├── ", "│   ")
     /** Prefix pair for the last directory entry */
     val LAST_ENTRY = PrefixPair("└── ", "    ")
+  }
+}
+
+
+/**
+ * Directories before files, otherwise sort by filename.
+ */
+private object FileSorter : Comparator<File> {
+  override fun compare(o1: File, o2: File): Int {
+    return when {
+      o1.isDirectory && o2.isFile -> -1 // directories before files
+      o1.isFile && o2.isDirectory -> +1 // files after directories
+      else                        -> o1.name.compareTo(o2.name)
+    }
   }
 }
