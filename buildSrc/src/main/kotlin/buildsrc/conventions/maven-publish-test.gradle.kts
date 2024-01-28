@@ -30,7 +30,8 @@ plugins.withType<MavenPublishPlugin>().all {
     .publications
     .withType<MavenPublication>().all publication@{
       val publicationName = this@publication.name
-      val installTaskName = "publish${publicationName.uppercaseFirstChar()}PublicationToTestMavenRepo"
+      val installTaskName =
+        "publish${publicationName.uppercaseFirstChar()}PublicationToTestMavenRepo"
 
       // Register a publication task for each publication.
       // Use PublishToMavenLocal, because the PublishToMavenRepository task will *always* create
@@ -66,16 +67,29 @@ plugins.withType<MavenPublishPlugin>().all {
 }
 
 
-val testMavenPublication by configurations.registering {
-  asConsumer()
+val testMavenPublication: Configuration by configurations.creating {
+  declarable()
   attributes {
     attribute(MavenPublishTestSettings.attribute, "testMavenRepo")
   }
 }
 
-val testMavenPublicationElements by configurations.registering {
-  asProvider()
-  extendsFrom(testMavenPublication.get())
+val testMavenPublicationResolvable: Configuration by configurations.creating {
+  resolvable()
+  extendsFrom(testMavenPublication)
+  attributes {
+    attribute(MavenPublishTestSettings.attribute, "testMavenRepo")
+  }
+  outgoing {
+    artifact(mavenPublishTestExtension.testMavenRepo) {
+      builtBy(publishToTestMavenRepo)
+    }
+  }
+}
+
+val testMavenPublicationConsumable: Configuration by configurations.creating {
+  consumable()
+  extendsFrom(testMavenPublication)
   attributes {
     attribute(MavenPublishTestSettings.attribute, "testMavenRepo")
   }

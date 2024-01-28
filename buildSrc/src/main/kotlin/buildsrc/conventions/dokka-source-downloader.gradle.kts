@@ -1,9 +1,10 @@
 package buildsrc.conventions
 
 import buildsrc.settings.DokkaSourceDownloaderSettings
-import buildsrc.utils.asConsumer
-import buildsrc.utils.asProvider
+import buildsrc.utils.consumable
+import buildsrc.utils.declarable
 import buildsrc.utils.dropDirectories
+import buildsrc.utils.resolvable
 import org.gradle.api.attributes.Usage.USAGE_ATTRIBUTE
 import org.gradle.kotlin.dsl.support.serviceOf
 
@@ -15,15 +16,24 @@ val dsdExt: DokkaSourceDownloaderSettings = extensions.create<DokkaSourceDownloa
   DokkaSourceDownloaderSettings.EXTENSION_NAME
 )
 
-val kotlinDokkaSource by configurations.creating<Configuration> {
-  asConsumer()
+val kotlinDokkaSource: Configuration by configurations.creating {
+  declarable()
   attributes {
     attribute(USAGE_ATTRIBUTE, objects.named("externals-dokka-src"))
   }
 }
 
-val kotlinDokkaSourceElements by configurations.registering {
-  asProvider()
+val kotlinDokkaSourceResolvable: Configuration by configurations.creating {
+  resolvable()
+  extendsFrom(kotlinDokkaSource)
+  attributes {
+    attribute(USAGE_ATTRIBUTE, objects.named("externals-dokka-src"))
+  }
+}
+
+val kotlinDokkaSourceConsumable: Configuration by configurations.creating {
+  consumable()
+  extendsFrom(kotlinDokkaSource)
   attributes {
     attribute(USAGE_ATTRIBUTE, objects.named("externals-dokka-src"))
   }
@@ -42,7 +52,7 @@ val prepareDokkaSource by tasks.registering(Sync::class) {
   val archives = serviceOf<ArchiveOperations>()
 
   from(
-    kotlinDokkaSource.incoming
+    kotlinDokkaSourceResolvable.incoming
       .artifacts
       .resolvedArtifacts
       .map { artifacts ->
