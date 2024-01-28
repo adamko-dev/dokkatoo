@@ -327,9 +327,9 @@ private class KotlinCompilationDetailsBuilder(
     dependencies.from(
       konanDistribution.platformLibsDir
         .resolve(target.name)
-        .listFiles()
-        .orEmpty()
-        .filter { it.isDirectory || it.extension == "klib" }
+        .walk()
+        .filter { it.isFile && it.extension == "klib" }
+        .asIterable()
     )
 
     return dependencies
@@ -387,6 +387,7 @@ private abstract class KotlinSourceSetDetails @Inject constructor(
 
   override fun getName(): String = named
 }
+
 
 /** Utility class, encapsulating logic for building [KotlinCompilationDetails] */
 private class KotlinSourceSetDetailsBuilder(
