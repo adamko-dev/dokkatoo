@@ -80,13 +80,13 @@ testing.suites {
 
         // depend on the test-publication configuration, but not the test-maven repo dir
         // (otherwise this task will never be up-to-date)
-        dependsOn(configurations.testMavenPublication)
+        dependsOn(configurations.testMavenPublicationResolvable)
 
         // depend on example & integration-test projects setup
-        dependsOn(configurations.exampleProjects)
+        dependsOn(configurations.exampleProjectsResolvable)
         dependsOn(tasks.updateDokkatooExamples)
 
-        val dokkatooExamplesDir = configurations.exampleProjects.map {
+        val dokkatooExamplesDir = configurations.exampleProjectsResolvable.map {
           it.incoming.files.singleFile.absolutePath
         }
 

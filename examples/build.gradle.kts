@@ -34,7 +34,7 @@ dokkaTemplateProjects {
   )
 }
 
-configurations.exampleProjectsElements.configure {
+configurations.exampleProjectsConsumable.configure {
   outgoing {
     artifact(projectDir) {
       builtBy(tasks.updateDokkatooExamples)

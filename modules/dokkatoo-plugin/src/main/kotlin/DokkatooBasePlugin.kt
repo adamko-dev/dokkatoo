@@ -150,10 +150,10 @@ constructor(
 
     dokkatooExtension.versions {
       jetbrainsDokka.convention(DokkatooConstants.DOKKA_VERSION)
-      jetbrainsMarkdown.convention("0.3.1")
-      freemarker.convention("2.3.31")
-      kotlinxHtml.convention("0.8.0")
-      kotlinxCoroutines.convention("1.6.4")
+      jetbrainsMarkdown.convention(DokkatooConstants.DOKKA_DEPENDENCY_VERSION_JETBRAINS_MARKDOWN)
+      freemarker.convention(DokkatooConstants.DOKKA_DEPENDENCY_VERSION_FREEMARKER)
+      kotlinxHtml.convention(DokkatooConstants.DOKKA_DEPENDENCY_VERSION_KOTLINX_HTML)
+      kotlinxCoroutines.convention(DokkatooConstants.DOKKA_DEPENDENCY_VERSION_KOTLINX_COROUTINES)
     }
 
     dokkatooExtension.dokkaGeneratorIsolation.convention(

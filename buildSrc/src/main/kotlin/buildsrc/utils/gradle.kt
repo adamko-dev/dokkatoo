@@ -17,14 +17,16 @@ import org.gradle.kotlin.dsl.*
  * ```
  * isCanBeResolved = false
  * isCanBeConsumed = true
+ * isCanBeDeclared = false
  * ```
  */
-fun Configuration.asProvider(
+fun Configuration.consumable(
   visible: Boolean = true
 ) {
   isVisible = visible
   isCanBeResolved = false
   isCanBeConsumed = true
+  isCanBeDeclared = false
 }
 
 /**
@@ -33,14 +35,34 @@ fun Configuration.asProvider(
  * ```
  * isCanBeResolved = true
  * isCanBeConsumed = false
+ * isCanBeDeclared = false
  * ```
- * */
-fun Configuration.asConsumer(
+ */
+fun Configuration.resolvable(
   visible: Boolean = false
 ) {
   isVisible = visible
   isCanBeResolved = true
   isCanBeConsumed = false
+  isCanBeDeclared = false
+}
+
+/**
+ * Mark this [Configuration] as one that will be used to declare dependencies.
+ *
+ * ```
+ * isCanBeResolved = false
+ * isCanBeConsumed = false
+ * isCanBeDeclared = true
+ * ```
+ */
+fun Configuration.declarable(
+  visible: Boolean = false
+) {
+  isVisible = visible
+  isCanBeResolved = false
+  isCanBeConsumed = false
+  isCanBeDeclared = true
 }
 
 
