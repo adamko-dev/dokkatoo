@@ -98,64 +98,64 @@ class AndroidProjectIntegrationTest : FunSpec({
 
         actualFileTree shouldBe /* language=text */ """
           html/
-          ├── index.html
           ├── images/
-          │   ├── copy-icon.svg
-          │   ├── footer-go-to-link.svg
-          │   ├── logo-icon.svg
           │   ├── nav-icons/
-          │   │   ├── function.svg
-          │   │   ├── interface.svg
-          │   │   ├── enum.svg
-          │   │   ├── typealias-kotlin.svg
-          │   │   ├── field-value.svg
+          │   │   ├── abstract-class-kotlin.svg
           │   │   ├── abstract-class.svg
+          │   │   ├── annotation-kotlin.svg
+          │   │   ├── annotation.svg
           │   │   ├── class-kotlin.svg
           │   │   ├── class.svg
-          │   │   ├── exception-class.svg
-          │   │   ├── annotation-kotlin.svg
-          │   │   ├── field-variable.svg
-          │   │   ├── abstract-class-kotlin.svg
           │   │   ├── enum-kotlin.svg
-          │   │   ├── object.svg
+          │   │   ├── enum.svg
+          │   │   ├── exception-class.svg
+          │   │   ├── field-value.svg
+          │   │   ├── field-variable.svg
+          │   │   ├── function.svg
           │   │   ├── interface-kotlin.svg
-          │   │   └── annotation.svg
-          │   ├── burger.svg
-          │   ├── go-to-top-icon.svg
+          │   │   ├── interface.svg
+          │   │   ├── object.svg
+          │   │   └── typealias-kotlin.svg
+          │   ├── anchor-copy-button.svg
           │   ├── arrow_down.svg
+          │   ├── burger.svg
+          │   ├── copy-icon.svg
           │   ├── copy-successful-icon.svg
-          │   ├── theme-toggle.svg
-          │   └── anchor-copy-button.svg
-          ├── styles/
-          │   ├── font-jb-sans-auto.css
-          │   ├── main.css
-          │   ├── prism.css
-          │   ├── style.css
-          │   └── logo-styles.css
+          │   ├── footer-go-to-link.svg
+          │   ├── go-to-top-icon.svg
+          │   ├── logo-icon.svg
+          │   └── theme-toggle.svg
           ├── it-android-0/
           │   ├── it.android/
-          │   │   ├── index.html
-          │   │   ├── -integration-test-activity/
+          │   │   ├── -android-specific-class/
+          │   │   │   ├── -android-specific-class.html
+          │   │   │   ├── create-view.html
           │   │   │   ├── index.html
+          │   │   │   └── sparse-int-array.html
+          │   │   ├── -integration-test-activity/
           │   │   │   ├── -integration-test-activity.html
+          │   │   │   ├── index.html
           │   │   │   └── on-create.html
-          │   │   └── -android-specific-class/
-          │   │       ├── index.html
-          │   │       ├── create-view.html
-          │   │       ├── -android-specific-class.html
-          │   │       └── sparse-int-array.html
+          │   │   └── index.html
           │   └── package-list
           ├── scripts/
-          │   ├── prism.js
-          │   ├── platform-content-handler.js
-          │   ├── symbol-parameters-wrapper_deferred.js
-          │   ├── navigation-loader.js
-          │   ├── main.js
           │   ├── clipboard.js
+          │   ├── main.js
+          │   ├── navigation-loader.js
+          │   ├── pages.json
+          │   ├── platform-content-handler.js
+          │   ├── prism.js
           │   ├── sourceset_dependencies.js
-          │   └── pages.json
+          │   └── symbol-parameters-wrapper_deferred.js
+          ├── styles/
+          │   ├── font-jb-sans-auto.css
+          │   ├── logo-styles.css
+          │   ├── main.css
+          │   ├── prism.css
+          │   └── style.css
+          ├── index.html
           └── navigation.html
-        """.trimIndent()
+""".trimIndent()
 
         val onCreateHtml =
           dokkatooHtmlDir.resolve("it-android-0/it.android/-integration-test-activity/on-create.html")
