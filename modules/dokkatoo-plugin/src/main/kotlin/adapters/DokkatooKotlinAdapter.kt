@@ -42,7 +42,6 @@ import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
 import org.jetbrains.kotlin.gradle.plugin.mpp.AbstractKotlinNativeCompilation
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinJvmAndroidCompilation
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinMetadataCompilation
-import org.jetbrains.kotlin.konan.target.KonanTarget
 import org.jetbrains.kotlin.tooling.core.KotlinToolingVersion
 
 /**
@@ -298,61 +297,69 @@ private class KotlinCompilationDetailsBuilder(
   ): FileCollection {
     val compilationClasspath = objects.fileCollection()
 
-    val compileDependencies: Provider<FileCollection> =
-      if (compilation.target.platformType == KotlinPlatformType.androidJvm) {
-        project.configurations
-          .named(compilation.compileDependencyConfigurationName)
-          .map {
-            it.incoming
-              .artifactView {
-                // Android publishes many variants, which can cause Gradle to get confused,
-                // so specify that we need a JAR and resolve leniently
-                attributes { artifactType("jar") }
-                lenient(true)
-              }
-              .artifacts
-              .artifactFiles
-          }
-      } else {
-        // collect dependency files from 'regular' Kotlin compilations
-        providers.provider { compilation.compileDependencyFiles }
-      }
-    compilationClasspath.from(compileDependencies)
+    compilationClasspath.from(
+      kotlinCompileDependencyFiles(compilation)
+    )
 
-    // apply workaround for Kotlin/Native, which will be fixed in Kotlin 2.0
-    // (see KT-61559: K/N dependencies will be part of `compilation.compileDependencyFiles`)
-    if (
-      currentKotlinToolingVersion < KotlinToolingVersion("2.0.0")
-      &&
-      compilation is AbstractKotlinNativeCompilation
-    ) {
-      compilationClasspath.from(
-        konanHome.map { konanHome ->
-          kotlinNativeDependencies(konanHome, compilation.konanTarget)
-        }
-      )
-    }
+    compilationClasspath.from(
+      kotlinNativeDependencies(compilation)
+    )
 
     return compilationClasspath
   }
 
-  private fun kotlinNativeDependencies(konanHome: File, target: KonanTarget): FileCollection {
-    val konanDistribution = KonanDistribution(konanHome)
+  private fun kotlinCompileDependencyFiles(
+    compilation: KotlinCompilation<*>,
+  ): Provider<FileCollection> {
+    return project.configurations
+      .named(compilation.compileDependencyConfigurationName)
+      .map {
+        it.incoming
+          .artifactView {
+            // Android publishes many variants, which can cause Gradle to get confused,
+            // so specify that we need a JAR and resolve leniently
+            if (compilation.target.platformType == KotlinPlatformType.androidJvm) {
+              attributes { artifactType("jar") }
+              lenient(true)
+            }
+            // 'Regular' Kotlin compilations have non-JAR files (e.g. Kotlin/Native klibs),
+            // so don't add attributes for non-Android projects.
+          }
+          .artifacts
+          .artifactFiles
+      }
+  }
 
-    val dependencies = objects.fileCollection()
+  private fun kotlinNativeDependencies(
+    compilation: KotlinCompilation<*>,
+  ): Provider<FileCollection> {
 
-    dependencies.from(konanDistribution.stdlib)
+    // apply workaround for Kotlin/Native, which will be fixed in Kotlin 2.0
+    // (see KT-61559: K/N dependencies will be part of `compilation.compileDependencyFiles`)
+    return if (
+      currentKotlinToolingVersion < KotlinToolingVersion("2.0.0")
+      &&
+      compilation is AbstractKotlinNativeCompilation
+    ) {
+      konanHome.map { konanHome ->
+        val konanDistribution = KonanDistribution(konanHome)
 
-    // Konan library files for a specific target
-    dependencies.from(
-      konanDistribution.platformLibsDir
-        .resolve(target.name)
-        .listFiles()
-        .orEmpty()
-        .filter { it.isDirectory || it.extension == "klib" }
-    )
+        val dependencies = objects.fileCollection()
 
-    return dependencies
+        dependencies.from(konanDistribution.stdlib)
+
+        // Konan library files for a specific target
+        dependencies.from(
+          konanDistribution.platformLibsDir
+            .resolve(compilation.target.name)
+            .listFiles()
+            .orEmpty()
+            .filter { it.isDirectory || it.extension == "klib" }
+        )
+      }
+    } else {
+      return providers.provider { objects.fileCollection() }
+    }
   }
 
   companion object {
@@ -371,7 +378,7 @@ private class KotlinCompilationDetailsBuilder(
         is KotlinMetadataCompilation<*> -> true
 
         is KotlinJvmAndroidCompilation  -> {
-          // use string-based comparison, not the actual classes, because AGP has deprecated and
+          // Use string-based comparison, not the actual classes, because AGP has deprecated and
           // moved the Library/Application classes to a different package.
           // Using strings is more widely compatible.
           val variantName = androidVariant::class.jvmName

@@ -1,6 +1,5 @@
 plugins {
   id("com.android.library") version "8.0.2"
-//  id("com.android.library") version "8.2.1"
   kotlin("android") version "1.9.0"
   id("dev.adamko.dokkatoo") version "2.1.0-SNAPSHOT"
 }
@@ -9,7 +8,6 @@ android {
   namespace = "org.jetbrains.dokka.it.android"
   defaultConfig {
     minSdkVersion(21)
-//    minSdk = 21
     setCompileSdkVersion(29)
   }
 }
