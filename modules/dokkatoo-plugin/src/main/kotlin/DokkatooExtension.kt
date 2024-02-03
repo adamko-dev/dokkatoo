@@ -4,6 +4,9 @@ import dev.adamko.dokkatoo.dependencies.BaseDependencyManager
 import dev.adamko.dokkatoo.dokka.DokkaPublication
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec
 import dev.adamko.dokkatoo.internal.*
+import dev.adamko.dokkatoo.workers.ClassLoaderIsolation
+import dev.adamko.dokkatoo.workers.ProcessIsolation
+import dev.adamko.dokkatoo.workers.WorkerIsolation
 import java.io.Serializable
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.file.DirectoryProperty
@@ -11,7 +14,9 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Nested
 import org.gradle.kotlin.dsl.*
+import org.gradle.workers.WorkerExecutor
 
 /**
  * Configure the behaviour of the [DokkatooBasePlugin].
@@ -19,7 +24,7 @@ import org.gradle.kotlin.dsl.*
 abstract class DokkatooExtension
 @DokkatooInternalApi
 constructor(
-  objects: ObjectFactory,
+  private val objects: ObjectFactory,
 ) : ExtensionAware, Serializable {
 
   /** Directory into which [DokkaPublication]s will be produced */
@@ -128,4 +133,52 @@ constructor(
 
     companion object
   }
+
+  /**
+   * Dokkatoo runs Dokka Generator in a separate
+   * [Gradle Worker](https://docs.gradle.org/8.5/userguide/worker_api.html).
+   *
+   * You can control whether Dokkatoo launches Dokka Generator in
+   * * a new process, using [ProcessIsolation],
+   * * or the current process with an isolated classpath, using [ClassLoaderIsolation].
+   *
+   * _Aside: Launching [without isolation][WorkerExecutor.noIsolation] is not an option, because
+   * running Dokka Generator **requires** an isolated classpath._
+   *
+   * ```kotlin
+   * dokkatoo {
+   *   // use the current Gradle process, but with an isolated classpath
+   *   workerIsolation = ClassLoaderIsolation()
+   *
+   *   // launch a new process, optionally controlling the standard JVM options
+   *   workerIsolation = ProcessIsolation {
+   *     minHeapSize = "2g" // increase minimum heap size
+   *     systemProperties.add("someCustomProperty", 123)
+   *   }
+   * }
+   * ```
+   *
+   * @see WorkerIsolation
+   * @see dev.adamko.dokkatoo.workers.ProcessIsolation
+   * @see dev.adamko.dokkatoo.workers.ClassLoaderIsolation
+   *
+   */
+  @get:Nested
+  abstract val dokkaGeneratorIsolation: Property<WorkerIsolation>
+
+  /**
+   * Create a new [ClassLoaderIsolation] options instance.
+   *
+   * The resulting options must be set into [dokkaGeneratorIsolation].
+   */
+  fun ClassLoaderIsolation(configure: ClassLoaderIsolation.() -> Unit = {}): ClassLoaderIsolation =
+    objects.newInstance<ClassLoaderIsolation>().apply(configure)
+
+  /**
+   * Create a new [ProcessIsolation] options.
+   *
+   * The resulting options instance must be set into [dokkaGeneratorIsolation].
+   */
+  fun ProcessIsolation(configure: ProcessIsolation.() -> Unit = {}): ProcessIsolation =
+    objects.newInstance<ProcessIsolation>().apply(configure)
 }

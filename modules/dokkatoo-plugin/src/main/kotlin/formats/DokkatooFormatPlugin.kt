@@ -327,8 +327,7 @@ abstract class DokkatooFormatPlugin(
         dokkaPlugin("org.freemarker:freemarker" version freemarker)
 
         dokkaGenerator(dokka("dokka-core"))
-        // TODO why does org.jetbrains:markdown need a -jvm suffix?
-        dokkaGenerator("org.jetbrains:markdown-jvm" version jetbrainsMarkdown)
+        dokkaGenerator("org.jetbrains:markdown" version jetbrainsMarkdown)
         dokkaGenerator("org.jetbrains.kotlinx:kotlinx-coroutines-core" version kotlinxCoroutines)
       }
     }

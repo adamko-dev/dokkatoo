@@ -68,6 +68,30 @@ publishing {
         }
       }
     }
+
+    val jbSpaceUsername = mavenPublishing.jbSpaceUsername.orNull
+    val jbSpacePassword = mavenPublishing.jbSpacePassword.orNull
+    if (!jbSpaceUsername.isNullOrBlank() && !jbSpacePassword.isNullOrBlank()) {
+      maven(mavenPublishing.jetBrainsSpaceReleaseUrl) {
+        name = "JetBrainsSpace"
+        credentials {
+          username = jbSpaceUsername
+          password = jbSpacePassword
+        }
+      }
+    }
+
+    val adamkoDevUsername = mavenPublishing.adamkoDevUsername.orNull
+    val adamkoDevPassword = mavenPublishing.adamkoDevPassword.orNull
+    if (!adamkoDevUsername.isNullOrBlank() && !adamkoDevPassword.isNullOrBlank()) {
+      maven(mavenPublishing.adamkoDevReleaseUrl) {
+        name = "AdamkoDev"
+        credentials {
+          username = adamkoDevUsername
+          password = adamkoDevPassword
+        }
+      }
+    }
   }
 
   // com.gradle.plugin-publish automatically adds a Javadoc jar
@@ -85,9 +109,15 @@ signing {
   }
 
   setRequired({
-    gradle.taskGraph.allTasks.filterIsInstance<PublishToMavenRepository>().any {
-      it.repository.name == "SonatypeRelease"
-    }
+    gradle.taskGraph.allTasks
+      .filterIsInstance<PublishToMavenRepository>()
+      .any {
+        it.repository.name in setOf(
+          "SonatypeRelease",
+          "JetBrainsSpace",
+          "AdamkoDev",
+        )
+      }
   })
 }
 

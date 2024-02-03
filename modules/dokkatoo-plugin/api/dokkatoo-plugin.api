@@ -18,6 +18,11 @@ public final class dev/adamko/dokkatoo/DokkatooBasePlugin$inlined$sam$i$org_grad
 }
 
 public abstract class dev/adamko/dokkatoo/DokkatooExtension : java/io/Serializable, org/gradle/api/plugins/ExtensionAware {
+	public final fun ClassLoaderIsolation (Lkotlin/jvm/functions/Function1;)Ldev/adamko/dokkatoo/workers/ClassLoaderIsolation;
+	public static synthetic fun ClassLoaderIsolation$default (Ldev/adamko/dokkatoo/DokkatooExtension;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ldev/adamko/dokkatoo/workers/ClassLoaderIsolation;
+	public final fun ProcessIsolation (Lkotlin/jvm/functions/Function1;)Ldev/adamko/dokkatoo/workers/ProcessIsolation;
+	public static synthetic fun ProcessIsolation$default (Ldev/adamko/dokkatoo/DokkatooExtension;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ldev/adamko/dokkatoo/workers/ProcessIsolation;
+	public abstract fun getDokkaGeneratorIsolation ()Lorg/gradle/api/provider/Property;
 	public abstract fun getDokkatooCacheDirectory ()Lorg/gradle/api/file/DirectoryProperty;
 	public abstract fun getDokkatooConfigurationsDirectory ()Lorg/gradle/api/file/DirectoryProperty;
 	public abstract fun getDokkatooModuleDirectory ()Lorg/gradle/api/file/DirectoryProperty;
@@ -351,6 +356,7 @@ public abstract class dev/adamko/dokkatoo/tasks/DokkatooGenerateTask : dev/adamk
 	public abstract fun getPublicationEnabled ()Lorg/gradle/api/provider/Property;
 	public abstract fun getRuntimeClasspath ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public abstract fun getWorkerDebugEnabled ()Lorg/gradle/api/provider/Property;
+	public abstract fun getWorkerIsolation ()Lorg/gradle/api/provider/Property;
 	public abstract fun getWorkerJvmArgs ()Lorg/gradle/api/provider/ListProperty;
 	public abstract fun getWorkerLogFile ()Lorg/gradle/api/file/RegularFileProperty;
 	public abstract fun getWorkerMaxHeapSize ()Lorg/gradle/api/provider/Property;
@@ -385,5 +391,21 @@ public abstract class dev/adamko/dokkatoo/tasks/LogHtmlPublicationLinkTask : dev
 }
 
 public final class dev/adamko/dokkatoo/tasks/LogHtmlPublicationLinkTask$Companion {
+}
+
+public abstract interface class dev/adamko/dokkatoo/workers/ClassLoaderIsolation : dev/adamko/dokkatoo/workers/WorkerIsolation {
+}
+
+public abstract interface class dev/adamko/dokkatoo/workers/ProcessIsolation : dev/adamko/dokkatoo/workers/WorkerIsolation {
+	public abstract fun getDebug ()Lorg/gradle/api/provider/Property;
+	public abstract fun getDefaultCharacterEncoding ()Lorg/gradle/api/provider/Property;
+	public abstract fun getEnableAssertions ()Lorg/gradle/api/provider/Property;
+	public abstract fun getJvmArgs ()Lorg/gradle/api/provider/ListProperty;
+	public abstract fun getMaxHeapSize ()Lorg/gradle/api/provider/Property;
+	public abstract fun getMinHeapSize ()Lorg/gradle/api/provider/Property;
+	public abstract fun getSystemProperties ()Lorg/gradle/api/provider/MapProperty;
+}
+
+public abstract interface class dev/adamko/dokkatoo/workers/WorkerIsolation {
 }
 

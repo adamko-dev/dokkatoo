@@ -5,13 +5,13 @@ on:
   workflow_dispatch:
     inputs:
       checkout-ref:
-        description: "The repository reference to checkout"
+        description: "The branch, tag or SHA to checkout. See actions/checkout 'ref'."
         required: false
         type: string
   workflow_call:
     inputs:
       checkout-ref:
-        description: "The repository reference to checkout"
+        description: "The branch, tag or SHA to checkout. See actions/checkout 'ref'."
         required: false
         type: string
 
@@ -40,5 +40,44 @@ jobs:
     with:
       runs-on: macos-latest # only macOS supports building all Kotlin targets
       gradle-task: >-
-        publishAllPublicationsToSonatypeReleaseRepository --stacktrace --no-configuration-cache --no-parallel
+        publishAllPublicationsToSonatypeReleaseRepository
+        --stacktrace
+        --no-configuration-cache
+        --no-parallel
+      checkout-ref: ${{ inputs.checkout-ref }}
+
+
+  jetbrains-space:
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      packages: write
+      checks: write
+    uses: ./.github/workflows/run_gradle_task.yml
+    secrets: inherit
+    with:
+      runs-on: macos-latest
+      gradle-task: >-
+        publishAllPublicationsToJetBrainsSpaceRepository
+        --stacktrace
+        --no-configuration-cache
+        --no-parallel
+      checkout-ref: ${{ inputs.checkout-ref }}
+
+
+  adamko-dev:
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      packages: write
+      checks: write
+    uses: ./.github/workflows/run_gradle_task.yml
+    secrets: inherit
+    with:
+      runs-on: macos-latest
+      gradle-task: >-
+        publishAllPublicationsToAdamkoDevRepository
+        --stacktrace
+        --no-configuration-cache
+        --no-parallel
       checkout-ref: ${{ inputs.checkout-ref }}

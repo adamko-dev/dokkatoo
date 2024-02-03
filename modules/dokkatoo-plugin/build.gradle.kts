@@ -1,5 +1,6 @@
 @file:Suppress("UnstableApiUsage") // jvm test suites & test report aggregation are incubating
 
+import buildsrc.tasks.GenerateDokkatooConstants
 import buildsrc.utils.buildDir_
 import buildsrc.utils.skipTestFixturesPublications
 
@@ -16,6 +17,8 @@ plugins {
   `jvm-test-suite`
   `test-report-aggregation`
   buildsrc.conventions.`maven-publish-test`
+
+  buildsrc.conventions.`dokka-source-downloader`
 }
 
 description = "Generates documentation for Kotlin projects (using Dokka)"
@@ -201,39 +204,10 @@ val dokkatooConstantsProperties = objects.mapProperty<String, String>().apply {
   put("DOKKA_VERSION", libs.versions.kotlin.dokka)
 }
 
-val buildConfigFileContents: Provider<TextResource> =
-  dokkatooConstantsProperties.map { constants ->
-
-    val vals = constants.entries
-      .sortedBy { it.key }
-      .joinToString("\n") { (k, v) ->
-        """const val $k = "$v""""
-      }.prependIndent("  ")
-
-    resources.text.fromString(
-      """
-        |package dev.adamko.dokkatoo.internal
-        |
-        |@DokkatooInternalApi
-        |object DokkatooConstants {
-        |$vals
-        |}
-        |
-      """.trimMargin()
-    )
-  }
-
-val generateDokkatooConstants by tasks.registering(Sync::class) {
-  group = project.name
-
-  val buildConfigFileContents = buildConfigFileContents
-
-  from(buildConfigFileContents) {
-    rename { "DokkatooConstants.kt" }
-    into("dev/adamko/dokkatoo/internal/")
-  }
-
-  into(layout.buildDirectory.dir("generated-source/main/kotlin/"))
+val generateDokkatooConstants by tasks.registering(GenerateDokkatooConstants::class) {
+  properties = dokkatooConstantsProperties
+  destinationDir.set(layout.buildDirectory.dir("generated-source/main/kotlin/"))
+  dokkaSource.fileProvider(tasks.prepareDokkaSource.map { it.destinationDir })
 }
 
 kotlin.sourceSets.main {
@@ -252,4 +226,8 @@ dokkatoo {
       remoteUrl("https://github.com/adamko-dev/dokkatoo/tree/main/$relativeProjectPath/src/main/kotlin")
     }
   }
+}
+
+dokkaSourceDownload {
+  dokkaVersion.set(libs.versions.kotlin.dokka)
 }

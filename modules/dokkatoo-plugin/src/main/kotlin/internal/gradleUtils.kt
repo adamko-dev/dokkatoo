@@ -242,12 +242,22 @@ internal fun ObjectFactory.dokkaPluginParametersContainer(): DokkaPluginParamete
 
 
 /**
- * Create a new [Named] [Attribute].
+ * Creates a new attribute of the given name with the given type.
  *
- * [T] is reified so this is nicer to use in Kotlin.
+ * @see Attribute.of
  */
-internal inline fun <reified T : Named> Attribute(name: String): Attribute<T> =
+internal inline fun <reified T> Attribute(
+  name: String
+): Attribute<T> =
   Attribute.of(name, T::class.java)
+
+
+internal val ArtifactTypeAttribute: Attribute<String> = Attribute("artifactType")
+
+
+internal fun AttributeContainer.artifactType(value: String) {
+  attribute(ArtifactTypeAttribute, value)
+}
 
 
 /**

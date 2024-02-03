@@ -14,6 +14,8 @@ import dev.adamko.dokkatoo.dokka.parameters.VisibilityModifier
 import dev.adamko.dokkatoo.internal.*
 import dev.adamko.dokkatoo.tasks.DokkatooGenerateTask
 import dev.adamko.dokkatoo.tasks.DokkatooTask
+import dev.adamko.dokkatoo.workers.ClassLoaderIsolation
+import dev.adamko.dokkatoo.workers.ProcessIsolation
 import dev.adamko.dokkatoo.tasks.TaskNames
 import java.io.File
 import javax.inject.Inject
@@ -83,11 +85,26 @@ constructor(
 
     dokkatooExtension.versions {
       jetbrainsDokka.convention(DokkatooConstants.DOKKA_VERSION)
-      jetbrainsMarkdown.convention("0.3.1")
-      freemarker.convention("2.3.31")
-      kotlinxHtml.convention("0.8.0")
-      kotlinxCoroutines.convention("1.6.4")
+      jetbrainsMarkdown.convention(DokkatooConstants.DOKKA_DEPENDENCY_VERSION_JETBRAINS_MARKDOWN)
+      freemarker.convention(DokkatooConstants.DOKKA_DEPENDENCY_VERSION_FREEMARKER)
+      kotlinxHtml.convention(DokkatooConstants.DOKKA_DEPENDENCY_VERSION_KOTLINX_HTML)
+      kotlinxCoroutines.convention(DokkatooConstants.DOKKA_DEPENDENCY_VERSION_KOTLINX_COROUTINES)
     }
+
+    dokkatooExtension.dokkaGeneratorIsolation.convention(
+      dokkatooExtension.ProcessIsolation {
+        debug.convention(false)
+        jvmArgs.convention(
+          listOf(
+            //"-XX:MaxMetaspaceSize=512m",
+            "-XX:+HeapDumpOnOutOfMemoryError",
+            "-XX:+AlwaysPreTouch", // https://github.com/gradle/gradle/issues/3093#issuecomment-387259298
+            //"-XX:StartFlightRecording=disk=true,name={path.drop(1).map { if (it.isLetterOrDigit()) it else '-' }.joinToString("")},dumponexit=true,duration=30s",
+            //"-XX:FlightRecorderOptions=repository=$baseDir/jfr,stackdepth=512",
+          )
+        )
+      }
+    )
 
     dokkatooExtension.dokkatooSourceSets.configureDefaults(
       sourceSetScopeConvention = dokkatooExtension.sourceSetScopeDefault
@@ -249,18 +266,44 @@ constructor(
 
     target.tasks.withType<DokkatooGenerateTask>().configureEach {
       cacheDirectory.convention(dokkatooExtension.dokkatooCacheDirectory)
-      workerDebugEnabled.convention(false)
       workerLogFile.convention(temporaryDir.resolve("dokka-worker.log"))
-      workerJvmArgs.set(
-        listOf(
-          //"-XX:MaxMetaspaceSize=512m",
-          "-XX:+HeapDumpOnOutOfMemoryError",
-          "-XX:+AlwaysPreTouch", // https://github.com/gradle/gradle/issues/3093#issuecomment-387259298
-          //"-XX:StartFlightRecording=disk=true,name={path.drop(1).map { if (it.isLetterOrDigit()) it else '-' }.joinToString("")},dumponexit=true,duration=30s",
-          //"-XX:FlightRecorderOptions=repository=$baseDir/jfr,stackdepth=512",
-        )
-      )
       dokkaConfigurationJsonFile.convention(temporaryDir.resolve("dokka-configuration.json"))
+
+      workerIsolation.convention(dokkatooExtension.dokkaGeneratorIsolation.map { src ->
+        when (src) {
+          is ClassLoaderIsolation -> src
+          is ProcessIsolation     -> {
+            // Complicated workaround to copy old properties, to maintain backwards compatibility.
+            // Remove when the deprecated task properties are deleted.
+            dokkatooExtension.ProcessIsolation {
+              @Suppress("DEPRECATION")
+              run {
+                debug.convention(workerDebugEnabled.orElse(src.debug))
+                enableAssertions.convention(src.enableAssertions)
+                minHeapSize.convention(workerMinHeapSize.orElse(src.minHeapSize))
+                maxHeapSize.convention(workerMaxHeapSize.orElse(src.maxHeapSize))
+                jvmArgs.convention(workerJvmArgs.orElse(src.jvmArgs))
+                defaultCharacterEncoding.convention(src.defaultCharacterEncoding)
+                systemProperties.convention(src.systemProperties)
+              }
+            }
+          }
+        }
+      })
+
+      publicationEnabled.convention(true)
+      onlyIf("publication must be enabled") { publicationEnabled.getOrElse(true) }
+
+      generator.dokkaSourceSets.addAllLater(
+        providers.provider {
+          // exclude suppressed source sets as early as possible, to avoid unnecessary dependency resolution
+          dokkatooExtension.dokkatooSourceSets.filterNot { it.suppress.get() }
+        }
+      )
+
+      generator.dokkaSourceSets.configureDefaults(
+        sourceSetScopeConvention = dokkatooExtension.sourceSetScopeDefault
+      )
     }
 
     target.tasks.withType<DokkatooGenerateTask>().configureEach {

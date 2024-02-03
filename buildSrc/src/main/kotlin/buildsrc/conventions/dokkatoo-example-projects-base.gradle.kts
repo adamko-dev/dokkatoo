@@ -1,7 +1,8 @@
 package buildsrc.conventions
 
-import buildsrc.utils.asConsumer
-import buildsrc.utils.asProvider
+import buildsrc.utils.consumable
+import buildsrc.utils.declarable
+import buildsrc.utils.resolvable
 
 plugins {
   id("buildsrc.conventions.base")
@@ -16,12 +17,19 @@ dependencies.attributesSchema {
 }
 
 
-val exampleProjects by configurations.registering {
-  asConsumer()
+val exampleProjects: Configuration by configurations.creating {
+  declarable()
   attributes { attribute(exampleProjectsAttribute, "dokka") }
 }
 
-val exampleProjectsElements by configurations.registering {
-  asProvider()
+val exampleProjectsResolvable: Configuration by configurations.creating {
+  resolvable()
+  extendsFrom(exampleProjects)
+  attributes { attribute(exampleProjectsAttribute, "dokka") }
+}
+
+val exampleProjectsConsumable: Configuration by configurations.creating {
+  consumable()
+  extendsFrom(exampleProjects)
   attributes { attribute(exampleProjectsAttribute, "dokka") }
 }
