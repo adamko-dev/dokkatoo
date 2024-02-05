@@ -6,9 +6,13 @@ import dev.adamko.dokkatoo.dokka.plugins.DokkaVersioningPluginParameters
 import dev.adamko.dokkatoo.dokka.plugins.DokkaVersioningPluginParameters.Companion.DOKKA_VERSIONING_PLUGIN_PARAMETERS_NAME
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import dev.adamko.dokkatoo.internal.uppercaseFirstChar
+import dev.adamko.dokkatoo.tasks.DokkatooGeneratePublicationTask
 import dev.adamko.dokkatoo.tasks.LogHtmlPublicationLinkTask
+import org.gradle.api.Action
+import org.gradle.api.Task
 import org.gradle.api.artifacts.component.ProjectComponentIdentifier
 import org.gradle.api.logging.Logging
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.*
 
@@ -20,31 +24,9 @@ constructor() : DokkatooFormatPlugin(formatName = "html") {
     registerDokkaBasePluginConfiguration()
     registerDokkaVersioningPlugin()
 
-    val logHtmlUrlTask = registerLogHtmlUrlTask()
+    configureHtmlUrlLogging()
 
-    dokkatooTasks.generatePublication.configure {
-      finalizedBy(logHtmlUrlTask)
-    }
-
-    //region automatically depend on all-modules-page-plugin if aggregating multiple projects
-    val dokkatooIsAggregatingSubprojects = formatDependencies.incoming.map { dokkatoo ->
-      dokkatoo.incoming.artifacts.artifacts.any { artifact ->
-        logger.info("${dokkatoo.name} depends on ${artifact.id}, project:${artifact.id.componentIdentifier is ProjectComponentIdentifier}")
-        artifact.id.componentIdentifier is ProjectComponentIdentifier
-      }
-    }
-
-    formatDependencies.dokkaPluginsClasspath.configure {
-      dependencies.addAllLater(dokkatooIsAggregatingSubprojects.map { aggregating ->
-        buildList {
-          if (aggregating) {
-            logger.info("Automatically adding dependency on all-modules-page-plugin")
-            add("org.jetbrains.dokka:all-modules-page-plugin")
-          }
-        }.map { project.dependencies.create(it) }
-      })
-    }
-    //endregion
+    configureModuleAggregation()
   }
 
   private fun DokkatooFormatPluginContext.registerDokkaBasePluginConfiguration() {
@@ -72,6 +54,14 @@ constructor() : DokkatooFormatPlugin(formatName = "html") {
     }
   }
 
+  private fun DokkatooFormatPluginContext.configureHtmlUrlLogging() {
+    val logHtmlUrlTask = registerLogHtmlUrlTask()
+
+    dokkatooTasks.generatePublication.configure {
+      finalizedBy(logHtmlUrlTask)
+    }
+  }
+
   private fun DokkatooFormatPluginContext.registerLogHtmlUrlTask():
       TaskProvider<LogHtmlPublicationLinkTask> {
 
@@ -93,6 +83,73 @@ constructor() : DokkatooFormatPlugin(formatName = "html") {
       // https://www.jetbrains.com/help/idea/settings-debugger.html#24aabda8
       serverUri.convention("http://localhost:63342")
       this.indexHtmlPath.convention(indexHtmlPath)
+    }
+  }
+
+  /**
+   * - Automatically depend on `all-modules-page-plugin` if aggregating multiple projects.
+   * - Add a check that logs a warning if `all-modules-page-plugin` is not defined.
+   */
+  private fun DokkatooFormatPluginContext.configureModuleAggregation() {
+
+    val dokkatooIsAggregatingSubprojects: Provider<Boolean> =
+      formatDependencies.incoming.map { dokkatoo ->
+        dokkatoo.incoming.artifacts.artifacts.any { artifact ->
+          logger.info("${dokkatoo.name} depends on ${artifact.id}, project:${artifact.id.componentIdentifier is ProjectComponentIdentifier}")
+          artifact.id.componentIdentifier is ProjectComponentIdentifier
+        }
+      }
+
+    formatDependencies.dokkaPluginsClasspath.configure {
+      dependencies.addAllLater(dokkatooIsAggregatingSubprojects.map { aggregating ->
+        buildList {
+          if (aggregating) {
+            logger.info("Automatically adding dependency on all-modules-page-plugin")
+            add("org.jetbrains.dokka:all-modules-page-plugin")
+          }
+        }.map { project.dependencies.create(it) }
+      })
+    }
+
+    dokkatooTasks.generatePublication.configure {
+      doFirst("check module aggregation has all-modules-page-plugin", ModuleAggregationCheck)
+    }
+  }
+
+  /**
+   * Log a warning if the publication has 1+ modules but `all-modules-page-plugin` is not present,
+   * because otherwise Dokka happily runs and produces no output, which is baffling and unhelpful.
+   */
+  private object ModuleAggregationCheck : Action<Task> {
+    override fun execute(task: Task) {
+      require(task is DokkatooGeneratePublicationTask) {
+        "[DokkatooHtmlPlugin] ModuleAggregationCheck expected DokkatooGeneratePublicationTask but got ${task::class}"
+      }
+
+      val modulesCount = task.generator.moduleOutputDirectories.count()
+
+      if (modulesCount > 0) {
+        val moduleAggregationPluginInClasspath =
+          task.generator.pluginsClasspath.any { "all-modules-page-plugin" in it.name }
+        if (!moduleAggregationPluginInClasspath) {
+          val moduleName = task.generator.moduleName.get()
+
+          logger.error(
+            /* language=text */ """
+              |[${task.path}] org.jetbrains.dokka:all-modules-page-plugin is missing
+              |
+              |Publication '$moduleName' in has $modulesCount modules, but plugins classpath does not contain 
+              |org.jetbrains.dokka:all-modules-page-plugin, which is required for aggregating HTML modules.
+              |
+              |all-modules-page-plugin should be added automatically.
+              |
+              | - verify that the dependency has not been excluded
+              | - raise an issue https://github.com/adamko-dev/dokkatoo/issues
+              |
+            """.trimMargin()
+          )
+        }
+      }
     }
   }
 

@@ -19,3 +19,12 @@ fun String.sortLines(separator: String = "\n") =
   lines()
     .sorted()
     .joinToString(separator)
+
+
+/** Replace characters that don't match [isLetterOrDigit] with [replacement]. */
+internal fun String.replaceNonAlphaNumeric(
+  replacement: String = "-"
+): String =
+  asIterable().joinToString("") { c ->
+    if (c.isLetterOrDigit()) "$c" else replacement
+  }
