@@ -89,14 +89,29 @@ public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaGeneratorParamet
 	public abstract fun getFailOnWarning ()Lorg/gradle/api/provider/Property;
 	public abstract fun getFinalizeCoroutines ()Lorg/gradle/api/provider/Property;
 	public abstract fun getIncludes ()Lorg/gradle/api/file/ConfigurableFileCollection;
-	public abstract fun getModuleDescriptors ()Lorg/gradle/api/NamedDomainObjectContainer;
 	public abstract fun getModuleName ()Lorg/gradle/api/provider/Property;
+	public abstract fun getModuleOutputDirectories ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public abstract fun getModuleVersion ()Lorg/gradle/api/provider/Property;
 	public abstract fun getOfflineMode ()Lorg/gradle/api/provider/Property;
 	public abstract fun getPluginsClasspath ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public final fun getPluginsConfiguration ()Lorg/gradle/api/ExtensiblePolymorphicDomainObjectContainer;
 	public abstract fun getSuppressInheritedMembers ()Lorg/gradle/api/provider/Property;
 	public abstract fun getSuppressObviousFunctions ()Lorg/gradle/api/provider/Property;
+}
+
+public final class dev/adamko/dokkatoo/dokka/parameters/DokkaModuleDescriptionKxs$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Ldev/adamko/dokkatoo/dokka/parameters/DokkaModuleDescriptionKxs$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ldev/adamko/dokkatoo/dokka/parameters/DokkaModuleDescriptionKxs;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Ldev/adamko/dokkatoo/dokka/parameters/DokkaModuleDescriptionKxs;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class dev/adamko/dokkatoo/dokka/parameters/DokkaModuleDescriptionKxs$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaPackageOptionsSpec : dev/adamko/dokkatoo/dokka/parameters/HasConfigurableVisibilityModifiers, java/io/Serializable {
@@ -318,11 +333,6 @@ public abstract class dev/adamko/dokkatoo/formats/DokkatooFormatPlugin : org/gra
 public final class dev/adamko/dokkatoo/formats/DokkatooFormatPlugin$Companion {
 }
 
-public final class dev/adamko/dokkatoo/formats/DokkatooFormatTasks$inlined$sam$i$org_gradle_api_Action$0 : org/gradle/api/Action {
-	public fun <init> (Lkotlin/jvm/functions/Function1;)V
-	public final synthetic fun execute (Ljava/lang/Object;)V
-}
-
 public abstract class dev/adamko/dokkatoo/formats/DokkatooGfmPlugin : dev/adamko/dokkatoo/formats/DokkatooFormatPlugin {
 	public fun configure (Ldev/adamko/dokkatoo/formats/DokkatooFormatPlugin$DokkatooFormatPluginContext;)V
 }
@@ -348,11 +358,19 @@ public abstract class dev/adamko/dokkatoo/formats/DokkatooJekyllPlugin : dev/ada
 public abstract interface annotation class dev/adamko/dokkatoo/internal/DokkatooInternalApi : java/lang/annotation/Annotation {
 }
 
+public abstract class dev/adamko/dokkatoo/tasks/DokkatooGenerateModuleTask : dev/adamko/dokkatoo/tasks/DokkatooGenerateTask {
+	public abstract fun getModulePath ()Lorg/gradle/api/provider/Property;
+	public abstract fun getOutputDirectory ()Lorg/gradle/api/file/DirectoryProperty;
+}
+
+public abstract class dev/adamko/dokkatoo/tasks/DokkatooGeneratePublicationTask : dev/adamko/dokkatoo/tasks/DokkatooGenerateTask {
+	public abstract fun getOutputDirectory ()Lorg/gradle/api/file/DirectoryProperty;
+}
+
 public abstract class dev/adamko/dokkatoo/tasks/DokkatooGenerateTask : dev/adamko/dokkatoo/tasks/DokkatooTask {
 	public abstract fun getCacheDirectory ()Lorg/gradle/api/file/DirectoryProperty;
 	public abstract fun getGenerationType ()Lorg/gradle/api/provider/Property;
 	public final fun getGenerator ()Ldev/adamko/dokkatoo/dokka/parameters/DokkaGeneratorParametersSpec;
-	public abstract fun getOutputDirectory ()Lorg/gradle/api/file/DirectoryProperty;
 	public abstract fun getPublicationEnabled ()Lorg/gradle/api/provider/Property;
 	public abstract fun getRuntimeClasspath ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public abstract fun getWorkerDebugEnabled ()Lorg/gradle/api/provider/Property;
@@ -371,9 +389,8 @@ public final class dev/adamko/dokkatoo/tasks/DokkatooGenerateTask$GenerationType
 }
 
 public abstract class dev/adamko/dokkatoo/tasks/DokkatooPrepareModuleDescriptorTask : dev/adamko/dokkatoo/tasks/DokkatooTask {
-	public abstract fun getDokkaModuleDescriptorJson ()Lorg/gradle/api/file/RegularFileProperty;
-	public abstract fun getIncludes ()Lorg/gradle/api/file/ConfigurableFileCollection;
-	public abstract fun getModuleDirectory ()Lorg/gradle/api/file/DirectoryProperty;
+	public final fun getDokkaModuleDescriptorJson ()Lorg/gradle/api/file/RegularFileProperty;
+	public abstract fun getModuleDescriptor ()Lorg/gradle/api/file/RegularFileProperty;
 	public abstract fun getModuleName ()Lorg/gradle/api/provider/Property;
 	public abstract fun getModulePath ()Lorg/gradle/api/provider/Property;
 }

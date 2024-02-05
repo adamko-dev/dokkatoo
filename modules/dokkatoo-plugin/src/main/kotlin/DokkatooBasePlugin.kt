@@ -1,22 +1,22 @@
 package dev.adamko.dokkatoo
 
+//import dev.adamko.dokkatoo.dependencies.DokkatooAttribute.Companion.DokkatooModuleNameAttribute
+//import dev.adamko.dokkatoo.dependencies.DokkatooAttribute.Companion.DokkatooModulePathAttribute
 import dev.adamko.dokkatoo.dependencies.BaseDependencyManager
 import dev.adamko.dokkatoo.dependencies.DependencyContainerNames
 import dev.adamko.dokkatoo.dependencies.DokkatooAttribute.Companion.DokkatooClasspathAttribute
 import dev.adamko.dokkatoo.dependencies.DokkatooAttribute.Companion.DokkatooFormatAttribute
 import dev.adamko.dokkatoo.dependencies.DokkatooAttribute.Companion.DokkatooModuleComponentAttribute
-import dev.adamko.dokkatoo.dependencies.DokkatooAttribute.Companion.DokkatooModuleGenerateTaskPathAttribute
-import dev.adamko.dokkatoo.dependencies.DokkatooAttribute.Companion.DokkatooModuleNameAttribute
-import dev.adamko.dokkatoo.dependencies.DokkatooAttribute.Companion.DokkatooModulePathAttribute
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec
 import dev.adamko.dokkatoo.dokka.parameters.KotlinPlatform
 import dev.adamko.dokkatoo.dokka.parameters.VisibilityModifier
 import dev.adamko.dokkatoo.internal.*
+import dev.adamko.dokkatoo.tasks.DokkatooGenerateModuleTask
 import dev.adamko.dokkatoo.tasks.DokkatooGenerateTask
 import dev.adamko.dokkatoo.tasks.DokkatooTask
+import dev.adamko.dokkatoo.tasks.TaskNames
 import dev.adamko.dokkatoo.workers.ClassLoaderIsolation
 import dev.adamko.dokkatoo.workers.ProcessIsolation
-import dev.adamko.dokkatoo.tasks.TaskNames
 import java.io.File
 import javax.inject.Inject
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -53,7 +53,10 @@ constructor(
 
     val dokkatooExtension = createExtension(target)
 
-    createBaseDependencyManager(target, dokkatooExtension)
+    createBaseDependencyManager(
+      target,
+//      dokkatooExtension
+    )
 
     configureDependencyAttributes(target)
 
@@ -116,12 +119,12 @@ constructor(
 
   private fun createBaseDependencyManager(
     target: Project,
-    dokkatooExtension: DokkatooExtension,
+//    dokkatooExtension: DokkatooExtension,
   ) {
     val baseDependencyManager = BaseDependencyManager(
       project = target,
-      moduleName = dokkatooExtension.moduleName,
-      modulePath = dokkatooExtension.modulePath,
+//      moduleName = dokkatooExtension.moduleName,
+//      modulePath = dokkatooExtension.modulePath,
       objects = objects,
     )
     target.extensions.adding(
@@ -134,9 +137,8 @@ constructor(
   private fun configureDependencyAttributes(target: Project) {
     target.dependencies.attributesSchema {
       attribute(DokkatooFormatAttribute)
-      attribute(DokkatooModuleNameAttribute)
-      attribute(DokkatooModulePathAttribute)
-      attribute(DokkatooModuleGenerateTaskPathAttribute)
+//      attribute(DokkatooModuleNameAttribute)
+//      attribute(DokkatooModulePathAttribute)
       attribute(DokkatooModuleComponentAttribute)
       attribute(DokkatooClasspathAttribute)
     }
@@ -176,7 +178,7 @@ constructor(
             // Multiplatform source sets (e.g. commonMain, jvmMain, macosMain)
             name.endsWith("Main") -> name.substringBeforeLast("Main")
 
-            // indeterminate source sets should be named by the Kotlin platform
+            // indeterminate source sets should use the name of the Kotlin platform
             else                  -> platform.displayName
           }
         }
@@ -264,6 +266,11 @@ constructor(
       dependsOn(target.tasks.withType<DokkatooGenerateTask>())
     }
 
+//    target.tasks.withType<DokkatooPrepareModuleDescriptorTask>().configureEach {
+//      moduleName.convention(dokkatooExtension.moduleName)
+//      modulePath.convention(dokkatooExtension.modulePath)
+//    }
+
     target.tasks.withType<DokkatooGenerateTask>().configureEach {
       cacheDirectory.convention(dokkatooExtension.dokkatooCacheDirectory)
       workerLogFile.convention(temporaryDir.resolve("dokka-worker.log"))
@@ -306,21 +313,8 @@ constructor(
       )
     }
 
-    target.tasks.withType<DokkatooGenerateTask>().configureEach {
-
-      publicationEnabled.convention(true)
-      onlyIf("publication must be enabled") { publicationEnabled.getOrElse(true) }
-
-      generator.dokkaSourceSets.addAllLater(
-        providers.provider {
-          // exclude suppressed source sets as early as possible, to avoid unnecessary dependency resolution
-          dokkatooExtension.dokkatooSourceSets.matching { !it.suppress.get() }
-        }
-      )
-
-      generator.dokkaSourceSets.configureDefaults(
-        sourceSetScopeConvention = dokkatooExtension.sourceSetScopeDefault
-      )
+    target.tasks.withType<DokkatooGenerateModuleTask>().configureEach {
+      modulePath.convention(dokkatooExtension.modulePath)
     }
   }
 
@@ -332,6 +326,7 @@ constructor(
   private fun RegularFileProperty.convention(file: Provider<File>): RegularFileProperty =
     convention(objects.fileProperty().fileProvider(file))
   //endregion
+
 
   companion object {
     const val EXTENSION_NAME = "dokkatoo"

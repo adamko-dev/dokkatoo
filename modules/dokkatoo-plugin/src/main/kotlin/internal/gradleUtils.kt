@@ -95,12 +95,12 @@ private fun Configuration.canBeDeclared(value: Boolean) {
 
 
 /** Shortcut for [GradleVersion.current] */
-private val CurrentGradleVersion: GradleVersion
+internal val CurrentGradleVersion: GradleVersion
   get() = GradleVersion.current()
 
 
 /** Compare a [GradleVersion] to a [version]. */
-private operator fun GradleVersion.compareTo(version: String): Int =
+internal operator fun GradleVersion.compareTo(version: String): Int =
   compareTo(GradleVersion.version(version))
 
 
@@ -274,3 +274,7 @@ internal fun AttributeContainer.toMap(): Map<Attribute<*>, Any?> =
  */
 internal operator fun <T : Any> AttributeContainer.get(key: Attribute<T>): T? =
   getAttribute(key)
+
+
+internal infix fun <T> Attribute<T>?.eq(other: Attribute<T>) =
+  this?.name == other.name

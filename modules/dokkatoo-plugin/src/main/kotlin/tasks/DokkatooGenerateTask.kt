@@ -9,7 +9,7 @@ import dev.adamko.dokkatoo.workers.ClassLoaderIsolation
 import dev.adamko.dokkatoo.workers.DokkaGeneratorWorker
 import dev.adamko.dokkatoo.workers.ProcessIsolation
 import dev.adamko.dokkatoo.workers.WorkerIsolation
-import java.io.IOException
+import java.io.File
 import javax.inject.Inject
 import kotlinx.serialization.json.JsonElement
 import org.gradle.api.file.ConfigurableFileCollection
@@ -44,9 +44,6 @@ constructor(
   pluginsConfiguration: DokkaPluginParametersContainer,
 ) : DokkatooTask() {
 
-  @get:OutputDirectory
-  abstract val outputDirectory: DirectoryProperty
-
   /**
    * Classpath required to run Dokka Generator.
    *
@@ -57,14 +54,6 @@ constructor(
 
   @get:LocalState
   abstract val cacheDirectory: DirectoryProperty
-
-  /**
-   * Generating a Dokka Module? Set this to [GenerationType.MODULE].
-   *
-   * Generating a Dokka Publication? [GenerationType.PUBLICATION].
-   */
-  @get:Input
-  abstract val generationType: Property<GenerationType>
 
   /** @see dev.adamko.dokkatoo.dokka.DokkaPublication.enabled */
   @get:Input
@@ -95,14 +84,24 @@ constructor(
   @get:Internal
   abstract val dokkaConfigurationJsonFile: RegularFileProperty
 
+  @DokkatooInternalApi
+  enum class GeneratorMode {
+    Module,
+    Publication,
+  }
+
+  @Deprecated("Removed - Module and Publication generation has been moved to specific subtasks")
   enum class GenerationType {
     MODULE,
     PUBLICATION,
   }
 
-  @TaskAction
-  internal fun generateDocumentation() {
-    val dokkaConfiguration = createDokkaConfiguration()
+  @DokkatooInternalApi
+  protected fun generateDocumentation(
+    generationType: GeneratorMode,
+    outputDirectory: File,
+  ) {
+    val dokkaConfiguration = createDokkaConfiguration(generationType, outputDirectory)
     logger.info("dokkaConfiguration: $dokkaConfiguration")
     dumpDokkaConfigurationJson(dokkaConfiguration)
 
@@ -157,23 +156,28 @@ constructor(
     logger.info("[$path] Dokka Generator configuration JSON: ${destFile.toURI()}")
   }
 
-  private fun createDokkaConfiguration(): DokkaConfiguration {
-    val outputDirectory = outputDirectory.get().asFile
+  private fun createDokkaConfiguration(
+    generationType: GeneratorMode,
+    outputDirectory: File,
+  ): DokkaConfiguration {
 
-    val delayTemplateSubstitution = when (generationType.orNull) {
-      GenerationType.MODULE      -> true
-      GenerationType.PUBLICATION -> false
-      null                       -> error("missing GenerationType")
+    val delayTemplateSubstitution = when (generationType) {
+      GeneratorMode.Module      -> true
+      GeneratorMode.Publication -> false
     }
+
+    val moduleOutputDirectories = generator.moduleOutputDirectories.toList()
+    logger.lifecycle("[$path] got ${moduleOutputDirectories.size} moduleOutputDirectories: $moduleOutputDirectories")
 
     return DokkaParametersBuilder.build(
       spec = generator,
       delayTemplateSubstitution = delayTemplateSubstitution,
       outputDirectory = outputDirectory,
-      moduleDescriptors = generator.moduleDescriptors,
+      moduleDescriptorDirs = moduleOutputDirectories,
       cacheDirectory = cacheDirectory.asFile.orNull,
     )
   }
+
 
   //region Deprecated Properties
   /**
@@ -262,5 +266,15 @@ constructor(
   @get:Internal
   @Deprecated("Please move worker options to `DokkatooExtension.dokkaGeneratorIsolation`. Worker options were moved to allow for configuring worker isolation")
   abstract val workerJvmArgs: ListProperty<String>
+
+
+  /**
+   * Generating a Dokka Module? Set this to [GenerationType.MODULE].
+   *
+   * Generating a Dokka Publication? [GenerationType.PUBLICATION].
+   */
+  @get:Internal
+  @Deprecated("Created specific Module/Publication subclasses")
+  abstract val generationType: Property<GenerationType>
   //endregion
 }

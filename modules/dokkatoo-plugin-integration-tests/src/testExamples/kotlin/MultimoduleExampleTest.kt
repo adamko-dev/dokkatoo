@@ -100,7 +100,7 @@ class MultimoduleExampleTest : FunSpec({
         )
         .forwardOutput()
         .build {
-          test("expect build is successful") {
+          test("expect first build is successful") {
             output shouldContain "BUILD SUCCESSFUL"
           }
 
@@ -126,7 +126,7 @@ class MultimoduleExampleTest : FunSpec({
         )
         .forwardOutput()
         .build {
-          test("expect build is successful") {
+          test("expect second build is successful") {
             output shouldContain "BUILD SUCCESSFUL"
           }
 

@@ -14,12 +14,8 @@ import org.gradle.kotlin.dsl.*
 @DokkatooInternalApi
 class BaseAttributes(
   objects: ObjectFactory,
-  moduleName: Provider<String>,
-  modulePath: Provider<String>,
 ) {
   val dokkatooUsage: Usage = objects.named("dev.adamko.dokkatoo")
-  val moduleName: Provider<DokkatooAttribute.ModuleName> = moduleName.map { objects.named(it) }
-  val modulePath: Provider<DokkatooAttribute.ModulePath> = modulePath.map { objects.named(it) }
   val dokkaPlugins: DokkatooAttribute.Classpath = objects.named("dokka-plugins")
   val dokkaGenerator: DokkatooAttribute.Classpath = objects.named("dokka-generator")
 }
@@ -32,6 +28,5 @@ class FormatAttributes(
   objects: ObjectFactory,
 ) {
   val format: DokkatooAttribute.Format = objects.named(formatName)
-  val moduleDirectory: DokkatooAttribute.ModuleComponent = objects.named("ModuleDirectory")
-  val moduleIncludes: DokkatooAttribute.ModuleComponent = objects.named("ModuleIncludes")
+  val moduleOutputDirectories: DokkatooAttribute.ModuleComponent = objects.named("ModuleOutputDirectories")
 }
