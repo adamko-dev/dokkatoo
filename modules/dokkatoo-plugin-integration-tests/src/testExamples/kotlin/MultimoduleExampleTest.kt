@@ -100,7 +100,7 @@ class MultimoduleExampleTest : FunSpec({
         )
         .forwardOutput()
         .build {
-          test("expect build is successful") {
+          test("expect first build is successful") {
             output shouldContain "BUILD SUCCESSFUL"
           }
 
@@ -126,7 +126,7 @@ class MultimoduleExampleTest : FunSpec({
         )
         .forwardOutput()
         .build {
-          test("expect build is successful") {
+          test("expect second build is successful") {
             output shouldContain "BUILD SUCCESSFUL"
           }
 
@@ -136,7 +136,7 @@ class MultimoduleExampleTest : FunSpec({
             nonLoggingTasks.shouldForAll {
               it shouldHaveOutcome UP_TO_DATE
             }
-            tasks.shouldHaveSize(6)
+            tasks.shouldHaveSize(4)
           }
 
           test("expect Dokka Generator is not triggered") {

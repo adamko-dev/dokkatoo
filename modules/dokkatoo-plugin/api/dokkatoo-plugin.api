@@ -1,5 +1,6 @@
 public abstract class dev/adamko/dokkatoo/DokkatooBasePlugin : org/gradle/api/Plugin {
 	public static final field Companion Ldev/adamko/dokkatoo/DokkatooBasePlugin$Companion;
+	public static final field DOKKATOO_CONFIGURATION_NAME Ljava/lang/String;
 	public static final field EXTENSION_NAME Ljava/lang/String;
 	public static final field TASK_GROUP Ljava/lang/String;
 	public synthetic fun apply (Ljava/lang/Object;)V
@@ -7,8 +8,8 @@ public abstract class dev/adamko/dokkatoo/DokkatooBasePlugin : org/gradle/api/Pl
 }
 
 public final class dev/adamko/dokkatoo/DokkatooBasePlugin$Companion {
-	public final fun getDependencyContainerNames ()Ldev/adamko/dokkatoo/DokkatooBasePlugin$DependencyContainerNames;
-	public final fun getTaskNames ()Ldev/adamko/dokkatoo/DokkatooBasePlugin$TaskNames;
+	public final fun getDependencyContainerNames ()Ldev/adamko/dokkatoo/dependencies/DependencyContainerNames;
+	public final fun getTaskNames ()Ldev/adamko/dokkatoo/tasks/TaskNames;
 }
 
 public final class dev/adamko/dokkatoo/DokkatooBasePlugin$inlined$sam$i$org_gradle_api_Action$0 : org/gradle/api/Action {
@@ -89,6 +90,7 @@ public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaGeneratorParamet
 	public abstract fun getFinalizeCoroutines ()Lorg/gradle/api/provider/Property;
 	public abstract fun getIncludes ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public abstract fun getModuleName ()Lorg/gradle/api/provider/Property;
+	public abstract fun getModuleOutputDirectories ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public abstract fun getModuleVersion ()Lorg/gradle/api/provider/Property;
 	public abstract fun getOfflineMode ()Lorg/gradle/api/provider/Property;
 	public abstract fun getPluginsClasspath ()Lorg/gradle/api/file/ConfigurableFileCollection;
@@ -359,6 +361,13 @@ public abstract class dev/adamko/dokkatoo/formats/DokkatooJekyllPlugin : dev/ada
 }
 
 public abstract interface annotation class dev/adamko/dokkatoo/internal/DokkatooInternalApi : java/lang/annotation/Annotation {
+}
+
+public abstract class dev/adamko/dokkatoo/tasks/DokkatooGenerateModuleTask : dev/adamko/dokkatoo/tasks/DokkatooGenerateTask {
+	public abstract fun getModulePath ()Lorg/gradle/api/provider/Property;
+}
+
+public abstract class dev/adamko/dokkatoo/tasks/DokkatooGeneratePublicationTask : dev/adamko/dokkatoo/tasks/DokkatooGenerateTask {
 }
 
 public abstract class dev/adamko/dokkatoo/tasks/DokkatooGenerateTask : dev/adamko/dokkatoo/tasks/DokkatooTask {

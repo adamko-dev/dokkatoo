@@ -17,6 +17,29 @@ import org.gradle.api.provider.Provider
 import org.gradle.api.specs.Spec
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.*
+import org.gradle.util.GradleVersion
+
+
+/**
+ * Mark this [Configuration] as one that should be used to declare dependencies in
+ * [Project.dependencies] block.
+ *
+ * Declarable Configurations should be extended by [resolvable] and [consumable] Configurations.
+ *
+ * ```
+ * isCanBeResolved = false
+ * isCanBeConsumed = false
+ * isCanBeDeclared = true
+ * ```
+ */
+internal fun Configuration.declarable(
+  visible: Boolean = false,
+) {
+  isCanBeResolved = false
+  isCanBeConsumed = false
+  canBeDeclared(true)
+  isVisible = visible
+}
 
 
 /**
@@ -25,15 +48,18 @@ import org.gradle.kotlin.dsl.*
  * ```
  * isCanBeResolved = false
  * isCanBeConsumed = true
+ * isCanBeDeclared = false
  * ```
  */
-internal fun Configuration.asProvider(
+internal fun Configuration.consumable(
   visible: Boolean = true,
 ) {
   isCanBeResolved = false
   isCanBeConsumed = true
+  canBeDeclared(false)
   isVisible = visible
 }
+
 
 /**
  * Mark this [Configuration] as one that will consume artifacts from other subprojects (also known as 'resolving')
@@ -41,19 +67,41 @@ internal fun Configuration.asProvider(
  * ```
  * isCanBeResolved = true
  * isCanBeConsumed = false
+ * isCanBeDeclared = false
  * ```
- * */
-internal fun Configuration.asConsumer(
+ */
+internal fun Configuration.resolvable(
   visible: Boolean = false,
 ) {
   isCanBeResolved = true
   isCanBeConsumed = false
+  canBeDeclared(false)
   isVisible = visible
 }
 
 
-/** Invert a boolean [Provider] */
-internal operator fun Provider<Boolean>.not(): Provider<Boolean> = map { !it }
+/**
+ * Enable/disable [Configuration.isCanBeDeclared] only if it is supported by the
+ * [CurrentGradleVersion]
+ *
+ * This function should be removed when the minimal supported Gradle version is 8.2.
+ */
+private fun Configuration.canBeDeclared(value: Boolean) {
+  if (CurrentGradleVersion >= "8.2") {
+    @Suppress("UnstableApiUsage")
+    isCanBeDeclared = value
+  }
+}
+
+
+/** Shortcut for [GradleVersion.current] */
+internal val CurrentGradleVersion: GradleVersion
+  get() = GradleVersion.current()
+
+
+/** Compare a [GradleVersion] to a [version]. */
+internal operator fun GradleVersion.compareTo(version: String): Int =
+  compareTo(GradleVersion.version(version))
 
 
 /** Only matches components that come from subprojects */
@@ -61,6 +109,10 @@ internal object LocalProjectOnlyFilter : Spec<ComponentIdentifier> {
   override fun isSatisfiedBy(element: ComponentIdentifier?): Boolean =
     element is ProjectComponentIdentifier
 }
+
+
+/** Invert a boolean [Provider] */
+internal operator fun Provider<Boolean>.not(): Provider<Boolean> = map { !it }
 
 
 /** Invert the result of a [Spec] predicate */
@@ -206,3 +258,23 @@ internal val ArtifactTypeAttribute: Attribute<String> = Attribute("artifactType"
 internal fun AttributeContainer.artifactType(value: String) {
   attribute(ArtifactTypeAttribute, value)
 }
+
+
+/**
+ * Get all [Attribute]s as a [Map] (helpful for debug printing)
+ */
+internal fun AttributeContainer.toMap(): Map<Attribute<*>, Any?> =
+  keySet().associateWith { getAttribute(it) }
+
+
+/**
+ * Get an [Attribute] from an [AttributeContainer].
+ *
+ * (Nicer Kotlin accessor function).
+ */
+internal operator fun <T : Any> AttributeContainer.get(key: Attribute<T>): T? =
+  getAttribute(key)
+
+
+internal infix fun <T> Attribute<T>?.eq(other: Attribute<T>) =
+  this?.name == other.name

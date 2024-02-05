@@ -29,9 +29,15 @@ constructor(
   /** Directory into which [DokkaPublication]s will be produced */
   abstract val dokkatooPublicationDirectory: DirectoryProperty
 
-  /** Directory into which Dokka Modules will be produced */
+  /**
+   * Directory into which Dokka Modules will be produced.
+   *
+   * Note that Dokka Modules are intermediate products and must be combined into a completed
+   * Dokka Publication. They are not intended to be comprehensible in isolation.
+   */
   abstract val dokkatooModuleDirectory: DirectoryProperty
 
+  @Deprecated("No longer used")
   abstract val dokkatooConfigurationsDirectory: DirectoryProperty
 
   /** Default Dokkatoo cache directory */

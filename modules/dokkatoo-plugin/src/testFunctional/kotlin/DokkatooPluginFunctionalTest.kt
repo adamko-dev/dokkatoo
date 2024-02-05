@@ -40,10 +40,10 @@ class DokkatooPluginFunctionalTest : FunSpec({
             "dokkatooGeneratePublicationHtml"        to "Executes the Dokka Generator, generating the html publication",
             "dokkatooGeneratePublicationJavadoc"     to "Executes the Dokka Generator, generating the javadoc publication",
             "dokkatooGeneratePublicationJekyll"      to "Executes the Dokka Generator, generating the jekyll publication",
-            "prepareDokkatooModuleDescriptorGfm"     to "Prepares the Dokka Module Descriptor for gfm",
-            "prepareDokkatooModuleDescriptorHtml"    to "Prepares the Dokka Module Descriptor for html",
-            "prepareDokkatooModuleDescriptorJavadoc" to "Prepares the Dokka Module Descriptor for javadoc",
-            "prepareDokkatooModuleDescriptorJekyll"  to "Prepares the Dokka Module Descriptor for jekyll",
+            "prepareDokkatooModuleDescriptorGfm"     to "[Deprecated ⚠️] Prepares the Dokka Module Descriptor for gfm",
+            "prepareDokkatooModuleDescriptorHtml"    to "[Deprecated ⚠️] Prepares the Dokka Module Descriptor for html",
+            "prepareDokkatooModuleDescriptorJavadoc" to "[Deprecated ⚠️] Prepares the Dokka Module Descriptor for javadoc",
+            "prepareDokkatooModuleDescriptorJekyll"  to "[Deprecated ⚠️] Prepares the Dokka Module Descriptor for jekyll",
             //@formatter:on
           )
         }
@@ -57,36 +57,35 @@ class DokkatooPluginFunctionalTest : FunSpec({
         val variants = output.invariantNewlines().replace('\\', '/')
 
         val dokkatooVariants = variants.lines()
-          .filter { it.contains("dokka", ignoreCase = true) }
-          .mapNotNull { it.substringAfter("Variant ", "").takeIf(String::isNotBlank) }
-
+          .filter { it.startsWith("Variant ") && it.contains("dokka", ignoreCase = true) }
+          .mapNotNull { it.substringAfter("Variant ", "").ifBlank { null } }
 
         dokkatooVariants.shouldContainExactlyInAnyOrder(
-          "dokkatooModuleElementsGfm",
-          "dokkatooModuleElementsHtml",
-          "dokkatooModuleElementsJavadoc",
-          "dokkatooModuleElementsJekyll",
+          expectedFormats.flatMap {
+            listOf(
+              "dokkatoo${it}ModuleOutputDirectoriesConsumable",
+            )
+          }
         )
 
         fun checkVariant(format: String) {
-          val formatCapitalized = format.uppercaseFirstChar()
+          @Suppress("LocalVariableName")
+          val Format = format.uppercaseFirstChar()
 
           variants shouldContain /* language=text */ """
             |--------------------------------------------------
-            |Variant dokkatooModuleElements$formatCapitalized
+            |Variant dokkatoo${Format}ModuleOutputDirectoriesConsumable
             |--------------------------------------------------
-            |Provide Dokka Module files for $format to other subprojects
+            |Provides Dokkatoo $format ModuleOutputDirectories files for consumption by other subprojects.
             |
             |Capabilities
             |    - :test:unspecified (default capability)
             |Attributes
-            |    - dev.adamko.dokkatoo.base     = dokkatoo
-            |    - dev.adamko.dokkatoo.category = module-files
-            |    - dev.adamko.dokkatoo.format   = $format
+            |    - dev.adamko.dokkatoo.format           = $format
+            |    - dev.adamko.dokkatoo.module-component = ModuleOutputDirectories
+            |    - org.gradle.usage                     = dev.adamko.dokkatoo
             |Artifacts
-            |    - build/dokka-config/$format/module_descriptor.json (artifactType = json)
-            |    - build/dokka-module/$format (artifactType = directory)
-            |
+            |    - build/dokka-module/$format (artifactType = dokka-module-directory)
           """.trimMargin()
         }
 
@@ -99,8 +98,6 @@ class DokkatooPluginFunctionalTest : FunSpec({
 
   test("expect Dokka Plugin creates Dokka resolvable configurations") {
 
-    val expectedFormats = listOf("Gfm", "Html", "Javadoc", "Jekyll")
-
     testProject.runner
       .addArguments("resolvableConfigurations", "-q")
       .build {
@@ -111,88 +108,81 @@ class DokkatooPluginFunctionalTest : FunSpec({
             .mapNotNull { it.substringAfter("Configuration ", "").takeIf(String::isNotBlank) }
 
           dokkatooConfigurations.shouldContainExactlyInAnyOrder(
-            buildList {
-              add("dokkatoo")
-
-              addAll(expectedFormats.map { "dokkatooModule$it" })
-              addAll(expectedFormats.map { "dokkatooGeneratorClasspath$it" })
-              addAll(expectedFormats.map { "dokkatooPlugin$it" })
-              addAll(expectedFormats.map { "dokkatooPluginIntransitive$it" })
+            buildSet {
+              addAll(expectedFormats.map { "dokkatoo${it}Resolver" })
+              addAll(expectedFormats.map { "dokkatoo${it}GeneratorClasspathResolver" })
+              addAll(expectedFormats.map { "dokkatoo${it}PluginsClasspathIntransitiveResolver" })
+              addAll(expectedFormats.map { "dokkatoo${it}ModuleOutputDirectoriesResolver" })
             }
           )
 
-          withClue("Configuration dokka") {
-            output.invariantNewlines() shouldContain /* language=text */ """
-              |--------------------------------------------------
-              |Configuration dokkatoo
-              |--------------------------------------------------
-              |Fetch all Dokkatoo files from all configurations in other subprojects
-              |
-              |Attributes
-              |    - dev.adamko.dokkatoo.base = dokkatoo
-              |
-            """.trimMargin()
-          }
-
-          fun checkConfigurations(format: String) {
-            val formatLowercase = format.lowercase()
+          fun checkConfigurations(
+            @Suppress("LocalVariableName")
+            Format: String
+          ) {
+            val format = Format.lowercase()
 
             allConfigurations shouldContain /* language=text */ """
               |--------------------------------------------------
-              |Configuration dokkatooGeneratorClasspath$format
+              |Configuration dokkatoo${Format}Resolver
               |--------------------------------------------------
-              |Dokka Generator runtime classpath for $formatLowercase - will be used in Dokka Worker. Should contain all transitive dependencies, plugins (and their transitive dependencies), so Dokka Worker can run.
+              |Resolve Dokkatoo declared dependencies for $format.
               |
               |Attributes
-              |    - dev.adamko.dokkatoo.base       = dokkatoo
-              |    - dev.adamko.dokkatoo.category   = generator-classpath
-              |    - dev.adamko.dokkatoo.format     = $formatLowercase
-              |    - org.gradle.category            = library
-              |    - org.gradle.dependency.bundling = external
-              |    - org.gradle.jvm.environment     = standard-jvm
-              |    - org.gradle.libraryelements     = jar
-              |    - org.gradle.usage               = java-runtime
+              |    - dev.adamko.dokkatoo.format = $format
+              |    - org.gradle.usage           = dev.adamko.dokkatoo
               |Extended Configurations
-              |    - dokkatooPlugin$format
-              |
+              |    - dokkatoo
            """.trimMargin()
 
             allConfigurations shouldContain /* language=text */ """
               |--------------------------------------------------
-              |Configuration dokkatooPlugin$format
+              |Configuration dokkatoo${Format}GeneratorClasspathResolver
               |--------------------------------------------------
-              |Dokka Plugins classpath for $formatLowercase
+              |Dokka Generator runtime classpath for $format - will be used in Dokka Worker. Should contain all transitive dependencies, plugins (and their transitive dependencies), so Dokka Worker can run.
               |
               |Attributes
-              |    - dev.adamko.dokkatoo.base       = dokkatoo
-              |    - dev.adamko.dokkatoo.category   = plugins-classpath
-              |    - dev.adamko.dokkatoo.format     = $formatLowercase
-              |    - org.gradle.category            = library
-              |    - org.gradle.dependency.bundling = external
-              |    - org.gradle.jvm.environment     = standard-jvm
-              |    - org.gradle.libraryelements     = jar
-              |    - org.gradle.usage               = java-runtime
-              |
-            """.trimMargin()
-
-            allConfigurations shouldContain /* language=text */ """
-              |--------------------------------------------------
-              |Configuration dokkatooPluginIntransitive$format
-              |--------------------------------------------------
-              |Dokka Plugins classpath for $formatLowercase - for internal use. Fetch only the plugins (no transitive dependencies) for use in the Dokka JSON Configuration.
-              |
-              |Attributes
-              |    - dev.adamko.dokkatoo.base       = dokkatoo
-              |    - dev.adamko.dokkatoo.category   = plugins-classpath
-              |    - dev.adamko.dokkatoo.format     = $formatLowercase
+              |    - dev.adamko.dokkatoo.classpath  = dokka-generator
+              |    - dev.adamko.dokkatoo.format     = $format
               |    - org.gradle.category            = library
               |    - org.gradle.dependency.bundling = external
               |    - org.gradle.jvm.environment     = standard-jvm
               |    - org.gradle.libraryelements     = jar
               |    - org.gradle.usage               = java-runtime
               |Extended Configurations
-              |    - dokkatooPlugin$format
+              |    - dokkatoo${Format}GeneratorClasspath
+           """.trimMargin()
+
+            allConfigurations shouldContain /* language=text */ """
+              |--------------------------------------------------
+              |Configuration dokkatoo${Format}PluginsClasspathIntransitiveResolver
+              |--------------------------------------------------
+              |Resolves Dokka Plugins classpath for $format - for internal use. Fetch only the plugins (no transitive dependencies) for use in the Dokka JSON Configuration.
               |
+              |Attributes
+              |    - dev.adamko.dokkatoo.classpath  = dokka-plugins
+              |    - dev.adamko.dokkatoo.format     = $format
+              |    - org.gradle.category            = library
+              |    - org.gradle.dependency.bundling = external
+              |    - org.gradle.jvm.environment     = standard-jvm
+              |    - org.gradle.libraryelements     = jar
+              |    - org.gradle.usage               = java-runtime
+              |Extended Configurations
+              |    - dokkatooPlugin${Format}
+           """.trimMargin()
+
+            allConfigurations shouldContain /* language=text */ """
+              |--------------------------------------------------
+              |Configuration dokkatoo${Format}ModuleOutputDirectoriesResolver
+              |--------------------------------------------------
+              |Resolves Dokkatoo $format ModuleOutputDirectories files.
+              |
+              |Attributes
+              |    - dev.adamko.dokkatoo.format           = $format
+              |    - dev.adamko.dokkatoo.module-component = ModuleOutputDirectories
+              |    - org.gradle.usage                     = dev.adamko.dokkatoo
+              |Extended Configurations
+              |    - dokkatoo
             """.trimMargin()
           }
 
@@ -202,4 +192,8 @@ class DokkatooPluginFunctionalTest : FunSpec({
         }
       }
   }
-})
+}) {
+  companion object {
+    private val expectedFormats = listOf("Gfm", "Html", "Javadoc", "Jekyll")
+  }
+}

@@ -1,28 +1,9 @@
-@file:UseSerializers(
-  FileAsPathStringSerializer::class,
-)
-
 package dev.adamko.dokkatoo.dokka.parameters
 
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
-import java.io.File
-import java.nio.file.Paths
-import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.UseSerializers
-import kotlinx.serialization.descriptors.PrimitiveKind
-import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
 import org.gradle.kotlin.dsl.*
 import org.jetbrains.dokka.DokkaConfiguration
-import org.jetbrains.dokka.DokkaModuleDescriptionImpl
-
-
-// Implementations of DokkaConfiguration interfaces that can be serialized to files.
-// Serialization is required because Gradle tasks can only pass data to one-another via files.
-
 
 /**
  * Any subproject can be merged into a single Dokka Publication. To do this, first it must create
@@ -41,38 +22,10 @@ import org.jetbrains.dokka.DokkaModuleDescriptionImpl
 data class DokkaModuleDescriptionKxs(
   /** @see DokkaConfiguration.DokkaModuleDescription.name */
   val name: String,
-  /**
-   * Location of the Dokka Module directory for a subproject.
-   *
-   * @see DokkaConfiguration.DokkaModuleDescription.sourceOutputDirectory
-   */
-  val sourceOutputDirectory: File,
-  /** @see DokkaConfiguration.DokkaModuleDescription.includes */
-  val includes: Set<File>,
   /** @see [org.gradle.api.Project.getPath] */
   val modulePath: String,
-) {
-  internal fun convert() =
-    DokkaModuleDescriptionImpl(
-      name = name,
-      relativePathToOutputDirectory = File(modulePath.removePrefix(":").replace(':', '/')),
-      includes = includes,
-      sourceOutputDirectory = sourceOutputDirectory,
-    )
-}
-
-
-/**
- * Serialize a [File] as an absolute, canonical file path, with
- * [invariant path separators][invariantSeparatorsPath]
- */
-private object FileAsPathStringSerializer : KSerializer<File> {
-  override val descriptor: SerialDescriptor =
-    PrimitiveSerialDescriptor("java.io.File", PrimitiveKind.STRING)
-
-  override fun deserialize(decoder: Decoder): File =
-    Paths.get(decoder.decodeString()).toFile()
-
-  override fun serialize(encoder: Encoder, value: File): Unit =
-    encoder.encodeString(value.invariantSeparatorsPath)
-}
+  /** name of the sibling directory that contains the module output */
+  val moduleOutputDirName: String = "module",
+  /** name of the sibling directory that contains the module includes */
+  val moduleIncludesDirName: String = "includes",
+)

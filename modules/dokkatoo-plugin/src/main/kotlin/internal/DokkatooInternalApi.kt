@@ -20,8 +20,8 @@ import kotlin.annotation.AnnotationTarget.*
  * [the Dokkatoo issue tracker](https://github.com/adamko-dev/dokkatoo/issues).
  */
 @RequiresOptIn(
-  message = "Internal API - may change at any time without notice",
-  level = WARNING
+  message = "Internal Dokkatoo API - may change at any time without notice",
+  level = WARNING,
 )
 @Retention(BINARY)
 @Target(

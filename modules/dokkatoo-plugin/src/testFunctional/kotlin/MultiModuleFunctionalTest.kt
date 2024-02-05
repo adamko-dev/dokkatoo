@@ -17,7 +17,9 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldBeEmpty
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
+import kotlin.io.path.deleteRecursively
 import kotlin.io.path.extension
+import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.readText
 import org.gradle.testkit.runner.TaskOutcome.*
 
@@ -78,14 +80,16 @@ class MultiModuleFunctionalTest : FunSpec({
           test("with element-list") {
             project.file("build/dokka/html/package-list").toFile().shouldBeAFile()
             project.file("build/dokka/html/package-list").readText()
+              .lines()
+              .sorted()
+              .joinToString("\n")
               .shouldContain( /* language=text */ """
-                |${'$'}dokka.format:html-v1
-                |${'$'}dokka.linkExtension:html
-                |
-                |module:subproject-hello
+              |${'$'}dokka.format:html-v1
+              |${'$'}dokka.linkExtension:html
+              |com.project.goodbye
                 |com.project.hello
                 |module:subproject-goodbye
-                |com.project.goodbye
+                |module:subproject-hello
               """.trimMargin()
               )
           }
@@ -142,7 +146,7 @@ class MultiModuleFunctionalTest : FunSpec({
             test("expect build is successful") {
               output shouldContainAll listOf(
                 "BUILD SUCCESSFUL",
-                "24 actionable tasks: 24 up-to-date",
+                "16 actionable tasks: 16 up-to-date",
               )
             }
 
@@ -158,6 +162,114 @@ class MultiModuleFunctionalTest : FunSpec({
           }
       }
     }
+
+    context("build cache relocation") {
+
+      val originalProject = initDokkatooProject("build-cache-relocation/original/")
+      // Create the _same_ project in a different dir, to verify that the build cache
+      // can be re-used and doesn't have path-sensitive inputs/outputs.
+      val relocatedProject = initDokkatooProject("build-cache-relocation/relocated/project/")
+
+      // create custom build cache dir, so it's easier to control, specify, and clean-up
+      val buildCacheDir = originalProject.projectDir.resolve("build-cache")
+
+      val expectedGenerationTasks = listOf(
+        ":dokkatooGeneratePublicationGfm",
+        ":dokkatooGeneratePublicationHtml",
+        ":dokkatooGeneratePublicationJavadoc",
+        ":dokkatooGeneratePublicationJekyll",
+        ":subproject-hello:dokkatooGenerateModuleGfm",
+        ":subproject-hello:dokkatooGenerateModuleHtml",
+        ":subproject-hello:dokkatooGenerateModuleJavadoc",
+        ":subproject-hello:dokkatooGenerateModuleJekyll",
+        ":subproject-goodbye:dokkatooGenerateModuleGfm",
+        ":subproject-goodbye:dokkatooGenerateModuleHtml",
+        ":subproject-goodbye:dokkatooGenerateModuleJavadoc",
+        ":subproject-goodbye:dokkatooGenerateModuleJekyll",
+      )
+
+      test("setup build cache") {
+        buildCacheDir.deleteRecursively()
+        buildCacheDir.toFile().mkdirs()
+
+        val buildCacheConfig = """
+          |
+          |buildCache { 
+          |  local { 
+          |    directory = "${buildCacheDir.invariantSeparatorsPathString}"
+          |  }
+          |}
+          |
+        """.trimMargin()
+
+        originalProject.settingsGradleKts += buildCacheConfig
+        relocatedProject.settingsGradleKts += buildCacheConfig
+      }
+
+      context("original project") {
+        originalProject.runner
+          .addArguments(
+            "clean",
+            "--build-cache",
+          )
+          .forwardOutput()
+          .build {
+            test("clean tasks should run successfully") {
+              shouldHaveTasksWithAnyOutcome(
+                ":clean" to listOf(UP_TO_DATE, SUCCESS),
+                ":subproject-hello:clean" to listOf(UP_TO_DATE, SUCCESS),
+                ":subproject-goodbye:clean" to listOf(UP_TO_DATE, SUCCESS),
+              )
+
+              output.shouldContain("BUILD SUCCESSFUL")
+            }
+          }
+        originalProject.runner
+          .addArguments(
+            ":dokkatooGenerate",
+            "--stacktrace",
+            "--build-cache",
+          )
+          .forwardOutput()
+          .build {
+            test("should execute all generation tasks") {
+              shouldHaveTasksWithOutcome(expectedGenerationTasks.map { it to SUCCESS })
+            }
+          }
+      }
+
+      context("relocated project") {
+        originalProject.runner
+          .addArguments(
+            "clean",
+            "--build-cache",
+          )
+          .forwardOutput()
+          .build {
+            test("clean tasks should run successfully") {
+              shouldHaveTasksWithOutcome(
+                ":clean" to SUCCESS,
+                ":subproject-hello:clean" to SUCCESS,
+                ":subproject-goodbye:clean" to SUCCESS,
+              )
+            }
+          }
+
+        relocatedProject.runner
+          .addArguments(
+            ":dokkatooGenerate",
+            "--stacktrace",
+            "--build-cache",
+          )
+          .forwardOutput()
+          .build {
+            test("should load all generation tasks from cache") {
+              shouldHaveTasksWithOutcome(expectedGenerationTasks.map { it to FROM_CACHE })
+            }
+          }
+      }
+    }
+
 
     context("Gradle Configuration Cache") {
       val project = initDokkatooProject("config-cache")
@@ -257,7 +369,6 @@ class MultiModuleFunctionalTest : FunSpec({
               test("expect :subproject-goodbye tasks are up-to-date, because no files changed") {
                 shouldHaveTasksWithOutcome(
                   ":subproject-goodbye:dokkatooGenerateModuleHtml" to UP_TO_DATE,
-                  ":subproject-goodbye:prepareDokkatooModuleDescriptorHtml" to UP_TO_DATE,
                 )
               }
 
@@ -265,7 +376,6 @@ class MultiModuleFunctionalTest : FunSpec({
               test("expect :subproject-hello tasks should be re-run, since a file changed") {
                 shouldHaveTasksWithAnyOutcome(
                   ":subproject-hello:dokkatooGenerateModuleHtml" to successfulOutcomes,
-                  ":subproject-hello:prepareDokkatooModuleDescriptorHtml" to successfulOutcomes,
                 )
               }
 
@@ -279,8 +389,8 @@ class MultiModuleFunctionalTest : FunSpec({
                 output shouldContain "BUILD SUCCESSFUL"
               }
 
-              test("expect 5 tasks are run") {
-                output shouldContain "5 actionable tasks"
+              test("expect 3 actionable tasks") {
+                output shouldContain "3 actionable tasks"
               }
             }
 
@@ -379,19 +489,11 @@ class MultiModuleFunctionalTest : FunSpec({
               "> Task :subproject-goodbye:dokkatooGenerateModuleHtml",
               "> Task :subproject-goodbye:dokkatooGenerateModuleJavadoc",
               "> Task :subproject-goodbye:dokkatooGenerateModuleJekyll",
-              "> Task :subproject-goodbye:prepareDokkatooModuleDescriptorGfm",
-              "> Task :subproject-goodbye:prepareDokkatooModuleDescriptorHtml",
-              "> Task :subproject-goodbye:prepareDokkatooModuleDescriptorJavadoc",
-              "> Task :subproject-goodbye:prepareDokkatooModuleDescriptorJekyll",
               "> Task :subproject-hello:clean",
               "> Task :subproject-hello:dokkatooGenerateModuleGfm",
               "> Task :subproject-hello:dokkatooGenerateModuleHtml",
               "> Task :subproject-hello:dokkatooGenerateModuleJavadoc",
               "> Task :subproject-hello:dokkatooGenerateModuleJekyll",
-              "> Task :subproject-hello:prepareDokkatooModuleDescriptorGfm",
-              "> Task :subproject-hello:prepareDokkatooModuleDescriptorHtml",
-              "> Task :subproject-hello:prepareDokkatooModuleDescriptorJavadoc",
-              "> Task :subproject-hello:prepareDokkatooModuleDescriptorJekyll",
             )
         }
     }

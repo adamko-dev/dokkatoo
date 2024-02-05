@@ -100,6 +100,7 @@ private fun haveAnyOutcome(outcomes: Collection<TaskOutcome>): Matcher<BuildTask
   }
 }
 
+
 fun BuildResult.shouldHaveTaskWithOutcome(taskPath: String, outcome: TaskOutcome) {
   this shouldHaveRunTask taskPath shouldHaveOutcome outcome
 }
@@ -109,8 +110,9 @@ fun BuildResult.shouldHaveTaskWithAnyOutcome(taskPath: String, outcomes: Collect
   this shouldHaveRunTask taskPath shouldHaveAnyOutcome outcomes
 }
 
+
 fun BuildResult.shouldHaveTasksWithOutcome(
-  vararg taskPathToExpectedOutcome: Pair<String, TaskOutcome>
+  taskPathToExpectedOutcome: Iterable<Pair<String, TaskOutcome>>
 ) {
   assertSoftly {
     taskPathToExpectedOutcome.forEach { (taskPath, outcome) ->
@@ -118,6 +120,12 @@ fun BuildResult.shouldHaveTasksWithOutcome(
     }
   }
 }
+
+
+fun BuildResult.shouldHaveTasksWithOutcome(
+  vararg taskPathToExpectedOutcome: Pair<String, TaskOutcome>
+) = shouldHaveTasksWithOutcome(taskPathToExpectedOutcome.asIterable())
+
 
 fun BuildResult.shouldHaveTasksWithAnyOutcome(
   vararg taskPathToExpectedOutcome: Pair<String, Collection<TaskOutcome>>
