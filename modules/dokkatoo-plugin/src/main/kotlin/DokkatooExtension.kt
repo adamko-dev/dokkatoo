@@ -1,6 +1,5 @@
 package dev.adamko.dokkatoo
 
-import dev.adamko.dokkatoo.dependencies.BaseDependencyManager
 import dev.adamko.dokkatoo.dokka.DokkaPublication
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec
 import dev.adamko.dokkatoo.internal.*
@@ -30,7 +29,12 @@ constructor(
   /** Directory into which [DokkaPublication]s will be produced */
   abstract val dokkatooPublicationDirectory: DirectoryProperty
 
-  /** Directory into which Dokka Modules will be produced */
+  /**
+   * Directory into which Dokka Modules will be produced.
+   *
+   * Note that Dokka Modules are intermediate products and must be combined into a completed
+   * Dokka Publication. They are not intended to be comprehensible in isolation.
+   */
   abstract val dokkatooModuleDirectory: DirectoryProperty
 
   @Deprecated("No longer used")
