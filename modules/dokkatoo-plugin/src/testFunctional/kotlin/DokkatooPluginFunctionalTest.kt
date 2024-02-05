@@ -40,18 +40,17 @@ class DokkatooPluginFunctionalTest : FunSpec({
             "dokkatooGeneratePublicationHtml"        to "Executes the Dokka Generator, generating the html publication",
             "dokkatooGeneratePublicationJavadoc"     to "Executes the Dokka Generator, generating the javadoc publication",
             "dokkatooGeneratePublicationJekyll"      to "Executes the Dokka Generator, generating the jekyll publication",
-//            "prepareDokkatooModuleDescriptorGfm"     to "[Deprecated ⚠️] Prepares the Dokka Module Descriptor for gfm",
-//            "prepareDokkatooModuleDescriptorHtml"    to "[Deprecated ⚠️] Prepares the Dokka Module Descriptor for html",
-//            "prepareDokkatooModuleDescriptorJavadoc" to "[Deprecated ⚠️] Prepares the Dokka Module Descriptor for javadoc",
-//            "prepareDokkatooModuleDescriptorJekyll"  to "[Deprecated ⚠️] Prepares the Dokka Module Descriptor for jekyll",
+            "prepareDokkatooModuleDescriptorGfm"     to "[Deprecated ⚠️] Prepares the Dokka Module Descriptor for gfm",
+            "prepareDokkatooModuleDescriptorHtml"    to "[Deprecated ⚠️] Prepares the Dokka Module Descriptor for html",
+            "prepareDokkatooModuleDescriptorJavadoc" to "[Deprecated ⚠️] Prepares the Dokka Module Descriptor for javadoc",
+            "prepareDokkatooModuleDescriptorJekyll"  to "[Deprecated ⚠️] Prepares the Dokka Module Descriptor for jekyll",
             //@formatter:on
           )
         }
       }
   }
 
-  // TODO re-enable test
-  xtest("expect Dokka Plugin creates Dokka outgoing variants") {
+  test("expect Dokka Plugin creates Dokka outgoing variants") {
     testProject.runner
       .addArguments("outgoingVariants", "-q")
       .build {
@@ -64,8 +63,7 @@ class DokkatooPluginFunctionalTest : FunSpec({
         dokkatooVariants.shouldContainExactlyInAnyOrder(
           expectedFormats.flatMap {
             listOf(
-              "dokkatoo${it}ModuleDirectoryConsumable",
-              "dokkatoo${it}ModuleIncludesConsumable",
+              "dokkatoo${it}ModuleOutputDirectoriesConsumable",
             )
           }
         )
@@ -76,53 +74,19 @@ class DokkatooPluginFunctionalTest : FunSpec({
 
           variants shouldContain /* language=text */ """
             |--------------------------------------------------
-            |Variant dokkatoo${Format}OutputDirectoriesConsumable
+            |Variant dokkatoo${Format}ModuleOutputDirectoriesConsumable
             |--------------------------------------------------
-            |Provides Dokkatoo $format ModuleIncludes files for consumption by other subprojects.
+            |Provides Dokkatoo $format ModuleOutputDirectories files for consumption by other subprojects.
             |
             |Capabilities
             |    - :test:unspecified (default capability)
             |Attributes
             |    - dev.adamko.dokkatoo.format           = $format
-            |    - dev.adamko.dokkatoo.module-component = ModuleIncludes
-            |    - dev.adamko.dokkatoo.module-name      = test
-            |    - dev.adamko.dokkatoo.module-path      = 
+            |    - dev.adamko.dokkatoo.module-component = ModuleOutputDirectories
             |    - org.gradle.usage                     = dev.adamko.dokkatoo
+            |Artifacts
+            |    - build/dokka-module/$format (artifactType = dokka-module-directory)
           """.trimMargin()
-
-//          variants shouldContain /* language=text */ """
-//            |--------------------------------------------------
-//            |Variant dokkatoo${Format}ModuleIncludesConsumable
-//            |--------------------------------------------------
-//            |Provides Dokkatoo $format ModuleIncludes files for consumption by other subprojects.
-//            |
-//            |Capabilities
-//            |    - :test:unspecified (default capability)
-//            |Attributes
-//            |    - dev.adamko.dokkatoo.format           = $format
-//            |    - dev.adamko.dokkatoo.module-component = ModuleIncludes
-//            |    - dev.adamko.dokkatoo.module-name      = test
-//            |    - dev.adamko.dokkatoo.module-path      =
-//            |    - org.gradle.usage                     = dev.adamko.dokkatoo
-//          """.trimMargin()
-
-//          variants shouldContain /* language=text */ """
-//            |--------------------------------------------------
-//            |Variant dokkatoo${Format}ModuleDirectoryConsumable
-//            |--------------------------------------------------
-//            |Provides Dokkatoo $format ModuleDirectory files for consumption by other subprojects.
-//            |
-//            |Capabilities
-//            |    - :test:unspecified (default capability)
-//            |Attributes
-//            |    - dev.adamko.dokkatoo.format           = $format
-//            |    - dev.adamko.dokkatoo.module-component = ModuleDirectory
-//            |    - dev.adamko.dokkatoo.module-name      = test
-//            |    - dev.adamko.dokkatoo.module-path      =
-//            |    - org.gradle.usage                     = dev.adamko.dokkatoo
-//            |Artifacts
-//            |    - build/dokka-module/$format (artifactType = directory)
-//          """.trimMargin()
         }
 
         checkVariant("gfm")
@@ -132,8 +96,7 @@ class DokkatooPluginFunctionalTest : FunSpec({
       }
   }
 
-  // TODO re-enable test
-  xtest("expect Dokka Plugin creates Dokka resolvable configurations") {
+  test("expect Dokka Plugin creates Dokka resolvable configurations") {
 
     testProject.runner
       .addArguments("resolvableConfigurations", "-q")
@@ -149,8 +112,7 @@ class DokkatooPluginFunctionalTest : FunSpec({
               addAll(expectedFormats.map { "dokkatoo${it}Resolver" })
               addAll(expectedFormats.map { "dokkatoo${it}GeneratorClasspathResolver" })
               addAll(expectedFormats.map { "dokkatoo${it}PluginsClasspathIntransitiveResolver" })
-              addAll(expectedFormats.map { "dokkatoo${it}ModuleDirectoryResolver" })
-              addAll(expectedFormats.map { "dokkatoo${it}ModuleIncludesResolver" })
+              addAll(expectedFormats.map { "dokkatoo${it}ModuleOutputDirectoriesResolver" })
             }
           )
 
@@ -170,13 +132,10 @@ class DokkatooPluginFunctionalTest : FunSpec({
               |    - dev.adamko.dokkatoo.format = $format
               |    - org.gradle.usage           = dev.adamko.dokkatoo
               |Extended Configurations
-              |    - dokkatoo${Format}
+              |    - dokkatoo
            """.trimMargin()
 
-//            |    - dev.adamko.dokkatoo.module-name = test
-//            |    - dev.adamko.dokkatoo.module-path =
-
-              allConfigurations shouldContain /* language=text */ """
+            allConfigurations shouldContain /* language=text */ """
               |--------------------------------------------------
               |Configuration dokkatoo${Format}GeneratorClasspathResolver
               |--------------------------------------------------
@@ -216,49 +175,15 @@ class DokkatooPluginFunctionalTest : FunSpec({
               |--------------------------------------------------
               |Configuration dokkatoo${Format}ModuleOutputDirectoriesResolver
               |--------------------------------------------------
-              |Resolves Dokkatoo $format ModuleDirectory files.
+              |Resolves Dokkatoo $format ModuleOutputDirectories files.
               |
               |Attributes
               |    - dev.adamko.dokkatoo.format           = $format
               |    - dev.adamko.dokkatoo.module-component = ModuleOutputDirectories
               |    - org.gradle.usage                     = dev.adamko.dokkatoo
               |Extended Configurations
-              |    - dokkatoo${Format}Resolver
+              |    - dokkatoo
             """.trimMargin()
-//
-//            allConfigurations shouldContain /* language=text */ """
-//              |--------------------------------------------------
-//              |Configuration dokkatoo${Format}ModuleDirectoryResolver
-//              |--------------------------------------------------
-//              |Resolves Dokkatoo $format ModuleDirectory files.
-//              |
-//              |Attributes
-//              |    - dev.adamko.dokkatoo.format           = $format
-//              |    - dev.adamko.dokkatoo.module-component = ModuleDirectory
-//              |    - org.gradle.usage                     = dev.adamko.dokkatoo
-//              |Extended Configurations
-//              |    - dokkatoo${Format}Resolver
-//            """.trimMargin()
-//
-////            |    - dev.adamko.dokkatoo.module-name      = test
-////            |    - dev.adamko.dokkatoo.module-path      =
-//
-//              allConfigurations shouldContain /* language=text */ """
-//              |--------------------------------------------------
-//              |Configuration dokkatoo${Format}ModuleIncludesResolver
-//              |--------------------------------------------------
-//              |Resolves Dokkatoo $format ModuleIncludes files.
-//              |
-//              |Attributes
-//              |    - dev.adamko.dokkatoo.format           = $format
-//              |    - dev.adamko.dokkatoo.module-component = ModuleIncludes
-//              |    - org.gradle.usage                     = dev.adamko.dokkatoo
-//              |Extended Configurations
-//              |    - dokkatoo${Format}Resolver
-//            """.trimMargin()
-//
-////            |    - dev.adamko.dokkatoo.module-name      = test
-////            |    - dev.adamko.dokkatoo.module-path      =
           }
 
           expectedFormats.forEach {
