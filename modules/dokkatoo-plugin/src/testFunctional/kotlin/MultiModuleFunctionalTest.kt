@@ -2,8 +2,8 @@ package dev.adamko.dokkatoo
 
 import dev.adamko.dokkatoo.WorkerIsolation.ClassLoader
 import dev.adamko.dokkatoo.WorkerIsolation.Process
-import dev.adamko.dokkatoo.internal.DokkatooConstants.DOKKATOO_VERSION
 import dev.adamko.dokkatoo.utils.*
+import dev.adamko.dokkatoo.utils.projects.initMultiModuleProject
 import io.kotest.assertions.withClue
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.inspectors.shouldForAll
@@ -26,7 +26,7 @@ import org.gradle.testkit.runner.TaskOutcome.*
 class MultiModuleFunctionalTest : FunSpec({
 
   context("when dokkatoo generates all formats") {
-    val project = initDokkatooProject("all-formats")
+    val project = initMultiModuleProject("all-formats")
 
     project.runner
       .addArguments(
@@ -100,7 +100,7 @@ class MultiModuleFunctionalTest : FunSpec({
   context("Gradle caching") {
 
     context("expect Dokkatoo is compatible with Gradle Build Cache") {
-      val project = initDokkatooProject("build-cache")
+      val project = initMultiModuleProject("build-cache")
 
       test("expect clean is successful") {
         project.runner.addArguments("clean").build {
@@ -165,10 +165,10 @@ class MultiModuleFunctionalTest : FunSpec({
 
     context("build cache relocation") {
 
-      val originalProject = initDokkatooProject("build-cache-relocation/original/")
+      val originalProject = initMultiModuleProject("build-cache-relocation/original/")
       // Create the _same_ project in a different dir, to verify that the build cache
       // can be re-used and doesn't have path-sensitive inputs/outputs.
-      val relocatedProject = initDokkatooProject("build-cache-relocation/relocated/project/")
+      val relocatedProject = initMultiModuleProject("build-cache-relocation/relocated/project/")
 
       // create custom build cache dir, so it's easier to control, specify, and clean-up
       val buildCacheDir = originalProject.projectDir.resolve("build-cache")
@@ -272,7 +272,7 @@ class MultiModuleFunctionalTest : FunSpec({
 
 
     context("Gradle Configuration Cache") {
-      val project = initDokkatooProject("config-cache")
+      val project = initMultiModuleProject("config-cache")
 
       test("expect clean is successful") {
         project.runner.addArguments("clean").build {
@@ -311,7 +311,7 @@ class MultiModuleFunctionalTest : FunSpec({
 
     context("expect updates in subprojects re-run tasks") {
 
-      val project = initDokkatooProject("submodule-update")
+      val project = initMultiModuleProject("submodule-update")
 
       test("expect clean is successful") {
         project.runner.addArguments("clean").build {
@@ -430,7 +430,7 @@ class MultiModuleFunctionalTest : FunSpec({
   }
 
   context("logging") {
-    val project = initDokkatooProject("logging")
+    val project = initMultiModuleProject("logging")
 
     test("expect no logs when built using --quiet log level") {
       project.runner
@@ -500,7 +500,7 @@ class MultiModuleFunctionalTest : FunSpec({
   }
 
   context("KotlinProjectExtension failure warning") {
-    val project = initDokkatooProject("kpe-warning") {
+    val project = initMultiModuleProject("kpe-warning") {
       buildGradleKts = buildGradleKts.lines().joinToString("\n") { line ->
         when {
           line.startsWith("""  kotlin("jvm")""") -> "//$line"
@@ -527,7 +527,7 @@ class MultiModuleFunctionalTest : FunSpec({
   WorkerIsolation.values().forEach { isolation ->
     context("DokkatooGenerateTask worker $isolation") {
 
-      val project = initDokkatooProject("worker-$isolation") {
+      val project = initMultiModuleProject("worker-$isolation") {
         val workerIsolationConfig = when (isolation) {
           ClassLoader -> { // language=kts
             """
@@ -639,87 +639,5 @@ class MultiModuleFunctionalTest : FunSpec({
   }
 })
 
-private fun initDokkatooProject(
-  testName: String,
-  config: GradleProjectTest.() -> Unit = {},
-): GradleProjectTest {
-  return gradleKtsProjectTest("multi-module-hello-goodbye/$testName") {
-
-    settingsGradleKts += """
-      |
-      |include(":subproject-hello")
-      |include(":subproject-goodbye")
-      |
-    """.trimMargin()
-
-    buildGradleKts = """
-      |plugins {
-      |  // Kotlin plugin shouldn't be necessary here, but without it Dokka errors
-      |  // with ClassNotFound KotlinPluginExtension... very weird
-      |  kotlin("jvm") version "1.8.22" apply false
-      |  id("dev.adamko.dokkatoo") version "$DOKKATOO_VERSION"
-      |}
-      |
-      |dependencies {
-      |  dokkatoo(project(":subproject-hello"))
-      |  dokkatoo(project(":subproject-goodbye"))
-      |}
-      |
-    """.trimMargin()
-
-    dir("subproject-hello") {
-      buildGradleKts = """
-          |plugins {
-          |  kotlin("jvm") version "1.8.22"
-          |  id("dev.adamko.dokkatoo") version "$DOKKATOO_VERSION"
-          |}
-          |
-        """.trimMargin()
-
-      createKotlinFile(
-        "src/main/kotlin/Hello.kt",
-        """
-          |package com.project.hello
-          |
-          |/** The Hello class */
-          |class Hello {
-          |    /** prints `Hello` to the console */  
-          |    fun sayHello() = println("Hello")
-          |}
-          |
-        """.trimMargin()
-      )
-
-      createKotlinFile("src/main/kotlin/HelloAgain.kt", "")
-    }
-
-    dir("subproject-goodbye") {
-
-      buildGradleKts = """
-          |plugins {
-          |  kotlin("jvm") version "1.8.22"
-          |  id("dev.adamko.dokkatoo") version "$DOKKATOO_VERSION"
-          |}
-          |
-        """.trimMargin()
-
-      createKotlinFile(
-        "src/main/kotlin/Goodbye.kt",
-        """
-          |package com.project.goodbye
-          |
-          |/** The Goodbye class */
-          |class Goodbye {
-          |    /** prints a goodbye message to the console */  
-          |    fun sayHello() = println("Goodbye!")
-          |}
-          |
-        """.trimMargin()
-      )
-    }
-
-    config()
-  }
-}
 
 private enum class WorkerIsolation { ClassLoader, Process }
