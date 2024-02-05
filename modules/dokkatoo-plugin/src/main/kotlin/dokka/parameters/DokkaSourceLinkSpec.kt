@@ -57,9 +57,9 @@ constructor(
    */
   @get:Input
   @DokkatooInternalApi
-  protected val localDirectoryPath: Provider<String>
+  internal val localDirectoryPath: Provider<String>
     get() = localDirectory.map {
-      it.asFile.toRelativeString(layout.projectDirectory.asFile)
+      it.asFile.relativeTo(layout.projectDirectory.asFile).invariantSeparatorsPath
     }
 
   /**
