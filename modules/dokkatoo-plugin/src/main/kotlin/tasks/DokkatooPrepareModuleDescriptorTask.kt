@@ -8,6 +8,7 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.UntrackedTask
 
 /**
  * Deprecated:
@@ -25,6 +26,8 @@ import org.gradle.api.tasks.TaskAction
       "Module Descriptor JSON generation was moved into DokkatooGenerateModuleTask. " +
       "This task now does nothing and should not be used."
 )
+@UntrackedTask(because = "DokkatooPrepareModuleDescriptorTask has been deprecated and should no longer be used - see KDoc")
+@Suppress("unused")
 abstract class DokkatooPrepareModuleDescriptorTask
 @DokkatooInternalApi
 @Inject
@@ -44,10 +47,6 @@ constructor() : DokkatooTask() {
 
   @get:Internal
   abstract val includes: ConfigurableFileCollection
-
-  init {
-    super.doNotTrackState("$path has be deprecated and should no longer be used")
-  }
 
   @TaskAction
   internal fun generateModuleConfiguration() {
