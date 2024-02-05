@@ -51,10 +51,7 @@ constructor(
 
     val dokkatooExtension = createExtension(target)
 
-    createBaseDependencyManager(
-      target,
-//      dokkatooExtension
-    )
+    createBaseDependencyManager(target = target)
 
     configureDependencyAttributes(target)
 
@@ -117,12 +114,9 @@ constructor(
 
   private fun createBaseDependencyManager(
     target: Project,
-//    dokkatooExtension: DokkatooExtension,
   ) {
     val baseDependencyManager = BaseDependencyManager(
       project = target,
-//      moduleName = dokkatooExtension.moduleName,
-//      modulePath = dokkatooExtension.modulePath,
       objects = objects,
     )
     target.extensions.adding(
@@ -135,8 +129,6 @@ constructor(
   private fun configureDependencyAttributes(target: Project) {
     target.dependencies.attributesSchema {
       attribute(DokkatooFormatAttribute)
-//      attribute(DokkatooModuleNameAttribute)
-//      attribute(DokkatooModulePathAttribute)
       attribute(DokkatooModuleComponentAttribute)
       attribute(DokkatooClasspathAttribute)
     }
@@ -196,7 +188,7 @@ constructor(
       sourceSetScope.convention(sourceSetScopeConvention)
 
       // Manually added sourceSets should not be suppressed by default. dokkatooSourceSets that are
-      // automatically added by DokkatooKotlinAdapter will have a sensible value for suppress.
+      // automatically added by DokkatooKotlinAdapter will have a sensible value for 'suppress'.
       suppress.convention(false)
 
       suppressGeneratedFiles.convention(true)
@@ -263,11 +255,6 @@ constructor(
       description = "Generates Dokkatoo publications for all formats"
       dependsOn(target.tasks.withType<DokkatooGenerateTask>())
     }
-
-//    target.tasks.withType<DokkatooPrepareModuleDescriptorTask>().configureEach {
-//      moduleName.convention(dokkatooExtension.moduleName)
-//      modulePath.convention(dokkatooExtension.modulePath)
-//    }
 
     target.tasks.withType<DokkatooGenerateTask>().configureEach {
       cacheDirectory.convention(dokkatooExtension.dokkatooCacheDirectory)
