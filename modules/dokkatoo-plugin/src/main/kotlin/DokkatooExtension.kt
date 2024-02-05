@@ -33,6 +33,7 @@ constructor(
   /** Directory into which Dokka Modules will be produced */
   abstract val dokkatooModuleDirectory: DirectoryProperty
 
+  @Deprecated("No longer used")
   abstract val dokkatooConfigurationsDirectory: DirectoryProperty
 
   /** Default Dokkatoo cache directory */
