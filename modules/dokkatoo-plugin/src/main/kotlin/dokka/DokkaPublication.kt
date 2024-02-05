@@ -94,12 +94,6 @@ constructor(
 //    @get:PathSensitive(PathSensitivity.NAME_ONLY)
 //    abstract val dokkaSubprojectConfigurations: ConfigurableFileCollection
 
-//    /** Dokka Module Configuration from other subprojects. */
-//    @get:InputFiles
-//    @get:NormalizeLineEndings
-//    @get:PathSensitive(PathSensitivity.NAME_ONLY)
-//    abstract val dokkaModuleDescriptorFiles: ConfigurableFileCollection
-
   @get:Input
   abstract val failOnWarning: Property<Boolean>
 

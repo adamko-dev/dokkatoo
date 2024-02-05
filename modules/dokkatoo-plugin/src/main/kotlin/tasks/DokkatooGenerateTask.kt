@@ -167,7 +167,7 @@ constructor(
     }
 
     val moduleOutputDirectories = generator.moduleOutputDirectories.toList()
-    logger.lifecycle("[$path] got ${moduleOutputDirectories.size} moduleOutputDirectories: $moduleOutputDirectories")
+    logger.info("[$path] got ${moduleOutputDirectories.size} moduleOutputDirectories: $moduleOutputDirectories")
 
     return DokkaParametersBuilder.build(
       spec = generator,

@@ -44,19 +44,19 @@ constructor(
   @TaskAction
   internal fun generateModule() {
     val outputDirectory = outputDirectory.get().asFile
-    val moduleOutputDir = outputDirectory.resolve("module")
-    val includesOutputDir = outputDirectory.resolve("includes")
     val moduleDescriptorJson = outputDirectory.resolve("module-descriptor.json")
 
     // clean output dir, so previous generations don't dirty this generation
     fs.delete { delete(outputDirectory) }
     outputDirectory.mkdirs()
 
+    // generate descriptor, will be read by other subprojects
+    val moduleDescriptor = generateModuleConfiguration(moduleDescriptorJson)
+    val includesOutputDir = outputDirectory.resolve(moduleDescriptor.moduleIncludesDirName)
+    val moduleOutputDir = outputDirectory.resolve(moduleDescriptor.moduleOutputDirName)
+
     // run Dokka Generator
     generateDocumentation(GeneratorMode.Module, moduleOutputDir)
-
-    // generate descriptor, will be read by other subprojects
-    generateModuleConfiguration(moduleDescriptorJson)
 
     // gather includes, to be consumed by other subprojects
     fs.sync {
@@ -68,7 +68,7 @@ constructor(
 
   private fun generateModuleConfiguration(
     moduleDescriptorJson: File,
-  ) {
+  ): DokkaModuleDescriptionKxs {
     val moduleName = generator.moduleName.get()
     val modulePath = modulePath.get()
 
@@ -89,5 +89,7 @@ constructor(
       parentFile.mkdirs()
       writeText(encodedModuleDesc)
     }
+
+    return moduleDesc
   }
 }

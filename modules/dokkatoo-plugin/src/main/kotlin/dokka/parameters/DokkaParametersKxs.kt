@@ -1,24 +1,9 @@
 package dev.adamko.dokkatoo.dokka.parameters
 
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
-import java.io.File
-import java.nio.file.Paths
-import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.UseSerializers
-import kotlinx.serialization.descriptors.PrimitiveKind
-import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
 import org.gradle.kotlin.dsl.*
 import org.jetbrains.dokka.DokkaConfiguration
-import org.jetbrains.dokka.DokkaModuleDescriptionImpl
-
-
-// Implementations of DokkaConfiguration interfaces that can be serialized to files.
-// Serialization is required because Gradle tasks can only pass data to one-another via files.
-
 
 /**
  * Any subproject can be merged into a single Dokka Publication. To do this, first it must create
@@ -39,15 +24,8 @@ data class DokkaModuleDescriptionKxs(
   val name: String,
   /** @see [org.gradle.api.Project.getPath] */
   val modulePath: String,
-) {
-//  internal fun convert(
-//    moduleOutputDirectory: File,
-//    moduleIncludes: Set<File>,
-//  ): DokkaModuleDescriptionImpl =
-//    DokkaModuleDescriptionImpl(
-//      name = name,
-//      sourceOutputDirectory = moduleOutputDirectory,
-//      includes = moduleIncludes,
-//      relativePathToOutputDirectory = File(modulePath.removePrefix(":").replace(':', '/')),
-//    )
-}
+  /** name of the sibling directory that contains the module output */
+  val moduleOutputDirName: String = "module",
+  /** name of the sibling directory that contains the module includes */
+  val moduleIncludesDirName: String = "includes",
+)

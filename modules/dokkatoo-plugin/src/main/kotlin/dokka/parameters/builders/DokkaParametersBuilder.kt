@@ -72,23 +72,23 @@ internal object DokkaParametersBuilder {
           error("missing module-descriptor.json in consolidated Dokka module $moduleDir")
         }
 
-        val moduleOutputDirectory = moduleDir.resolve("module")
-        if (!moduleOutputDirectory.exists()) {
-          error("missing module output directory in consolidated Dokka module $moduleDir")
-        }
-
-        val moduleIncludes = moduleDir.resolve("includes")
-          .takeIf(File::exists)
-          ?.walk()
-          ?.drop(1)
-          ?.toSet()
-          ?: emptySet()  // 'include' files are optional
-
         val moduleDescriptor: DokkaModuleDescriptionKxs =
           DokkatooBasePlugin.jsonMapper.decodeFromString(
             DokkaModuleDescriptionKxs.serializer(),
             moduleDescriptorJson.readText(),
           )
+
+        val moduleOutputDirectory = moduleDir.resolve(moduleDescriptor.moduleOutputDirName)
+        if (!moduleOutputDirectory.exists()) {
+          error("missing module output directory in consolidated Dokka module $moduleDir")
+        }
+
+        val moduleIncludes = moduleDir.resolve(moduleDescriptor.moduleIncludesDirName)
+          .takeIf(File::exists)
+          ?.walk()
+          ?.drop(1)
+          ?.toSet()
+          ?: emptySet()  // 'include' files are optional
 
 
         // `relativeOutputDir` is the path where the Dokka Module should be located within the final
@@ -98,7 +98,6 @@ internal object DokkaParametersBuilder {
         // The path has to be unique per module - using the project path is a useful way to achieve this.
         val relativeOutputDir =
           File(moduleDescriptor.modulePath.removePrefix(":").replace(':', '/'))
-
 
         val md = DokkaModuleDescriptionImpl(
           name = moduleDescriptor.name,
@@ -118,44 +117,6 @@ internal object DokkaParametersBuilder {
       // machines (which is important for relocatable Build Cache).
       .sortedBy { it.relativePathToOutputDirectory }
   }
-
-//  private fun build(
-//    moduleDescriptors: Iterable<DokkaModuleDescriptionImpl>,
-//  ): List<DokkaModuleDescriptionImpl> =
-//    moduleDescriptors
-//      // Sort so the output is stable.
-//      // `relativePathToOutputDirectory` is better than `name` since it's guaranteed to be unique
-//      // across all modules (otherwise they'd be generated into the same directory), and even
-//      // though it's a file - it's a _relative_ file, so the ordering should be stable across
-//      // machines (which is important for relocatable Build Cache).
-//      .sortedBy { it.relativePathToOutputDirectory }
-//
-//  private fun build(spec: DokkaModuleDescriptionSpec): DokkaModuleDescriptionImpl {
-//    val moduleDirectory = spec.moduleDirectory
-//      .asFile.orNull
-//      ?: error("missing required moduleDirectory in DokkaModuleDescriptionSpec(${spec.name})")
-//
-//    val moduleIncludes = spec.includes
-//      .elements.orNull
-//      ?.mapToSet { it.asFile }
-//      ?: emptySet() // 'include' files are optional
-//
-//    val projectPath = spec.projectPath.orNull?.ifBlank { null }
-//      ?: error("missing required projectPath in DokkaModuleDescriptionSpec(${spec.name})")
-//
-//    // `relativeOutputDir` is the path where the Dokka Module should be located within the final
-//    // Dokka Publication.
-//    // Convert a project path e.g. `:x:y:z:my-cool-subproject` to a relative path e.g. `x/y/z/my-cool-subproject`.
-//    // The path has to be unique per module - using the project path is a useful way to achieve this.
-//    val relativeOutputDir = File(projectPath.removePrefix(":").replace(':', '/'))
-//
-//    return DokkaModuleDescriptionImpl(
-//      name = spec.moduleName,
-//      relativePathToOutputDirectory = relativeOutputDir,
-//      includes = moduleIncludes,
-//      sourceOutputDirectory = moduleDirectory,
-//    )
-//  }
 
   private fun build(spec: DokkaPluginParametersBaseSpec): PluginConfigurationImpl {
     return PluginConfigurationImpl(

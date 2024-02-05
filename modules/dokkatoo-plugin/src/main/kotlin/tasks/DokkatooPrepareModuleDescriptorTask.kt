@@ -1,67 +1,56 @@
 package dev.adamko.dokkatoo.tasks
 
-import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.jsonMapper
-import dev.adamko.dokkatoo.dokka.parameters.DokkaModuleDescriptionKxs
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import javax.inject.Inject
-import kotlinx.serialization.encodeToString
+import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.model.ReplacedBy
 import org.gradle.api.provider.Property
-import org.gradle.api.tasks.*
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.TaskAction
 
 /**
- * Produces a Dokka Configuration that describes a single module of a multimodule Dokka configuration.
+ * Deprecated:
  *
- * @see dev.adamko.dokkatoo.dokka.parameters.DokkaModuleDescriptionKxs
+ * The `module-descriptor.json` that this task produced was not compatible with relocatable
+ * build-cache.
+ *
+ * Generation of the Module Descriptor JSON was moved into [DokkatooGenerateModuleTask].
+ * This task now does nothing and should not be used.
+ *
+ * @see dev.adamko.dokkatoo.tasks.DokkatooGenerateModuleTask
  */
-//@CacheableTask
-@Deprecated("not build-cache compatible")
+@Deprecated(
+  "The module-descriptor.json that this task produced was not compatible with relocatable build-cache. " +
+      "Module Descriptor JSON generation was moved into DokkatooGenerateModuleTask. " +
+      "This task now does nothing and should not be used."
+)
 abstract class DokkatooPrepareModuleDescriptorTask
 @DokkatooInternalApi
 @Inject
 constructor() : DokkatooTask() {
 
-  @get:OutputFile
-  abstract val moduleDescriptor: RegularFileProperty
+  @get:Internal
+  abstract val dokkaModuleDescriptorJson: RegularFileProperty
 
-  @get:Input
+  @get:Internal
   abstract val moduleName: Property<String>
 
-  @get:Input
+  @get:Internal
   abstract val modulePath: Property<String>
 
-//  @get:InputDirectory
-//  @get:PathSensitive(RELATIVE)
-//  abstract val moduleDirectory: DirectoryProperty
-//
-//  @get:InputFiles
-//  @get:Optional
-//  @get:PathSensitive(RELATIVE)
-//  abstract val includes: ConfigurableFileCollection
+  @get:Internal
+  abstract val moduleDirectory: DirectoryProperty
+
+  @get:Internal
+  abstract val includes: ConfigurableFileCollection
+
+  init {
+    super.doNotTrackState("$path has be deprecated and should no longer be used")
+  }
 
   @TaskAction
   internal fun generateModuleConfiguration() {
-    val moduleName = moduleName.get()
-    val modulePath = modulePath.get()
-
-    val moduleDesc = DokkaModuleDescriptionKxs(
-      name = moduleName,
-      modulePath = modulePath,
-    )
-
-    val encodedModuleDesc =
-      jsonMapper.encodeToString(DokkaModuleDescriptionKxs.serializer(), moduleDesc)
-
-    logger.info("encodedModuleDesc: $encodedModuleDesc")
-
-    moduleDescriptor.get().asFile.writeText(encodedModuleDesc)
+    logger.warn("$path has been deprecated and should no longer be used.")
   }
-
-  //region deprecated properties
-  @Deprecated("Renamed to moduleDescriptorJson", ReplaceWith("moduleDescriptor"))
-  @get:ReplacedBy("moduleDescriptor")
-  @Suppress("unused")
-  val dokkaModuleDescriptorJson: RegularFileProperty by ::moduleDescriptor
-  //endregion
 }

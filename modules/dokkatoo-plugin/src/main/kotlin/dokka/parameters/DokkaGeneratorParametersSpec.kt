@@ -1,6 +1,7 @@
 package dev.adamko.dokkatoo.dokka.parameters
 
-import dev.adamko.dokkatoo.internal.*
+import dev.adamko.dokkatoo.internal.DokkaPluginParametersContainer
+import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import dev.adamko.dokkatoo.internal.adding
 import dev.adamko.dokkatoo.internal.domainObjectContainer
 import javax.inject.Inject
@@ -87,56 +88,8 @@ constructor(
   @Suppress("unused")
   abstract val dokkaModuleFiles: ConfigurableFileCollection
 
-//  @get:Nested
-//  abstract val moduleDescriptors: NamedDomainObjectContainer<DokkaModuleDescriptionSpec>
-
+  /** Dokka Modules directories, containing the output, module descriptor, and module includes. */
   @get:InputFiles
   @get:PathSensitive(RELATIVE)
   abstract val moduleOutputDirectories: ConfigurableFileCollection
 }
-
-//
-//
-//private fun createModuleDescriptors(
-//  formatDependencies: FormatDependenciesManager
-//): NamedDomainObjectContainer<DokkaModuleDescriptionSpec> {
-//  val incomingModuleDescriptors =
-//    formatDependencies.moduleDirectory.incomingArtifacts.map { moduleOutputDirectoryArtifact ->
-//      moduleOutputDirectoryArtifact.map { moduleDirArtifact ->
-//        createModuleDescriptor(formatDependencies, moduleDirArtifact)
-//      }
-//    }
-//
-//  val dokkaModuleDescriptors = objects.domainObjectContainer<DokkaModuleDescriptionSpec>()
-//  dokkaModuleDescriptors.addAllLater(incomingModuleDescriptors)
-//  return dokkaModuleDescriptors
-//}
-//
-//private fun createModuleDescriptor(
-//  formatDependencies: FormatDependenciesManager,
-//  moduleDirArtifact: ResolvedArtifactResult,
-//): DokkaModuleDescriptionSpec {
-//  fun missingAttributeError(name: String): Nothing =
-//    error("missing $name in artifact:$moduleDirArtifact, variant:${moduleDirArtifact.variant}, attributes: ${moduleDirArtifact.variant.attributes.toMap()}")
-//
-//  val moduleName = moduleDirArtifact.variant.attributes[DokkatooAttribute.DokkatooModuleNameAttribute]
-//    ?: missingAttributeError("DokkatooModuleNameAttribute")
-//
-//  val projectPath = moduleDirArtifact.variant.attributes[DokkatooAttribute.DokkatooModulePathAttribute]
-//    ?: missingAttributeError("DokkatooModulePathAttribute")
-//
-//  val moduleDirectory = moduleDirArtifact.file
-//
-//  val includes: Provider<List<File>> =
-//    formatDependencies.moduleIncludes.incomingArtifacts.map { artifacts ->
-//      artifacts
-//        .filter { artifact -> artifact.variant.attributes[DokkatooAttribute.DokkatooModuleNameAttribute] == moduleName }
-//        .map(ResolvedArtifactResult::getFile)
-//    }
-//
-//  return objects.newInstance<DokkaModuleDescriptionSpec>(moduleName.name).apply {
-//    this.moduleDirectory.convention(layout.dir(providers.provider { moduleDirectory })) // https://github.com/gradle/gradle/issues/23708
-//    this.includes.from(includes)
-//    this.projectPath.convention(projectPath.name)
-//  }
-//}

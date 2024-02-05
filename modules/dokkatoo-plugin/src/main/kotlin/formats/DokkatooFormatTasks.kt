@@ -5,12 +5,11 @@ import dev.adamko.dokkatoo.dependencies.FormatDependenciesManager
 import dev.adamko.dokkatoo.dokka.DokkaPublication
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import dev.adamko.dokkatoo.internal.configuring
-import dev.adamko.dokkatoo.tasks.*
-import java.io.File
+import dev.adamko.dokkatoo.tasks.DokkatooGenerateModuleTask
+import dev.adamko.dokkatoo.tasks.DokkatooGeneratePublicationTask
+import dev.adamko.dokkatoo.tasks.DokkatooGenerateTask
+import dev.adamko.dokkatoo.tasks.TaskNames
 import org.gradle.api.Project
-import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.file.ProjectLayout
-import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.*
@@ -24,13 +23,10 @@ class DokkatooFormatTasks(
   private val formatDependencies: FormatDependenciesManager,
 
   private val providers: ProviderFactory,
-//  private val moduleDescriptors: NamedDomainObjectContainer<DokkaModuleDescriptionSpec>,
 ) {
   private val formatName: String get() = publication.formatName
 
   private val taskNames = TaskNames(formatName)
-
-//  private val layout: ProjectLayout = project.layout
 
   private fun DokkatooGenerateTask.applyFormatSpecificConfiguration() {
     runtimeClasspath.from(
@@ -60,7 +56,6 @@ class DokkatooFormatTasks(
       publication.pluginsConfiguration,
     ).configuring task@{
       description = "Executes the Dokka Generator, generating the $formatName publication"
-//      generationType.set(DokkatooGenerateTask.GenerationType.PUBLICATION)
 
       outputDirectory.convention(dokkatooExtension.dokkatooPublicationDirectory.dir(formatName))
 
@@ -73,33 +68,18 @@ class DokkatooFormatTasks(
       publication.pluginsConfiguration,
     ).configuring task@{
       description = "Executes the Dokka Generator, generating a $formatName module"
-//      generationType.set(DokkatooGenerateTask.GenerationType.MODULE)
 
       outputDirectory.convention(dokkatooExtension.dokkatooModuleDirectory.dir(formatName))
 
       applyFormatSpecificConfiguration()
     }
 
-//  private val prepareModuleDescriptor: TaskProvider<DokkatooPrepareModuleDescriptorTask> =
-//    project.tasks.register<DokkatooPrepareModuleDescriptorTask>(
-//      taskNames.prepareModuleDescriptor
-//    ) task@{
-//      description = "Prepares the Dokka Module Descriptor for $formatName"
-//      moduleDescriptor.convention(temporaryDir.resolve("module-descriptor.json"))
-//    }
-
-//  val consolidateModuleElements: TaskProvider<ConsolidateDokkaModuleElementsTask> =
-//    project.tasks.register<ConsolidateDokkaModuleElementsTask>(taskNames.consolidateModuleElements) {
-////      outputDirectory.convention(temporaryDir)
-//      outputDirectory.convention(temporaryDir)
-//      moduleDescriptor.convention(prepareModuleDescriptor.flatMap { it.moduleDescriptor })
-//      moduleDirectory.convention(generateModule.flatMap { it.outputDirectory })
-//    }
-
-//  //region workaround for https://github.com/gradle/gradle/issues/23708
-//  private fun DirectoryProperty.convention(file: File): DirectoryProperty =
-//    convention(layout.dir(providers.provider { file }))
-//  private fun RegularFileProperty.convention(file: File): RegularFileProperty =
-//    convention(layout.file(providers.provider { file }))
-//  //endregion
+  @Suppress("DEPRECATION", "unused")
+  @Deprecated("DokkatooPrepareModuleDescriptorTask was not compatible with relocatable Gradle Build Cache and has been replaced with a dark Gradle devilry. All references to DokkatooPrepareModuleDescriptorTask must be removed.")
+  val prepareModuleDescriptor: TaskProvider<dev.adamko.dokkatoo.tasks.DokkatooPrepareModuleDescriptorTask> =
+    project.tasks.register<dev.adamko.dokkatoo.tasks.DokkatooPrepareModuleDescriptorTask>(
+      taskNames.prepareModuleDescriptor
+    ) task@{
+      description = "[Deprecated ⚠️] Prepares the Dokka Module Descriptor for $formatName"
+    }
 }

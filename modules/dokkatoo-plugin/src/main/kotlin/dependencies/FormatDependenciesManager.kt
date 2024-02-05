@@ -59,28 +59,15 @@ class FormatDependenciesManager(
     attribute(LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(JAR))
   }
 
-
-//  /** Contains dependencies declared in a [Project.dependencies] block. */
-//  private val declaredDependencies: Configuration =
-//    project.configurations.create(configurationNames.dokkatoo) {
-//      description = "Declared Dokkatoo dependencies for $formatName."
-//      declarable()
-//      extendsFrom(baseDependencyManager.declaredDependencies)
-//    }
-
-
   /** Collect [BaseDependencyManager.declaredDependencies]. */
   val incoming: NamedDomainObjectProvider<Configuration> =
     project.configurations.register(configurationNames.dokkatooResolver) {
       description = "Resolve Dokkatoo declared dependencies for $formatName."
       resolvable()
-//      extendsFrom(declaredDependencies)
       extendsFrom(baseDependencyManager.declaredDependencies)
       attributes {
         attribute(USAGE_ATTRIBUTE, baseAttributes.dokkatooUsage)
         attribute(DokkatooFormatAttribute, formatAttributes.format)
-        //attributeProvider(DokkatooModulePathAttribute, baseAttributes.modulePath)
-        //attributeProvider(DokkatooModuleNameAttribute, baseAttributes.moduleName)
       }
     }
 
@@ -166,28 +153,30 @@ class FormatDependenciesManager(
     }
   //endregion
 
-  private fun componentDependencies(component: DokkatooAttribute.ModuleComponent): ModuleComponentDependencies =
+  private fun componentDependencies(
+    component: DokkatooAttribute.ModuleComponent
+  ): ModuleComponentDependencies =
     ModuleComponentDependencies(
       project = project,
       component = component,
       baseAttributes = baseAttributes,
       formatAttributes = formatAttributes,
       declaredDependencies = baseDependencyManager.declaredDependencies,
-//      baseOutgoing = baseDependencyManager.outgoing,
       baseConfigurationName = configurationNames.dokkatoo,
     )
 
-//  /**
-//   * @see org.jetbrains.dokka.DokkaConfiguration.DokkaModuleDescription.sourceOutputDirectory
-//   */
-//  val moduleDirectory: ModuleComponent = ModuleComponent(formatAttributes.moduleDirectory)
-//
-//  /**
-//   * Module includes (might not be used?)
-//   *
-//   * @see org.jetbrains.dokka.DokkaConfiguration.DokkaModuleDescription.includes
-//   */
-//  val moduleIncludes: ModuleComponent = ModuleComponent(formatAttributes.moduleIncludes)
-//  val publicationIncludes: ModuleComponent = ModuleComponent(formatAttributes.publicationIncludes)
-  val moduleOutputDirectories: ModuleComponentDependencies = componentDependencies(formatAttributes.moduleOutputDirectories)
+  /**
+   * Output directories of a Dokka Module.
+   *
+   * Contains
+   *
+   * - `module-descriptor.json`
+   * - module output directory
+   * - module includes directory
+   *
+   * @see dev.adamko.dokkatoo.dokka.parameters.DokkaModuleDescriptionKxs
+   * @see org.jetbrains.dokka.DokkaConfiguration.DokkaModuleDescription.sourceOutputDirectory
+   */
+  val moduleOutputDirectories: ModuleComponentDependencies =
+    componentDependencies(formatAttributes.moduleOutputDirectories)
 }

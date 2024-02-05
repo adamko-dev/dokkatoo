@@ -333,6 +333,11 @@ public abstract class dev/adamko/dokkatoo/formats/DokkatooFormatPlugin : org/gra
 public final class dev/adamko/dokkatoo/formats/DokkatooFormatPlugin$Companion {
 }
 
+public final class dev/adamko/dokkatoo/formats/DokkatooFormatTasks$inlined$sam$i$org_gradle_api_Action$0 : org/gradle/api/Action {
+	public fun <init> (Lkotlin/jvm/functions/Function1;)V
+	public final synthetic fun execute (Ljava/lang/Object;)V
+}
+
 public abstract class dev/adamko/dokkatoo/formats/DokkatooGfmPlugin : dev/adamko/dokkatoo/formats/DokkatooFormatPlugin {
 	public fun configure (Ldev/adamko/dokkatoo/formats/DokkatooFormatPlugin$DokkatooFormatPluginContext;)V
 }
@@ -389,8 +394,9 @@ public final class dev/adamko/dokkatoo/tasks/DokkatooGenerateTask$GenerationType
 }
 
 public abstract class dev/adamko/dokkatoo/tasks/DokkatooPrepareModuleDescriptorTask : dev/adamko/dokkatoo/tasks/DokkatooTask {
-	public final fun getDokkaModuleDescriptorJson ()Lorg/gradle/api/file/RegularFileProperty;
-	public abstract fun getModuleDescriptor ()Lorg/gradle/api/file/RegularFileProperty;
+	public abstract fun getDokkaModuleDescriptorJson ()Lorg/gradle/api/file/RegularFileProperty;
+	public abstract fun getIncludes ()Lorg/gradle/api/file/ConfigurableFileCollection;
+	public abstract fun getModuleDirectory ()Lorg/gradle/api/file/DirectoryProperty;
 	public abstract fun getModuleName ()Lorg/gradle/api/provider/Property;
 	public abstract fun getModulePath ()Lorg/gradle/api/provider/Property;
 }

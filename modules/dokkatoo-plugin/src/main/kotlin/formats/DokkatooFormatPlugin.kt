@@ -79,15 +79,12 @@ abstract class DokkatooFormatPlugin(
         objects = objects,
       )
 
-//      val moduleDescriptors = createModuleDescriptors(formatDependencies)
-
       val dokkatooTasks = DokkatooFormatTasks(
         project = target,
         publication = publication,
         dokkatooExtension = dokkatooExtension,
         formatDependencies = formatDependencies,
         providers = providers,
-//        moduleDescriptors = moduleDescriptors,
       )
 
       formatDependencies.moduleOutputDirectories
