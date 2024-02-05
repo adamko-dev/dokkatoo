@@ -365,17 +365,16 @@ public abstract interface annotation class dev/adamko/dokkatoo/internal/Dokkatoo
 
 public abstract class dev/adamko/dokkatoo/tasks/DokkatooGenerateModuleTask : dev/adamko/dokkatoo/tasks/DokkatooGenerateTask {
 	public abstract fun getModulePath ()Lorg/gradle/api/provider/Property;
-	public abstract fun getOutputDirectory ()Lorg/gradle/api/file/DirectoryProperty;
 }
 
 public abstract class dev/adamko/dokkatoo/tasks/DokkatooGeneratePublicationTask : dev/adamko/dokkatoo/tasks/DokkatooGenerateTask {
-	public abstract fun getOutputDirectory ()Lorg/gradle/api/file/DirectoryProperty;
 }
 
 public abstract class dev/adamko/dokkatoo/tasks/DokkatooGenerateTask : dev/adamko/dokkatoo/tasks/DokkatooTask {
 	public abstract fun getCacheDirectory ()Lorg/gradle/api/file/DirectoryProperty;
 	public abstract fun getGenerationType ()Lorg/gradle/api/provider/Property;
 	public final fun getGenerator ()Ldev/adamko/dokkatoo/dokka/parameters/DokkaGeneratorParametersSpec;
+	public abstract fun getOutputDirectory ()Lorg/gradle/api/file/DirectoryProperty;
 	public abstract fun getPublicationEnabled ()Lorg/gradle/api/provider/Property;
 	public abstract fun getRuntimeClasspath ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public abstract fun getWorkerDebugEnabled ()Lorg/gradle/api/provider/Property;

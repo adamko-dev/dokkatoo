@@ -35,9 +35,6 @@ constructor(
   pluginsConfiguration = pluginsConfiguration,
 ) {
 
-  @get:OutputDirectory
-  abstract val outputDirectory: DirectoryProperty
-
   @get:Input
   abstract val modulePath: Property<String>
 

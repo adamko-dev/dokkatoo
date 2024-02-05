@@ -38,9 +38,6 @@ constructor(
   pluginsConfiguration = pluginsConfiguration,
 ) {
 
-  @get:OutputDirectory
-  abstract val outputDirectory: DirectoryProperty
-
   @TaskAction
   internal fun generatePublication() {
     val outputDirectory = outputDirectory.get().asFile

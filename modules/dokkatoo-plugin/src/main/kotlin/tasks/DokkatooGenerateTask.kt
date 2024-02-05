@@ -25,9 +25,9 @@ import org.jetbrains.dokka.DokkaConfiguration
 import org.jetbrains.dokka.toPrettyJsonString
 
 /**
- * Executes the Dokka Generator, and produces documentation.
+ * Base task for executing Dokka Generator, producing documentation.
  *
- * The type of documentation generated is determined by the supplied Dokka Plugins in [generator].
+ * The Dokka Plugins added to the generator classpath determine the type of documentation generated.
  */
 @CacheableTask
 abstract class DokkatooGenerateTask
@@ -43,6 +43,13 @@ constructor(
    */
   pluginsConfiguration: DokkaPluginParametersContainer,
 ) : DokkatooTask() {
+
+  /**
+   * Directory containing the generation result. The content and structure depends on whether
+   * the task generates a Dokka Module or a Dokka Publication.
+   */
+  @get:OutputDirectory
+  abstract val outputDirectory: DirectoryProperty
 
   /**
    * Classpath required to run Dokka Generator.
