@@ -24,9 +24,8 @@ import org.gradle.kotlin.dsl.*
 
 /**
  * Dependencies for a specific Dokka Format - for example, HTML or Markdown.
- */
-/**
- * The Dokka-specific Gradle [Configuration]s used to declare, resolve, and share dependencies
+ *
+ * The [Configuration] here are used to declare, resolve, and share dependencies
  * from external sources (example: Maven Central), or between subprojects.
  *
  * (Be careful of the confusing names: Gradle [Configuration]s are used to transfer files,
@@ -126,6 +125,7 @@ class FormatDependenciesManager(
       // extend from plugins classpath, so Dokka Worker can run the plugins
       extendsFrom(dokkaPluginsClasspath.get())
     }
+
   /**
    * Runtime classpath used to execute Dokka Worker.
    *

@@ -6,16 +6,21 @@ import dev.adamko.dokkatoo.internal.DokkaPluginParametersContainer
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import java.io.File
 import javax.inject.Inject
-import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.FileSystemOperations
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.workers.WorkerExecutor
 
+
+/**
+ * Generates a Dokka Module.
+ *
+ * Dokka Modules are 'incomplete', and must be combined into a single Dokka Publication
+ * by [DokkatooGeneratePublicationTask].
+ */
 @CacheableTask
 abstract class DokkatooGenerateModuleTask
 @DokkatooInternalApi
