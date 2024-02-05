@@ -106,7 +106,7 @@ internal object DokkaParametersBuilder {
           sourceOutputDirectory = moduleOutputDirectory,
         )
 
-        logger.lifecycle("[${this::class}] converted $moduleDir to $md")
+        logger.info("[${this::class}] converted $moduleDir to $md")
 
         md
       }
