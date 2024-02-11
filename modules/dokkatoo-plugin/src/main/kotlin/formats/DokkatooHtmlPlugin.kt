@@ -8,24 +8,31 @@ import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import dev.adamko.dokkatoo.internal.uppercaseFirstChar
 import dev.adamko.dokkatoo.tasks.DokkatooGeneratePublicationTask
 import dev.adamko.dokkatoo.tasks.LogHtmlPublicationLinkTask
+import java.io.File
+import javax.inject.Inject
 import org.gradle.api.Action
 import org.gradle.api.Task
-import org.gradle.api.artifacts.component.ProjectComponentIdentifier
+import org.gradle.api.file.ArchiveOperations
 import org.gradle.api.logging.Logging
-import org.gradle.api.provider.Provider
+import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.*
 
 abstract class DokkatooHtmlPlugin
 @DokkatooInternalApi
-constructor() : DokkatooFormatPlugin(formatName = "html") {
+@Inject
+constructor(
+  archives: ArchiveOperations,
+  providers: ProviderFactory,
+) : DokkatooFormatPlugin(formatName = "html") {
+
+  private val moduleAggregationCheck: HtmlModuleAggregationCheck =
+    HtmlModuleAggregationCheck(archives, providers)
 
   override fun DokkatooFormatPluginContext.configure() {
     registerDokkaBasePluginConfiguration()
     registerDokkaVersioningPlugin()
-
     configureHtmlUrlLogging()
-
     configureModuleAggregation()
   }
 
@@ -40,8 +47,8 @@ constructor() : DokkatooFormatPlugin(formatName = "html") {
     }
   }
 
+  /** register and configure Dokka Versioning Plugin */
   private fun DokkatooFormatPluginContext.registerDokkaVersioningPlugin() {
-    // register and configure Dokka Versioning Plugin
     with(dokkatooExtension.pluginsConfiguration) {
       registerBinding(
         DokkaVersioningPluginParameters::class,
@@ -92,27 +99,14 @@ constructor() : DokkatooFormatPlugin(formatName = "html") {
    */
   private fun DokkatooFormatPluginContext.configureModuleAggregation() {
 
-    val dokkatooIsAggregatingSubprojects: Provider<Boolean> =
-      formatDependencies.incoming.map { dokkatoo ->
-        dokkatoo.incoming.artifacts.artifacts.any { artifact ->
-          logger.info("${dokkatoo.name} depends on ${artifact.id}, project:${artifact.id.componentIdentifier is ProjectComponentIdentifier}")
-          artifact.id.componentIdentifier is ProjectComponentIdentifier
-        }
-      }
-
-    formatDependencies.dokkaPluginsClasspath.configure {
-      dependencies.addAllLater(dokkatooIsAggregatingSubprojects.map { aggregating ->
-        buildList {
-          if (aggregating) {
-            logger.info("Automatically adding dependency on all-modules-page-plugin")
-            add("org.jetbrains.dokka:all-modules-page-plugin")
-          }
-        }.map { project.dependencies.create(it) }
-      })
+    dokkatooTasks.generatePublication.configure {
+      doFirst("check all-modules-page-plugin is present", moduleAggregationCheck)
     }
 
-    dokkatooTasks.generatePublication.configure {
-      doFirst("check module aggregation has all-modules-page-plugin", ModuleAggregationCheck)
+    formatDependencies.dokkaPublicationPluginClasspathApiOnly.configure {
+      dependencies.addLater(dokkatooExtension.versions.jetbrainsDokka.map { v ->
+        project.dependencies.create("org.jetbrains.dokka:all-modules-page-plugin:$v")
+      })
     }
   }
 
@@ -120,35 +114,66 @@ constructor() : DokkatooFormatPlugin(formatName = "html") {
    * Log a warning if the publication has 1+ modules but `all-modules-page-plugin` is not present,
    * because otherwise Dokka happily runs and produces no output, which is baffling and unhelpful.
    */
-  private object ModuleAggregationCheck : Action<Task> {
+  private class HtmlModuleAggregationCheck(
+    private val archives: ArchiveOperations,
+    private val providers: ProviderFactory,
+  ) : Action<Task> {
+
+    private val checkEnabled: Boolean
+      get() = providers
+        .gradleProperty(HTML_MODULE_AGGREGATION_CHECK_ENABLED)
+        .map(String::toBoolean)
+        .getOrElse(true)
+
     override fun execute(task: Task) {
+      if (!checkEnabled) {
+        logger.info("[${task.path} ModuleAggregationCheck] check is disabled")
+        return
+      }
+
       require(task is DokkatooGeneratePublicationTask) {
-        "[DokkatooHtmlPlugin] ModuleAggregationCheck expected DokkatooGeneratePublicationTask but got ${task::class}"
+        "[${task.path} ModuleAggregationCheck] expected DokkatooGeneratePublicationTask but got ${task::class}"
       }
 
       val modulesCount = task.generator.moduleOutputDirectories.count()
 
-      if (modulesCount > 0) {
-        val moduleAggregationPluginInClasspath =
-          task.generator.pluginsClasspath.any { "all-modules-page-plugin" in it.name }
-        if (!moduleAggregationPluginInClasspath) {
-          val moduleName = task.generator.moduleName.get()
+      if (modulesCount <= 0) {
+        logger.info("[${task.path} ModuleAggregationCheck] skipping check - publication does not have 1+ modules")
+        return
+      }
 
-          logger.error(
-            /* language=text */ """
-              |[${task.path}] org.jetbrains.dokka:all-modules-page-plugin is missing
-              |
-              |Publication '$moduleName' in has $modulesCount modules, but plugins classpath does not contain 
-              |org.jetbrains.dokka:all-modules-page-plugin, which is required for aggregating HTML modules.
-              |
-              |all-modules-page-plugin should be added automatically.
-              |
-              | - verify that the dependency has not been excluded
-              | - raise an issue https://github.com/adamko-dev/dokkatoo/issues
-              |
-            """.trimMargin()
-          )
+      val allDokkaPlugins = task.generator.pluginsClasspath
+        .flatMap { file ->
+          extractDokkaPluginMarkers(archives, file)
         }
+
+      val allModulesPagePluginPresent = allDokkaPlugins.any { ALL_MODULES_PAGE_PLUGIN_FQN in it }
+      logger.info("[${task.path} ModuleAggregationCheck] allModulesPagePluginPresent:$allModulesPagePluginPresent")
+
+      if (!allModulesPagePluginPresent) {
+        val moduleName = task.generator.moduleName.get()
+
+        logger.warn(/* language=text */ """
+            |[${task.path}] org.jetbrains.dokka:all-modules-page-plugin is missing.
+            |
+            |Publication '$moduleName' in has $modulesCount modules, but
+            |the Dokka Generator plugins classpath does not contain 
+            |   org.jetbrains.dokka:all-modules-page-plugin
+            |which is required for aggregating Dokka HTML modules.
+            |
+            |Dokkatoo should have added org.jetbrains.dokka:all-modules-page-plugin automatically.
+            |
+            |Generation will proceed, but the generated output might not contain the full HTML docs.
+            |
+            |Suggestions:
+            | - Verify that the dependency has not been excluded.
+            | - Raise an issue https://github.com/adamko-dev/dokkatoo/issues
+            |
+            |(all plugins: ${allDokkaPlugins.sorted().joinToString()})
+          """
+          .trimMargin()
+          .prependIndent("> ")
+        )
       }
     }
   }
@@ -156,5 +181,29 @@ constructor() : DokkatooFormatPlugin(formatName = "html") {
   @DokkatooInternalApi
   companion object {
     private val logger = Logging.getLogger(DokkatooHtmlPlugin::class.java)
+
+    private const val ALL_MODULES_PAGE_PLUGIN_FQN =
+      "org.jetbrains.dokka.allModulesPage.AllModulesPagePlugin"
+
+    private const val HTML_MODULE_AGGREGATION_CHECK_ENABLED =
+      "dev.adamko.dokkatoo.tasks.html.moduleAggregationCheckEnabled"
+
+    private const val DOKKA_PLUGIN_MARKER_PATH =
+      "/META-INF/services/org.jetbrains.dokka.plugability.DokkaPlugin"
+
+    internal fun extractDokkaPluginMarkers(archives: ArchiveOperations, file: File): List<String> {
+      val markers = archives.zipTree(file)
+        .matching { include(DOKKA_PLUGIN_MARKER_PATH) }
+
+      val pluginIds = markers.flatMap { marker ->
+        marker.useLines { lines ->
+          lines
+            .filter { line -> line.isNotBlank() && !line.startsWith("#") }
+            .toList()
+        }
+      }
+
+      return pluginIds
+    }
   }
 }

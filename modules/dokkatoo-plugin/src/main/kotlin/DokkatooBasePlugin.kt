@@ -325,10 +325,12 @@ constructor(
     const val TASK_GROUP = "dokkatoo"
 
     /** The names of [Gradle tasks][org.gradle.api.Task] created by Dokkatoo */
-    val taskNames = TaskNames(null)
+    val taskNames = TaskNames("")
 
     /** The names of [Configuration]s created by Dokkatoo */
-    val dependencyContainerNames = DependencyContainerNames(null)
+    @Deprecated("no longer used")
+    @Suppress("unused")
+    val dependencyContainerNames = DependencyContainerNames("null")
 
     /** Name of the [Configuration] used to declare dependencies on other subprojects. */
     const val DOKKATOO_CONFIGURATION_NAME = "dokkatoo"

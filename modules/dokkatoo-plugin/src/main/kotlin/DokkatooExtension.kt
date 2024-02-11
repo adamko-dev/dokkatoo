@@ -53,7 +53,7 @@ constructor(
    * This is primarily used by Kotlin Multiplatform projects, which can have multiple source sets
    * per subproject.
    *
-   * Defaults to [the path of the subproject][org.gradle.api.Project.getPath].
+   * Defaults to [the Gradle path of the subproject][org.gradle.api.Project.getPath].
    */
   abstract val sourceSetScopeDefault: Property<String>
 

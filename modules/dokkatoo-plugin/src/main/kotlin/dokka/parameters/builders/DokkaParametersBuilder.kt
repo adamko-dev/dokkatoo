@@ -4,9 +4,12 @@ import dev.adamko.dokkatoo.DokkatooBasePlugin
 import dev.adamko.dokkatoo.dokka.parameters.DokkaGeneratorParametersSpec
 import dev.adamko.dokkatoo.dokka.parameters.DokkaModuleDescriptionKxs
 import dev.adamko.dokkatoo.dokka.plugins.DokkaPluginParametersBaseSpec
+import dev.adamko.dokkatoo.formats.DokkatooHtmlPlugin.Companion.extractDokkaPluginMarkers
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import java.io.File
 import org.gradle.api.Project
+import org.gradle.api.file.ArchiveOperations
+import org.gradle.api.file.FileCollection
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 import org.jetbrains.dokka.*
@@ -19,7 +22,9 @@ import org.jetbrains.dokka.*
  * leaking into the public API.
  */
 @DokkatooInternalApi
-internal object DokkaParametersBuilder {
+internal class DokkaParametersBuilder(
+  private val archives: ArchiveOperations,
+) {
 
   private val logger: Logger = Logging.getLogger(DokkaParametersBuilder::class.java)
 
@@ -40,7 +45,10 @@ internal object DokkaParametersBuilder {
     val finalizeCoroutines = spec.finalizeCoroutines.get()
     val pluginsConfiguration = spec.pluginsConfiguration.toSet()
 
-    val pluginsClasspath = spec.pluginsClasspath.files.toList()
+    val pluginsClasspath = buildPluginsClasspath(
+      plugins = spec.pluginsClasspath,
+    )
+
     val includes = spec.includes.files
 
     return DokkaConfigurationImpl(
@@ -60,6 +68,18 @@ internal object DokkaParametersBuilder {
       suppressInheritedMembers = suppressInheritedMembers,
       finalizeCoroutines = finalizeCoroutines,
     )
+  }
+
+  private fun buildPluginsClasspath(
+    plugins: FileCollection,
+  ): List<File> {
+    // only include dependencies with Dokka Plugin markers
+    return plugins
+      .filter { file ->
+        val pluginIds = extractDokkaPluginMarkers(archives, file)
+        pluginIds.isNotEmpty()
+      }
+      .toList()
   }
 
   private fun buildModuleDescriptors(

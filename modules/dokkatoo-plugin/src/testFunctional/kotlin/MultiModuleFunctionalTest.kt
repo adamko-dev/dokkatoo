@@ -229,6 +229,7 @@ class MultiModuleFunctionalTest : FunSpec({
             ":dokkatooGenerate",
             "--stacktrace",
             "--build-cache",
+            "-D" + "org.gradle.caching.debug=true"
           )
           .forwardOutput()
           .build {
@@ -623,7 +624,9 @@ class MultiModuleFunctionalTest : FunSpec({
               .walk()
               .filter { it.isFile && it.extension == "html" }
 
-            htmlFiles.shouldNotBeEmpty()
+            withClue("html files should be generated") {
+              htmlFiles.shouldNotBeEmpty()
+            }
 
             htmlFiles.forEach { htmlFile ->
               val relativePath = htmlFile.relativeTo(project.projectDir.toFile())

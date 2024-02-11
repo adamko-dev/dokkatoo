@@ -63,6 +63,11 @@ class AndroidProjectIntegrationTest : FunSpec({
                 )
               }
           }
+
+          test("expect configurations are not resolved during configuration time") {
+            output shouldNotContain Regex("""Configuration '.*' was resolved during configuration time""")
+            output shouldNotContain "https://github.com/gradle/gradle/issues/2298"
+          }
         }
     }
 

@@ -6,6 +6,7 @@ import dev.adamko.dokkatoo.internal.DokkaPluginParametersContainer
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import java.io.File
 import javax.inject.Inject
+import org.gradle.api.file.ArchiveOperations
 import org.gradle.api.file.FileSystemOperations
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
@@ -28,6 +29,7 @@ abstract class DokkatooGenerateModuleTask
 constructor(
   objects: ObjectFactory,
   workers: WorkerExecutor,
+  archives: ArchiveOperations,
   private val fs: FileSystemOperations,
   /**
    * Configurations for Dokka Generator Plugins. Must be provided from
@@ -38,6 +40,7 @@ constructor(
   objects = objects,
   workers = workers,
   pluginsConfiguration = pluginsConfiguration,
+  archives = archives,
 ) {
 
   @get:Input

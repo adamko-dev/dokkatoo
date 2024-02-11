@@ -64,6 +64,7 @@ class DokkatooPluginFunctionalTest : FunSpec({
           expectedFormats.flatMap {
             listOf(
               "dokkatoo${it}ModuleOutputDirectoriesConsumable",
+              "dokkatoo${it}PublicationPluginClasspathApiOnlyConsumable",
             )
           }
         )
@@ -111,8 +112,9 @@ class DokkatooPluginFunctionalTest : FunSpec({
             buildSet {
               addAll(expectedFormats.map { "dokkatoo${it}Resolver" })
               addAll(expectedFormats.map { "dokkatoo${it}GeneratorClasspathResolver" })
-              addAll(expectedFormats.map { "dokkatoo${it}PluginsClasspathIntransitiveResolver" })
               addAll(expectedFormats.map { "dokkatoo${it}ModuleOutputDirectoriesResolver" })
+              addAll(expectedFormats.map { "dokkatoo${it}PluginsClasspathIntransitiveResolver" })
+              addAll(expectedFormats.map { "dokkatoo${it}PublicationPluginClasspathResolver" })
             }
           )
 

@@ -87,8 +87,9 @@ constructor(
 
     val logHtmlPublicationLinkTaskEnabled = providers
       .gradleProperty(ENABLE_TASK_PROPERTY_NAME)
-      .orElse("true")
       .map(String::toBoolean)
+      .orElse(true)
+
     super.onlyIf("task is enabled via property") {
       logHtmlPublicationLinkTaskEnabled.get()
     }

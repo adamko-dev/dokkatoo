@@ -13,6 +13,7 @@ import dev.adamko.dokkatoo.dependencies.FormatDependenciesManager
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import javax.inject.Inject
 import org.gradle.api.Action
+import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
@@ -27,7 +28,6 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
-import org.gradle.api.tasks.PathSensitivity.RELATIVE
 import org.gradle.kotlin.dsl.*
 
 /**
@@ -89,6 +89,7 @@ abstract class DokkatooFormatPlugin(
 
       formatDependencies.moduleOutputDirectories
         .outgoing
+        .get()
         .outgoing
         .artifact(dokkatooTasks.generateModule.map { it.outputDirectory }) {
           builtBy(dokkatooTasks.generateModule)
@@ -98,6 +99,9 @@ abstract class DokkatooFormatPlugin(
       dokkatooTasks.generatePublication.configure {
         generator.moduleOutputDirectories.from(
           formatDependencies.moduleOutputDirectories.incomingArtifactFiles
+        )
+        generator.pluginsClasspath.from(
+          formatDependencies.dokkaPublicationPluginClasspathResolver
         )
       }
 
@@ -122,15 +126,17 @@ abstract class DokkatooFormatPlugin(
         listOf(
           formatDependencies.dokkaPluginsIntransitiveClasspathResolver,
           formatDependencies.dokkaGeneratorClasspathResolver,
-        ).forEach { dependenciesContainer: Configuration ->
+        ).forEach { dependenciesContainer: NamedDomainObjectProvider<Configuration> ->
           // Add a version if one is missing, which will allow defining a org.jetbrains.dokka
           // dependency without a version.
           // (It would be nice to do this with a virtual-platform, but Gradle is bugged:
           // https://github.com/gradle/gradle/issues/27435)
-          dependenciesContainer.resolutionStrategy.eachDependency {
-            if (requested.group == "org.jetbrains.dokka" && requested.version.isNullOrBlank()) {
-              logger.info("adding version of dokka dependency '$requested'")
-              useVersion(dokkatooExtension.versions.jetbrainsDokka.get())
+          dependenciesContainer.configure {
+            resolutionStrategy.eachDependency {
+              if (requested.group == "org.jetbrains.dokka" && requested.version.isNullOrBlank()) {
+                logger.info("adding version of dokka dependency '$requested'")
+                useVersion(dokkatooExtension.versions.jetbrainsDokka.get())
+              }
             }
           }
         }
@@ -211,17 +217,15 @@ abstract class DokkatooFormatPlugin(
         version.map { v -> create("$this:$v") }
 
       with(dokkatooExtension.versions) {
-        dokkaPlugin(dokka("analysis-kotlin-descriptors"))
         dokkaPlugin(dokka("templating-plugin"))
         dokkaPlugin(dokka("dokka-base"))
-        //dokkaPlugin(dokka("all-modules-page-plugin"))
 
-        dokkaPlugin("org.jetbrains.kotlinx:kotlinx-html" version kotlinxHtml)
-        dokkaPlugin("org.freemarker:freemarker" version freemarker)
-
+        dokkaGenerator(dokka("analysis-kotlin-descriptors"))
         dokkaGenerator(dokka("dokka-core"))
+        dokkaGenerator("org.freemarker:freemarker" version freemarker)
         dokkaGenerator("org.jetbrains:markdown" version jetbrainsMarkdown)
         dokkaGenerator("org.jetbrains.kotlinx:kotlinx-coroutines-core" version kotlinxCoroutines)
+        dokkaGenerator("org.jetbrains.kotlinx:kotlinx-html" version kotlinxHtml)
       }
     }
   }

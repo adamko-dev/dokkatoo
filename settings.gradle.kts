@@ -9,7 +9,6 @@ pluginManagement {
 
 @Suppress("UnstableApiUsage")
 dependencyResolutionManagement {
-
   repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
 
   repositories {
