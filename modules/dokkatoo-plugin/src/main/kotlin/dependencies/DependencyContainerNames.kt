@@ -14,7 +14,7 @@ import org.gradle.api.artifacts.Configuration
  * - [DokkaConfiguration][org.jetbrains.dokka.DokkaConfiguration] - parameters for executing the Dokka Generator
  */
 @DokkatooInternalApi
-class DependencyContainerNames(override val formatName: String?) : HasFormatName() {
+class DependencyContainerNames(override val formatName: String) : HasFormatName() {
 
   val dokkatoo = DOKKATOO_CONFIGURATION_NAME.appendFormat()
   val dokkatooResolver = "${dokkatoo}Resolver"
@@ -24,7 +24,7 @@ class DependencyContainerNames(override val formatName: String?) : HasFormatName
    *
    * Includes transitive dependencies, so this can be passed to the Dokka Generator Worker classpath.
    *
-   * Will be used in user's build scripts to declare additional Dokka Plugins.
+   * Will be used in user's build scripts to declare additional format-specific Dokka Plugins.
    */
   val pluginsClasspath = "dokkatooPlugin".appendFormat()
 
@@ -51,4 +51,10 @@ class DependencyContainerNames(override val formatName: String?) : HasFormatName
 
   /** Resolver for [generatorClasspath] - internal Dokkatoo usage only. */
   val generatorClasspathResolver = "${dokkatoo}GeneratorClasspathResolver"
+
+  val publicationPluginClasspath = "${dokkatoo}PublicationPluginClasspath"
+  val publicationPluginClasspathApiOnly = "${publicationPluginClasspath}ApiOnly"
+  val publicationPluginClasspathResolver = "${publicationPluginClasspath}Resolver"
+  val publicationPluginClasspathApiOnlyConsumable =
+    "${publicationPluginClasspathApiOnly}Consumable"
 }

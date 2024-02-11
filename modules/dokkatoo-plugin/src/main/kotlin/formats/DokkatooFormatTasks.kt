@@ -54,7 +54,7 @@ class DokkatooFormatTasks(
     project.tasks.register<DokkatooGeneratePublicationTask>(
       taskNames.generatePublication,
       publication.pluginsConfiguration,
-    ).configuring task@{
+    ).configuring {
       description = "Executes the Dokka Generator, generating the $formatName publication"
 
       outputDirectory.convention(dokkatooExtension.dokkatooPublicationDirectory.dir(formatName))
@@ -66,7 +66,7 @@ class DokkatooFormatTasks(
     project.tasks.register<DokkatooGenerateModuleTask>(
       taskNames.generateModule,
       publication.pluginsConfiguration,
-    ).configuring task@{
+    ).configuring {
       description = "Executes the Dokka Generator, generating a $formatName module"
 
       outputDirectory.convention(dokkatooExtension.dokkatooModuleDirectory.dir(formatName))
@@ -79,7 +79,7 @@ class DokkatooFormatTasks(
   val prepareModuleDescriptor: TaskProvider<dev.adamko.dokkatoo.tasks.DokkatooPrepareModuleDescriptorTask> =
     project.tasks.register<dev.adamko.dokkatoo.tasks.DokkatooPrepareModuleDescriptorTask>(
       taskNames.prepareModuleDescriptor
-    ) task@{
+    ) {
       description = "[Deprecated ⚠️] Prepares the Dokka Module Descriptor for $formatName"
     }
 }

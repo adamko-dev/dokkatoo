@@ -12,6 +12,7 @@ import dev.adamko.dokkatoo.workers.WorkerIsolation
 import java.io.File
 import javax.inject.Inject
 import kotlinx.serialization.json.JsonElement
+import org.gradle.api.file.ArchiveOperations
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
@@ -35,6 +36,7 @@ abstract class DokkatooGenerateTask
 @Inject
 constructor(
   objects: ObjectFactory,
+  archives: ArchiveOperations,
   private val workers: WorkerExecutor,
 
   /**
@@ -43,6 +45,8 @@ constructor(
    */
   pluginsConfiguration: DokkaPluginParametersContainer,
 ) : DokkatooTask() {
+
+  private val dokkaParametersBuilder = DokkaParametersBuilder(archives)
 
   /**
    * Directory containing the generation result. The content and structure depends on whether
@@ -95,12 +99,6 @@ constructor(
   enum class GeneratorMode {
     Module,
     Publication,
-  }
-
-  @Deprecated("Removed - Module and Publication generation has been moved to specific subtasks")
-  enum class GenerationType {
-    MODULE,
-    PUBLICATION,
   }
 
   @DokkatooInternalApi
@@ -176,7 +174,7 @@ constructor(
     val moduleOutputDirectories = generator.moduleOutputDirectories.toList()
     logger.info("[$path] got ${moduleOutputDirectories.size} moduleOutputDirectories: $moduleOutputDirectories")
 
-    return DokkaParametersBuilder.build(
+    return dokkaParametersBuilder.build(
       spec = generator,
       delayTemplateSubstitution = delayTemplateSubstitution,
       outputDirectory = outputDirectory,
@@ -208,6 +206,7 @@ constructor(
   @get:Internal
   @Deprecated("Please move worker options to `DokkatooExtension.dokkaGeneratorIsolation`. Worker options were moved to allow for configuring worker isolation")
   abstract val workerDebugEnabled: Property<Boolean>
+
   /**
    * Please move worker options:
    *
@@ -229,6 +228,7 @@ constructor(
   @get:Internal
   @Deprecated("Please move worker options to `DokkatooExtension.dokkaGeneratorIsolation`. Worker options were moved to allow for configuring worker isolation")
   abstract val workerMinHeapSize: Property<String>
+
   /**
    * Please move worker options:
    *
@@ -250,6 +250,7 @@ constructor(
   @get:Internal
   @Deprecated("Please move worker options to `DokkatooExtension.dokkaGeneratorIsolation`. Worker options were moved to allow for configuring worker isolation")
   abstract val workerMaxHeapSize: Property<String>
+
   /**
    * Please move worker options:
    *
@@ -274,14 +275,22 @@ constructor(
   @Deprecated("Please move worker options to `DokkatooExtension.dokkaGeneratorIsolation`. Worker options were moved to allow for configuring worker isolation")
   abstract val workerJvmArgs: ListProperty<String>
 
+  @Deprecated("Removed - Module and Publication generation have been moved to specific subtasks")
+  @Suppress("unused")
+  enum class GenerationType {
+    MODULE,
+    PUBLICATION,
+  }
 
   /**
-   * Generating a Dokka Module? Set this to [GenerationType.MODULE].
+   * Deprecated - instead use specific subtasks for Module/Publication generation.
    *
-   * Generating a Dokka Publication? [GenerationType.PUBLICATION].
+   * @see DokkatooGenerateModuleTask
+   * @see DokkatooGeneratePublicationTask
    */
   @get:Internal
   @Deprecated("Created specific Module/Publication subclasses")
+  @Suppress("DEPRECATION", "unused")
   abstract val generationType: Property<GenerationType>
   //endregion
 }

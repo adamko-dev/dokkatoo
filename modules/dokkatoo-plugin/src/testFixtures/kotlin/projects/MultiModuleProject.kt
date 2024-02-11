@@ -13,7 +13,7 @@ fun TestScope.initMultiModuleProject(
   // get the FQN of the class that contains the test, so even though multiple
   // tests uses this project it's unlikely that the project dirs clash
   val baseDirName = testCase.descriptor.ids().first().value
-    .substringAfter("dev.adamko.dokkatoo") // drop the package name
+    .substringAfter("dev.adamko.dokkatoo.") // drop the package name
     .replaceNonAlphaNumeric()
 
   return gradleKtsProjectTest("$baseDirName/multi-module-hello-goodbye/$testName") {

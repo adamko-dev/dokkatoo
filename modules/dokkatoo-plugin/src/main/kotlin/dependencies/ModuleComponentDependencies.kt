@@ -4,6 +4,7 @@ import dev.adamko.dokkatoo.dependencies.DokkatooAttribute.Companion.DokkatooForm
 import dev.adamko.dokkatoo.dependencies.DokkatooAttribute.Companion.DokkatooModuleComponentAttribute
 import dev.adamko.dokkatoo.internal.*
 import java.io.File
+import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.result.ResolvedArtifactResult
@@ -25,8 +26,8 @@ class ModuleComponentDependencies(
   private val formatName: String get() = formatAttributes.format.name
   private val componentName: String get() = component.name
 
-  private val resolver: Configuration =
-    project.configurations.create("${baseConfigurationName}${componentName}Resolver") {
+  private val resolver: NamedDomainObjectProvider<Configuration> =
+    project.configurations.register("${baseConfigurationName}${componentName}Resolver") {
       description = "Resolves Dokkatoo $formatName $componentName files."
       resolvable()
       extendsFrom(declaredDependencies)
@@ -37,11 +38,12 @@ class ModuleComponentDependencies(
       }
     }
 
-  val outgoing: Configuration =
-    project.configurations.create("${baseConfigurationName}${componentName}Consumable") {
+  val outgoing: NamedDomainObjectProvider<Configuration> =
+    project.configurations.register("${baseConfigurationName}${componentName}Consumable") {
       description =
         "Provides Dokkatoo $formatName $componentName files for consumption by other subprojects."
       consumable()
+      extendsFrom(declaredDependencies)
       attributes {
         attribute(USAGE_ATTRIBUTE, baseAttributes.dokkatooUsage)
         attribute(DokkatooFormatAttribute, formatAttributes.format)
@@ -62,13 +64,14 @@ class ModuleComponentDependencies(
    * enabled, which might obscure errors.
    */
   val incomingArtifactFiles: Provider<List<File>> =
-    resolver.incomingArtifacts().map { it.map(ResolvedArtifactResult::getFile) }
+    resolver.get().incomingArtifacts().map { it.map(ResolvedArtifactResult::getFile) }
 
   private fun Configuration.incomingArtifacts(): Provider<List<ResolvedArtifactResult>> {
 
     // Redefine variables locally, because Configuration Cache is easily confused
     // and produces confusing error messages.
     val baseAttributes = baseAttributes
+    val usage = baseAttributes.dokkatooUsage
     val formatAttributes = formatAttributes
     val incoming = incoming
     val incomingName = incoming.name
@@ -79,7 +82,7 @@ class ModuleComponentDependencies(
         @Suppress("UnstableApiUsage")
         withVariantReselection()
         attributes {
-          attribute(USAGE_ATTRIBUTE, baseAttributes.dokkatooUsage)
+          attribute(USAGE_ATTRIBUTE, usage)
           attribute(DokkatooFormatAttribute, formatAttributes.format)
           attribute(DokkatooModuleComponentAttribute, component)
         }
