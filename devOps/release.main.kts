@@ -43,6 +43,7 @@ object Release : CliktCommand() {
   override fun run() {
     echo("Current Dokkatoo version is $dokkatooVersion")
     echo("git dir is ${Git.rootDir}")
+    echo("gh version ${GitHub.version()}") // verify gh is installed
 
     val startBranch = Git.currentBranch()
 
@@ -327,6 +328,9 @@ private object GitHub : CliTool() {
 
   fun waitForPrChecks(branch: String): String =
     runCommand("gh pr checks $branch --watch --interval 30")
+
+  fun version(): String =
+    runCommand("gh version", logOutput = false)
 }
 
 /** GitHub commands */
