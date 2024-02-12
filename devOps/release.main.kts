@@ -1,10 +1,11 @@
 #!/usr/bin/env kotlin
-@file:DependsOn("com.github.ajalt.clikt:clikt-jvm:3.5.2")
-@file:DependsOn("me.alllex.parsus:parsus-jvm:0.4.0")
+@file:DependsOn("com.github.ajalt.clikt:clikt-jvm:4.2.2")
+@file:DependsOn("me.alllex.parsus:parsus-jvm:0.6.1")
 @file:DependsOn("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.7.3")
 
 import Release_main.SemVer.Companion.SemVer
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.terminal
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import java.io.File
@@ -71,8 +72,7 @@ object Release : CliktCommand() {
     // Tag the release
     createAndPushTag(releaseVersion)
 
-    confirm("Publish plugins to Gradle Plugin Portal?", abort = true)
-    Gradle.publishPlugins()
+    publishPlugins()
 
     // Bump the version to the next snapshot
     updateVersionCreatePR(nextVersion)
@@ -109,13 +109,10 @@ object Release : CliktCommand() {
     default: SemVer,
     validate: (candidate: SemVer) -> Boolean = { true },
   ): SemVer {
-    val response = prompt(
-      text = text,
+    val response = terminal.prompt(
+      prompt = text,
       default = default.toString(),
-      requireConfirmation = true,
-    ) {
-      SemVer.of(it)
-    }
+    )?.let(SemVer.Companion::of)
 
     return if (response == null || !validate(response)) {
       if (response == null) echo("invalid SemVer")
@@ -146,7 +143,7 @@ object Release : CliktCommand() {
     echo("creating PR...")
     GitHub.createPr(releaseBranch)
 
-    confirm("Merge the PR for branch $releaseBranch?", abort = true)
+    echo("Merging the PR for branch $releaseBranch...")
     mergeAndWait(releaseBranch)
     echo("$releaseBranch PR merged")
   }
@@ -158,12 +155,15 @@ object Release : CliktCommand() {
     }
     val tagName = "v$version"
     Git.tag(tagName)
-    confirm("Push tag $tagName?", abort = true)
+    echo("Pushing tag $tagName...")
     Git.push(tagName)
-    echo("Tag pushed")
+    echo("Tag $tagName pushed")
+  }
 
-    confirm("Publish plugins to Gradle Plugin Portal?", abort = true)
+  private fun publishPlugins() {
+    echo("Publishing plugins to Gradle Plugin Portal...")
     Gradle.publishPlugins()
+    echo("Published plugins")
   }
 
   private val buildGradleKts: File by lazy {
@@ -376,16 +376,16 @@ private data class SemVer(
 
   companion object {
     fun SemVer(input: String): SemVer =
-      SemVerParser.parseEntire(input).getOrElse { error ->
+      SemVerParser.parse(input).getOrElse { error ->
         error("provided version to release must be SemVer X.Y.Z, but got error while parsing: $error")
       }
 
     fun of(input: String): SemVer? =
-      SemVerParser.parseEntire(input).getOrElse { return null }
+      SemVerParser.parseOrNull(input)
 
     fun isValid(input: String): Boolean =
       try {
-        SemVerParser.parseEntireOrThrow(input)
+        SemVerParser.parseOrThrow(input)
         true
       } catch (ex: ParseException) {
         false
