@@ -132,7 +132,6 @@ class FormatDependenciesManager(
     project.configurations.register(configurationNames.publicationPluginClasspathApiOnly) {
       description =
         "Dokka Plugins for consumers that will assemble a $formatName Publication using the Dokka Module that this project produces"
-      description = "TODO"
       declarable()
     }
 
