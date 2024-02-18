@@ -1,17 +1,13 @@
 package dev.adamko.dokkatoo.tasks
 
-import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.jsonMapper
 import dev.adamko.dokkatoo.dokka.parameters.DokkaGeneratorParametersSpec
 import dev.adamko.dokkatoo.dokka.parameters.builders.DokkaParametersBuilder
 import dev.adamko.dokkatoo.internal.DokkaPluginParametersContainer
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
-import dev.adamko.dokkatoo.workers.ClassLoaderIsolation
 import dev.adamko.dokkatoo.workers.DokkaGeneratorWorker
-import dev.adamko.dokkatoo.workers.ProcessIsolation
 import dev.adamko.dokkatoo.workers.WorkerIsolation
 import java.io.File
 import javax.inject.Inject
-import kotlinx.serialization.json.JsonElement
 import org.gradle.api.file.ArchiveOperations
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
@@ -23,7 +19,6 @@ import org.gradle.api.tasks.*
 import org.gradle.kotlin.dsl.*
 import org.gradle.workers.WorkerExecutor
 import org.jetbrains.dokka.DokkaConfiguration
-import org.jetbrains.dokka.toPrettyJsonString
 
 /**
  * Base task for executing Dokka Generator, producing documentation.
@@ -36,7 +31,7 @@ abstract class DokkatooGenerateTask
 @Inject
 constructor(
   objects: ObjectFactory,
-  archives: ArchiveOperations,
+  private val archives: ArchiveOperations,
   private val workers: WorkerExecutor,
 
   /**
@@ -95,94 +90,25 @@ constructor(
   @get:Internal
   abstract val dokkaConfigurationJsonFile: RegularFileProperty
 
-  @DokkatooInternalApi
-  enum class GeneratorMode {
-    Module,
-    Publication,
-  }
-
-  @DokkatooInternalApi
-  protected fun generateDocumentation(
-    generationType: GeneratorMode,
-    outputDirectory: File,
-  ) {
-    val dokkaConfiguration = createDokkaConfiguration(generationType, outputDirectory)
-    logger.info("dokkaConfiguration: $dokkaConfiguration")
-    dumpDokkaConfigurationJson(dokkaConfiguration)
-
-    logger.info("DokkaGeneratorWorker runtimeClasspath: ${runtimeClasspath.asPath}")
-
-    val isolation = workerIsolation.get()
-    logger.info("[$path] running with workerIsolation $isolation")
-    val workQueue = when (isolation) {
-      is ClassLoaderIsolation ->
-        workers.classLoaderIsolation {
-          classpath.from(runtimeClasspath)
-        }
-
-      is ProcessIsolation     ->
-        workers.processIsolation {
-          classpath.from(runtimeClasspath)
-          forkOptions {
-            isolation.defaultCharacterEncoding.orNull?.let(this::setDefaultCharacterEncoding)
-            isolation.debug.orNull?.let(this::setDebug)
-            isolation.enableAssertions.orNull?.let(this::setEnableAssertions)
-            isolation.maxHeapSize.orNull?.let(this::setMaxHeapSize)
-            isolation.minHeapSize.orNull?.let(this::setMinHeapSize)
-            isolation.jvmArgs.orNull?.let(this::setJvmArgs)
-            isolation.systemProperties.orNull?.let(this::systemProperties)
-          }
-        }
-    }
-
-    workQueue.submit(DokkaGeneratorWorker::class) {
-      this.dokkaParameters.set(dokkaConfiguration)
-      this.logFile.set(workerLogFile)
-    }
-  }
-
-  /**
-   * Dump the [DokkaConfiguration] JSON to a file ([dokkaConfigurationJsonFile]) for debugging
-   * purposes.
-   */
-  private fun dumpDokkaConfigurationJson(
-    dokkaConfiguration: DokkaConfiguration,
-  ) {
-    val destFile = dokkaConfigurationJsonFile.asFile.orNull ?: return
-    destFile.parentFile.mkdirs()
-    destFile.createNewFile()
-
-    val compactJson = dokkaConfiguration.toPrettyJsonString()
-    val json = jsonMapper.decodeFromString(JsonElement.serializer(), compactJson)
-    val prettyJson = jsonMapper.encodeToString(JsonElement.serializer(), json)
-
-    destFile.writeText(prettyJson)
-
-    logger.info("[$path] Dokka Generator configuration JSON: ${destFile.toURI()}")
-  }
-
-  private fun createDokkaConfiguration(
-    generationType: GeneratorMode,
-    outputDirectory: File,
-  ): DokkaConfiguration {
-
-    val delayTemplateSubstitution = when (generationType) {
-      GeneratorMode.Module      -> true
-      GeneratorMode.Publication -> false
-    }
-
-    val moduleOutputDirectories = generator.moduleOutputDirectories.toList()
-    logger.info("[$path] got ${moduleOutputDirectories.size} moduleOutputDirectories: $moduleOutputDirectories")
-
-    return dokkaParametersBuilder.build(
-      spec = generator,
-      delayTemplateSubstitution = delayTemplateSubstitution,
-      outputDirectory = outputDirectory,
-      moduleDescriptorDirs = moduleOutputDirectories,
-      cacheDirectory = cacheDirectory.asFile.orNull,
-    )
-  }
-
+//  @DokkatooInternalApi
+//  protected fun generateDocumentation(
+//    generationType: DokkaGeneratorWorker.GeneratorMode,
+//    outputDirectory: File,
+//  ) {
+//    val worker = DokkaGeneratorWorker(
+//      runtimeClasspath = runtimeClasspath,
+//      isolation = workerIsolation.get(),
+//      generatorParams = generator,
+//      cacheDirectory = cacheDirectory.asFile.orNull,
+//      taskPath = path,
+//      workerLogFile = workerLogFile.asFile.get(),
+//      dokkaConfigurationJsonFile = dokkaConfigurationJsonFile.asFile.orNull,
+//      workers = workers,
+//      archives = archives,
+//    )
+//
+//    worker.generate(generationType, outputDirectory)
+//  }
 
   //region Deprecated Properties
   /**

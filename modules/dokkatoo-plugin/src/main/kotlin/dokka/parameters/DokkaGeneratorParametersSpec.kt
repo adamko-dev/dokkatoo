@@ -8,6 +8,7 @@ import javax.inject.Inject
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.model.ReplacedBy
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
@@ -17,6 +18,11 @@ import org.gradle.api.tasks.PathSensitivity.RELATIVE
  * Parameters used to run Dokka Generator to produce either a
  * Dokka Publication or a Dokka Module.
  */
+// TODO Make a separate class for Publication parameters vs Module parameters
+//      Some options, like `finalizeCoroutines` `offlineMode`, aren't module-specific,
+//      and should only be configured in the aggregating project.
+//      Some options, like moduleName moduleVersion, are _only_ module specific.
+//
 abstract class DokkaGeneratorParametersSpec
 @DokkatooInternalApi
 @Inject
@@ -50,6 +56,10 @@ constructor(
   @get:Optional
   abstract val moduleVersion: Property<String>
 
+  /**
+   * Controls whether Dokka Generator will attempt to download resources
+   * (for example, [DokkaSourceLinkSpec.remoteUrl]) from online locations.
+   */
   @get:Input
   abstract val offlineMode: Property<Boolean>
 
@@ -64,13 +74,17 @@ constructor(
   abstract val includes: ConfigurableFileCollection
 
   /**
-   * Classpath that contains the Dokka Generator Plugins used to modify this publication.
+   * Dokka Plugins that will be activated during Dokka Generator execution.
+   *
+   * Should only contain the Dokka Plugins, and *not* transitive dependencies.
+   * The plugins (and transitive dependencies) *must* also be added to
+   * [dev.adamko.dokkatoo.tasks.DokkatooGenerateTask.runtimeClasspath].
    *
    * The plugins should be configured in [dev.adamko.dokkatoo.dokka.DokkaPublication.pluginsConfiguration].
    */
   @get:InputFiles
   @get:Classpath
-  abstract val pluginsClasspath: ConfigurableFileCollection
+  abstract val dokkaPlugins: ConfigurableFileCollection
 
   /**
    * Source sets used to generate a Dokka Module.
@@ -82,6 +96,7 @@ constructor(
   val dokkaSourceSets: NamedDomainObjectContainer<DokkaSourceSetSpec> =
     extensions.adding("dokkaSourceSets", objects.domainObjectContainer())
 
+  //region deprecated properties
   /** Dokka Module files from other subprojects. */
   @get:Internal
   @Deprecated("DokkatooPrepareModuleDescriptorTask was not compatible with relocatable Gradle Build Cache and has been replaced with a dark Gradle devilry. All references to DokkatooPrepareModuleDescriptorTask must be removed.")
@@ -89,7 +104,14 @@ constructor(
   abstract val dokkaModuleFiles: ConfigurableFileCollection
 
   /** Dokka Modules directories, containing the output, module descriptor, and module includes. */
-  @get:InputFiles
-  @get:PathSensitive(RELATIVE)
+  @get:Internal
+  @Deprecated("moved to DokkatooGeneratePublicationTask")
   abstract val moduleOutputDirectories: ConfigurableFileCollection
+
+  @get:ReplacedBy("dokkaPlugins")
+  @Deprecated("renamed", ReplaceWith("dokkaPlugins"))
+  @Suppress("unused")
+  val pluginsClasspath: ConfigurableFileCollection
+    get() = dokkaPlugins
+  //endregion
 }

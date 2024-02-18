@@ -1,77 +1,158 @@
 package dev.adamko.dokkatoo.workers
 
+import dev.adamko.dokkatoo.dokka.parameters.DokkaGeneratorParametersSpec
+import dev.adamko.dokkatoo.dokka.parameters.builders.DokkaParametersBuilder
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
-import dev.adamko.dokkatoo.internal.LoggerAdapter
 import java.io.File
-import java.time.Duration
-import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.provider.Property
-import org.gradle.workers.WorkAction
-import org.gradle.workers.WorkParameters
+import org.gradle.api.file.ArchiveOperations
+import org.gradle.api.file.FileCollection
+import org.gradle.api.logging.Logger
+import org.gradle.api.logging.Logging
+import org.gradle.kotlin.dsl.*
+import org.gradle.workers.WorkQueue
+import org.gradle.workers.WorkerExecutor
 import org.jetbrains.dokka.DokkaConfiguration
-import org.jetbrains.dokka.DokkaGenerator
 
-/**
- * Gradle Worker Daemon for running [DokkaGenerator].
- *
- * The worker requires [DokkaGenerator] is present on its classpath, as well as any Dokka plugins
- * that are used to generate the Dokka files. Transitive dependencies are also required.
- */
 @DokkatooInternalApi
-abstract class DokkaGeneratorWorker : WorkAction<DokkaGeneratorWorker.Parameters> {
+class DokkaGeneratorWorker(
+  private val runtimeClasspath: FileCollection,
+  private val isolation: WorkerIsolation,
 
-  @DokkatooInternalApi
-  interface Parameters : WorkParameters {
-    val dokkaParameters: Property<DokkaConfiguration>
-    val logFile: RegularFileProperty
-  }
+//  private val generatorParameters: DokkaGeneratorParametersSpec,
+  private val cacheDirectory: File?,
 
-  override fun execute() {
-    val dokkaParameters = parameters.dokkaParameters.get()
+  private val workerLogFile: File,
+//  private val dokkaConfigurationJsonFile: File?,
 
-    prepareOutputDir(dokkaParameters)
+  taskPath: String,
+  workers: WorkerExecutor,
+  archives: ArchiveOperations,
+) {
 
-    executeDokkaGenerator(
-      parameters.logFile.get().asFile,
-      dokkaParameters,
+  private val logTag = "[$taskPath:DokkaGeneratorWorker]"
+  private val dokkaParametersBuilder = DokkaParametersBuilder(archives)
+
+  private val workQueue: WorkQueue = workers.dokkaGeneratorQueue()
+
+  internal fun generateModule(
+    parameters: DokkaGeneratorParametersSpec,
+    outputDirectory: File,
+  ) {
+    generate(
+      parameters = parameters,
+      delayTemplateSubstitution = true,
+      dokkaModuleDirectories = emptyList(),
+      outputDirectory = outputDirectory,
     )
   }
 
-  private fun prepareOutputDir(dokkaParameters: DokkaConfiguration) {
-    // Dokka Generator doesn't clean up old files, so we need to manually clean the output directory
-    dokkaParameters.outputDir.deleteRecursively()
-    dokkaParameters.outputDir.mkdirs()
-
-    // workaround until https://github.com/Kotlin/dokka/pull/2867 is released
-    dokkaParameters.modules.forEach { module ->
-      val moduleDir = dokkaParameters.outputDir.resolve(module.relativePathToOutputDirectory)
-      moduleDir.mkdirs()
-    }
-  }
-
-  private fun executeDokkaGenerator(
-    logFile: File,
-    dokkaParameters: DokkaConfiguration
+  internal fun generatePublication(
+    parameters: DokkaGeneratorParametersSpec,
+    dokkaModuleDirectories: Collection<File>,
+    outputDirectory: File,
   ) {
-    LoggerAdapter(logFile).use { logger ->
-      logger.progress("Executing DokkaGeneratorWorker with dokkaParameters: $dokkaParameters")
+    generate(
+      parameters = parameters,
+      delayTemplateSubstitution = false,
+      dokkaModuleDirectories = dokkaModuleDirectories,
+      outputDirectory = outputDirectory,
+    )
+  }
 
-      val generator = DokkaGenerator(dokkaParameters, logger)
+  /**
+   * Asynchronously start generating a Dokka Module or Publication into [outputDirectory]
+   */
+  private fun generate(
+    parameters: DokkaGeneratorParametersSpec,
+    delayTemplateSubstitution: Boolean,
+    dokkaModuleDirectories: Collection<File>,
+    outputDirectory: File,
+  ) {
+    val dokkaConfiguration = createDokkaConfiguration(
+      parameters = parameters,
+      delayTemplateSubstitution = delayTemplateSubstitution,
+      dokkaModuleDirectories = dokkaModuleDirectories,
+      outputDirectory = outputDirectory,
+    )
+    logger.info("$logTag dokkaConfiguration: $dokkaConfiguration")
+//    dumpDokkaConfigurationJson(dokkaConfiguration)
 
-      val duration = measureTime { generator.generate() }
-
-      logger.info("DokkaGeneratorWorker completed in $duration")
+    workQueue.submit(DokkaGeneratorWorkAction::class) {
+      this.dokkaParameters.set(dokkaConfiguration)
+      this.logFile.set(workerLogFile)
     }
   }
+
+  private fun WorkerExecutor.dokkaGeneratorQueue(): WorkQueue {
+    logger.info("$logTag runtimeClasspath: ${runtimeClasspath.asPath}")
+
+    logger.info("$logTag running with workerIsolation $isolation")
+
+    return when (isolation) {
+      is ClassLoaderIsolation ->
+        classLoaderIsolation {
+          classpath.from(runtimeClasspath)
+        }
+
+      is ProcessIsolation     ->
+        processIsolation {
+          classpath.from(runtimeClasspath)
+          forkOptions {
+            isolation.defaultCharacterEncoding.orNull?.let(this::setDefaultCharacterEncoding)
+            isolation.debug.orNull?.let(this::setDebug)
+            isolation.enableAssertions.orNull?.let(this::setEnableAssertions)
+            isolation.maxHeapSize.orNull?.let(this::setMaxHeapSize)
+            isolation.minHeapSize.orNull?.let(this::setMinHeapSize)
+            isolation.jvmArgs.orNull?.let(this::setJvmArgs)
+            isolation.systemProperties.orNull?.let(this::systemProperties)
+          }
+        }
+    }
+  }
+
+
+  private fun createDokkaConfiguration(
+    parameters: DokkaGeneratorParametersSpec,
+    delayTemplateSubstitution: Boolean,
+    dokkaModuleDirectories: Collection<File>,
+    outputDirectory: File,
+  ): DokkaConfiguration {
+
+    val moduleOutputDirectories = dokkaModuleDirectories.toList()
+    logger.info("$logTag got ${moduleOutputDirectories.size} moduleOutputDirectories: $moduleOutputDirectories")
+
+    return dokkaParametersBuilder.build(
+      spec = parameters,
+      delayTemplateSubstitution = delayTemplateSubstitution,
+      outputDirectory = outputDirectory,
+      moduleDescriptorDirs = moduleOutputDirectories,
+      cacheDirectory = cacheDirectory,
+    )
+  }
+
+
+//  /**
+//   * Dump the [DokkaConfiguration] JSON to a file ([dokkaConfigurationJsonFile]) for debugging
+//   * purposes.
+//   */
+//  private fun dumpDokkaConfigurationJson(
+//    dokkaConfiguration: DokkaConfiguration,
+//  ) {
+//    val destFile = dokkaConfigurationJsonFile ?: return
+//    destFile.parentFile.mkdirs()
+//    destFile.createNewFile()
+//
+//    val compactJson = dokkaConfiguration.toPrettyJsonString()
+//    val json = DokkatooBasePlugin.jsonMapper.decodeFromString(JsonElement.serializer(), compactJson)
+//    val prettyJson = DokkatooBasePlugin.jsonMapper.encodeToString(JsonElement.serializer(), json)
+//
+//    destFile.writeText(prettyJson)
+//
+//    logger.info("$logTag Dokka Generator configuration JSON: ${destFile.toURI()}")
+//  }
 
   @DokkatooInternalApi
   companion object {
-    // can't use kotlin.Duration or kotlin.time.measureTime {} because
-    // the implementation isn't stable across Kotlin versions
-    private fun measureTime(block: () -> Unit): Duration =
-      System.nanoTime().let { startTime ->
-        block()
-        Duration.ofNanos(System.nanoTime() - startTime)
-      }
+    private val logger: Logger = Logging.getLogger(DokkaGeneratorWorker::class.java)
   }
 }

@@ -4,15 +4,12 @@ import dev.adamko.dokkatoo.dependencies.BaseDependencyManager
 import dev.adamko.dokkatoo.dependencies.DependencyContainerNames
 import dev.adamko.dokkatoo.dependencies.DokkatooAttribute.Companion.DokkatooClasspathAttribute
 import dev.adamko.dokkatoo.dependencies.DokkatooAttribute.Companion.DokkatooFormatAttribute
-import dev.adamko.dokkatoo.dependencies.DokkatooAttribute.Companion.DokkatooModuleComponentAttribute
+import dev.adamko.dokkatoo.dependencies.DokkatooAttribute.Companion.DokkatooComponentAttribute
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec
 import dev.adamko.dokkatoo.dokka.parameters.KotlinPlatform
 import dev.adamko.dokkatoo.dokka.parameters.VisibilityModifier
 import dev.adamko.dokkatoo.internal.*
-import dev.adamko.dokkatoo.tasks.DokkatooGenerateModuleTask
-import dev.adamko.dokkatoo.tasks.DokkatooGenerateTask
-import dev.adamko.dokkatoo.tasks.DokkatooTask
-import dev.adamko.dokkatoo.tasks.TaskNames
+import dev.adamko.dokkatoo.tasks.*
 import dev.adamko.dokkatoo.workers.ClassLoaderIsolation
 import dev.adamko.dokkatoo.workers.ProcessIsolation
 import java.io.File
@@ -130,7 +127,7 @@ constructor(
   private fun configureDependencyAttributes(target: Project) {
     target.dependencies.attributesSchema {
       attribute(DokkatooFormatAttribute)
-      attribute(DokkatooModuleComponentAttribute)
+      attribute(DokkatooComponentAttribute)
       attribute(DokkatooClasspathAttribute)
     }
   }
@@ -255,46 +252,61 @@ constructor(
     target.tasks.register<DokkatooTask>(taskNames.generate) {
       description = "Generates Dokkatoo publications for all formats"
       dependsOn(target.tasks.withType<DokkatooGenerateTask>())
+      dependsOn(target.tasks.withType<DokkatooGenerateTask2>())
     }
 
-    target.tasks.withType<DokkatooGenerateTask>().configureEach {
+    target.tasks.withType<DokkatooGenerateTask2>().configureEach {
       cacheDirectory.convention(dokkatooExtension.dokkatooCacheDirectory)
       workerLogFile.convention(temporaryDir.resolve("dokka-worker.log"))
       dokkaConfigurationJsonFile.convention(temporaryDir.resolve("dokka-configuration.json"))
 
-      workerIsolation.convention(dokkatooExtension.dokkaGeneratorIsolation.map { src ->
-        when (src) {
-          is ClassLoaderIsolation -> src
-          is ProcessIsolation     -> {
-            // Complicated workaround to copy old properties, to maintain backwards compatibility.
-            // Remove when the deprecated task properties are deleted.
-            dokkatooExtension.ProcessIsolation {
-              @Suppress("DEPRECATION")
-              run {
-                debug.convention(workerDebugEnabled.orElse(src.debug))
-                enableAssertions.convention(src.enableAssertions)
-                minHeapSize.convention(workerMinHeapSize.orElse(src.minHeapSize))
-                maxHeapSize.convention(workerMaxHeapSize.orElse(src.maxHeapSize))
-                jvmArgs.convention(workerJvmArgs.orElse(src.jvmArgs))
-                defaultCharacterEncoding.convention(src.defaultCharacterEncoding)
-                systemProperties.convention(src.systemProperties)
-              }
-            }
-          }
-        }
-      })
+      workerIsolation.convention(dokkatooExtension.dokkaGeneratorIsolation)
+//      workerIsolation.convention(dokkatooExtension.dokkaGeneratorIsolation.map { src ->
+//        when (src) {
+//          is ClassLoaderIsolation -> src
+//          is ProcessIsolation     -> {
+//            // Complicated workaround to copy old properties, to maintain backwards compatibility.
+//            // Remove when the deprecated task properties are deleted.
+//            dokkatooExtension.ProcessIsolation {
+//              @Suppress("DEPRECATION")
+//              run {
+//                debug.convention(workerDebugEnabled.orElse(src.debug))
+//                enableAssertions.convention(src.enableAssertions)
+//                minHeapSize.convention(workerMinHeapSize.orElse(src.minHeapSize))
+//                maxHeapSize.convention(workerMaxHeapSize.orElse(src.maxHeapSize))
+//                jvmArgs.convention(workerJvmArgs.orElse(src.jvmArgs))
+//                defaultCharacterEncoding.convention(src.defaultCharacterEncoding)
+//                systemProperties.convention(src.systemProperties)
+//              }
+//            }
+//          }
+//        }
+//      })
 
       publicationEnabled.convention(true)
       onlyIf("publication must be enabled") { publicationEnabled.getOrElse(true) }
 
-      generator.dokkaSourceSets.addAllLater(
+      generatorParameters.dokkaSourceSets.addAllLater(
         providers.provider {
           // exclude suppressed source sets as early as possible, to avoid unnecessary dependency resolution
           dokkatooExtension.dokkatooSourceSets.filterNot { it.suppress.get() }
         }
       )
 
-      generator.dokkaSourceSets.configureDefaults(
+      generatorParameters.dokkaSourceSets.configureDefaults(
+        sourceSetScopeConvention = dokkatooExtension.sourceSetScopeDefault
+      )
+    }
+
+    target.tasks.withType<PrepareDokkaModuleComponentsTask>().configureEach {
+      // TODO make common type for tasks with generatorParameters...
+      generatorParameters.dokkaSourceSets.addAllLater(
+        providers.provider {
+          // exclude suppressed source sets as early as possible, to avoid unnecessary dependency resolution
+          dokkatooExtension.dokkatooSourceSets.filterNot { it.suppress.get() }
+        }
+      )
+      generatorParameters.dokkaSourceSets.configureDefaults(
         sourceSetScopeConvention = dokkatooExtension.sourceSetScopeDefault
       )
     }

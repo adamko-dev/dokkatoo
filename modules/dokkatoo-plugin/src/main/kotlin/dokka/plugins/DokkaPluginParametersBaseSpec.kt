@@ -1,8 +1,10 @@
 package dev.adamko.dokkatoo.dokka.plugins
 
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
+import java.io.File
 import java.io.Serializable
 import javax.inject.Inject
+import kotlinx.serialization.KSerializer
 import org.gradle.api.Named
 import org.gradle.api.tasks.Input
 
@@ -19,13 +21,20 @@ import org.gradle.api.tasks.Input
 abstract class DokkaPluginParametersBaseSpec
 @DokkatooInternalApi
 @Inject
-constructor(
+constructor
+  (
   private val name: String,
   @get:Input
   open val pluginFqn: String,
 ) : Serializable, Named {
 
-  abstract fun jsonEncode(): String // to be implemented by subclasses
+  abstract fun valuesSerializer(
+    componentsDir: File
+  ): KSerializer<String>
+
+//  abstract fun jsonEncode(
+//    componentsDir: File
+//  ): String // must be implemented by subclasses
 
   @Input
   override fun getName(): String = name

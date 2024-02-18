@@ -1,7 +1,7 @@
 package dev.adamko.dokkatoo.dependencies
 
+import dev.adamko.dokkatoo.dependencies.DokkatooAttribute.Companion.DokkatooComponentAttribute
 import dev.adamko.dokkatoo.dependencies.DokkatooAttribute.Companion.DokkatooFormatAttribute
-import dev.adamko.dokkatoo.dependencies.DokkatooAttribute.Companion.DokkatooModuleComponentAttribute
 import dev.adamko.dokkatoo.internal.*
 import java.io.File
 import org.gradle.api.NamedDomainObjectProvider
@@ -17,7 +17,7 @@ import org.gradle.api.provider.Provider
 @DokkatooInternalApi
 class ModuleComponentDependencies(
   project: Project,
-  private val component: DokkatooAttribute.ModuleComponent,
+  private val component: DokkatooAttribute.Component,
   private val baseAttributes: BaseAttributes,
   private val formatAttributes: FormatAttributes,
   declaredDependencies: Configuration,
@@ -34,7 +34,7 @@ class ModuleComponentDependencies(
       attributes {
         attribute(USAGE_ATTRIBUTE, baseAttributes.dokkatooUsage)
         attribute(DokkatooFormatAttribute, formatAttributes.format)
-        attribute(DokkatooModuleComponentAttribute, component)
+        attribute(DokkatooComponentAttribute, component)
       }
     }
 
@@ -47,7 +47,7 @@ class ModuleComponentDependencies(
       attributes {
         attribute(USAGE_ATTRIBUTE, baseAttributes.dokkatooUsage)
         attribute(DokkatooFormatAttribute, formatAttributes.format)
-        attribute(DokkatooModuleComponentAttribute, component)
+        attribute(DokkatooComponentAttribute, component)
       }
     }
 
@@ -56,7 +56,7 @@ class ModuleComponentDependencies(
    *
    * The artifacts will be filtered to ensure:
    *
-   * - [DokkatooModuleComponentAttribute] equals [component]
+   * - [DokkatooComponentAttribute] equals [component]
    * - [DokkatooFormatAttribute] equals [FormatAttributes.format]
    *
    * This filtering should prevent a Gradle bug where it fetches random files.
@@ -84,7 +84,7 @@ class ModuleComponentDependencies(
         attributes {
           attribute(USAGE_ATTRIBUTE, usage)
           attribute(DokkatooFormatAttribute, formatAttributes.format)
-          attribute(DokkatooModuleComponentAttribute, component)
+          attribute(DokkatooComponentAttribute, component)
         }
         lenient(true)
       }
@@ -95,6 +95,9 @@ class ModuleComponentDependencies(
           // Gradle says it will only use the attributes defined in the above
           // `artifactView {}`, but it doesn't, and the artifacts it finds might be
           // random ones with arbitrary attributes, so we have to filter again.
+          // This is slow, repetitive, and the providing tasks will still be triggered,
+          // even if the output is disregarded. It would be nice to not need this,
+          // but the Gradle devs don't understand UX 🤡
           .filter { artifact ->
             val variantAttributes = artifact.variant.attributes
             when {
@@ -108,7 +111,7 @@ class ModuleComponentDependencies(
                 false
               }
 
-              variantAttributes[DokkatooModuleComponentAttribute]?.name != component.name             -> {
+              variantAttributes[DokkatooComponentAttribute]?.name != component.name                   -> {
                 logger.info("[${incomingName}] ignoring artifact $artifact - DokkatooModuleComponentAttribute != $component | attributes:${variantAttributes.toMap()}")
                 false
               }
@@ -124,6 +127,6 @@ class ModuleComponentDependencies(
 
   @DokkatooInternalApi
   companion object {
-    private val logger: Logger = Logging.getLogger(DokkatooAttribute.ModuleComponent::class.java)
+    private val logger: Logger = Logging.getLogger(ModuleComponentDependencies::class.java)
   }
 }

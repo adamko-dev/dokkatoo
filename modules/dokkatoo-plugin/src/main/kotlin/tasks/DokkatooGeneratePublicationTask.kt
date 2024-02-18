@@ -4,10 +4,12 @@ import dev.adamko.dokkatoo.internal.DokkaPluginParametersContainer
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import javax.inject.Inject
 import org.gradle.api.file.ArchiveOperations
+import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.FileSystemOperations
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.tasks.CacheableTask
-import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.*
+import org.gradle.api.tasks.PathSensitivity.RELATIVE
 import org.gradle.workers.WorkerExecutor
 
 
@@ -24,30 +26,45 @@ abstract class DokkatooGeneratePublicationTask
 constructor(
   objects: ObjectFactory,
   workers: WorkerExecutor,
+  private val fs: FileSystemOperations,
   archives: ArchiveOperations,
 
-  private val fs: FileSystemOperations,
   /**
    * Configurations for Dokka Generator Plugins. Must be provided from
    * [dev.adamko.dokkatoo.dokka.DokkaPublication.pluginsConfiguration].
    */
   pluginsConfiguration: DokkaPluginParametersContainer,
-) : DokkatooGenerateTask(
+) : DokkatooGenerateTask2(
   objects = objects,
   workers = workers,
-  pluginsConfiguration = pluginsConfiguration,
+  fs = fs,
   archives = archives,
+  pluginsConfiguration = pluginsConfiguration,
 ) {
+
+  @get:OutputDirectory
+  abstract val outputDirectory: DirectoryProperty
+
+  /** Dokka Modules directories, containing the output, module descriptor, and module includes. */
+  @get:InputFiles
+  @get:PathSensitive(RELATIVE)
+  abstract val dokkaModuleDirectories: ConfigurableFileCollection
 
   @TaskAction
   internal fun generatePublication() {
     val outputDirectory = outputDirectory.get().asFile
+
+    val generator = dokkaGeneratorWorker()
 
     // clean output dir, so previous generations don't dirty this generation
     fs.delete { delete(outputDirectory) }
     outputDirectory.mkdirs()
 
     // run Dokka Generator
-    generateDocumentation(GeneratorMode.Publication, outputDirectory)
+    generator.generatePublication(
+      parameters = generatorParameters,
+      dokkaModuleDirectories = dokkaModuleDirectories.files,
+      outputDirectory = outputDirectory,
+    )
   }
 }

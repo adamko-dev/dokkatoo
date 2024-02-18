@@ -3,14 +3,23 @@ package dev.adamko.dokkatoo.dokka.plugins
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import dev.adamko.dokkatoo.internal.addAll
 import dev.adamko.dokkatoo.internal.putIfNotNull
+import java.io.File
 import javax.inject.Inject
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.putJsonArray
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import org.gradle.api.tasks.PathSensitivity.RELATIVE
+import org.gradle.kotlin.dsl.*
 
 
 /**
@@ -22,7 +31,8 @@ abstract class DokkaHtmlPluginParameters
 @DokkatooInternalApi
 @Inject
 constructor(
-  name: String
+  name: String,
+  private val objects: ObjectFactory,
 ) : DokkaPluginParametersBaseSpec(
   name,
   DOKKA_HTML_PLUGIN_FQN,
@@ -101,26 +111,98 @@ constructor(
   @get:Optional
   abstract val templatesDir: DirectoryProperty
 
-  override fun jsonEncode(): String =
-    buildJsonObject {
-      putJsonArray("customAssets") {
-        addAll(customAssets.files)
+  @DokkatooInternalApi
+  class Serializer(
+    private val objects: ObjectFactory,
+    private val componentsDir: File,
+  ) : KSerializer<DokkaHtmlPluginParameters> {
+    @Serializable
+    data class Delegate(
+      val name: String,
+      val customAssetsRelativePaths: List<String>,
+      val customStyleSheetsRelativePaths: List<String>,
+      val templatesDirRelativePath: String?,
+      val mergeImplicitExpectActualDeclarations: Boolean?,
+      val separateInheritedMembers: Boolean?,
+      val footerMessage: String?,
+    )
+
+    private val serializer = Delegate.serializer()
+
+    override val descriptor: SerialDescriptor
+      get() = serializer.descriptor
+
+    override fun deserialize(decoder: Decoder): DokkaHtmlPluginParameters {
+      val delegate = serializer.deserialize(decoder)
+      return objects.newInstance<DokkaHtmlPluginParameters>(delegate.name).apply {
+        customAssets.from(
+          delegate.customAssetsRelativePaths.map { componentsDir.resolve(it) }
+        )
+        customStyleSheets.from(
+          delegate.customAssetsRelativePaths.map { componentsDir.resolve(it) }
+        )
+        if (delegate.templatesDirRelativePath != null) {
+          templatesDir.set(componentsDir.resolve(delegate.templatesDirRelativePath))
+        }
+        separateInheritedMembers.set(delegate.separateInheritedMembers)
+        footerMessage.set(delegate.footerMessage)
       }
-      putJsonArray("customStyleSheets") {
-        addAll(customStyleSheets.files)
+    }
+
+    override fun serialize(encoder: Encoder, value: DokkaHtmlPluginParameters) {
+      Delegate(
+        name = value.name,
+        customStyleSheetsRelativePaths = value.customStyleSheets.asFileTree.files.map {
+          it.relativeTo(componentsDir).invariantSeparatorsPath
+        },
+        customAssetsRelativePaths = value.customAssets.asFileTree.files.map {
+          it.relativeTo(componentsDir).invariantSeparatorsPath
+        },
+        templatesDirRelativePath = value.templatesDir.asFile.orNull
+          ?.relativeTo(componentsDir)?.invariantSeparatorsPath,
+        footerMessage = value.footerMessage.orNull,
+        separateInheritedMembers = value.separateInheritedMembers.orNull,
+        mergeImplicitExpectActualDeclarations = value.mergeImplicitExpectActualDeclarations.orNull,
+      )
+    }
+  }
+
+  override fun serializer(
+    componentsDir: File,
+  ): KSerializer<String> {
+    return object: KSerializer<String> {
+      override val descriptor: SerialDescriptor = String.serializer().descriptor
+      override fun deserialize(decoder: Decoder): String {
+        String.serializer().deserialize(decoder)
       }
-      putIfNotNull("separateInheritedMembers", separateInheritedMembers.orNull)
-      putIfNotNull(
-        "mergeImplicitExpectActualDeclarations",
-        mergeImplicitExpectActualDeclarations.orNull
-      )
-      putIfNotNull("footerMessage", footerMessage.orNull)
-      putIfNotNull("footerMessage", footerMessage.orNull)
-      putIfNotNull(
-        "templatesDir",
-        templatesDir.orNull?.asFile?.canonicalFile?.invariantSeparatorsPath
-      )
-    }.toString()
+    }
+    return Serializer(objects, componentsDir)
+  }
+
+//  override fun jsonEncode(
+//    componentsDir: File,
+//  ): String =
+//    buildJsonObject {
+//      putJsonArray("customAssets") {
+//        addAll(customAssets.files)
+//      }
+//      putJsonArray("customStyleSheets") {
+//        addAll(customStyleSheets.files)
+//      }
+//      putIfNotNull("separateInheritedMembers", separateInheritedMembers.orNull)
+//      putIfNotNull(
+//        "mergeImplicitExpectActualDeclarations",
+//        mergeImplicitExpectActualDeclarations.orNull
+//      )
+//      putIfNotNull("footerMessage", footerMessage.orNull)
+//      putIfNotNull(
+//        "templatesDir",
+//        templatesDir.orNull
+//          ?.asFile
+//          ?.relativeTo(componentsDir)
+//          ?.invariantSeparatorsPath
+//      )
+//    }.toString()
 
   companion object {
     const val DOKKA_HTML_PARAMETERS_NAME = "html"

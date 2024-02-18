@@ -36,6 +36,7 @@ dependencies {
 
   implementation(platform(libs.kotlinxSerialization.bom))
   implementation(libs.kotlinxSerialization.json)
+  implementation("net.thauvin.erik.urlencoder:urlencoder-lib:1.4.0")
 
   testFixturesImplementation(gradleApi())
   testFixturesImplementation(gradleTestKit())

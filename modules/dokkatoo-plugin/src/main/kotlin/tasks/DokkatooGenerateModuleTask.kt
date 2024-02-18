@@ -58,10 +58,10 @@ constructor(
     // generate descriptor, will be read by other subprojects
     val moduleDescriptor = generateModuleConfiguration(moduleDescriptorJson)
     val includesOutputDir = outputDirectory.resolve(moduleDescriptor.moduleIncludesDirName)
-    val moduleOutputDir = outputDirectory.resolve(moduleDescriptor.moduleOutputDirName)
+//    val moduleOutputDir = outputDirectory.resolve(moduleDescriptor.moduleOutputDirName)
 
     // run Dokka Generator
-    generateDocumentation(GeneratorMode.Module, moduleOutputDir)
+//    generateDocumentation(Module, moduleOutputDir)
 
     // gather includes, to be consumed by other subprojects
     fs.sync {

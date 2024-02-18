@@ -20,7 +20,7 @@ interface DokkatooAttribute {
 
   /** Generated output, or subproject classpath, or included files, etc */
   @DokkatooInternalApi
-  interface ModuleComponent : Named
+  interface Component : Named
 
   /** A classpath, e.g. for Dokka Plugins or the Dokka Generator. */
   @DokkatooInternalApi
@@ -31,8 +31,11 @@ interface DokkatooAttribute {
     val DokkatooFormatAttribute: Attribute<Format> =
       Attribute("dev.adamko.dokkatoo.format")
 
-    val DokkatooModuleComponentAttribute: Attribute<ModuleComponent> =
-      Attribute("dev.adamko.dokkatoo.module-component")
+    val DokkatooComponentAttribute: Attribute<Component> =
+      Attribute("dev.adamko.dokkatoo.component")
+
+//    val DokkatooModuleComponentAttribute: Attribute<ModuleComponent> =
+//      Attribute("dev.adamko.dokkatoo.module-component")
 
     val DokkatooClasspathAttribute: Attribute<Classpath> =
       Attribute("dev.adamko.dokkatoo.classpath")

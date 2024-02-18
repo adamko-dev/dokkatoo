@@ -17,7 +17,7 @@ import org.gradle.api.artifacts.Configuration
 class DependencyContainerNames(override val formatName: String) : HasFormatName() {
 
   val dokkatoo = DOKKATOO_CONFIGURATION_NAME.appendFormat()
-  val dokkatooResolver = "${dokkatoo}Resolver"
+//  val dokkatooResolver = "${dokkatoo}Resolver"
 
   /**
    * ### Dokka Plugins
@@ -27,19 +27,21 @@ class DependencyContainerNames(override val formatName: String) : HasFormatName(
    * Will be used in user's build scripts to declare additional format-specific Dokka Plugins.
    */
   val pluginsClasspath = "dokkatooPlugin".appendFormat()
-
-  /**
-   * ### Dokka Plugins (excluding transitive dependencies)
-   *
-   * Will be used to create Dokka Generator Parameters
-   *
-   * Extends [pluginsClasspath]
-   *
-   * Internal Dokkatoo usage only.
-   */
-  val pluginsClasspathIntransitiveResolver =
-    "${dokkatoo}PluginsClasspathIntransitiveResolver"
-
+//  val modulesPluginsClasspath = "dokkatooModulePlugin".appendFormat()
+//  val publicationPluginsClasspath = "dokkatooPublicationPlugin".appendFormat()
+//
+//  /**
+//   * ### Dokka Plugins (excluding transitive dependencies)
+//   *
+//   * Will be used to create Dokka Generator Parameters
+//   *
+//   * Extends [pluginsClasspath]
+//   *
+//   * Internal Dokkatoo usage only.
+//   */
+//  val pluginsClasspathIntransitiveResolver =
+//    "${dokkatoo}PluginsClasspathIntransitiveResolver"
+//
   /**
    * ### Dokka Generator Classpath
    *
@@ -48,13 +50,35 @@ class DependencyContainerNames(override val formatName: String) : HasFormatName(
    * Extends [pluginsClasspath], so Dokka plugins and their dependencies are included.
    */
   val generatorClasspath = "${dokkatoo}GeneratorClasspath"
+//
+//  /** Resolver for [generatorClasspath] - internal Dokkatoo usage only. */
+//  val generatorClasspathResolver = "${dokkatoo}GeneratorClasspathResolver"
 
-  /** Resolver for [generatorClasspath] - internal Dokkatoo usage only. */
-  val generatorClasspathResolver = "${dokkatoo}GeneratorClasspathResolver"
-
+  @Deprecated("no longer used")
   val publicationPluginClasspath = "${dokkatoo}PublicationPluginClasspath"
+  @Suppress("DEPRECATION")
+  @Deprecated("no longer used")
   val publicationPluginClasspathApiOnly = "${publicationPluginClasspath}ApiOnly"
+  @Suppress("DEPRECATION")
+  @Deprecated("no longer used")
   val publicationPluginClasspathResolver = "${publicationPluginClasspath}Resolver"
+  @Suppress("DEPRECATION")
+  @Deprecated("no longer used")
   val publicationPluginClasspathApiOnlyConsumable =
     "${publicationPluginClasspathApiOnly}Consumable"
+
+  val plugins = "dokkatooPlugin".appendFormat()
+  val modulePlugins = "dokkatooModuleGeneratorPlugin".appendFormat()
+  val publicationPlugins = "dokkatooPublicationGeneratorPlugin".appendFormat()
+  val modulePluginsResolver = "${modulePlugins}Resolver"
+  val modulePluginsIntransitiveClasspathResolver = "${modulePlugins}IntransitiveResolver"
+  val publicationPluginsResolver = "${publicationPlugins}Resolver"
+  val publicationPluginsIntransitiveResolver = "${publicationPlugins}IntransitiveResolver"
+  val moduleGeneratorClasspath = "${dokkatoo}ModuleGeneratorClasspath"
+  val moduleGeneratorClasspathResolver = "${moduleGeneratorClasspath}Resolver"
+  val publicationGeneratorClasspath = "${dokkatoo}PublicationGeneratorClasspath"
+  val publicationGeneratorClasspathResolver = "${publicationGeneratorClasspath}Resolver"
+
+  val moduleComponentsResolver = "${dokkatoo}ModuleComponentsResolver"
+  val moduleComponentsConsumable = "${dokkatoo}ModuleComponentsConsumable"
 }

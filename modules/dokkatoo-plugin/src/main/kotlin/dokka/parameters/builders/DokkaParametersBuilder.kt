@@ -26,7 +26,6 @@ internal class DokkaParametersBuilder(
   private val archives: ArchiveOperations,
 ) {
 
-  private val logger: Logger = Logging.getLogger(DokkaParametersBuilder::class.java)
 
   fun build(
     spec: DokkaGeneratorParametersSpec,
@@ -46,7 +45,7 @@ internal class DokkaParametersBuilder(
     val pluginsConfiguration = spec.pluginsConfiguration.toSet()
 
     val pluginsClasspath = buildPluginsClasspath(
-      plugins = spec.pluginsClasspath,
+      plugins = spec.dokkaPlugins,
     )
 
     val includes = spec.includes.files
@@ -88,8 +87,8 @@ internal class DokkaParametersBuilder(
     return moduleDescriptorDirs
       .map { moduleDir ->
         val moduleDescriptorJson = moduleDir.resolve("module-descriptor.json")
-        if (!moduleDir.exists()) {
-          error("missing module-descriptor.json in consolidated Dokka module $moduleDir")
+        if (!moduleDescriptorJson.exists() && !moduleDescriptorJson.isFile) {
+          error("missing module-descriptor.json file in consolidated Dokka module $moduleDir")
         }
 
         val moduleDescriptor: DokkaModuleDescriptionKxs =
@@ -144,5 +143,9 @@ internal class DokkaParametersBuilder(
       serializationFormat = DokkaConfiguration.SerializationFormat.JSON,
       values = spec.jsonEncode(),
     )
+  }
+
+  companion object {
+    private val logger: Logger = Logging.getLogger(DokkaParametersBuilder::class.java)
   }
 }

@@ -87,21 +87,49 @@ abstract class DokkatooFormatPlugin(
         providers = providers,
       )
 
-      formatDependencies.moduleOutputDirectories
-        .outgoing
-        .get()
-        .outgoing
-        .artifact(dokkatooTasks.generateModule.map { it.outputDirectory }) {
-          builtBy(dokkatooTasks.generateModule)
-          type = "dokka-module-directory"
+      formatDependencies.dokkatooModuleComponentsConsumable.configure {
+        outgoing.artifact(dokkatooTasks.prepareDokkaModuleComponents.map { it.outputDirectory }) {
+          builtBy(dokkatooTasks.prepareDokkaModuleComponents)
+          type = "gradle sucks"
         }
+      }
+
+
+//      formatDependencies.moduleOutputDirectories
+//        .outgoing
+//        .get()
+//        .outgoing
+//        .artifact(dokkatooTasks.generateModule.map { it.outputDirectory }) {
+//          builtBy(dokkatooTasks.generateModule)
+//          type = "dokka-module-directory"
+//        }
 
       dokkatooTasks.generatePublication.configure {
-        generator.moduleOutputDirectories.from(
-          formatDependencies.moduleOutputDirectories.incomingArtifactFiles
+//        generatorParameters.moduleOutputDirectories.from(
+//          formatDependencies.moduleOutputDirectories.incomingArtifactFiles
+//        )
+        generatorParameters.dokkaPlugins.from(
+          formatDependencies.dokkaPublicationPluginsResolver
         )
-        generator.pluginsClasspath.from(
-          formatDependencies.dokkaPublicationPluginClasspathResolver
+
+        dokkaModuleDirectories.from(
+          dokkatooTasks.generateModule.flatMap { it.outputDirectory.asFile.map {
+            it.walk().maxDepth(1).drop(1).toList()
+          } }
+        )
+      }
+
+      dokkatooTasks.generateModule.configure {
+        generatorParameters.dokkaPlugins.from(
+          formatDependencies.dokkaModulePluginsResolver
+        )
+
+        dependsOn(dokkatooTasks.prepareDokkaModuleComponents) // Gradle 🤡
+        dokkaModuleComponentsDirectories.from(
+          dokkatooTasks.prepareDokkaModuleComponents
+        )
+        dokkaModuleComponentsDirectories.from(
+          formatDependencies.dokkatooModuleComponentsResolver
         )
       }
 
@@ -124,8 +152,11 @@ abstract class DokkatooFormatPlugin(
       if (context.enableVersionAlignment) {
         //region version alignment
         listOf(
-          formatDependencies.dokkaPluginsIntransitiveClasspathResolver,
-          formatDependencies.dokkaGeneratorClasspathResolver,
+          formatDependencies.dokkaModulePluginsResolver,
+          formatDependencies.dokkaModulePluginsIntransitiveClasspathResolver,
+          formatDependencies.dokkaPublicationPluginsResolver,
+          formatDependencies.dokkaPublicationPluginsIntransitiveResolver,
+          formatDependencies.dokkaModuleGeneratorClasspathResolver,
         ).forEach { dependenciesContainer: NamedDomainObjectProvider<Configuration> ->
           // Add a version if one is missing, which will allow defining a org.jetbrains.dokka
           // dependency without a version.

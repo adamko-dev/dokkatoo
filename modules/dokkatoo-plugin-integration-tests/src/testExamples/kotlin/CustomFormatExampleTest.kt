@@ -45,7 +45,7 @@ class CustomFormatExampleTest : FunSpec({
           "clean",
           ":dokkatooGeneratePublicationHtml",
           "--stacktrace",
-          "--info",
+//          "--info",
         )
         .forwardOutput()
         .build {

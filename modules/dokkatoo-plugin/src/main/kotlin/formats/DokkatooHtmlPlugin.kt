@@ -103,7 +103,7 @@ constructor(
       doFirst("check all-modules-page-plugin is present", moduleAggregationCheck)
     }
 
-    formatDependencies.dokkaPublicationPluginClasspathApiOnly.configure {
+    formatDependencies.dokkaPublicationPlugins.configure {
       dependencies.addLater(dokkatooExtension.versions.jetbrainsDokka.map { v ->
         project.dependencies.create("org.jetbrains.dokka:all-modules-page-plugin:$v")
       })
@@ -135,14 +135,14 @@ constructor(
         "[${task.path} ModuleAggregationCheck] expected DokkatooGeneratePublicationTask but got ${task::class}"
       }
 
-      val modulesCount = task.generator.moduleOutputDirectories.count()
+      val modulesCount = task.generatorParameters.moduleOutputDirectories.count()
 
       if (modulesCount <= 0) {
         logger.info("[${task.path} ModuleAggregationCheck] skipping check - publication does not have 1+ modules")
         return
       }
 
-      val allDokkaPlugins = task.generator.pluginsClasspath
+      val allDokkaPlugins = task.generatorParameters.dokkaPlugins
         .flatMap { file ->
           extractDokkaPluginMarkers(archives, file)
         }
@@ -151,7 +151,7 @@ constructor(
       logger.info("[${task.path} ModuleAggregationCheck] allModulesPagePluginPresent:$allModulesPagePluginPresent")
 
       if (!allModulesPagePluginPresent) {
-        val moduleName = task.generator.moduleName.get()
+        val moduleName = task.generatorParameters.moduleName.get()
 
         logger.warn(/* language=text */ """
             |[${task.path}] org.jetbrains.dokka:all-modules-page-plugin is missing.

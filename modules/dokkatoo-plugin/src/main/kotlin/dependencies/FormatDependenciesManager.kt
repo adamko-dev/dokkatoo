@@ -1,6 +1,6 @@
 package dev.adamko.dokkatoo.dependencies
 
-import dev.adamko.dokkatoo.dependencies.DokkatooAttribute.Companion.DokkatooClasspathAttribute
+import dev.adamko.dokkatoo.dependencies.DokkatooAttribute.Companion.DokkatooComponentAttribute
 import dev.adamko.dokkatoo.dependencies.DokkatooAttribute.Companion.DokkatooFormatAttribute
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import dev.adamko.dokkatoo.internal.consumable
@@ -59,17 +59,17 @@ class FormatDependenciesManager(
     attribute(LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(JAR))
   }
 
-  /** Collect [BaseDependencyManager.declaredDependencies]. */
-  val incoming: NamedDomainObjectProvider<Configuration> =
-    project.configurations.register(configurationNames.dokkatooResolver) {
-      description = "Resolve Dokkatoo declared dependencies for $formatName."
-      resolvable()
-      extendsFrom(baseDependencyManager.declaredDependencies)
-      attributes {
-        attribute(USAGE_ATTRIBUTE, baseAttributes.dokkatooUsage)
-        attribute(DokkatooFormatAttribute, formatAttributes.format)
-      }
-    }
+//  /** Collect [BaseDependencyManager.declaredDependencies]. */
+//  val dokkatooResolver: NamedDomainObjectProvider<Configuration> =
+//    project.configurations.register(configurationNames.dokkatooResolver) {
+//      description = "Resolve Dokkatoo declared dependencies for $formatName."
+//      resolvable()
+//      extendsFrom(baseDependencyManager.declaredDependencies)
+//      attributes {
+//        attribute(USAGE_ATTRIBUTE, baseAttributes.dokkatooUsage)
+//        attribute(DokkatooFormatAttribute, formatAttributes.format)
+//      }
+//    }
 
 
   //region Dokka Generator Plugins
@@ -80,74 +80,138 @@ class FormatDependenciesManager(
    *
    * Should not contain runtime dependencies - use [dokkaGeneratorClasspath].
    */
-  private val dokkaPluginsClasspath: NamedDomainObjectProvider<Configuration> =
-    project.configurations.register(configurationNames.pluginsClasspath) {
+  private val dokkaPlugins: NamedDomainObjectProvider<Configuration> =
+    project.configurations.register(configurationNames.plugins) {
       description = "Dokka Plugins classpath for $formatName."
       declarable()
     }
 
-  /**
-   * Resolves Dokka Plugins, without transitive dependencies.
-   *
-   * It extends [dokkaPluginsClasspath].
-   */
-  val dokkaPluginsIntransitiveClasspathResolver: NamedDomainObjectProvider<Configuration> =
-    project.configurations.register(configurationNames.pluginsClasspathIntransitiveResolver) {
+  private val dokkaModulePlugins: NamedDomainObjectProvider<Configuration> =
+    project.configurations.register(configurationNames.modulePlugins) {
+      description = "Dokka Plugins classpath for generating $formatName Modules."
+      declarable()
+      extendsFrom(dokkaPlugins.get())
+    }
+
+    val dokkaPublicationPlugins: NamedDomainObjectProvider<Configuration> =
+    project.configurations.register(configurationNames.publicationPlugins) {
+      description = "Dokka Plugins classpath for generating a $formatName Publication."
+      declarable()
+      extendsFrom(dokkaPlugins.get())
+    }
+
+  val dokkaModulePluginsResolver: NamedDomainObjectProvider<Configuration> =
+    project.configurations.register(configurationNames.modulePluginsResolver) {
+      description = "Resolves Dokka Plugins classpath for $formatName Modules"
+      resolvable()
+      extendsFrom(dokkaModulePlugins.get())
+      attributes {
+        // Don't declare any other attributes, Gradle is buggy, and the devs can't fix it https://github.com/gradle/gradle/issues/18846,
+        jvmJar()
+      }
+    }
+
+  val dokkaModulePluginsIntransitiveClasspathResolver: NamedDomainObjectProvider<Configuration> =
+    project.configurations.register(configurationNames.modulePluginsIntransitiveClasspathResolver) {
       description =
         "Resolves Dokka Plugins classpath for $formatName - for internal use. Fetch only the plugins (no transitive dependencies) for use in the Dokka JSON Configuration."
       resolvable()
-      extendsFrom(dokkaPluginsClasspath.get())
+      extendsFrom(dokkaModulePlugins.get())
       isTransitive = false
       attributes {
+        // Don't declare any other attributes, Gradle is buggy, and the devs can't fix it https://github.com/gradle/gradle/issues/18846,
         jvmJar()
-        attribute(DokkatooFormatAttribute, formatAttributes.format)
-        attribute(DokkatooClasspathAttribute, baseAttributes.dokkaPlugins)
       }
     }
+
+  val dokkaPublicationPluginsResolver: NamedDomainObjectProvider<Configuration> =
+    project.configurations.register(configurationNames.publicationPluginsResolver) {
+      description =
+        "Resolves Dokka Plugins classpath for $formatName - for internal use."
+      resolvable()
+      extendsFrom(dokkaPublicationPlugins.get())
+      attributes {
+        // Don't declare any other attributes, Gradle is buggy, and the devs can't fix it https://github.com/gradle/gradle/issues/18846,
+        jvmJar()
+      }
+    }
+
+  val dokkaPublicationPluginsIntransitiveResolver: NamedDomainObjectProvider<Configuration> =
+    project.configurations.register(configurationNames.publicationPluginsIntransitiveResolver) {
+      description =
+        "Resolves Dokka Plugins classpath for $formatName - for internal use. Fetch only the plugins (no transitive dependencies) for use in the Dokka JSON Configuration."
+      resolvable()
+      extendsFrom(dokkaPublicationPlugins.get())
+      isTransitive = false
+      attributes {
+        // Don't declare any other attributes, Gradle is buggy, and the devs can't fix it https://github.com/gradle/gradle/issues/18846,
+        jvmJar()
+      }
+    }
+
+//  /**
+//   * Resolves Dokka Plugins, without transitive dependencies.
+//   *
+//   * It extends [dokkaPluginsClasspath].
+//   */
+//  @Deprecated("split into module/publication resolvers")
+//  val dokkaPluginsIntransitiveClasspathResolver: NamedDomainObjectProvider<Configuration> =
+//    project.configurations.register(configurationNames.pluginsClasspathIntransitiveResolver) {
+//      description =
+//        "Resolves Dokka Plugins classpath for $formatName - for internal use. Fetch only the plugins (no transitive dependencies) for use in the Dokka JSON Configuration."
+//      resolvable()
+//      extendsFrom(dokkaPluginsClasspath.get())
+//      isTransitive = false
+//      attributes {
+//        jvmJar()
+//        attribute(DokkatooFormatAttribute, formatAttributes.format)
+//        attribute(DokkatooClasspathAttribute, baseAttributes.dokkaPlugins)
+//      }
+//    }
   //endregion
 
   //region Dokka Plugins for Publication Generation
-  private val dokkaPublicationPluginClasspath: NamedDomainObjectProvider<Configuration> =
-    project.configurations.register(configurationNames.publicationPluginClasspath) {
-      description =
-        "Dokka Plugins classpath for a $formatName Publication (consisting of 1+ Dokka Module)."
-      declarable()
-      extendsFrom(baseDependencyManager.declaredDependencies)
-    }
+//  private val dokkaPublicationPluginClasspath: NamedDomainObjectProvider<Configuration> =
+//    project.configurations.register(configurationNames.publicationPluginClasspath) {
+//      description =
+//        "Dokka Plugins classpath for a $formatName Publication (consisting of 1+ Dokka Module)."
+//      declarable()
+//      extendsFrom(baseDependencyManager.declaredDependencies)
+//    }
 
-  val dokkaPublicationPluginClasspathResolver: NamedDomainObjectProvider<Configuration> =
-    project.configurations.register(configurationNames.publicationPluginClasspathResolver) {
-      description =
-        "Resolves Dokka Plugins classpath for a $formatName Publication (consisting of 1+ Dokka Module)."
-      resolvable()
-      extendsFrom(dokkaPublicationPluginClasspath.get())
-      attributes {
-        jvmJar()
-        attribute(DokkatooFormatAttribute, formatAttributes.format)
-        attribute(DokkatooClasspathAttribute, baseAttributes.dokkaPublicationPlugins)
-      }
-    }
+//  val dokkaPublicationPluginClasspathResolver: NamedDomainObjectProvider<Configuration> =
+//    project.configurations.register(configurationNames.publicationPluginClasspathResolver) {
+//      description =
+//        "Resolves Dokka Plugins classpath for a $formatName Publication (consisting of 1+ Dokka Module)."
+//      resolvable()
+//      extendsFrom(dokkaPublicationPluginClasspath.get())
+//      attributes {
+//        jvmJar()
+//        attribute(DokkatooFormatAttribute, formatAttributes.format)
+//        attribute(DokkatooClasspathAttribute, baseAttributes.dokkaPublicationPlugins)
+//      }
+//    }
 
-  val dokkaPublicationPluginClasspathApiOnly: NamedDomainObjectProvider<Configuration> =
-    project.configurations.register(configurationNames.publicationPluginClasspathApiOnly) {
-      description =
-        "Dokka Plugins for consumers that will assemble a $formatName Publication using the Dokka Module that this project produces"
-      declarable()
-    }
+//  val dokkaPublicationPluginClasspathApiOnly: NamedDomainObjectProvider<Configuration> =
+//    project.configurations.register(configurationNames.publicationPluginClasspathApiOnly) {
+//      description =
+//        "Dokka Plugins for consumers that will assemble a $formatName Publication using the Dokka Module that this project produces"
+//      declarable()
+//    }
 
-  init {
-    project.configurations.register(configurationNames.publicationPluginClasspathApiOnlyConsumable) {
-      description =
-        "Shared Dokka Plugins for consumers that will assemble a $formatName Publication using the Dokka Module that this project produces"
-      consumable()
-      extendsFrom(dokkaPublicationPluginClasspathApiOnly.get())
-      attributes {
-        jvmJar()
-        attribute(DokkatooFormatAttribute, formatAttributes.format)
-        attribute(DokkatooClasspathAttribute, baseAttributes.dokkaPublicationPlugins)
-      }
-    }
-  }
+//  init {
+//    project.configurations.register(configurationNames.publicationPluginClasspathApiOnlyConsumable) {
+//      description =
+//        "Shared Dokka Plugins for consumers that will assemble a $formatName Publication using the Dokka Module that this project produces"
+//      consumable()
+//      extendsFrom(dokkaPublicationPluginClasspathApiOnly.get())
+//      attributes {
+//        jvmJar()
+//        attribute(DokkatooFormatAttribute, formatAttributes.format)
+//        attribute(DokkatooClasspathAttribute, baseAttributes.dokkaPublicationPlugins)
+//      }
+//    }
+//  }
   //endregion
 
   //region Dokka Generator Classpath
@@ -156,7 +220,7 @@ class FormatDependenciesManager(
    *
    * This configuration is not exposed to other subprojects.
    *
-   * Extends [dokkaPluginsClasspath].
+   * Extends [dokkaPublicationPlugins].
    *
    * @see dev.adamko.dokkatoo.workers.DokkaGeneratorWorker
    * @see dev.adamko.dokkatoo.tasks.DokkatooGenerateTask
@@ -166,9 +230,24 @@ class FormatDependenciesManager(
       description =
         "Dokka Generator runtime classpath for $formatName - will be used in Dokka Worker. Should contain all transitive dependencies, plugins (and their transitive dependencies), so Dokka Worker can run."
       declarable()
+    }
 
-      // extend from plugins classpath, so Dokka Worker can run the plugins
-      extendsFrom(dokkaPluginsClasspath.get())
+  /**
+   * Runtime classpath used to execute Dokka Worker.
+   *
+   * This configuration is not exposed to other subprojects.
+   *
+   * Extends [dokkaPublicationPlugins].
+   *
+   * @see dev.adamko.dokkatoo.workers.DokkaGeneratorWorker
+   * @see dev.adamko.dokkatoo.tasks.DokkatooGenerateTask
+   */
+  private val dokkaModuleGeneratorClasspath: NamedDomainObjectProvider<Configuration> =
+    project.configurations.register(configurationNames.moduleGeneratorClasspath) {
+      description =
+        "Dokka Generator runtime classpath for $formatName - will be used in Dokka Worker. Should contain all transitive dependencies, plugins (and their transitive dependencies), so Dokka Worker can run."
+      declarable()
+      extendsFrom(dokkaGeneratorClasspath.get())
     }
 
   /**
@@ -181,40 +260,107 @@ class FormatDependenciesManager(
    * @see dev.adamko.dokkatoo.workers.DokkaGeneratorWorker
    * @see dev.adamko.dokkatoo.tasks.DokkatooGenerateTask
    */
-  val dokkaGeneratorClasspathResolver: NamedDomainObjectProvider<Configuration> =
-    project.configurations.register(configurationNames.generatorClasspathResolver) {
+  val dokkaModuleGeneratorClasspathResolver: NamedDomainObjectProvider<Configuration> =
+    project.configurations.register(configurationNames.moduleGeneratorClasspathResolver) {
       description =
         "Dokka Generator runtime classpath for $formatName - will be used in Dokka Worker. Should contain all transitive dependencies, plugins (and their transitive dependencies), so Dokka Worker can run."
       resolvable()
 
       // extend from plugins classpath, so Dokka Worker can run the plugins
-      extendsFrom(dokkaGeneratorClasspath.get())
+      extendsFrom(dokkaModuleGeneratorClasspath.get())
+      // extend from plugins classpath, so Dokka Worker can run the plugins
+      extendsFrom(dokkaModulePlugins.get())
 
       attributes {
         jvmJar()
-        attribute(DokkatooFormatAttribute, formatAttributes.format)
-        attribute(DokkatooClasspathAttribute, baseAttributes.dokkaGenerator)
+//        attribute(DokkatooFormatAttribute, formatAttributes.format)
+//        attribute(DokkatooClasspathAttribute, baseAttributes.dokkaGenerator)
+      }
+    }
+
+  /**
+   * Runtime classpath used to execute Dokka Worker.
+   *
+   * This configuration is not exposed to other subprojects.
+   *
+   * Extends [dokkaPublicationPlugins].
+   *
+   * @see dev.adamko.dokkatoo.workers.DokkaGeneratorWorker
+   * @see dev.adamko.dokkatoo.tasks.DokkatooGenerateTask
+   */
+  private val dokkaPublicationGeneratorClasspath: NamedDomainObjectProvider<Configuration> =
+    project.configurations.register(configurationNames.publicationGeneratorClasspath) {
+      description =
+        "Dokka Generator runtime classpath for $formatName - will be used in Dokka Worker. Should contain all transitive dependencies, plugins (and their transitive dependencies), so Dokka Worker can run."
+      declarable()
+      extendsFrom(dokkaGeneratorClasspath.get())
+    }
+
+  /**
+   * Runtime classpath used to execute Dokka Worker.
+   *
+   * This configuration is not exposed to other subprojects.
+   *
+   * Extends [dokkaPluginsClasspath].
+   *
+   * @see dev.adamko.dokkatoo.workers.DokkaGeneratorWorker
+   * @see dev.adamko.dokkatoo.tasks.DokkatooGenerateTask
+   */
+  val dokkaPublicationGeneratorClasspathResolver: NamedDomainObjectProvider<Configuration> =
+    project.configurations.register(configurationNames.publicationGeneratorClasspathResolver) {
+      description =
+        "Dokka Generator runtime classpath for $formatName - will be used in Dokka Worker. Should contain all transitive dependencies, plugins (and their transitive dependencies), so Dokka Worker can run."
+      resolvable()
+
+      // extend from plugins classpath, so Dokka Worker can run the plugins
+      extendsFrom(dokkaPublicationGeneratorClasspath.get())
+      extendsFrom(dokkaPublicationPlugins.get())
+
+      attributes {
+        jvmJar()
+//        attribute(DokkatooFormatAttribute, formatAttributes.format)
+//        attribute(DokkatooClasspathAttribute, baseAttributes.dokkaGenerator)
       }
     }
   //endregion
 
-  /**
-   * Output directories of a Dokka Module.
-   *
-   * Contains
-   *
-   * - `module-descriptor.json`
-   * - module output directory
-   * - module includes directory
-   *
-   * @see dev.adamko.dokkatoo.dokka.parameters.DokkaModuleDescriptionKxs
-   * @see org.jetbrains.dokka.DokkaConfiguration.DokkaModuleDescription.sourceOutputDirectory
-   */
-  val moduleOutputDirectories: ModuleComponentDependencies =
-    componentDependencies(formatAttributes.moduleOutputDirectories)
+//  /**
+//   * Output directories of a Dokka Module.
+//   *
+//   * Contains
+//   *
+//   * - `module-descriptor.json`
+//   * - module output directory
+//   * - module includes directory
+//   *
+//   * @see dev.adamko.dokkatoo.dokka.parameters.DokkaModuleDescriptionKxs
+//   * @see org.jetbrains.dokka.DokkaConfiguration.DokkaModuleDescription.sourceOutputDirectory
+//   */
+//  val moduleOutputDirectories: ModuleComponentDependencies =
+//    componentDependencies(formatAttributes.moduleOutputDirectories)
+
+
+  val dokkatooModuleComponentsResolver =
+    project.configurations.register(configurationNames.moduleComponentsResolver) {
+      resolvable()
+      extendsFrom(baseDependencyManager.declaredDependencies)
+      attributes {
+        attribute(DokkatooFormatAttribute, formatAttributes.format)
+        attribute(DokkatooComponentAttribute, baseAttributes.dokkaModuleComponents)
+      }
+    }
+
+  val dokkatooModuleComponentsConsumable =
+    project.configurations.register(configurationNames.moduleComponentsConsumable) {
+      consumable()
+      attributes {
+        attribute(DokkatooFormatAttribute, formatAttributes.format)
+        attribute(DokkatooComponentAttribute, baseAttributes.dokkaModuleComponents)
+      }
+    }
 
   private fun componentDependencies(
-    component: DokkatooAttribute.ModuleComponent,
+    component: DokkatooAttribute.Component,
   ): ModuleComponentDependencies =
     ModuleComponentDependencies(
       project = project,
