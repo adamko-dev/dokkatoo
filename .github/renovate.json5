@@ -32,8 +32,8 @@
 
   timezone: "Etc/UTC",
   schedule: [
-    //"on the first day of the month",
     "after 10am",
+    "before 10pm",
   ],
 
   stabilityDays: 14,
