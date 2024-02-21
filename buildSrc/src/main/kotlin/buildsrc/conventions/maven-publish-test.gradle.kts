@@ -10,11 +10,10 @@ plugins {
   base
 }
 
-val Gradle.rootGradle: Gradle get() = generateSequence(gradle) { it.parent }.last()
 
 val mavenPublishTestExtension = extensions.create<MavenPublishTestSettings>(
   "mavenPublishTest",
-  gradle.rootGradle.rootProject.layout.buildDirectory.dir("test-maven-repo"),
+  gradle.rootProject.layout.buildDirectory.dir("test-maven-repo"),
 )
 
 
