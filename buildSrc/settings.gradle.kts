@@ -1,8 +1,3 @@
-@file:OptIn(ExperimentalEncodingApi::class)
-
-import kotlin.io.encoding.Base64.Default.decode
-import kotlin.io.encoding.ExperimentalEncodingApi
-
 rootProject.name = "buildSrc"
 
 pluginManagement {
