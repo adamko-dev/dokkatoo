@@ -6,7 +6,7 @@ import io.kotest.core.spec.style.FunSpec
 
 
 class AttributeHackTest : FunSpec({
-  context("project without Dokkatoo") {
+  context("verify that Dokkatoo does not interfere with JAR Configurations") {
 
     val project = initProject()
 
@@ -19,7 +19,7 @@ class AttributeHackTest : FunSpec({
       )
       .forwardOutput()
       .build {
-        test("doesn't receive non-Dokkatoo files") {
+        test("resolving JARs from a Dokkatoo-enabled project should not contain Dokka plugin JARs") {
           output.shouldNotContainAnyOf(
             "org.jetbrains.dokka",
             "all-modules-page-plugin",
@@ -33,7 +33,6 @@ class AttributeHackTest : FunSpec({
 private fun initProject(
   config: GradleProjectTest.() -> Unit = {},
 ): GradleProjectTest {
-
   return gradleKtsProjectTest("attribute-hack-test") {
 
     settingsGradleKts += """
