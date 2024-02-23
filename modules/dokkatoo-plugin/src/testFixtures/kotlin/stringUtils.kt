@@ -22,7 +22,7 @@ fun String.sortLines(separator: String = "\n") =
 
 
 /** Replace characters that don't match [isLetterOrDigit] with [replacement]. */
-fun String.replaceNonAlphaNumeric(
+internal fun String.replaceNonAlphaNumeric(
   replacement: String = "-"
 ): String =
   asIterable().joinToString("") { c ->
