@@ -110,7 +110,6 @@ class DokkatooPluginFunctionalTest : FunSpec({
 
           dokkatooConfigurations.shouldContainExactlyInAnyOrder(
             buildSet {
-              addAll(expectedFormats.map { "dokkatoo${it}Resolver" })
               addAll(expectedFormats.map { "dokkatoo${it}GeneratorClasspathResolver" })
               addAll(expectedFormats.map { "dokkatoo${it}ModuleOutputDirectoriesResolver" })
               addAll(expectedFormats.map { "dokkatoo${it}PluginsClasspathIntransitiveResolver" })
@@ -126,19 +125,6 @@ class DokkatooPluginFunctionalTest : FunSpec({
 
             allConfigurations shouldContain /* language=text */ """
               |--------------------------------------------------
-              |Configuration dokkatoo${Format}Resolver
-              |--------------------------------------------------
-              |Resolve Dokkatoo declared dependencies for $format.
-              |
-              |Attributes
-              |    - dev.adamko.dokkatoo.format = $format
-              |    - org.gradle.usage           = dev.adamko.dokkatoo
-              |Extended Configurations
-              |    - dokkatoo
-           """.trimMargin()
-
-            allConfigurations shouldContain /* language=text */ """
-              |--------------------------------------------------
               |Configuration dokkatoo${Format}GeneratorClasspathResolver
               |--------------------------------------------------
               |Dokka Generator runtime classpath for $format - will be used in Dokka Worker. Should contain all transitive dependencies, plugins (and their transitive dependencies), so Dokka Worker can run.
@@ -146,11 +132,11 @@ class DokkatooPluginFunctionalTest : FunSpec({
               |Attributes
               |    - dev.adamko.dokkatoo.classpath  = dokka-generator
               |    - dev.adamko.dokkatoo.format     = $format
-              |    - org.gradle.category            = library
-              |    - org.gradle.dependency.bundling = external
-              |    - org.gradle.jvm.environment     = standard-jvm
-              |    - org.gradle.libraryelements     = jar
-              |    - org.gradle.usage               = java-runtime
+              |    - org.gradle.category            = Dokkatoo~library
+              |    - org.gradle.dependency.bundling = Dokkatoo~external
+              |    - org.gradle.jvm.environment     = Dokkatoo~standard-jvm
+              |    - org.gradle.libraryelements     = Dokkatoo~jar
+              |    - org.gradle.usage               = Dokkatoo~java-runtime
               |Extended Configurations
               |    - dokkatoo${Format}GeneratorClasspath
            """.trimMargin()
@@ -164,11 +150,11 @@ class DokkatooPluginFunctionalTest : FunSpec({
               |Attributes
               |    - dev.adamko.dokkatoo.classpath  = dokka-plugins
               |    - dev.adamko.dokkatoo.format     = $format
-              |    - org.gradle.category            = library
-              |    - org.gradle.dependency.bundling = external
-              |    - org.gradle.jvm.environment     = standard-jvm
-              |    - org.gradle.libraryelements     = jar
-              |    - org.gradle.usage               = java-runtime
+              |    - org.gradle.category            = Dokkatoo~library
+              |    - org.gradle.dependency.bundling = Dokkatoo~external
+              |    - org.gradle.jvm.environment     = Dokkatoo~standard-jvm
+              |    - org.gradle.libraryelements     = Dokkatoo~jar
+              |    - org.gradle.usage               = Dokkatoo~java-runtime
               |Extended Configurations
               |    - dokkatooPlugin${Format}
            """.trimMargin()
