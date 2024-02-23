@@ -46,7 +46,6 @@ private fun initProject(
       buildGradleKts = """
           |plugins {
           |  kotlin("multiplatform") version embeddedKotlinVersion
-          |  //`java-library`
           |  id("dev.adamko.dokkatoo-html") version "${DokkatooConstants.DOKKATOO_VERSION}"
           |}
           |

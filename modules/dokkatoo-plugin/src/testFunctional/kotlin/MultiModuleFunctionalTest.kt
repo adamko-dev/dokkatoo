@@ -240,7 +240,7 @@ class MultiModuleFunctionalTest : FunSpec({
       }
 
       context("relocated project") {
-        originalProject.runner
+        relocatedProject.runner
           .addArguments(
             "clean",
             "--build-cache",
@@ -261,6 +261,7 @@ class MultiModuleFunctionalTest : FunSpec({
             ":dokkatooGenerate",
             "--stacktrace",
             "--build-cache",
+            "-D" + "org.gradle.caching.debug=true"
           )
           .forwardOutput()
           .build {
