@@ -1,18 +1,13 @@
 package dev.adamko.dokkatoo.dokka.plugins
 
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
-import dev.adamko.dokkatoo.internal.addAll
-import dev.adamko.dokkatoo.internal.putIfNotNull
 import java.io.File
 import javax.inject.Inject
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.putJsonArray
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.model.ObjectFactory
@@ -33,7 +28,7 @@ abstract class DokkaHtmlPluginParameters
 constructor(
   name: String,
   private val objects: ObjectFactory,
-) : DokkaPluginParametersBaseSpec<DokkaHtmlPluginParameters>(
+) : DokkaPluginParametersBaseSpec(
   name,
   DOKKA_HTML_PLUGIN_FQN,
 ) {
@@ -167,9 +162,9 @@ constructor(
     }
   }
 
-  override fun valuesSerializer(
+  override fun <T : DokkaPluginParametersBaseSpec> valuesSerializer(
     componentsDir: File,
-  ): KSerializer<DokkaHtmlPluginParameters> {
+  ): KSerializer<T> {
     return Serializer(objects, componentsDir)
   }
 

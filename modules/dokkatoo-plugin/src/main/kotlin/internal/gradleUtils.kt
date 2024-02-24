@@ -37,7 +37,7 @@ internal fun Configuration.declarable(
 ) {
   isCanBeResolved = false
   isCanBeConsumed = false
-  canBeDeclared(true)
+  canBeDeclared = true
   isVisible = visible
 }
 
@@ -56,7 +56,7 @@ internal fun Configuration.consumable(
 ) {
   isCanBeResolved = false
   isCanBeConsumed = true
-  canBeDeclared(false)
+  canBeDeclared = false
   isVisible = visible
 }
 
@@ -75,7 +75,7 @@ internal fun Configuration.resolvable(
 ) {
   isCanBeResolved = true
   isCanBeConsumed = false
-  canBeDeclared(false)
+  canBeDeclared = false
   isVisible = visible
 }
 
@@ -86,12 +86,17 @@ internal fun Configuration.resolvable(
  *
  * This function should be removed when the minimal supported Gradle version is 8.2.
  */
-private fun Configuration.canBeDeclared(value: Boolean) {
-  if (CurrentGradleVersion >= "8.2") {
-    @Suppress("UnstableApiUsage")
-    isCanBeDeclared = value
+private var Configuration.canBeDeclared: Boolean
+  set(value) {
+    if (isConfigurationCanBeDeclaredAvailable) {
+      @Suppress("UnstableApiUsage")
+      isCanBeDeclared = value
+    }
   }
-}
+  @Suppress("UnstableApiUsage")
+  get() = isConfigurationCanBeDeclaredAvailable && isCanBeDeclared
+
+private val isConfigurationCanBeDeclaredAvailable = CurrentGradleVersion >= "8.2"
 
 
 /** Shortcut for [GradleVersion.current] */

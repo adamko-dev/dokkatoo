@@ -19,7 +19,6 @@ import org.gradle.api.tasks.Input
  * @param[pluginFqn] Fully qualified classname of the Dokka Plugin
  */
 abstract class DokkaPluginParametersBaseSpec
-<T: DokkaPluginParametersBaseSpec<T>>
 @DokkatooInternalApi
 @Inject
 constructor
@@ -29,7 +28,7 @@ constructor
   open val pluginFqn: String,
 ) : Serializable, Named {
 
-  abstract fun valuesSerializer(
+  abstract fun <T : DokkaPluginParametersBaseSpec> valuesSerializer(
     componentsDir: File
   ): KSerializer<T>
 
