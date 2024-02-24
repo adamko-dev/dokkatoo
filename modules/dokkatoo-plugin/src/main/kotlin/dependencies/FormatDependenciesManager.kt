@@ -51,26 +51,19 @@ class FormatDependenciesManager(
       objects = objects,
     )
 
-  private fun AttributeContainer.jvmJar() {
-    attribute(USAGE_ATTRIBUTE, objects.named(JAVA_RUNTIME))
-    attribute(CATEGORY_ATTRIBUTE, objects.named(LIBRARY))
-    attribute(BUNDLING_ATTRIBUTE, objects.named(EXTERNAL))
-    attribute(TARGET_JVM_ENVIRONMENT_ATTRIBUTE, objects.named(STANDARD_JVM))
-    attribute(LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(JAR))
+  init {
+    project.dependencies {
+      applyAttributeHacks()
+    }
   }
 
-//  /** Collect [BaseDependencyManager.declaredDependencies]. */
-//  val dokkatooResolver: NamedDomainObjectProvider<Configuration> =
-//    project.configurations.register(configurationNames.dokkatooResolver) {
-//      description = "Resolve Dokkatoo declared dependencies for $formatName."
-//      resolvable()
-//      extendsFrom(baseDependencyManager.declaredDependencies)
-//      attributes {
-//        attribute(USAGE_ATTRIBUTE, baseAttributes.dokkatooUsage)
-//        attribute(DokkatooFormatAttribute, formatAttributes.format)
-//      }
-//    }
-
+  private fun AttributeContainer.jvmJar() {
+    attribute(USAGE_ATTRIBUTE, objects.named(AttributeHackPrefix + JAVA_RUNTIME))
+    attribute(CATEGORY_ATTRIBUTE, objects.named(AttributeHackPrefix + LIBRARY))
+    attribute(BUNDLING_ATTRIBUTE, objects.named(AttributeHackPrefix + EXTERNAL))
+    attribute(TARGET_JVM_ENVIRONMENT_ATTRIBUTE, objects.named(AttributeHackPrefix + STANDARD_JVM))
+    attribute(LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(AttributeHackPrefix + JAR))
+  }
 
   //region Dokka Generator Plugins
   /**

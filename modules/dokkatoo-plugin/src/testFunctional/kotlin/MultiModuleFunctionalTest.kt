@@ -240,7 +240,7 @@ class MultiModuleFunctionalTest : FunSpec({
       }
 
       context("relocated project") {
-        originalProject.runner
+        relocatedProject.runner
           .addArguments(
             "clean",
             "--build-cache",
@@ -248,10 +248,10 @@ class MultiModuleFunctionalTest : FunSpec({
           .forwardOutput()
           .build {
             test("clean tasks should run successfully") {
-              shouldHaveTasksWithOutcome(
-                ":clean" to SUCCESS,
-                ":subproject-hello:clean" to SUCCESS,
-                ":subproject-goodbye:clean" to SUCCESS,
+              shouldHaveTasksWithAnyOutcome(
+                ":clean" to listOf(UP_TO_DATE, SUCCESS),
+                ":subproject-hello:clean" to listOf(UP_TO_DATE, SUCCESS),
+                ":subproject-goodbye:clean" to listOf(UP_TO_DATE, SUCCESS),
               )
             }
           }
@@ -261,6 +261,7 @@ class MultiModuleFunctionalTest : FunSpec({
             ":dokkatooGenerate",
             "--stacktrace",
             "--build-cache",
+            "-D" + "org.gradle.caching.debug=true"
           )
           .forwardOutput()
           .build {
