@@ -74,7 +74,6 @@ constructor() :
    * Whether to emit warnings about visible undocumented declarations, that is declarations from
    * this package and without KDocs, after they have been filtered by [documentedVisibilities].
    *
-   *
    * Can be overridden on source set level by setting [DokkaSourceSetSpec.reportUndocumented].
    *
    * Default is `false`.

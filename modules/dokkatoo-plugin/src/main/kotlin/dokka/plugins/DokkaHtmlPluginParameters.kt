@@ -33,7 +33,7 @@ abstract class DokkaHtmlPluginParameters
 constructor(
   name: String,
   private val objects: ObjectFactory,
-) : DokkaPluginParametersBaseSpec(
+) : DokkaPluginParametersBaseSpec<DokkaHtmlPluginParameters>(
   name,
   DOKKA_HTML_PLUGIN_FQN,
 ) {
@@ -167,15 +167,9 @@ constructor(
     }
   }
 
-  override fun serializer(
+  override fun valuesSerializer(
     componentsDir: File,
-  ): KSerializer<String> {
-    return object: KSerializer<String> {
-      override val descriptor: SerialDescriptor = String.serializer().descriptor
-      override fun deserialize(decoder: Decoder): String {
-        String.serializer().deserialize(decoder)
-      }
-    }
+  ): KSerializer<DokkaHtmlPluginParameters> {
     return Serializer(objects, componentsDir)
   }
 

@@ -19,6 +19,7 @@ import org.gradle.api.tasks.Input
  * @param[pluginFqn] Fully qualified classname of the Dokka Plugin
  */
 abstract class DokkaPluginParametersBaseSpec
+<T: DokkaPluginParametersBaseSpec<T>>
 @DokkatooInternalApi
 @Inject
 constructor
@@ -30,7 +31,7 @@ constructor
 
   abstract fun valuesSerializer(
     componentsDir: File
-  ): KSerializer<String>
+  ): KSerializer<T>
 
 //  abstract fun jsonEncode(
 //    componentsDir: File

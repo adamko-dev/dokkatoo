@@ -4,13 +4,8 @@
 
 package dev.adamko.dokkatoo.dokka.parameters
 
-import dev.adamko.dokkatoo.dokka.DokkaModuleComponentsSpec
-import dev.adamko.dokkatoo.dokka.parameters.DokkaModuleParametersKxs.SourceSetIdKxs.Companion.resolve
-import dev.adamko.dokkatoo.dokka.parameters.KotlinPlatform.Companion.dokkaType
-import dev.adamko.dokkatoo.dokka.parameters.VisibilityModifier.Companion.dokkaType
 import dev.adamko.dokkatoo.dokka.plugins.DokkaPluginParametersBaseSpec
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
-import dev.adamko.dokkatoo.internal.mapToSet
 import java.io.File
 import java.net.URI
 import kotlinx.serialization.KSerializer
