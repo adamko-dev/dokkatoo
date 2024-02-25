@@ -3,6 +3,7 @@ package dev.adamko.dokkatoo.utils
 import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
+import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.readText
 import kotlin.properties.PropertyDelegateProvider
 import kotlin.properties.ReadWriteProperty
@@ -37,9 +38,6 @@ class GradleProjectTest(
         "-XX:+AlwaysPreTouch", // https://github.com/gradle/gradle/issues/3093#issuecomment-387259298
       )
       .addArguments(*defaultRunnerArgs.toTypedArray())
-
-  val testMavenRepoRelativePath: String =
-    projectDir.relativize(testMavenRepoDir).toFile().invariantSeparatorsPath
 
   companion object {
 
@@ -85,42 +83,15 @@ fun gradleKtsProjectTest(
   baseDir: Path = GradleProjectTest.funcTestTempDir,
   build: GradleProjectTest.() -> Unit,
 ): GradleProjectTest {
-  return GradleProjectTest(baseDir = baseDir, testProjectName = testProjectName).apply {
-
+  return gradleProjectTest(
+    testProjectName = testProjectName,
+    baseDir = baseDir,
+  ) {
     settingsGradleKts = """
       |rootProject.name = "test"
       |
-      |@Suppress("UnstableApiUsage")
-      |dependencyResolutionManagement {
-      |  repositories {
-      |    mavenCentral()
-      |    maven(file("$testMavenRepoRelativePath")) {
-      |      mavenContent {
-      |        includeGroup("dev.adamko.dokkatoo")
-      |        includeGroup("dev.adamko.dokkatoo-html")
-      |      }
-      |    }
-      |  }
-      |}
+      |${settingsRepositories()}
       |
-      |pluginManagement {
-      |  repositories {
-      |    mavenCentral()
-      |    gradlePluginPortal()
-      |    maven(file("$testMavenRepoRelativePath")) {
-      |      mavenContent {
-      |        includeGroup("dev.adamko.dokkatoo")
-      |        includeGroup("dev.adamko.dokkatoo-html")
-      |      }
-      |    }
-      |  }
-      |}
-      |
-    """.trimMargin()
-
-    gradleProperties = """
-      |kotlin.mpp.stability.nowarn=true
-      |org.gradle.cache=true
     """.trimMargin()
 
     build()
@@ -138,31 +109,32 @@ fun gradleGroovyProjectTest(
   baseDir: Path = GradleProjectTest.funcTestTempDir,
   build: GradleProjectTest.() -> Unit,
 ): GradleProjectTest {
-  return GradleProjectTest(baseDir = baseDir, testProjectName = testProjectName).apply {
-
+  return gradleProjectTest(
+    testProjectName = testProjectName,
+    baseDir = baseDir,
+  ) {
     settingsGradle = """
       |rootProject.name = "test"
       |
-      |dependencyResolutionManagement {
-      |    repositories {
-      |        mavenCentral()
-      |        maven { url = file("$testMavenRepoRelativePath") }
-      |    }
-      |}
-      |
-      |pluginManagement {
-      |    repositories {
-      |        mavenCentral()
-      |        gradlePluginPortal()
-      |        maven { url = file("$testMavenRepoRelativePath") }
-      |    }
-      |}
+      |${settingsRepositories()}
       |
     """.trimMargin()
+
+    build()
+  }
+}
+
+private fun gradleProjectTest(
+  testProjectName: String,
+  baseDir: Path = GradleProjectTest.funcTestTempDir,
+  build: GradleProjectTest.() -> Unit,
+): GradleProjectTest {
+  return GradleProjectTest(baseDir = baseDir, testProjectName = testProjectName).apply {
 
     gradleProperties = """
       |kotlin.mpp.stability.nowarn=true
       |org.gradle.cache=true
+      |
     """.trimMargin()
 
     build()
@@ -211,6 +183,54 @@ annotation class ProjectDirectoryDsl
 @ProjectDirectoryDsl
 interface ProjectDirectoryScope {
   val projectDir: Path
+
+  val testMavenRepoRelativePath: String
+    get() = projectDir
+      .relativize(GradleProjectTest.testMavenRepoDir)
+      .invariantSeparatorsPathString
+
+  @Language("kts")
+  fun settingsRepositories(): String {
+    // must be compatible with both Kotlin DSL and Groovy DSL
+
+    @Language("kts")
+    val dokkatooTestRepo = """
+        |exclusiveContent {
+        |  forRepository {
+        |    maven {
+        |      url = file("$testMavenRepoRelativePath").toURI()
+        |      name = "DokkatooTestMavenRepo"
+        |    }
+        |  }
+        |  filter {
+        |    includeGroup("dev.adamko.dokkatoo")
+        |    includeGroup("dev.adamko.dokkatoo-html")
+        |    includeGroup("dev.adamko.dokkatoo-javadoc")
+        |    includeGroup("dev.adamko.dokkatoo-jekyll")
+        |    includeGroup("dev.adamko.dokkatoo-gfm")
+        |  }
+        |}
+    """.trimMargin()
+
+    return """
+        |pluginManagement {
+        |  repositories {
+        |${dokkatooTestRepo.prependIndent("    ")}
+        |    mavenCentral()
+        |    gradlePluginPortal()
+        |  }
+        |}
+        |
+        |@Suppress("UnstableApiUsage")
+        |dependencyResolutionManagement {
+        |  repositories {
+        |${dokkatooTestRepo.prependIndent("    ")}
+        |    mavenCentral()
+        |  }
+        |}
+        |
+      """.trimMargin()
+  }
 }
 
 private data class ProjectDirectoryScopeImpl(
@@ -271,9 +291,15 @@ var ProjectDirectoryScope.gradleProperties: String by TestProjectFileDelegate(
 )
 
 
-fun ProjectDirectoryScope.createKotlinFile(filePath: String, @Language("kotlin") contents: String) =
+fun ProjectDirectoryScope.createKotlinFile(
+  filePath: String,
+  @Language("kotlin") contents: String
+): File =
   createFile(filePath, contents)
 
 
-fun ProjectDirectoryScope.createKtsFile(filePath: String, @Language("kts") contents: String) =
+fun ProjectDirectoryScope.createKtsFile(
+  filePath: String,
+  @Language("kts") contents: String
+): File =
   createFile(filePath, contents)

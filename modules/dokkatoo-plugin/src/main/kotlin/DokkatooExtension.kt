@@ -1,5 +1,6 @@
 package dev.adamko.dokkatoo
 
+import dev.adamko.dokkatoo.dependencies.BaseDependencyManager
 import dev.adamko.dokkatoo.dokka.DokkaPublication
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec
 import dev.adamko.dokkatoo.internal.*
@@ -24,6 +25,7 @@ abstract class DokkatooExtension
 @DokkatooInternalApi
 constructor(
   private val objects: ObjectFactory,
+  internal val baseDependencyManager: BaseDependencyManager,
 ) : ExtensionAware, Serializable {
 
   /** Directory into which [DokkaPublication]s will be produced */
