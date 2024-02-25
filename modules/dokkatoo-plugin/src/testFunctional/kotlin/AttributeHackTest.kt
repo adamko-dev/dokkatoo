@@ -1,6 +1,6 @@
 package dev.adamko.dokkatoo
 
-import dev.adamko.dokkatoo.internal.DokkatooConstants
+import dev.adamko.dokkatoo.internal.DokkatooConstants.DOKKATOO_VERSION
 import dev.adamko.dokkatoo.utils.*
 import io.kotest.core.spec.style.FunSpec
 
@@ -46,12 +46,13 @@ private fun initProject(
       buildGradleKts = """
           |plugins {
           |  kotlin("multiplatform") version embeddedKotlinVersion
-          |  id("dev.adamko.dokkatoo-html") version "${DokkatooConstants.DOKKATOO_VERSION}"
+          |  id("dev.adamko.dokkatoo-html") version "$DOKKATOO_VERSION"
           |}
           |
           |kotlin {
           |  jvm()
           |}
+          |
         """.trimMargin()
     }
 

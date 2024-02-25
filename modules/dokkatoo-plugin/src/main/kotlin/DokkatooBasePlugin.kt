@@ -51,8 +51,6 @@ constructor(
 
     val dokkatooExtension = createExtension(target)
 
-    createBaseDependencyManager(target = target)
-
     configureDependencyAttributes(target)
 
     configureDokkaPublicationsDefaults(dokkatooExtension)
@@ -61,7 +59,16 @@ constructor(
   }
 
   private fun createExtension(project: Project): DokkatooExtension {
-    val dokkatooExtension = project.extensions.create<DokkatooExtension>(EXTENSION_NAME).apply {
+
+    val baseDependencyManager = BaseDependencyManager(
+      project = project,
+      objects = objects,
+    )
+
+    val dokkatooExtension = project.extensions.create<DokkatooExtension>(
+      EXTENSION_NAME,
+      baseDependencyManager,
+    ).apply {
       moduleName.convention(providers.provider { project.name })
       moduleVersion.convention(providers.provider { project.version.toString() })
       modulePath.convention(project.pathAsFilePath())
@@ -110,20 +117,6 @@ constructor(
     )
 
     return dokkatooExtension
-  }
-
-
-  private fun createBaseDependencyManager(
-    target: Project,
-  ) {
-    val baseDependencyManager = BaseDependencyManager(
-      project = target,
-      objects = objects,
-    )
-    target.extensions.adding(
-      "dokkatooBaseDependencyManager$INTERNAL_MARKER",
-      baseDependencyManager
-    )
   }
 
 
@@ -334,9 +327,6 @@ constructor(
 
     /** Name of the [Configuration] used to declare dependencies on other subprojects. */
     const val DOKKATOO_CONFIGURATION_NAME = "dokkatoo"
-
-    /** disable Kotlin DSL accessors by adding `~` */
-    internal const val INTERNAL_MARKER = "~internal"
 
     internal val jsonMapper = Json {
       prettyPrint = true
