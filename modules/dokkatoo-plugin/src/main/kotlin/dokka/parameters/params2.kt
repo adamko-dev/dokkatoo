@@ -34,20 +34,27 @@ abstract class DokkaWorkerParameters : ExtensionAware {
  * Parameters that affect how source content is rendered.
  */
 abstract class BaseDokkaRenderingParameters : ExtensionAware {
+
   @get:InputFiles
   @get:PathSensitive(RELATIVE)
   abstract val includes: ConfigurableFileCollection
+
   @get:Input
   abstract val suppressInheritedMembers: Property<Boolean>
+
   @get:Input
   abstract val suppressObviousFunctions: Property<Boolean>
+
   @get:Input
   abstract val moduleName: Property<String>
+
   @get:Input
   @get:Optional
   abstract val moduleVersion: Property<String>
+
   @get:Nested
   abstract val pluginParameters: DokkaPluginParametersContainer
+
   @get:Input
   abstract val enabledPluginIds: ListProperty<String>
 }
@@ -68,7 +75,6 @@ abstract class DokkaModuleRenderingParameters @Inject constructor(
   @get:Nested
   val dokkaSourceSets: NamedDomainObjectContainer<DokkaSourceSetSpec> =
     extensions.adding("dokkaSourceSets", objects.domainObjectContainer())
-
 }
 
 
@@ -78,14 +84,19 @@ abstract class DokkaModuleRenderingParameters @Inject constructor(
  * Will only affect the behaviour of Dokka tasks in the current project.
  */
 abstract class DokkaGeneratorParameters : ExtensionAware {
+
   @get:LocalState
   abstract val cacheDirectory: DirectoryProperty
+
   @get:Input
   abstract val finalizeCoroutines: Property<Boolean>
+
   @get:Input
   abstract val failOnWarning: Property<Boolean>
+
   @get:Input
   abstract val offlineMode: Property<Boolean>
+
   @get:LocalState
   abstract val logFile: RegularFileProperty
 }
