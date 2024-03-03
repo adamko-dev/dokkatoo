@@ -45,7 +45,7 @@ constructor(
   @get:OutputDirectory
   abstract val outputDirectory: DirectoryProperty
 
-  /** Dokka Modules directories, containing the output, module descriptor, and module includes. */
+  /** Dokka Modules directories, each containing a rendered Dokka Module. */
   @get:InputFiles
   @get:PathSensitive(RELATIVE)
   abstract val dokkaModuleDirectories: ConfigurableFileCollection

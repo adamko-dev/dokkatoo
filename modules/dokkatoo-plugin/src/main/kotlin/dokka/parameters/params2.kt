@@ -1,59 +1,91 @@
 package dev.adamko.dokkatoo.dokka.parameters
 
 import dev.adamko.dokkatoo.internal.DokkaPluginParametersContainer
+import dev.adamko.dokkatoo.internal.adding
+import dev.adamko.dokkatoo.internal.domainObjectContainer
 import dev.adamko.dokkatoo.workers.WorkerIsolation
+import javax.inject.Inject
+import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.model.ObjectFactory
+import org.gradle.api.plugins.ExtensionAware
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Nested
-import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.*
+import org.gradle.api.tasks.PathSensitivity.RELATIVE
+
 
 /**
  * Gradle Worker specific parameters
  */
-interface DokkaWorkerParameters {
-  val isolation: Property<WorkerIsolation>
-  val dokkaPlugins: ConfigurableFileCollection
-  val runtimeClasspath: ConfigurableFileCollection
+abstract class DokkaWorkerParameters : ExtensionAware {
+
+  @get:Nested
+  abstract val isolation: Property<WorkerIsolation>
+
+  @get:Classpath
+  abstract val runtimeClasspath: ConfigurableFileCollection
 }
+
 
 /**
  * Parameters that affect how source content is rendered.
  */
-interface BaseDokkaRenderingParameters {
-  val includes: ConfigurableFileCollection
-  val suppressInheritedMembers: Property<Boolean>
-  val suppressObviousFunctions: Property<Boolean>
+abstract class BaseDokkaRenderingParameters : ExtensionAware {
+  @get:InputFiles
+  @get:PathSensitive(RELATIVE)
+  abstract val includes: ConfigurableFileCollection
   @get:Input
-  val moduleName: Property<String>
-
+  abstract val suppressInheritedMembers: Property<Boolean>
+  @get:Input
+  abstract val suppressObviousFunctions: Property<Boolean>
+  @get:Input
+  abstract val moduleName: Property<String>
   @get:Input
   @get:Optional
-  val moduleVersion: Property<String>
-
-//  @get:Nested
-//  val pluginsConfiguration: DokkaPluginParametersContainer
+  abstract val moduleVersion: Property<String>
+  @get:Nested
+  abstract val pluginParameters: DokkaPluginParametersContainer
+  @get:Input
+  abstract val enabledPluginIds: ListProperty<String>
 }
 
-interface DokkaPublicationRenderingParameters : BaseDokkaRenderingParameters {
-  val moduleDirectories: ConfigurableFileCollection
+
+abstract class DokkaPublicationRenderingParameters : BaseDokkaRenderingParameters(),
+  ExtensionAware {
+
+  @get:InputFiles
+  abstract val moduleDirectories: ConfigurableFileCollection
 }
 
-interface DokkaModuleRenderingParameters : BaseDokkaRenderingParameters {
+
+abstract class DokkaModuleRenderingParameters @Inject constructor(
+  objects: ObjectFactory
+) : BaseDokkaRenderingParameters(), ExtensionAware {
+
+  @get:Nested
+  val dokkaSourceSets: NamedDomainObjectContainer<DokkaSourceSetSpec> =
+    extensions.adding("dokkaSourceSets", objects.domainObjectContainer())
 
 }
+
 
 /**
  * Parameters that control the behaviour of the Dokka Generator.
  *
  * Will only affect the behaviour of Dokka tasks in the current project.
  */
-interface DokkaGeneratorParameters {
-  val cacheDirectory: DirectoryProperty
-  val finalizeCoroutines: Property<Boolean>
-  val failOnWarning: Property<Boolean>
-  val offlineMode: Property<Boolean>
-  val logFile: RegularFileProperty
+abstract class DokkaGeneratorParameters : ExtensionAware {
+  @get:LocalState
+  abstract val cacheDirectory: DirectoryProperty
+  @get:Input
+  abstract val finalizeCoroutines: Property<Boolean>
+  @get:Input
+  abstract val failOnWarning: Property<Boolean>
+  @get:Input
+  abstract val offlineMode: Property<Boolean>
+  @get:LocalState
+  abstract val logFile: RegularFileProperty
 }

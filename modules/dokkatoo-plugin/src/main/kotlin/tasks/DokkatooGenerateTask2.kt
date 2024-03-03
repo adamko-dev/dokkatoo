@@ -1,5 +1,6 @@
 package dev.adamko.dokkatoo.tasks
 
+import dev.adamko.dokkatoo.dokka.parameters.DokkaGeneratorParameters
 import dev.adamko.dokkatoo.dokka.parameters.DokkaGeneratorParametersSpec
 import dev.adamko.dokkatoo.internal.DokkaPluginParametersContainer
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
@@ -37,6 +38,9 @@ constructor(
   /** @see dev.adamko.dokkatoo.dokka.DokkaPublication.enabled */
   @get:Input
   abstract val publicationEnabled: Property<Boolean>
+
+  @get:Nested
+    val generatorParameters: DokkaGeneratorParameters = objects.newInstance()
 
   @get:Nested
   val generatorParameters: DokkaGeneratorParametersSpec = objects.newInstance(pluginsConfiguration)
