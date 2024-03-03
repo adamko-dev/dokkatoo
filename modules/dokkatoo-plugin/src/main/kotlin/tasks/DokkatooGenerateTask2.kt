@@ -1,17 +1,19 @@
 package dev.adamko.dokkatoo.tasks
 
 import dev.adamko.dokkatoo.dokka.parameters.DokkaGeneratorParameters
-import dev.adamko.dokkatoo.dokka.parameters.DokkaGeneratorParametersSpec
+import dev.adamko.dokkatoo.dokka.parameters.DokkaWorkerParameters
 import dev.adamko.dokkatoo.internal.DokkaPluginParametersContainer
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import dev.adamko.dokkatoo.workers.DokkaGeneratorWorker
-import dev.adamko.dokkatoo.workers.WorkerIsolation
 import javax.inject.Inject
-import org.gradle.api.file.*
+import org.gradle.api.file.ArchiveOperations
+import org.gradle.api.file.FileSystemOperations
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.model.ReplacedBy
 import org.gradle.api.provider.Property
-import org.gradle.api.tasks.*
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Nested
 import org.gradle.kotlin.dsl.*
 import org.gradle.workers.WorkerExecutor
 import org.jetbrains.dokka.DokkaConfiguration
@@ -40,10 +42,7 @@ constructor(
   abstract val publicationEnabled: Property<Boolean>
 
   @get:Nested
-    val generatorParameters: DokkaGeneratorParameters = objects.newInstance()
-
-  @get:Nested
-  val generatorParameters: DokkaGeneratorParametersSpec = objects.newInstance(pluginsConfiguration)
+  val dokkaGenerator: DokkaGeneratorParameters = objects.newInstance()
 
   /**
    * The [DokkaConfiguration] by Dokka Generator can be saved to a file for debugging purposes.
@@ -53,38 +52,13 @@ constructor(
   @get:Internal
   abstract val dokkaConfigurationJsonFile: RegularFileProperty
 
-  /**
-   * Control whether Dokkatoo launches Dokka Generator.
-   *
-   * Defaults to [dev.adamko.dokkatoo.DokkatooExtension.dokkaGeneratorIsolation].
-   *
-   * @see dev.adamko.dokkatoo.DokkatooExtension.dokkaGeneratorIsolation
-   * @see dev.adamko.dokkatoo.workers.ProcessIsolation
-   */
-  @get:Nested
-  abstract val workerIsolation: Property<WorkerIsolation>
-
-  /**
-   * Classpath required to run Dokka Generator.
-   *
-   * Contains the Dokka Generator, Dokka plugins, and any transitive dependencies.
-   */
-  @get:Classpath
-  abstract val runtimeClasspath: ConfigurableFileCollection
-
-  @get:Internal
-  abstract val workerLogFile: RegularFileProperty
-
-  @get:LocalState
-  abstract val cacheDirectory: DirectoryProperty
-
   protected fun dokkaGeneratorWorker(): DokkaGeneratorWorker {
     return DokkaGeneratorWorker(
-      runtimeClasspath = runtimeClasspath,
-      isolation = workerIsolation.get(),
+      runtimeClasspath = dokkaGenerator.runtimeClasspath,
+      isolation = dokkaGenerator.isolation.get(),
 //      generatorParameters = generatorParameters,
-      cacheDirectory = cacheDirectory.asFile.orNull,
-      workerLogFile = workerLogFile.asFile.get(),
+      cacheDirectory = dokkaGenerator.cacheDirectory.asFile.orNull,
+      workerLogFile = dokkaGenerator.logFile.asFile.get(),
 //      dokkaConfigurationJsonFile = dokkaConfigurationJsonFile.asFile.orNull,
 
       taskPath = path,
@@ -92,11 +66,4 @@ constructor(
       archives = archives,
     )
   }
-
-  //region deprecated properties
-  @get:ReplacedBy("generatorParameters")
-  @Deprecated("renamed", ReplaceWith("generatorParameters"))
-  val generator: DokkaGeneratorParametersSpec
-    get() = generatorParameters
-  //endregion
 }

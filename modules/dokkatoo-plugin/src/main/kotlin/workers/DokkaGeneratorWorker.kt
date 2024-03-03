@@ -21,7 +21,7 @@ class DokkaGeneratorWorker(
 //  private val generatorParameters: DokkaGeneratorParametersSpec,
   private val cacheDirectory: File?,
 
-  private val workerLogFile: File,
+  private val workerLogFile: File?,
 //  private val dokkaConfigurationJsonFile: File?,
 
   taskPath: String,
