@@ -7,8 +7,8 @@ plugins {
 
 dependencies {
   dokkatoo(projects.modules.dokkatooPlugin)
-  dokkatooPluginHtml(libs.kotlin.dokkaPlugin.allModulesPage)
-  dokkatooPluginHtml(libs.kotlin.dokkaPlugin.templating)
+//  dokkatooPluginHtml(libs.kotlin.dokkaPlugin.allModulesPage)
+//  dokkatooPluginHtml(libs.kotlin.dokkaPlugin.templating)
 }
 
 dokkatoo {
