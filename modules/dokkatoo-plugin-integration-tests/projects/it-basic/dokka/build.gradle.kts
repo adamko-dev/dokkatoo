@@ -16,11 +16,11 @@ plugins {
 
 buildscript {
     dependencies {
-        classpath("org.jetbrains.dokka:dokka-base:1.9.10")
+        classpath("org.jetbrains.dokka:dokka-base:1.9.20")
     }
 }
 
-version = "1.9.10-SNAPSHOT"
+version = "1.9.20-SNAPSHOT"
 
 apply(from = "./template.root.gradle.kts")
 
@@ -51,7 +51,7 @@ tasks.withType<DokkaTask> {
                 remoteUrl.set(
                     URL(
                         "https://github.com/Kotlin/dokka/tree/master/" +
-                                "integration-tests/gradle/projects/it-basic/src/main"
+                                "dokka-integration-tests/gradle/projects/it-basic/src/main"
                     )
                 )
             }

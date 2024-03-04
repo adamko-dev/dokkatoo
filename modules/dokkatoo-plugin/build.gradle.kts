@@ -226,6 +226,12 @@ dokkatoo {
       remoteUrl("https://github.com/adamko-dev/dokkatoo/tree/main/$relativeProjectPath/src/main/kotlin")
     }
   }
+
+  pluginsConfiguration {
+    html {
+      homepageLink = "https://github.com/adamko-dev/dokkatoo/"
+    }
+  }
 }
 
 dokkaSourceDownload {

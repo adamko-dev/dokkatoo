@@ -212,6 +212,7 @@ public abstract class dev/adamko/dokkatoo/dokka/plugins/DokkaHtmlPluginParameter
 	public abstract fun getCustomAssets ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public abstract fun getCustomStyleSheets ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public abstract fun getFooterMessage ()Lorg/gradle/api/provider/Property;
+	public abstract fun getHomepageLink ()Lorg/gradle/api/provider/Property;
 	public abstract fun getMergeImplicitExpectActualDeclarations ()Lorg/gradle/api/provider/Property;
 	public abstract fun getSeparateInheritedMembers ()Lorg/gradle/api/provider/Property;
 	public abstract fun getTemplatesDir ()Lorg/gradle/api/file/DirectoryProperty;
