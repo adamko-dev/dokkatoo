@@ -43,6 +43,8 @@ jobs:
       - uses: gradle/gradle-build-action@v2
         with:
           gradle-home-cache-cleanup: true
+          # write build cache on 'main' and 'release' branches, or tags (default is 'main' only)
+          cache-read-only: ${{ github.ref != 'refs/heads/main' && !startsWith(github.ref, 'refs/heads/release') && !startsWith(github.ref, 'refs/tags/') }}
           arguments: |
             :modules:docs:dokkatooGenerate
 

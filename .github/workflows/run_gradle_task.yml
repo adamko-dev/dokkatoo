@@ -82,6 +82,8 @@ jobs:
         with:
           gradle-home-cache-cleanup: true
           arguments: ${{ inputs.gradle-task }}
+          # write build cache on 'main' and 'release' branches, or tags (default is 'main' only)
+          cache-read-only: ${{ github.ref != 'refs/heads/main' && !startsWith(github.ref, 'refs/heads/release') && !startsWith(github.ref, 'refs/tags/') }}
         env:
           MAVEN_SONATYPE_USERNAME: ${{ vars.MAVEN_SONATYPE_USERNAME }}
           MAVEN_SONATYPE_PASSWORD: ${{ secrets.MAVEN_SONATYPE_PASSWORD }}
