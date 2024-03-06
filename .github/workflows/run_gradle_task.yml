@@ -99,7 +99,7 @@ jobs:
 
       - name: Upload build reports
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build-report-${{ runner.os }}${{ github.action }}
           path: |
