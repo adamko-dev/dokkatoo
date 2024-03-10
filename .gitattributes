@@ -39,10 +39,12 @@ gradlew         text eol=lf
 *.svg             text
 
 # Exclude external libs from GitHub language stats https://github.com/github/linguist/blob/v7.24.1/docs/overrides.md
-examples/**                                                       linguist-documentation
-examples/*/dokka                                                  linguist-vendored
-modules/dokkatoo-plugin-integration-tests/projects/**dokka/       linguist-vendored
-modules/dokkatoo-plugin-integration-tests/projects/**dokkatoo/    linguist-documentation
+examples/**                                                           linguist-documentation
+examples/*/dokka                                                      linguist-vendored
+examples/versioning-multimodule-example/dokka/previousDocVersions     linguist-generated
+examples/versioning-multimodule-example/dokkatoo/previousDocVersions  linguist-generated
+modules/dokkatoo-plugin-integration-tests/projects/**dokka/           linguist-vendored
+modules/dokkatoo-plugin-integration-tests/projects/**dokkatoo/        linguist-documentation
 
 # Exclude files from exporting
 
