@@ -7,7 +7,7 @@ dependencies {
   dokkatoo(project(":parentProject:childProjectA"))
   dokkatoo(project(":parentProject:childProjectB"))
 
-  dokkatooPluginHtml("org.jetbrains.dokka:versioning-plugin")
+  dokkatooPluginHtml("org.jetbrains.dokka:versioning-plugin") // Dokkatoo will automatically add the version
 }
 
 dokkatoo {
@@ -15,7 +15,8 @@ dokkatoo {
 }
 
 val currentVersion = "1.0"
-val previousVersionsDirectory: Directory = rootProject.layout.projectDirectory.dir("previousDocVersions")
+val previousVersionsDirectory: Directory =
+  rootProject.layout.projectDirectory.dir("previousDocVersions")
 
 dokkatoo {
   pluginsConfiguration {
