@@ -23,7 +23,7 @@ concurrency:
 
 jobs:
 
-  build:
+  build-dokka:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repo
@@ -52,15 +52,38 @@ jobs:
         with:
           path: ./modules/docs/build/dokka/html/
 
+
+  build-writerside:
+    runs-on: ubuntu-latest
+    env:
+      WS_ALL_ZIP: "webHelpD2-all.zip"
+    steps:
+      - name: Build Writerside docs
+        uses: JetBrains/writerside-github-action@v4
+        with:
+          instance: "modules/docs/d"
+          artifact: ${{ env.WS_ALL_ZIP }}
+          docker-version: "233.14389"
+
+      - name: Save artifact with build results
+        uses: actions/upload-artifact@v3
+        with:
+          name: docs
+          path: |
+            artifacts/${{ env.WS_ALL_ZIP }}
+
+
   deploy:
-    needs: build
+    needs:
+      - build-dokka
+      - build-writerside
     runs-on: ubuntu-latest
     permissions:
       pages: write      # to deploy to Pages
       id-token: write   # to verify the deployment originates from an appropriate source
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
