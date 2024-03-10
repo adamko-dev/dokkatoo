@@ -1,9 +1,9 @@
-rootProject.name = "versioning-multimodule-example"
+rootProject.name = "buildSrc"
 
 pluginManagement {
   repositories {
-    gradlePluginPortal()
     mavenCentral()
+    gradlePluginPortal()
     exclusiveContent {
       forRepository {
         maven(providers.gradleProperty("testMavenRepo")) {
@@ -23,8 +23,12 @@ pluginManagement {
 
 @Suppress("UnstableApiUsage")
 dependencyResolutionManagement {
+
+  repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+
   repositories {
     mavenCentral()
+    gradlePluginPortal()
     exclusiveContent {
       forRepository {
         maven(providers.gradleProperty("testMavenRepo")) {
@@ -41,9 +45,3 @@ dependencyResolutionManagement {
     }
   }
 }
-
-include(
-  ":parentProject",
-  ":parentProject:childProjectA",
-  ":parentProject:childProjectB",
-)
