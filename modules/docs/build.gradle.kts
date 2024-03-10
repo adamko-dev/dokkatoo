@@ -14,6 +14,9 @@ dokkatoo {
     includes.from("Module.md")
   }
 
+  // generate into a nested /kdoc/ directory for GitHub Pages
+  dokkatooPublicationDirectory.set(layout.buildDirectory.dir("dokka/html/kdoc"))
+
   pluginsConfiguration {
     html {
       customAssets.from(
