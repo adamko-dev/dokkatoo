@@ -21,7 +21,7 @@ import org.gradle.kotlin.dsl.*
  * ```
  */
 fun Configuration.consumable(
-  visible: Boolean = true
+  visible: Boolean = false
 ) {
   isVisible = visible
   isCanBeResolved = false

@@ -2,6 +2,8 @@ package buildsrc.conventions
 
 import buildsrc.settings.MavenPublishTestSettings
 import buildsrc.utils.*
+import org.gradle.api.attributes.Category.CATEGORY_ATTRIBUTE
+import org.gradle.api.attributes.Usage.USAGE_ATTRIBUTE
 
 
 /** Utility for publishing a project to a local Maven directory for use in integration tests. */
@@ -68,9 +70,6 @@ plugins.withType<MavenPublishPlugin>().all {
 
 val testMavenPublication: Configuration by configurations.creating {
   declarable()
-  attributes {
-    attribute(MavenPublishTestSettings.attribute, "testMavenRepo")
-  }
 }
 
 val testMavenPublicationResolvable: Configuration by configurations.creating {
@@ -78,6 +77,8 @@ val testMavenPublicationResolvable: Configuration by configurations.creating {
   extendsFrom(testMavenPublication)
   attributes {
     attribute(MavenPublishTestSettings.attribute, "testMavenRepo")
+    attribute(USAGE_ATTRIBUTE, objects.named("maven-publish-test"))
+    attribute(CATEGORY_ATTRIBUTE, objects.named("maven-publish-test"))
   }
   outgoing {
     artifact(mavenPublishTestExtension.testMavenRepo) {
@@ -91,6 +92,8 @@ val testMavenPublicationConsumable: Configuration by configurations.creating {
   extendsFrom(testMavenPublication)
   attributes {
     attribute(MavenPublishTestSettings.attribute, "testMavenRepo")
+    attribute(USAGE_ATTRIBUTE, objects.named("maven-publish-test"))
+    attribute(CATEGORY_ATTRIBUTE, objects.named("maven-publish-test"))
   }
   outgoing {
     artifact(mavenPublishTestExtension.testMavenRepo) {
