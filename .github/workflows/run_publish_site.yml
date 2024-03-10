@@ -21,11 +21,6 @@ concurrency:
   cancel-in-progress: true
 
 
-env:
-  WRITERSIDE_INSTANCE: "modules/docs/d"
-  WRITERSIDE_DOC_ZIP: "webHelpD2-all.zip"
-
-
 jobs:
 
   build-dokka:
@@ -62,6 +57,9 @@ jobs:
 
   build-writerside:
     runs-on: ubuntu-latest
+    env:
+      WRITERSIDE_INSTANCE: "modules/docs/d"
+      WRITERSIDE_DOC_ZIP: "webHelpD2-all.zip"
     steps:
       - name: Build Writerside docs
         uses: JetBrains/writerside-github-action@v4
