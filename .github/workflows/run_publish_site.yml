@@ -58,7 +58,7 @@ jobs:
   build-writerside:
     runs-on: ubuntu-latest
     env:
-      WRITERSIDE_INSTANCE: "modules/docs/d"
+      WRITERSIDE_INSTANCE: "dokkatoo/d"
       WRITERSIDE_DOC_ZIP: "webHelpD2-all.zip"
     steps:
       - name: Build Writerside docs
@@ -74,7 +74,7 @@ jobs:
           instance: ${{ env.WRITERSIDE_INSTANCE }}
 
       - name: Unpack Writerside zip
-        run: unzip -O UTF-8 -qq '${{ env.WS_ALL_ZIP }}' -d writerside-dir
+        run: unzip -O UTF-8 -qq '${{ env.WRITERSIDE_DOC_ZIP }}' -d writerside-dir
 
       - name: Upload Writerside to Pages
         uses: actions/upload-pages-artifact@v3
