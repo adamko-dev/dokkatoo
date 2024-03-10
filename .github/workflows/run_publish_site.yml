@@ -50,7 +50,7 @@ jobs:
 
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: ./modules/docs/build/dokka/html
+          path: ./modules/docs/build/dokka/
 
   deploy:
     needs: build

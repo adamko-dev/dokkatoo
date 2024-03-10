@@ -26,8 +26,8 @@ Dokkatoo has a number of improvements over the existing Dokka Gradle Plugin:
 * Compatible with [Gradle Build Cache](https://docs.gradle.org/current/userguide/build_cache.html)
 * Compatible with
   [Gradle Configuration Cache](https://docs.gradle.org/current/userguide/configuration_cache.html)
-* Safe cross-project sharing and aggregation
-* Parallel execution
+* Follows Gradle best practices for plugin development, for a more stable experience
+* Faster, parallel execution
 
 
 ### Status
@@ -80,7 +80,7 @@ and
 2. Run the generation task
 
    ```shell
-   ./gradlew dokkatooGenerate
+   ./gradlew :dokkatooGenerate
    ```
 
 3. View the results in `./build/dokka/`
