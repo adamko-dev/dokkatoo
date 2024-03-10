@@ -215,6 +215,8 @@ kotlin.sourceSets.main {
 }
 
 dokkatoo {
+  moduleName = "Dokkatoo Gradle Plugin"
+
   dokkatooSourceSets.configureEach {
     externalDocumentationLinks.register("gradle") {
       // https://docs.gradle.org/current/javadoc/index.html
@@ -225,6 +227,10 @@ dokkatoo {
       val relativeProjectPath = projectDir.relativeToOrNull(rootDir)?.invariantSeparatorsPath ?: ""
       remoteUrl("https://github.com/adamko-dev/dokkatoo/tree/main/$relativeProjectPath/src/main/kotlin")
     }
+  }
+
+  dokkatooSourceSets.configureEach {
+    includes.from("Module.md")
   }
 
   pluginsConfiguration {

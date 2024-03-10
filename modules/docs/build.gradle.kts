@@ -10,6 +10,10 @@ dependencies {
 dokkatoo {
   moduleName.set("Dokkatoo Gradle Plugin")
 
+  dokkatooPublications.configureEach {
+    includes.from("Module.md")
+  }
+
   pluginsConfiguration {
     html {
       customAssets.from(
