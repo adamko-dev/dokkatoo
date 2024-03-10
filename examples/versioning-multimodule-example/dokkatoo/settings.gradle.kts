@@ -41,3 +41,9 @@ dependencyResolutionManagement {
     }
   }
 }
+
+include(
+  ":parentProject",
+  ":parentProject:childProjectA",
+  ":parentProject:childProjectB",
+)

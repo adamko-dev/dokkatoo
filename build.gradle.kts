@@ -24,6 +24,8 @@ idea {
         "build",
         "gradle/wrapper",
         "ANDROID_SDK",
+        "examples/versioning-multimodule-example/dokkatoo/previousDocVersions",
+        "examples/versioning-multimodule-example/dokka/previousDocVersions",
       )
       addAll(
         projectDir.walk().filter { file ->

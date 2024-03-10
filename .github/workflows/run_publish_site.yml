@@ -23,7 +23,7 @@ concurrency:
 
 jobs:
 
-  build:
+  build-dokka:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repo
@@ -40,7 +40,8 @@ jobs:
           distribution: temurin
           java-version: 11
 
-      - uses: gradle/gradle-build-action@v3
+      - name: dokkatooGenerate
+        uses: gradle/gradle-build-action@v3
         with:
           gradle-home-cache-cleanup: true
           # write build cache on 'main' and 'release' branches, or tags (default is 'main' only)
@@ -48,12 +49,43 @@ jobs:
           arguments: |
             :modules:docs:dokkatooGenerate
 
-      - uses: actions/upload-pages-artifact@v3
+      - name: Upload Dokka to Pages
+        uses: actions/upload-pages-artifact@v3
         with:
-          path: ./modules/docs/build/dokka/html
+          path: ./modules/docs/build/dokka/html/
+
+
+  build-writerside:
+    runs-on: ubuntu-latest
+    env:
+      WRITERSIDE_INSTANCE: "modules/docs/d"
+      WRITERSIDE_DOC_ZIP: "webHelpD2-all.zip"
+    steps:
+      - name: Build Writerside docs
+        uses: JetBrains/writerside-github-action@v4
+        with:
+          instance: ${{ env.WRITERSIDE_INSTANCE }}
+          artifact: ${{ env.WRITERSIDE_DOC_ZIP }}
+          docker-version: "233.14389"
+
+      - name: Writerside check
+        uses: JetBrains/writerside-checker-action@v1
+        with:
+          instance: ${{ env.WRITERSIDE_INSTANCE }}
+
+      - name: Unpack Writerside zip
+        run: unzip -O UTF-8 -qq '${{ env.WS_ALL_ZIP }}' -d writerside-dir
+
+      - name: Upload Writerside to Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./writerside-dir/
+
 
   deploy:
-    needs: build
+    needs:
+      - build-dokka
+      - build-writerside
     runs-on: ubuntu-latest
     permissions:
       pages: write      # to deploy to Pages
@@ -62,6 +94,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
