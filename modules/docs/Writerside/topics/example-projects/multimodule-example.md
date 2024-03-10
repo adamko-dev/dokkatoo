@@ -1,3 +1,0 @@
-# Multimodule Example Project
-
-Start typing here...

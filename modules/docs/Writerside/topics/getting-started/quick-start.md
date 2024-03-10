@@ -81,5 +81,5 @@ Run the Dokkatoo generation task.
 
 Dokkatoo will then generate documentation into `./build/dokka/`
 
-To improve performance only run the task in the aggregating project by prefixing the task name with
-the subproject path (or `:` if aggregating in the root project).
+> To improve performance only run the task in the aggregating project by prefixing the task name
+> with the subproject path (or `:` if aggregating in the root project).

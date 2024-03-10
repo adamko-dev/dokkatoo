@@ -1,3 +1,0 @@
-# Kotlin-As-Java Example Project
-
-Start typing here...

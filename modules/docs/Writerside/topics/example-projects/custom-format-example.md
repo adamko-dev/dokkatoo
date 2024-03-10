@@ -1,3 +1,0 @@
-# Custom Format Example Project
-
-Start typing here...

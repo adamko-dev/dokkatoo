@@ -1,7 +1,7 @@
 # Migrating from Dokka
 
 For help in migrating from the Dokka Gradle Plugin to Dokkatoo, you can still apply both plugins -
-just make sure to update the Dokkatoo output directory!
+just make sure to update the Dokkatoo output directory, so it doesn't overlap!
 
 ```kotlin
 // build.gradle.kts
