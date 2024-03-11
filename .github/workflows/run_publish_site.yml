@@ -40,7 +40,7 @@ jobs:
           distribution: temurin
           java-version: 11
 
-      - name: dokkatooGenerate
+      - name: Build site
         uses: gradle/gradle-build-action@v3
         with:
           gradle-home-cache-cleanup: true
