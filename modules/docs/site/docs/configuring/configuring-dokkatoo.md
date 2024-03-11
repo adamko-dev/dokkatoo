@@ -4,8 +4,7 @@ Once the Dokkatoo plugin is applied to a project, it can be configuring using th
 
 Here is an example - it is not exhaustive and does not cover all functionality.
 
-```kotlin
-// build.gradle.kts
+```kotlin title="build.gradle.kts"
 import dev.adamko.dokkatoo.dokka.plugins.DokkaHtmlPluginParameters
 
 plugins {

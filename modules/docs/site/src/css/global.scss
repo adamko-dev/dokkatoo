@@ -1,0 +1,108 @@
+//@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap");
+//@import url("https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap");
+//@import url("https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap");
+
+/* override the default Infima variables */
+:root {
+  --ifm-color-primary: #254750;
+  --ifm-color-primary-dark: #214048;
+  --ifm-color-primary-darker: #1f3c44;
+  --ifm-color-primary-darkest: #1b333a;
+  --ifm-color-primary-light: #294f59;
+  --ifm-color-primary-lighter: #2c5560;
+  --ifm-color-primary-lightest: #315e6a;
+  --ifm-background-color: #fcfffe;
+  --ifm-pre-background: var(--ifm-background-color);
+
+  --ifm-pre-line-height: 1.4em;
+      // make bold a little less bold (because I can't figure out how else to modify the headings)
+  --ifm-font-weight-bold: 500;
+
+  --ifm-font-family-base: "JetBrains Sans";
+  --ifm-font-family-monospace: JetBrains Mono, Source Code Pro, PT Mono, Consolas, Monaco, Andale Mono, Ubuntu Mono, monospace;
+}
+
+/* choose a lighter palette in dark mode. */
+[data-theme='dark'] {
+  --ifm-color-primary: #3de1ff;
+  --ifm-color-primary-dark: #1ddcff;
+  --ifm-color-primary-darker: #0edaff;
+  --ifm-color-primary-darkest: #00bbdd;
+  --ifm-color-primary-light: #5de6ff;
+  --ifm-color-primary-lighter: #6ce8ff;
+  --ifm-color-primary-lightest: #9cf0ff;
+  --ifm-background-color: #2b2b2b;
+  --ifm-pre-background: var(--ifm-background-color);
+}
+
+
+[data-theme='light']  {
+  [class*="language-"] {
+    @import "prism-themes/themes/prism-vs";
+  }
+}
+
+[data-theme='dark'] {
+   [class*="language-"] {
+    @import "prismjs-darcula-theme/darcula";
+  }
+}
+
+code  {
+  background-color: var(--ifm-background-color) !important;
+  line-height: var(--ifm-pre-line-height) !important;
+  font-size: 90% !important;
+}
+
+pre[class*="language-"] {
+  background-color: var(-ifm-pre-background);
+}
+
+div[class*="language-"] {
+  background: var(--ifm-color-secondary-contrast-background);
+}
+
+
+@font-face {
+  font-family: 'JetBrains Sans';
+  src: url('https://resources.jetbrains.com/storage/jetbrains-sans/JetBrainsSans-Light.woff2') format('woff2'),
+  url('https://resources.jetbrains.com/storage/jetbrains-sans/JetBrainsSans-Light.woff') format('woff');
+  font-weight: 300;
+  font-style: normal;
+}
+
+/* Regular weight */
+@font-face {
+  font-family: 'JetBrains Sans';
+  src: url('https://resources.jetbrains.com/storage/jetbrains-sans/JetBrainsSans-Regular.woff2') format('woff2'),
+  url('https://resources.jetbrains.com/storage/jetbrains-sans/JetBrainsSans-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* SemiBold weight */
+@font-face {
+  font-family: 'JetBrains Sans';
+  src: url('https://resources.jetbrains.com/storage/jetbrains-sans/JetBrainsSans-SemiBold.woff2') format('woff2'),
+  url('https://resources.jetbrains.com/storage/jetbrains-sans/JetBrainsSans-SemiBold.woff') format('woff');
+  font-weight: 600;
+  font-style: normal;
+}
+
+@supports (font-variation-settings: normal) {
+  @font-face {
+    font-family: 'JetBrains Sans';
+    src: url('https://resources.jetbrains.com/storage/jetbrains-sans/JetBrainsSans.woff2') format('woff2 supports variations'),
+    url('https://resources.jetbrains.com/storage/jetbrains-sans/JetBrainsSans.woff2') format('woff2-variations'),
+    url('https://resources.jetbrains.com/storage/jetbrains-sans/JetBrainsSans.woff') format('woff-variations');
+    font-weight: 100 900;
+    font-style: normal;
+  }
+}
+
+:root {
+  //--ifm-font-family-base: "IBM Plex Sans";
+  //--ifm-font-family-base: "Work Sans";
+  //--ifm-font-family-base: "Inter";
+}

@@ -12,6 +12,7 @@ gradlePlugin-android = "8.2.2"
 gradlePlugin-dokkatoo = "latest.integration"
 gradlePlugin-gradlePublishPlugin = "1.2.1"
 gradlePlugin-bcvMu = "0.1.0"
+gradlePlugin-node = "7.0.2"
 
 
 [libraries]
@@ -49,6 +50,7 @@ kotest-assertionsJson = { module = "io.kotest:kotest-assertions-json" }
 gradlePlugin-android = { module = "com.android.tools.build:gradle", version.ref = "gradlePlugin-android" }
 gradlePlugin-androidApi = { module = "com.android.tools.build:gradle-api", version.ref = "gradlePlugin-android" }
 gradlePlugin-dokkatoo = { module = "dev.adamko.dokkatoo:dokkatoo-plugin", version.ref = "gradlePlugin-dokkatoo" }
+gradlePlugin-node = { module = "com.github.node-gradle:gradle-node-plugin", version.ref = "gradlePlugin-node" }
 gradlePlugin-bcvMu = { module = "dev.adamko.kotlin.binary_compatibility_validator:bcv-gradle-plugin", version.ref = "gradlePlugin-bcvMu" }
 gradlePlugin-gradlePublishPlugin = { module = "com.gradle.publish:plugin-publish-plugin", version.ref = "gradlePlugin-gradlePublishPlugin" }
 gradlePlugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }

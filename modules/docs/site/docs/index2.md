@@ -23,14 +23,6 @@ Dokkatoo has a number of improvements over the existing Dokka Gradle Plugin:
 * Faster, parallel execution
 
 
-#### What can Dokkatoo do?
-
-
-
-* [https://adamko-dev.github.io/dokkatoo/](https://adamko-dev.github.io/dokkatoo/)
-* [https://docs.gradle.org/current/kotlin-dsl/](https://docs.gradle.org/current/kotlin-dsl/)
-* [https://www.apollographql.com/docs/kotlin/kdoc/](https://www.apollographql.com/docs/kotlin/kdoc/)
-
 ### Status
 
 Dokkatoo is used in production by many projects, and can generate documentation for single-module
@@ -46,9 +38,7 @@ Until JetBrains releases a version of Dokkatoo, continue to use this version and
 Snapshot versions of Dokkatoo are available on
 [Maven Central](https://s01.oss.sonatype.org/content/repositories/snapshots/dev/adamko/dokkatoo/dokkatoo-plugin/).
 
-```kotlin
-// settings.gradle.kts
-
+```kotlin title="settings.gradle.kts"
 pluginManagement {
   repositories {
     gradlePluginPortal()
@@ -62,7 +52,6 @@ pluginManagement {
   }
 }
 ```
-{collapsible="true"}
 
 
 ## Usage
