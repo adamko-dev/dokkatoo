@@ -1,5 +1,7 @@
 # Dokkatoo Documentation
 
+[//]: # (TODO make this the first page in the docs)
+
 Welcome to the documentation website for Dokkatoo,
 
 Dokkatoo is a Gradle plugin that generates documentation
@@ -7,6 +9,8 @@ for your Kotlin projects.
 
 Dokkatoo uses [Dokka](https://github.com/Kotlin/dokka/), the API documentation engine for Kotlin,
 to generate API reference documentation from source code.
+
+[//]: # (TODO add 'about' page, move 'why dokkatoo' and 'status' there)
 
 ###### Why Dokkatoo?
 
@@ -22,7 +26,6 @@ Dokkatoo has a number of improvements over the existing Dokka Gradle Plugin:
 * Follows Gradle best practices for plugin development, for a more stable experience
 * Faster, parallel execution
 
-
 ### Status
 
 Dokkatoo is used in production by many projects, and can generate documentation for single-module
@@ -32,6 +35,8 @@ and multimodule projects.
 although as of December 2023 it has not been released.
 Until JetBrains releases a version of Dokkatoo, continue to use this version and
 [watch this space](https://github.com/Kotlin/dokka/issues/3131).
+
+[//]: # (TODO create 'releases' page)
 
 #### Snapshot releases
 
@@ -52,7 +57,6 @@ pluginManagement {
   }
 }
 ```
-
 
 ## Usage
 

@@ -14,3 +14,6 @@ dokkatoo {
   dokkatooPublicationDirectory.set(layout.buildDirectory.dir("dokkatoo"))
 }
 ```
+
+[//]: # (TODO add tasks)
+[//]: # (TODO add example directory tree of build dir)

@@ -22,7 +22,7 @@ const config: Config = {
       docs: {
         sidebarPath: require.resolve("./sidebars.config.js"),
         sidebarCollapsible: false,
-        editUrl: "https://github.com/adamko-dev/dokkatoo/blob/main/",
+        editUrl: "https://github.com/adamko-dev/dokkatoo/blob/main/modules/docs/site/",
       },
       theme: {
         customCss: [

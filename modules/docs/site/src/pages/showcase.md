@@ -1,6 +1,5 @@
 # Showcase
 
-
 Dokkatoo is used to generate
 
 #### Dokkatoo
@@ -20,3 +19,5 @@ Of course, Dokkatoo uses Dokkatoo:
 #### androidx-ktx-extras
 
 https://edricchan03.github.io/androidx-ktx-extras/
+
+[//]: # (TODO make this prettier, add screenshots, use tags like on the Docusaurs showcase site)

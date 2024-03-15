@@ -11,20 +11,9 @@
 svg.featureSvg {
   height: 10em;
   width: 20em;
-  /*-webkit-filter: invert(100%); !* safari 6.0 - 9.0 *!*/
-  /*filter: invert(100%);*/
-  /*fill: white;*/
-  /*fill: var(--ifm-background-color);*/
-  /*filter: drop-shadow(3px 5px 2px var(--ifm-background-color));*/
-  /*filter: hue-rotate(180deg);*/
-  /*backdrop-filter: invert(100%);*/
-  fill: var(--ifm-color-primary-darkest);
-  stroke: var(--ifm-color-primary-darkest);
-  stroke-width: var(--ifm-color-primary-darkest);
-}
+  mix-blend-mode: exclusion;
+  fill: var(--ifm-color-primary);
+  stroke: var(--ifm-color-primary);
+  /*stroke-width: var(--ifm-color-primary));*/
 
-/*.undraw-primary {*/
-/*  fill: var(--ifm-color-primary-lightest);*/
-/*  stroke: var(--ifm-color-primary-lightest);*/
-/*  stroke-width: var(--ifm-color-primary-lightest);*/
-/*}*/
+}
