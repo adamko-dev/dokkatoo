@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",
-    "start": "docusaurus start",
+    "start": "docusaurus start --no-open",
     "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
@@ -17,20 +17,20 @@
   "dependencies": {
     "@docusaurus/core": "3.1.1",
     "@docusaurus/preset-classic": "3.1.1",
-    "@mdx-js/react": "^3.0.1",
-    "clsx": "^2.1.0",
-    "docusaurus-plugin-sass": "^0.2.5",
-    "prism-react-renderer": "^2.3.1",
-    "prism-themes": "^1.9.0",
-    "prismjs-darcula-theme": "^1.0.3",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "typescript": "^5.4.2"
+    "@mdx-js/react": "3.0.1",
+    "clsx": "2.1.0",
+    "docusaurus-plugin-sass": "0.2.5",
+    "prism-react-renderer": "2.3.1",
+    "prism-themes": "1.9.0",
+    "prismjs-darcula-theme": "1.0.3",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "typescript": "5.4.2"
   },
   "devDependencies": {
     "@docusaurus/module-type-aliases": "3.1.1",
     "@docusaurus/types": "3.1.1",
-    "@tsconfig/docusaurus": "^2.0.2"
+    "@tsconfig/docusaurus": "2.0.2"
   },
   "browserslist": {
     "production": [

@@ -3,7 +3,7 @@ import type * as Preset from "@docusaurus/preset-classic";
 
 const config: Config = {
   title: "Dokkatoo",
-  tagline: "Generate Dokka for your Gradle projects",
+  tagline: "Generate Documentation for your Kotlin Projects",
   url: "https://adamko-dev.github.io",
   baseUrl: "/dokkatoo",
   onBrokenLinks: "throw",
@@ -66,11 +66,22 @@ const config: Config = {
           href: "/dokkatoo/showcase",
         },
         {
-          label: "API Reference",
+          // TODO add external link ↗
+          label: "API Reference ↗",
           position: "left",
           className: "external-link",
           // to: "/dokkatoo/kdoc/index.html",
           to: "pathname:///dokkatoo/kdoc/index.html",
+          // external: true,
+          // target: '_self',
+        },
+        {
+          // TODO add external link ↗
+          label: "Releases ↗",
+          position: "left",
+          className: "external-link",
+          // to: "/dokkatoo/kdoc/index.html",
+          href: "https://github.com/adamko-dev/dokkatoo/releases",
           // external: true,
           // target: '_self',
         },

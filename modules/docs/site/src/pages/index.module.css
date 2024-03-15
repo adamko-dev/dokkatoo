@@ -8,6 +8,7 @@
   text-align: center;
   position: relative;
   overflow: hidden;
+  background-color: var(--ifm-color-primary-darkest);
 }
 
 @media screen and (max-width: 996px) {
@@ -20,4 +21,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 1em;
 }
+
+.buttons > a.button {
+  /*margin-inline: 1em;*/
+  /*margin-block: 1em;*/
+  /*margin-block: 1em;*/
+  /*display: flex;*/
+  /*gap: 10em;*/
+  /*display:inline-block;*/
+}
+
+/*.indexCtasGitHubButtonWrapper {*/
+/*padding: 1em;*/
+/*}*/

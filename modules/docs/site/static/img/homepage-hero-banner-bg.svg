@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+  version="1.1"
+  viewBox="0 0 32 32"
+  height="480"
+  width="1440"
+  style="background-color: black;"
+  xml:space="preserve"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  shape-rendering="crispEdges"
+  xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient
+      id="blue-purple-gradient"
+      gradientUnits="userSpaceOnUse"
+      x1="0"
+      y1="31"
+      x2="31"
+      y2="0">
+      <stop offset="0.3" stop-color="#0095D5"/>
+      <stop offset="0.5" stop-color="#3C83DC"/>
+      <stop offset="0.6" stop-color="#6D74E1"/>
+      <stop offset="0.7" stop-color="#806EE3"/>
+    </linearGradient>
+    <linearGradient
+      id="purple-orange-gradient"
+      gradientUnits="userSpaceOnUse"
+      x1="0"
+      y1="31"
+      x2="31"
+      y2="0">
+      <stop offset="0.5" stop-color="#C757BC"/>
+      <stop offset="0.65" stop-color="#D0609A"/>
+      <stop offset="0.9" stop-color="#F88909"/>
+  </linearGradient>
+
+    <filter id="hueRot_05"><feColorMatrix id="feCo_05" type="hueRotate" values="  0"/></filter>
+
+    <animate xlink:href="#blue-purple-gradient" attributeName="values" dur="30s" repeatCount="indefinite" additive="sum" values="0; 360"/>
+    <filter id="blurMe">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="0.8"/>
+  </filter>
+
+    <animate xlink:href="#blurMe" attributeName="stdDeviation"
+      from="10" to="30" dur="1s" begin="0s" repeatCount="indefinite"/>
+</defs>
+
+  <rect id="black-background" width="100%" height="100%"/>
+
+  <g id="bird" filter="url(#blurMe)">
+    <path id="blue-feathers" fill="url(#blue-purple-gradient)"
+      d="
+        M-8,32 h-12 l32,-32 h12
+        M16,32 h-12 l32,-32 h12
+        "/>
+    <path id="orange-feather" fill="url(#purple-orange-gradient)"
+      d="M4,32 h-12 l32,-32 h12"/>
+  </g>
+</svg>
