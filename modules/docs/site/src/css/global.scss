@@ -16,6 +16,13 @@
   --ifm-background-color: #fcfffe;
   --ifm-pre-background: var(--ifm-background-color);
 
+  --site-color-favourite-background: #f6fdfd;
+  --site-color-tooltip: #fff;
+  --site-color-tooltip-background: #353738;
+  --site-color-svg-icon-favourite: #e9669e;
+  --site-color-checkbox-checked-bg: hsl(167deg 56% 73% / 25%);
+  --site-color-feedback-background: #f0f8ff;
+
   --ifm-pre-line-height: 1.4em;
   // make bold a little less bold (because I can't figure out how else to modify the headings)
   --ifm-font-weight-bold: 500;
@@ -34,6 +41,10 @@
   --ifm-color-primary-lighter: #6ce8ff;
   --ifm-color-primary-lightest: #9cf0ff;
   --ifm-background-color: #2b2b2b;
+
+  --site-color-feedback-background: #2a2929;
+  --site-color-favourite-background: #1d1e1e;
+  --site-color-checkbox-checked-bg: hsl(167deg 56% 73% / 10%);
 }
 
 [data-theme="light"] {

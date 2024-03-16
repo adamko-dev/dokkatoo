@@ -6,6 +6,7 @@ plugins {
   buildsrc.conventions.base
   dev.adamko.`dokkatoo-html`
   com.github.`node-gradle`.node
+  buildsrc.screenshotter.plugin
 }
 
 val docusaurusSiteDir = layout.projectDirectory.dir("site")
@@ -97,4 +98,15 @@ val npmUpdate by tasks.registering(NpmTask::class) {
 tasks.clean {
   delete(docusaurusSiteDir.dir(".docusaurus"))
   delete(docusaurusSiteDir.dir("node_modules"))
+}
+
+tasks.screenshotter {
+  website("dokkatoo", "https://adamko-dev.github.io/dokkatoo/")
+  website("androidx-ktx-extras", "https://edricchan03.github.io/androidx-ktx-extras/")
+  website("apollo-graphql", "https://www.apollographql.com/docs/kotlin/kdoc/")
+  website("gradle", "https://docs.gradle.org/current/kotlin-dsl/")
+  website("kotka-streams", "https://adamko-dev.github.io/kotka-streams/")
+  website("ks3", "https://www.ks3.io/")
+  website("oss-review-toolkit", "https://javadoc.io/doc/org.ossreviewtoolkit/cli/latest/")
+  website("selfie", "https://kdoc.selfie.dev/")
 }
