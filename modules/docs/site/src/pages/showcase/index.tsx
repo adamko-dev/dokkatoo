@@ -11,10 +11,6 @@ import FavouriteIcon from '@site/src/components/svgIcons/FavouriteIcon';
 import {sortedUsers, TagList, Tags, type TagType, type User,} from "@site/src/data/users";
 import Heading from "@theme/Heading";
 import ShowcaseTagSelect, {readSearchTags,} from "./_components/ShowcaseTagSelect";
-import ShowcaseFilterToggle, {
-  type Operator,
-  readOperator,
-} from "./_components/ShowcaseFilterToggle";
 import ShowcaseCard from "./_components/ShowcaseCard";
 import ShowcaseTooltip from "./_components/ShowcaseTooltip";
 
@@ -57,7 +53,6 @@ function readSearchName(search: string) {
 function filterUsers(
     users: User[],
     selectedTags: TagType[],
-    operator: Operator,
     searchName: string | null,
 ) {
   if (searchName) {
@@ -73,16 +68,12 @@ function filterUsers(
     if (user.tags.length === 0) {
       return false;
     }
-    if (operator === "AND") {
-      return selectedTags.every((tag) => user.tags.includes(tag));
-    }
-    return selectedTags.some((tag) => user.tags.includes(tag));
+    return selectedTags.every((tag) => user.tags.includes(tag));
   });
 }
 
 function useFilteredUsers() {
   const location = useLocation<UserState>();
-  const [operator, setOperator] = useState<Operator>("OR");
   // On SSR / first mount (hydration) no tag is selected
   const [selectedTags, setSelectedTags] = useState<TagType[]>([]);
   const [searchName, setSearchName] = useState<string | null>(null);
@@ -90,14 +81,13 @@ function useFilteredUsers() {
   // hydration mismatch)
   useEffect(() => {
     setSelectedTags(readSearchTags(location.search));
-    setOperator(readOperator(location.search));
     setSearchName(readSearchName(location.search));
     restoreUserState(location.state);
   }, [location]);
 
   return useMemo(
-      () => filterUsers(sortedUsers, selectedTags, operator, searchName),
-      [selectedTags, operator, searchName],
+      () => filterUsers(sortedUsers, selectedTags, searchName),
+      [selectedTags, searchName],
   );
 }
 
@@ -106,7 +96,7 @@ function ShowcaseHeader() {
       <section className="margin-top--lg margin-bottom--lg text--center">
         <Heading as="h1">{TITLE}</Heading>
         <p>{DESCRIPTION}</p>
-        <Link className="button button--primary" to="https://github.com/adamko-dev/dokkatoo/issues">
+        <Link className="button button--secondary" to="https://github.com/adamko-dev/dokkatoo/issues/new">
           🙏 Please add your site
         </Link>
       </section>
@@ -142,7 +132,6 @@ function ShowcaseFilters() {
             </Heading>
             <span>{siteCountPlural(filteredUsers.length)}</span>
           </div>
-          <ShowcaseFilterToggle/>
         </div>
         <ul className={clsx("clean-list", styles.checkboxList)}>
           {TagList.map((tag, i) => {
