@@ -1,6 +1,5 @@
 package buildsrc.screenshotter
 
-
 import com.microsoft.playwright.Browser
 import com.microsoft.playwright.Browser.NewPageOptions
 import com.microsoft.playwright.Page.ScreenshotOptions
@@ -11,14 +10,18 @@ import com.microsoft.playwright.options.ColorScheme.LIGHT
 import com.microsoft.playwright.options.LoadState.DOMCONTENTLOADED
 import java.io.Serializable
 import java.net.URI
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.nanoseconds
 import kotlin.time.Duration.Companion.seconds
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.logging.Logging
 import org.gradle.api.provider.ListProperty
 import org.gradle.workers.WorkAction
 import org.gradle.workers.WorkParameters
 
-
 internal abstract class ScreenshotterWorker : WorkAction<ScreenshotterWorker.Parameters> {
+
+  private val logger = Logging.getLogger(ScreenshotterWorker::class.java)
 
   interface Parameters : WorkParameters {
     val outputDirectory: DirectoryProperty
@@ -38,8 +41,8 @@ internal abstract class ScreenshotterWorker : WorkAction<ScreenshotterWorker.Par
   }
 
   override fun execute() {
-
     Playwright.create().use { playwright ->
+      logger.info("[ScreenshotterWorker] Created Playwright ${playwright}")
       playwright.webkit().launch().use { browser ->
         parameters.websites
           .get()
@@ -61,17 +64,28 @@ internal abstract class ScreenshotterWorker : WorkAction<ScreenshotterWorker.Par
     val outputFile = parameters.outputDirectory
       .file(outputFileName)
       .get().asFile
-
-    newPage(
-      NewPageOptions()
-        .setColorScheme(colorScheme)
-    ).apply {
-      navigate(uri.toString()).finished()
-      waitForLoadState(DOMCONTENTLOADED)
-      Thread.sleep(1.seconds.inWholeMilliseconds)
-      screenshot(
-        ScreenshotOptions().setPath(outputFile.toPath())
-      )
+    val duration = measureTime {
+      newPage(
+        NewPageOptions()
+          .setColorScheme(colorScheme)
+      ).apply {
+        navigate(uri.toString()).finished()
+        waitForLoadState(DOMCONTENTLOADED)
+        Thread.sleep(0.5.seconds.inWholeMilliseconds)
+        screenshot(
+          ScreenshotOptions().setPath(outputFile.toPath())
+        )
+      }
     }
+    logger.lifecycle("[ScreenshotterWorker] Captured ${colorScheme.name.lowercase()} screenshot for $name $uri in $duration")
+  }
+
+  companion object {
+    // can't use kotlin.time.measureTime {} because Gradle forces the language level to be low.
+    private fun measureTime(block: () -> Unit): Duration =
+      System.nanoTime().let { startTime ->
+        block()
+        (System.nanoTime() - startTime).nanoseconds
+      }
   }
 }

@@ -32,7 +32,7 @@ abstract class ScreenshotTask @Inject constructor(
 
   init {
     group = "screenshotter"
-    description = "take screenshots of websites, save to directory"
+    description = "Take screenshots of websites, save to directory. Used for the website showcase."
     extensions.add("websites", websites) // so that Gradle generates Kotlin DSL accessors
   }
 
