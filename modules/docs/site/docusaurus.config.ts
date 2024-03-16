@@ -47,7 +47,7 @@ const config: Config = {
     },
     metadata: [{
       name: "keywords",
-      content: "kotlin, dokka, documentation, api reference"
+      content: "kotlin, dokka, gradle, plugin, dokkatoo, documentation, api reference, html, javadoc"
     }],
     navbar: {
       title: "Dokkatoo",
