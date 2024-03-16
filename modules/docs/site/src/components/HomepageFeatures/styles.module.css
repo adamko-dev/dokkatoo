@@ -5,15 +5,26 @@
   width: 100%;
 }
 
-/*.featureSvg {*/
-/*}*/
+.col {
+  background-color: var(--ifm-footer-background-color);
+}
 
 svg.featureSvg {
   height: 10em;
   width: 20em;
-  mix-blend-mode: exclusion;
-  fill: var(--ifm-color-primary);
-  stroke: var(--ifm-color-primary);
-  /*stroke-width: var(--ifm-color-primary));*/
 
+  [fill="#6c63ff"] {
+    fill: var(--ifm-color-primary-darkest);
+  }
+
+  [fill="#3f3d56"] {
+    fill: var(--ifm-color-primary-contrast-background);
+    filter: drop-shadow(2px 3px 1px var(--ifm-color-white));
+  }
+
+  [fill="#fff"] {
+    fill: var(--ifm-color-primary-contrast-background);
+  }
+
+  filter: drop-shadow(3px 5px 2px rgb(0 0 0 / 0.4));
 }
