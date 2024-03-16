@@ -10,6 +10,10 @@ See the Gradle Docs for more information.
 
 Dokkatoo is fully compatible with the Gradle, so make sure to enable it to get the most benefit.
 
+[//]: # (TODO brief instructions for Build Cache)
+
+[//]: # (TODO brief instructions for Configuration Cache)
+
 ### Worker API
 
 Dokkatoo uses the Gradle Worker API to run Dokka Generator.
