@@ -2,12 +2,12 @@ import React, {type ComponentProps, type ReactElement, useEffect, useMemo, useSt
 import clsx from "clsx";
 import ExecutionEnvironment from "@docusaurus/ExecutionEnvironment";
 import Translate, {translate} from "@docusaurus/Translate";
-import {useHistory, useLocation} from "@docusaurus/router";
+import {useLocation} from "@docusaurus/router";
 import {usePluralForm} from "@docusaurus/theme-common";
 
 import Link from "@docusaurus/Link";
 import Layout from "@theme/Layout";
-import FavouriteIcon from '@site/src/components/svgIcons/FavouriteIcon';
+import FavouriteIcon from "@site/src/components/svgIcons/FavouriteIcon";
 import {sortedUsers, TagList, Tags, type TagType, type User,} from "@site/src/data/users";
 import Heading from "@theme/Heading";
 import ShowcaseTagSelect, {readSearchTags,} from "./_components/ShowcaseTagSelect";
@@ -17,7 +17,7 @@ import ShowcaseTooltip from "./_components/ShowcaseTooltip";
 import styles from "./styles.module.css";
 
 const TITLE = "Dokkatoo Showcase";
-const DESCRIPTION = "List of projects using Dokkatoo people are building with Docusaurus";
+const DESCRIPTION = "List of projects using Dokkatoo to build documentation references";
 
 type UserState = {
   scrollTopPosition: number;
@@ -29,7 +29,9 @@ function restoreUserState(userState: UserState | null) {
     scrollTopPosition: 0,
     focusedElementId: undefined,
   };
-  if(focusedElementId) document.getElementById(focusedElementId)?.focus();
+  if (focusedElementId) {
+    document.getElementById(focusedElementId)?.focus();
+  }
   window.scrollTo({top: scrollTopPosition});
 }
 
@@ -40,27 +42,13 @@ export function prepareUserState(): UserState | undefined {
       focusedElementId: document.activeElement?.id,
     };
   }
-
   return undefined;
-}
-
-const SearchNameQueryKey = "name";
-
-function readSearchName(search: string) {
-  return new URLSearchParams(search).get(SearchNameQueryKey);
 }
 
 function filterUsers(
     users: User[],
     selectedTags: TagType[],
-    searchName: string | null,
 ) {
-  if (searchName) {
-    // eslint-disable-next-line no-param-reassign
-    users = users.filter((user) =>
-        user.title.toLowerCase().includes(searchName.toLowerCase()),
-    );
-  }
   if (selectedTags.length === 0) {
     return users;
   }
@@ -76,18 +64,16 @@ function useFilteredUsers() {
   const location = useLocation<UserState>();
   // On SSR / first mount (hydration) no tag is selected
   const [selectedTags, setSelectedTags] = useState<TagType[]>([]);
-  const [searchName, setSearchName] = useState<string | null>(null);
   // Sync tags from QS to state (delayed on purpose to avoid SSR/Client
   // hydration mismatch)
   useEffect(() => {
     setSelectedTags(readSearchTags(location.search));
-    setSearchName(readSearchName(location.search));
     restoreUserState(location.state);
   }, [location]);
 
   return useMemo(
-      () => filterUsers(sortedUsers, selectedTags, searchName),
-      [selectedTags, searchName],
+      () => filterUsers(sortedUsers, selectedTags),
+      [selectedTags],
   );
 }
 
@@ -96,7 +82,8 @@ function ShowcaseHeader() {
       <section className="margin-top--lg margin-bottom--lg text--center">
         <Heading as="h1">{TITLE}</Heading>
         <p>{DESCRIPTION}</p>
-        <Link className="button button--secondary" to="https://github.com/adamko-dev/dokkatoo/issues/new">
+        <Link className="button button--secondary"
+              to="https://github.com/adamko-dev/dokkatoo/issues/new">
           🙏 Please add your site
         </Link>
       </section>
@@ -141,7 +128,7 @@ function ShowcaseFilters() {
             if (tag === "favourite") {
               icon = <FavouriteIcon svgClass={styles.svgIconFavouriteXs}/>
             } else {
-              icon =  <span
+              icon = <span
                   style={{
                     backgroundColor: color,
                     width: 10,
@@ -178,43 +165,6 @@ const favouriteUsers = sortedUsers.filter((user) =>
 const otherUsers = sortedUsers.filter(
     (user) => !user.tags.includes("favourite"),
 );
-
-function SearchBar() {
-  const history = useHistory();
-  const location = useLocation();
-  const [value, setValue] = useState<string | null>(null);
-  useEffect(() => {
-    setValue(readSearchName(location.search));
-  }, [location]);
-  return (
-      <div className={styles.searchContainer}>
-        <input
-            id="searchbar"
-            placeholder={translate({
-              message: "Search for site name...",
-              id: "showcase.searchBar.placeholder",
-            })}
-            value={value ?? undefined}
-            onInput={(e) => {
-              setValue(e.currentTarget.value);
-              const newSearch = new URLSearchParams(location.search);
-              newSearch.delete(SearchNameQueryKey);
-              if (e.currentTarget.value) {
-                newSearch.set(SearchNameQueryKey, e.currentTarget.value);
-              }
-              history.push({
-                ...location,
-                search: newSearch.toString(),
-                state: prepareUserState(),
-              });
-              setTimeout(() => {
-                document.getElementById("searchbar")?.focus();
-              }, 0);
-            }}
-        />
-      </div>
-  );
-}
 
 function ShowcaseCards() {
   const filteredUsers = useFilteredUsers();
@@ -283,9 +233,6 @@ export default function Showcase(): React.JSX.Element {
         <main className="margin-vert--lg">
           <ShowcaseHeader/>
           <ShowcaseFilters/>
-          <div style={{display: "flex", marginLeft: "auto"}} className="container">
-            <SearchBar/>
-          </div>
           <ShowcaseCards/>
         </main>
       </Layout>
