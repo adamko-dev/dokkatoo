@@ -61,12 +61,36 @@ const Users: User[] = [
     tags: ["kotlinJvm", "html", "javadocJar"],
   },
   {
+    title: "GW2ChatLinks",
+    description: "A Kotlin Multiplatform library for parsing and generating Guild Wars 2 chat links.",
+    preview: require("./showcase/GW2ChatLinks-dark.png").default,
+    website: "https://gw2toolbelt.github.io/GW2ChatLinks/latest/api/",
+    source: "https://github.com/GW2ToolBelt/GW2ChatLinks/blob/4dcce081987f731aa816d0562e486a705680bc07/build.gradle.kts#L156-L183",
+    tags: ["kotlinMultiplatform", "html", "javadocJar"],
+  },
+  {
     title: "GW2ToolBelt api-generator",
     description: "A library for creating programs that interface with data exposed by the official Guild Wars 2 API.",
     preview: <JarFileIcon className="java-filetype"/>,
     website: null, // it appears a new version hasn't been published since Dokkatoo was added
     source: "https://github.com/GW2ToolBelt/api-generator/blob/2059cd9883a9eb9347e66679c42e471bf48e28e4/build.gradle.kts#L59-L83",
     tags: ["html", "javadocJar"],
+  },
+  {
+    title: "KobanKat",
+    description: "RevenueCat SDK for Kotlin Multiplatform.",
+    preview: require("./showcase/KobanKat-dark.png").default,
+    website: "https://kobankat.shortway.io/",
+    source: "https://github.com/diffplug/selfie/tree/jvm/2.0.1/jvm/gradle/dokka",
+    tags: ["kotlinMultiplatform", "html"],
+  },
+  {
+    title: "Kolibrium",
+    description: "Kotlin library for Selenium tests.",
+    preview: <JarFileIcon className="java-filetype"/>,
+    website: null,
+    source: "https://github.com/attila-fazekas/kolibrium/blob/33e724bcb8f34d6a3654fee92a83c5b045454f21/buildSrc/src/main/kotlin/kolibrium.library-conventions.gradle.kts#L23",
+    tags: ["kotlinJvm", "html", "javadocJar"],
   },
   {
     title: "Kotka Streams",
@@ -85,6 +109,14 @@ const Users: User[] = [
     tags: ["kotlinMultiplatform", "html", "javadoc", "javadocJar"],
   },
   {
+    title: "ModuleCheck",
+    description: "Fast dependency graph validation for Gradle.",
+    preview: require("./showcase/ModuleCheck-dark.png").default,
+    website: "https://rickbusarow.github.io/ModuleCheck/api/index.html",
+    source: "https://github.com/rickbusarow/ModuleCheck/blob/ff891da3b08cf1bd375e6617c36baa6e98e2e0fe/build-logic/conventions/src/main/kotlin/modulecheck/builds/DokkatooConventionPlugin.kt#L53",
+    tags: ["kotlinJvm", "html", "large"],
+  },
+  {
     title: "OSS Review Toolkit (ORT)",
     description: "A suite of tools to automate software compliance checks.",
     preview: require("./showcase/oss-review-toolkit-dark.png").default,
@@ -92,6 +124,22 @@ const Users: User[] = [
     website: "https://javadoc.io/doc/org.ossreviewtoolkit/cli/latest/",
     source: "https://github.com/oss-review-toolkit/ort/blob/18.0.0/buildSrc/src/main/kotlin/ort-kotlin-conventions.gradle.kts#L186-L193",
     tags: ["kotlinJvm", "javadoc", "javadocJar"],
+  },
+  {
+    title: "Pedestal",
+    description: "Progress and failure tracking, architectures for aggressive caching.",
+    preview: require("./showcase/Pedestal-dark.png").default,
+    website: "https://opensavvy.gitlab.io/prepared/api-docs/suite/index.html",
+    source: "https://gitlab.com/opensavvy/pedestal",
+    tags: ["kotlinMultiplatform", "html"],
+  },
+  {
+    title: "Prepared",
+    description: "Magicless testing framework for Kotlin Multiplatform.",
+    preview: require("./showcase/Prepared-dark.png").default,
+    website: "https://opensavvy.gitlab.io/prepared/api-docs/suite/index.html",
+    source: "https://gitlab.com/opensavvy/prepared",
+    tags: ["favourite", "kotlinMultiplatform", "html"],
   },
   {
     title: "Selfie",
@@ -113,21 +161,9 @@ const Users: User[] = [
   // tags: ["kotlinMultiplatform", "javadoc", "javadocJar"], },
 
 
-  // TODO
-  //      https://github.com/GW2ToolBelt/GW2ChatLinks
-  //      https://github.com/fluxo-kt/fluxo-kmp-conf
-  //      https://github.com/rickbusarow/mahout
-  //      https://github.com/rickbusarow/matrix-gradle-plugin
-  //      https://github.com/gagarski/vertigram
-  //      https://github.com/rickbusarow/ModuleCheck
-  //      https://github.com/attila-fazekas/kolibrium
-  //      https://github.com/CLOVIS-AI/Prepared
-  //      https://github.com/rickbusarow/kase
-  //      https://github.com/CLOVIS-AI/Pedestal
-  //      https://github.com/rickbusarow/Doks
-  //      https://github.com/JayShortway/kobankat
-  //      https://github.com/rickbusarow/statik
-
+  // https://github.com/fluxo-kt/fluxo-kmp-conf - uses Dokka, mentions Dokkatoo, but hasn't migrated
+  // https://github.com/rickbusarow/mahout
+  // https://github.com/rickbusarow/kase
 ];
 
 export type User = {

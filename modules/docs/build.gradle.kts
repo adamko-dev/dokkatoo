@@ -101,12 +101,17 @@ tasks.clean {
 }
 
 tasks.screenshotter {
-  website("dokkatoo", "https://adamko-dev.github.io/dokkatoo/")
+  website("GW2ChatLinks", "https://gw2toolbelt.github.io/GW2ChatLinks/latest/api/")
+  website("KobanKat", "https://kobankat.shortway.io/")
+  website("ModuleCheck", "https://rickbusarow.github.io/ModuleCheck/api/")
   website("androidx-ktx-extras", "https://edricchan03.github.io/androidx-ktx-extras/")
   website("apollo-graphql", "https://www.apollographql.com/docs/kotlin/kdoc/")
+  website("dokkatoo", "https://adamko-dev.github.io/dokkatoo/")
   website("gradle", "https://docs.gradle.org/current/kotlin-dsl/")
   website("kotka-streams", "https://adamko-dev.github.io/kotka-streams/")
   website("ks3", "https://www.ks3.io/")
   website("oss-review-toolkit", "https://javadoc.io/doc/org.ossreviewtoolkit/cli/latest/")
   website("selfie", "https://kdoc.selfie.dev/")
+  website("Prepared", "https://opensavvy.gitlab.io/prepared/api-docs/suite/index.html")
+  website("Pedestal", "https://opensavvy.gitlab.io/pedestal/api-docs/")
 }

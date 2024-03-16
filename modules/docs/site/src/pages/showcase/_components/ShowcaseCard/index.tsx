@@ -67,7 +67,7 @@ function getCardImage(user: User): React.JSX.Element {
 
 function ShowcaseCard({user}: { user: User }) {
   const image = getCardImage(user);
-  let websiteLink: React.JSX.Element = <React.Fragment/>
+  let websiteLink: React.JSX.Element = <div> {user.title} </div>
   if (user.website) {
     websiteLink = <Link href={user.website} className={styles.showcaseCardLink}>
       {user.title}
@@ -77,8 +77,6 @@ function ShowcaseCard({user}: { user: User }) {
   return (
       <li key={user.title} className="card shadow--md">
         <div className={clsx("card__image", styles.showcaseCardImage)}>
-          {/*<img ref={image} alt={user.title}></img>*/}
-          {/*<Image img={image} alt={user.title} />*/}
           {image}
         </div>
         <div className="card__body">
