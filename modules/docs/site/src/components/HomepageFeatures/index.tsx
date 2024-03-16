@@ -5,61 +5,6 @@ import styles from "./styles.module.css";
 import Heading from "@theme/Heading";
 import UndrawArtMuseum from "/static/img/feature-icons/undraw_art_museum.svg";
 
-
-// type FeatureItem = {
-//   buttonText: string;
-//   destination: string;
-//   content: string;
-// };
-//
-// const FeatureList: FeatureItem[] = [
-//   {
-//     buttonText: 'Documentation',
-//     destination: "/docs/getting-started/quick-start",
-//     content: "Learn more about how to use Dokkatoo to create documentation",
-//   },
-//   {
-//     buttonText: "Examples",
-//     destination: "/docs/configuring/example-projects",
-//   },
-//   {
-//     buttonText: "Showcase",
-//     destination: "/showcase",
-//     content: "View some examples of the documentation that Dokkatoo can generate",
-//   },
-// ];
-//
-// function Feature({buttonText, destination, content}: FeatureItem) {
-//   return (
-//     <div className={clsx('col')}>
-//       <div className="text--center padding-horiz--md">
-//         <div className={styles.buttons}>
-//           <Link
-//             className="button button--secondary button--lg"
-//             to={destination}>
-//             {buttonText}
-//           </Link>
-//           <p>{content}</p>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-//
-// export default function HomepageFeatures(): JSX.Element {
-//   return (
-//     <section className={styles.features}>
-//       <div className="container">
-//         <div className="row align-items-start">
-//           {FeatureList.map((props, idx) => (
-//             <Feature key={idx} {...props} />
-//           ))}
-//         </div>
-//       </div>
-//     </section>
-//   );
-// }
-
 type FeatureItem = {
   title: string;
   Svg: React.ComponentType<React.ComponentProps<"svg">>;
