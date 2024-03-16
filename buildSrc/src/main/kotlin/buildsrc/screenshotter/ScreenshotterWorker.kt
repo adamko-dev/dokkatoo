@@ -8,8 +8,10 @@ import com.microsoft.playwright.Playwright
 import com.microsoft.playwright.options.ColorScheme
 import com.microsoft.playwright.options.ColorScheme.DARK
 import com.microsoft.playwright.options.ColorScheme.LIGHT
+import com.microsoft.playwright.options.LoadState.DOMCONTENTLOADED
 import java.io.Serializable
 import java.net.URI
+import kotlin.time.Duration.Companion.seconds
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.workers.WorkAction
@@ -26,7 +28,7 @@ internal abstract class ScreenshotterWorker : WorkAction<ScreenshotterWorker.Par
       val name: String,
       val uri: URI,
       val isEnabled: Boolean,
-    ): Serializable {
+    ) : Serializable {
       constructor(website: buildsrc.screenshotter.Website) : this(
         name = website.name,
         uri = website.uri.get(),
@@ -61,9 +63,12 @@ internal abstract class ScreenshotterWorker : WorkAction<ScreenshotterWorker.Par
       .get().asFile
 
     newPage(
-      NewPageOptions().setColorScheme(colorScheme)
+      NewPageOptions()
+        .setColorScheme(colorScheme)
     ).apply {
-      navigate(uri.toString())
+      navigate(uri.toString()).finished()
+      waitForLoadState(DOMCONTENTLOADED)
+      Thread.sleep(1.seconds.inWholeMilliseconds)
       screenshot(
         ScreenshotOptions().setPath(outputFile.toPath())
       )
