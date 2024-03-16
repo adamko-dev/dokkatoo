@@ -15,6 +15,8 @@ dependencies {
   implementation("org.tomlj:tomlj:1.1.1") {
     because("parse Dokka's libs.version.toml, so Dokkatoo can use the same versions")
   }
+
+  compileOnly("com.microsoft.playwright:playwright:1.42.0")
 }
 
 java {
