@@ -1,7 +1,7 @@
-import React, {useEffect, useState, useRef} from 'react';
-import ReactDOM from 'react-dom';
-import {usePopper} from 'react-popper';
-import styles from './styles.module.css';
+import React, {useEffect, useRef, useState} from "react";
+import ReactDOM from "react-dom";
+import {usePopper} from "react-popper";
+import styles from "./styles.module.css";
 
 interface Props {
   anchorEl?: HTMLElement | string;
@@ -29,13 +29,13 @@ export default function Tooltip({
       {
         modifiers: [
           {
-            name: 'arrow',
+            name: "arrow",
             options: {
               element: arrowElement,
             },
           },
           {
-            name: 'offset',
+            name: "offset",
             options: {
               offset: [0, 8],
             },
@@ -49,7 +49,7 @@ export default function Tooltip({
 
   useEffect(() => {
     if (anchorEl) {
-      if (typeof anchorEl === 'string') {
+      if (typeof anchorEl === "string") {
         setContainer(document.querySelector(anchorEl));
       } else {
         setContainer(anchorEl);
@@ -60,18 +60,18 @@ export default function Tooltip({
   }, [container, anchorEl]);
 
   useEffect(() => {
-    const showEvents = ['mouseenter', 'focus'];
-    const hideEvents = ['mouseleave', 'blur'];
+    const showEvents = ["mouseenter", "focus"];
+    const hideEvents = ["mouseleave", "blur"];
 
     const handleOpen = () => {
       // There is no point in displaying an empty tooltip.
-      if (text === '') {
+      if (text === "") {
         return;
       }
 
       // Remove the title ahead of time to avoid displaying
       // two tooltips at the same time (native + this one).
-      referenceElement?.removeAttribute('title');
+      referenceElement?.removeAttribute("title");
 
       timeout.current = window.setTimeout(() => {
         setOpen(true);
@@ -110,7 +110,7 @@ export default function Tooltip({
       <>
         {React.cloneElement(children, {
           ref: setReferenceElement,
-          'aria-describedby': open ? tooltipId : undefined,
+          "aria-describedby": open ? tooltipId : undefined,
         })}
         {container
          ? ReactDOM.createPortal(
