@@ -70,20 +70,12 @@ const config: Config = {
           label: "API Reference ↗",
           position: "left",
           className: "external-link",
-          // to: "/dokkatoo/kdoc/index.html",
           to: "pathname:///dokkatoo/kdoc/index.html",
-          // external: true,
-          // target: '_self',
         },
         {
-          // TODO add external link ↗
-          label: "Releases ↗",
+          label: "Releases",
           position: "left",
-          className: "external-link",
-          // to: "/dokkatoo/kdoc/index.html",
           href: "https://github.com/adamko-dev/dokkatoo/releases",
-          // external: true,
-          // target: '_self',
         },
         {
           href: "https://github.com/adamko-dev/dokkatoo",
