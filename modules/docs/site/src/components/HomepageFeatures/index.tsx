@@ -13,7 +13,6 @@ type FeatureItem = {
 
 
 // TODO update features text to be better, less vague
-// TODO update features so they are spaced evenly
 const FeatureList: FeatureItem[] = [
   {
     title: "Easy to Use",
