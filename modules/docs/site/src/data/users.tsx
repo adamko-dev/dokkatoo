@@ -42,7 +42,7 @@ const Users: User[] = [
     preview: require("./showcase/dokkatoo-dark.png").default,
     website: "https://adamko-dev.github.io/dokkatoo/",
     source: "https://github.com/adamko-dev/dokkatoo/blob/v2.2.0/modules/dokkatoo-plugin/build.gradle.kts#L217-L235",
-    tags: ["favourite", "html"],
+    tags: ["html", "kotlinJvm"],
   },
   {
     title: "Gradle",
@@ -50,7 +50,7 @@ const Users: User[] = [
     preview: require("./showcase/gradle-dark.png").default,
     website: "https://docs.gradle.org/current/kotlin-dsl/",
     source: "https://github.com/gradle/gradle/tree/v8.6.0/build-logic/documentation",
-    tags: ["java", "kotlinJvm", "large", "html"],
+    tags: ["favourite", "java", "kotlinJvm", "large", "html"],
   },
   {
     title: "Gradle central-release-publishing",
