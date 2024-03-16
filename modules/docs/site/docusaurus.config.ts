@@ -66,8 +66,7 @@ const config: Config = {
           href: "/dokkatoo/showcase",
         },
         {
-          // TODO add external link ↗
-          label: "API Reference ↗",
+          label: "API Reference",
           position: "left",
           className: "external-link",
           to: "pathname:///dokkatoo/kdoc/index.html",
