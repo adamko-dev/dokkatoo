@@ -6,20 +6,25 @@ import ThemedImage from "@theme/ThemedImage";
 
 export type TagType =
     | "favourite"
-    | "example"
-    | "design" // add 'design' if there's _some_ customisation
-    | "versioning"
-    | "customPlugin"
-    | "large"
+
     | "android"
     | "java"
     | "kotlinJvm"
     | "kotlinMultiplatform"
-    | "html"
-    | "javadoc"
-    | "jekyll"
-    | "gfm"
+
+    | "customPlugin"
+    | "versioning"
+
+    | "design" // add 'design' if there's _some_ customisation
+    | "example"
+    | "large"
     | "javadocJar"
+
+    | "gfm"
+    | "html"
+    | "jekyll"
+    | "javadoc"
+
 
 // please sort sites alphabetically
 const Users: User[] = [
@@ -253,7 +258,7 @@ const Users: User[] = [
     preview: <ThreeDotsIcon/>,
     website: null,
     source: "https://github.com/adamko-dev/dokkatoo/tree/main/examples/custom-format-example/dokkatoo",
-    tags: ["example", "design", "kotlinJvm"],
+    tags: ["example", "design", "kotlinJvm", "html"],
   },
   {
     title: "Gradle Example",
@@ -261,7 +266,7 @@ const Users: User[] = [
     preview: <ThreeDotsIcon/>,
     website: null,
     source: "https://github.com/adamko-dev/dokkatoo/tree/main/examples/gradle-example/dokkatoo",
-    tags: ["example", "kotlinJvm"],
+    tags: ["example", "kotlinJvm", "html", "jekyll", "gfm", "javadoc"],
   },
   {
     title: "Kotlin-as-Java Example",
@@ -269,7 +274,7 @@ const Users: User[] = [
     preview: <ThreeDotsIcon/>,
     website: null,
     source: "https://github.com/adamko-dev/dokkatoo/tree/main/examples/kotlin-as-java-example/dokkatoo",
-    tags: ["example", "kotlinJvm", "customPlugin"],
+    tags: ["example", "kotlinJvm", "customPlugin", "html", "jekyll", "gfm", "javadoc"],
   },
   {
     title: "Kotlin Multiplatform Example",
@@ -277,7 +282,7 @@ const Users: User[] = [
     preview: <ThreeDotsIcon/>,
     website: null,
     source: "https://github.com/adamko-dev/dokkatoo/tree/main/examples/multiplatform-example/dokkatoo",
-    tags: ["example", "kotlinMultiplatform"],
+    tags: ["example", "kotlinMultiplatform", "html", "jekyll", "gfm", "javadoc"],
   },
   // {
   //   title: "Library Publishing Example",
@@ -292,7 +297,7 @@ const Users: User[] = [
     preview: <ThreeDotsIcon/>,
     website: null,
     source: "https://github.com/adamko-dev/dokkatoo/tree/main/examples/multiplatform-example/dokkatoo",
-    tags: ["example", "kotlinJvm"],
+    tags: ["example", "kotlinJvm", "html"],
   },
   {
     title: "Versioning Example",
@@ -300,7 +305,7 @@ const Users: User[] = [
     preview: <ThreeDotsIcon/>,
     website: null,
     source: "https://github.com/adamko-dev/dokkatoo/tree/main/examples/versioning-multimodule-example/dokkatoo",
-    tags: ["example", "kotlinJvm", "versioning"],
+    tags: ["example", "kotlinJvm", "versioning", "html"],
   },
   //endregion
 ];
@@ -326,6 +331,28 @@ export const Tags: { [type in TagType]: Tag } = {
     description: "Our favourite Dokkatoo sites.",
     color: "#E9669EFF",
   },
+
+  android: {
+    label: "Android",
+    description: "Sites for Android projects",
+    color: "#00ff00",
+  },
+  java: {
+    label: "Java",
+    description: "Sites for Java projects",
+    color: "#808000",
+  },
+  kotlinJvm: {
+    label: "Kotlin JVM",
+    description: "Sites for Kotlin JVM projects",
+    color: "#d2b48c",
+  },
+  kotlinMultiplatform: {
+    label: "Kotlin Multiplatform",
+    description: "Sites for Kotlin Multiplatform projects",
+    color: "#ff0000",
+  },
+
   example: {
     label: "Examples",
     description: "Simple demonstration projects, for learning the basics.",
@@ -351,26 +378,12 @@ export const Tags: { [type in TagType]: Tag } = {
     description: "Very large Dokkatoo sites, including many more pages than the average!",
     color: "#8b0000",
   },
-  android: {
-    label: "Android",
-    description: "Sites for Android projects",
-    color: "#00ff00",
+  javadocJar: {
+    label: "Javadoc JAR",
+    description: "Dokkatoo is used to create a Javadoc JAR.",
+    color: "#00ffff",
   },
-  java: {
-    label: "Java",
-    description: "Sites for Java projects",
-    color: "#808000",
-  },
-  kotlinJvm: {
-    label: "Kotlin JVM",
-    description: "Sites for Kotlin JVM projects",
-    color: "#d2b48c",
-  },
-  kotlinMultiplatform: {
-    label: "Kotlin Multiplatform",
-    description: "Sites for Kotlin Multiplatform projects",
-    color: "#ff0000",
-  },
+
   html: {
     label: "HTML",
     description: "HTML output format",
@@ -390,11 +403,6 @@ export const Tags: { [type in TagType]: Tag } = {
     label: "Markdown",
     description: "GitHub Flavoured Markdown output format.",
     color: "#ba55d3",
-  },
-  javadocJar: {
-    label: "Javadoc JAR",
-    description: "Dokkatoo is used to create a Javadoc JAR.",
-    color: "#00ffff",
   },
   /*
   additional distinct colours:
