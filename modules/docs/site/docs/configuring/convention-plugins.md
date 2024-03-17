@@ -51,7 +51,7 @@ for [buildSrc](https://docs.gradle.org/current/userguide/organizing_gradle_proje
 Since buildSrc is effectively a standalone project, it's best to create a `settings.gradle.kts`
 file,
 and at the same time we can define the repositories Gradle will use with a
-[centralised repositories declaration](https://docs.gradle.org/current/userguide/declaring_repositories.html#sub:centralized-repository-declaration).
+[Centralizing repositories declaration](https://docs.gradle.org/current/userguide/declaring_repositories.html#sub:centralized-repository-declaration).
 
 ```kotlin title="buildSrc/settings.gradle.kts"
 rootProject.name = "buildSrc"
