@@ -186,7 +186,7 @@ dependencies {
 ```
 
 :::tip
-For the latest Dokkatoo version, check the [releases](/../releases) page.
+For the latest Dokkatoo version, check the [releases](/docs/releases) page.
 :::
 
 ### Apply Dokkatoo in the Convention Plugin
