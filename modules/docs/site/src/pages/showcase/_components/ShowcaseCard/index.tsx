@@ -1,8 +1,6 @@
 import React from "react";
 import clsx from "clsx";
 import Link from "@docusaurus/Link";
-import Translate from "@docusaurus/Translate";
-// import Image from "@theme/IdealImage";
 import {type Tag, TagList, Tags, type TagType, type User,} from "@site/src/data/users";
 import {sortBy} from "@site/src/utils/jsUtils";
 import Heading from "@theme/Heading";
@@ -13,7 +11,7 @@ import {FavouriteIcon} from "@site/src/components/svgIcons";
 const TagComp = React.forwardRef<HTMLLIElement, Tag>(
     ({label, color, description}, ref) => (
         <li ref={ref} className={styles.tag} title={description}>
-          <span className={styles.textLabel}>{label.toLowerCase()}</span>
+          <span className={styles.textLabel}>{label}</span>
           <span className={styles.colorLabel} style={{backgroundColor: color}}/>
         </li>
     ),
@@ -75,7 +73,7 @@ function ShowcaseCard({user}: { user: User }) {
                         "button button--secondary button--sm",
                         styles.showcaseCardSrcBtn,
                     )}>
-                  <Translate id="showcase.card.sourceLink">source</Translate>
+                  source
                 </Link>
             )}
           </div>

@@ -1,7 +1,6 @@
 import React, {type ComponentProps, type ReactElement, useEffect, useMemo, useState} from "react";
 import clsx from "clsx";
 import ExecutionEnvironment from "@docusaurus/ExecutionEnvironment";
-import Translate, {translate} from "@docusaurus/Translate";
 import {useLocation} from "@docusaurus/router";
 import {usePluralForm} from "@docusaurus/theme-common";
 
@@ -92,19 +91,9 @@ function ShowcaseHeader() {
 
 function useSiteCountPlural() {
   const {selectMessage} = usePluralForm();
-  return (sitesCount: number) =>
-      selectMessage(
-          sitesCount,
-          translate(
-              {
-                id: "showcase.filters.resultCount",
-                description:
-                    "Pluralized label for the number of sites found on the showcase. Use as much plural forms (separated by \"|\") as your language support (see https://www.unicode.org/cldr/cldr-aux/charts/34/supplemental/language_plural_rules.html)",
-                message: "1 site|{sitesCount} sites",
-              },
-              {sitesCount},
-          ),
-      );
+  return (sitesCount: number) => {
+    return selectMessage(sitesCount, `1 site|${sitesCount} sites`);
+  };
 }
 
 function ShowcaseFilters() {
@@ -180,7 +169,7 @@ function ShowcaseCards() {
         <section className="margin-top--lg margin-bottom--xl">
           <div className="container padding-vert--md text--center">
             <Heading as="h2">
-              <Translate id="showcase.usersList.noResult">No result</Translate>
+              No result
             </Heading>
           </div>
         </section>
