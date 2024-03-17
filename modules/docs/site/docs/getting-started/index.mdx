@@ -117,8 +117,23 @@ For more detailed information [see the Dokka documentation](https://github.com/K
 
     <!--@formatter:off-->
     ```kotlin title="build.gradle.kts"
-      plugins {
+    plugins {
       id("dev.adamko.dokkatoo") version "$dokkatooVersion"
+    }
+    ```
+    <!--@formatter:on-->
+
+  </TabItem>
+  <TabItem value="pick-and-choose" label="Pick and Choose">
+    Of course, you can pick and choose your formats à la carte! Just apply the formats you want.
+
+    For example, you could choose to generate HTML and Javadoc.
+
+    <!--@formatter:off-->
+    ```kotlin title="build.gradle.kts"
+    plugins {
+      id("dev.adamko.dokkatoo-html") version "$dokkatooVersion"
+      id("dev.adamko.dokkatoo-javadoc") version "$dokkatooVersion"
     }
     ```
     <!--@formatter:on-->

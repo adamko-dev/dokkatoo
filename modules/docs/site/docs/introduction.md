@@ -16,7 +16,7 @@ for your Kotlin projects.
 Dokkatoo uses [Dokka](https://github.com/Kotlin/dokka/), the API documentation engine for Kotlin,
 to generate API reference documentation from source code.
 
-###### Why Dokkatoo?
+## Why Dokkatoo?
 
 If
 [Dokka already has a Gradle plugin](https://kotlinlang.org/docs/dokka-gradle.html),
@@ -30,7 +30,7 @@ Dokkatoo has a number of improvements over the existing Dokka Gradle Plugin:
 * Follows Gradle best practices for plugin development, for a more stable experience.
 * Faster, parallel execution, allows for cleaner build scripts and more fine-grained control.
 
-### Status
+## Status
 
 Dokkatoo is used in production by many projects ([see the Showcase!](/showcase)), 
 generating documentation for single-module and multimodule projects, in multiple different formats.
