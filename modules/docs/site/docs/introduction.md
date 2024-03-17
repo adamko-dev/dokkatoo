@@ -32,7 +32,7 @@ Dokkatoo has a number of improvements over the existing Dokka Gradle Plugin:
 
 ### Status
 
-Dokkatoo is used in production by many projects ([See the Showcase!](/showcase)), 
+Dokkatoo is used in production by many projects ([see the Showcase!](/showcase)), 
 generating documentation for single-module and multimodule projects, in multiple different formats.
 
 [Dokkatoo has been merged into the Dokka codebase](https://github.com/Kotlin/dokka/pull/3188),

@@ -17,7 +17,7 @@ Dokkatoo is published on:
 For notes about the latest changes and fixes are available
 [GitHub Releases](https://github.com/adamko-dev/dokkatoo/releases).
 
-### Snapshot releases
+### Snapshots
 
 Snapshot versions of Dokkatoo are available on
 [Maven Central](https://s01.oss.sonatype.org/content/repositories/snapshots/dev/adamko/dokkatoo/dokkatoo-plugin/).

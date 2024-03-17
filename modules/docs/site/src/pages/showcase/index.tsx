@@ -6,7 +6,7 @@ import {usePluralForm} from "@docusaurus/theme-common";
 
 import Link from "@docusaurus/Link";
 import Layout from "@theme/Layout";
-import {sortedUsers, TagList, Tags, type TagType, type User,} from "@site/src/data/users";
+import {sortedUsers, TagList, Tags, type TagType, type User,} from "./users";
 import Heading from "@theme/Heading";
 import ShowcaseTagSelect, {readSearchTags,} from "./_components/ShowcaseTagSelect";
 import ShowcaseCard from "./_components/ShowcaseCard";

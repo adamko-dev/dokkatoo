@@ -24,9 +24,8 @@ function HomepageHeader() {
             <Link className="button button--secondary button--lg" to="/showcase">
               See the showcase 🖼️
             </Link>
-            <span className={styles.indexCtasGitHubButtonWrapper}>
+            <span>
             <iframe
-                className={styles.indexCtasGitHubButton}
                 src="https://ghbtns.com/github-btn.html?user=adamko-dev&amp;repo=dokkatoo&amp;type=star&amp;count=true&amp;size=large"
                 width={160}
                 height={30}
@@ -44,7 +43,7 @@ export default function Home(): React.JSX.Element {
   return (
       <Layout
           title={`Hello from ${siteConfig.title}`}
-          description="Description will go into a meta tag in <head />">
+          description="Documentation website for Dokkatoo, a Gradle Plugin that generates Documentation for Kotlin and Java projects.">
         <HomepageHeader/>
         <main>
           <HomepageFeatures/>

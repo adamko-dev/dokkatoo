@@ -15,7 +15,7 @@ export type TagType =
     | "customPlugin"
     | "versioning"
 
-    | "design" // add 'design' if there's _some_ customisation
+    | "design" // add 'design' if there's _some_ customization
     | "example"
     | "large"
     | "javadocJar"
@@ -34,8 +34,8 @@ const Users: User[] = [
     preview: <ThemedImage
         alt={`androidx website screenshot`}
         sources={{
-          light: require("./showcase/androidx-ktx-extras-light.png").default,
-          dark: require("./showcase/androidx-ktx-extras-dark.png").default,
+          light: require("./previews/androidx-ktx-extras-light.png").default,
+          dark: require("./previews/androidx-ktx-extras-dark.png").default,
         }}
     />,
     website: "https://edricchan03.github.io/androidx-ktx-extras/",
@@ -48,8 +48,8 @@ const Users: User[] = [
     preview: <ThemedImage
         alt={`Apollo website screenshot`}
         sources={{
-          light: require("./showcase/apollo-graphql-light.png").default,
-          dark: require("./showcase/apollo-graphql-dark.png").default,
+          light: require("./previews/apollo-graphql-light.png").default,
+          dark: require("./previews/apollo-graphql-dark.png").default,
         }}
     />,
     website: "https://www.apollographql.com/docs/kotlin/kdoc/",
@@ -62,8 +62,8 @@ const Users: User[] = [
     preview: <ThemedImage
         alt={`Dokkatoo website screenshot`}
         sources={{
-          light: require("./showcase/dokkatoo-light.png").default,
-          dark: require("./showcase/dokkatoo-dark.png").default,
+          light: require("./previews/dokkatoo-light.png").default,
+          dark: require("./previews/dokkatoo-dark.png").default,
         }}
     />,
     website: "https://adamko-dev.github.io/dokkatoo/",
@@ -76,8 +76,8 @@ const Users: User[] = [
     preview: <ThemedImage
         alt={`Gradle website screenshot`}
         sources={{
-          light: require("./showcase/gradle-light.png").default,
-          dark: require("./showcase/gradle-dark.png").default,
+          light: require("./previews/gradle-light.png").default,
+          dark: require("./previews/gradle-dark.png").default,
         }}
     />,
     website: "https://docs.gradle.org/current/kotlin-dsl/",
@@ -98,8 +98,8 @@ const Users: User[] = [
     preview: <ThemedImage
         alt={`$GW2ChatLinks website screenshot`}
         sources={{
-          light: require("./showcase/GW2ChatLinks-light.png").default,
-          dark: require("./showcase/GW2ChatLinks-dark.png").default,
+          light: require("./previews/GW2ChatLinks-light.png").default,
+          dark: require("./previews/GW2ChatLinks-dark.png").default,
         }}
     />,
     website: "https://gw2toolbelt.github.io/GW2ChatLinks/latest/api/",
@@ -120,8 +120,8 @@ const Users: User[] = [
     preview: <ThemedImage
         alt={`KobanKat website screenshot`}
         sources={{
-          light: require("./showcase/KobanKat-light.png").default,
-          dark: require("./showcase/KobanKat-dark.png").default,
+          light: require("./previews/KobanKat-light.png").default,
+          dark: require("./previews/KobanKat-dark.png").default,
         }}
     />,
     website: "https://kobankat.shortway.io/",
@@ -142,8 +142,8 @@ const Users: User[] = [
     preview: <ThemedImage
         alt={`Kotka website screenshot`}
         sources={{
-          light: require("./showcase/kotka-streams-light.png").default,
-          dark: require("./showcase/kotka-streams-dark.png").default,
+          light: require("./previews/kotka-streams-light.png").default,
+          dark: require("./previews/kotka-streams-dark.png").default,
         }}
     />,
     website: "https://adamko-dev.github.io/kotka-streams/",
@@ -156,8 +156,8 @@ const Users: User[] = [
     preview: <ThemedImage
         alt={`KS3 website screenshot`}
         sources={{
-          light: require("./showcase/ks3-light.png").default,
-          dark: require("./showcase/ks3-dark.png").default,
+          light: require("./previews/ks3-light.png").default,
+          dark: require("./previews/ks3-dark.png").default,
         }}
     />,
     website: "https://www.ks3.io/",
@@ -170,8 +170,8 @@ const Users: User[] = [
     preview: <ThemedImage
         alt={`$ModuleCheck website screenshot`}
         sources={{
-          light: require("./showcase/ModuleCheck-light.png").default,
-          dark: require("./showcase/ModuleCheck-dark.png").default,
+          light: require("./previews/ModuleCheck-light.png").default,
+          dark: require("./previews/ModuleCheck-dark.png").default,
         }}
     />,
     website: "https://rickbusarow.github.io/ModuleCheck/api/index.html",
@@ -184,8 +184,8 @@ const Users: User[] = [
     preview: <ThemedImage
         alt={`OSS website screenshot`}
         sources={{
-          light: require("./showcase/oss-review-toolkit-light.png").default,
-          dark: require("./showcase/oss-review-toolkit-dark.png").default,
+          light: require("./previews/oss-review-toolkit-light.png").default,
+          dark: require("./previews/oss-review-toolkit-dark.png").default,
         }}
     />,
     // docs are published per-module (not aggregated)
@@ -199,8 +199,8 @@ const Users: User[] = [
     preview: <ThemedImage
         alt={`Pedestal website screenshot`}
         sources={{
-          light: require("./showcase/Pedestal-light.png").default,
-          dark: require("./showcase/Pedestal-dark.png").default,
+          light: require("./previews/Pedestal-light.png").default,
+          dark: require("./previews/Pedestal-dark.png").default,
         }}
     />,
     website: "https://opensavvy.gitlab.io/prepared/api-docs/suite/index.html",
@@ -213,8 +213,8 @@ const Users: User[] = [
     preview: <ThemedImage
         alt={`Prepared website screenshot`}
         sources={{
-          light: require("./showcase/Prepared-light.png").default,
-          dark: require("./showcase/Prepared-dark.png").default,
+          light: require("./previews/Prepared-light.png").default,
+          dark: require("./previews/Prepared-dark.png").default,
         }}
     />,
     website: "https://opensavvy.gitlab.io/prepared/api-docs/suite/index.html",
@@ -227,8 +227,8 @@ const Users: User[] = [
     preview: <ThemedImage
         alt={`Selfie website screenshot`}
         sources={{
-          light: require("./showcase/selfie-light.png").default,
-          dark: require("./showcase/selfie-dark.png").default,
+          light: require("./previews/selfie-light.png").default,
+          dark: require("./previews/selfie-dark.png").default,
         }}
     />,
     website: "https://kdoc.selfie.dev/",
@@ -240,7 +240,7 @@ const Users: User[] = [
   // {
   //   title: "DiffPlug Blowdryer scripts",
   //   description: "DiffPlug's scripts for use with blowdryer.",
-  //   preview: require("./showcase/dokkatoo-dark.png.default,
+  //   preview: require("./previews/dokkatoo-dark.png.default,
   //   website: "https://github.com/diffplug/blowdryer-diffplug",
   //   source:
   // "https://github.com/diffplug/blowdryer-diffplug/blob/7.2.0/src/main/resources/base/maven.gradle#L66-L71",
