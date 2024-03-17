@@ -56,7 +56,7 @@ const config: Config = {
         // {to: "/getting-started", label: "Getting started", position: "left"},
         {
           type: "doc",
-          docId: "getting-started",
+          docId: "introduction",
           label: "Documentation",
           position: "left",
         },

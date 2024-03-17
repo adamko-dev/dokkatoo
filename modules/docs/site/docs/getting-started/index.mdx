@@ -2,8 +2,8 @@
 id: getting-started
 title: Getting Started
 description: Adding Dokkatoo to a project
-sidebar_position: 1
-slug: /
+sidebar_position: 3
+slug: /getting-started/
 ---
 
 import Link from "@docusaurus/Link";
@@ -28,6 +28,14 @@ Find the latest version of Dokkatoo:
 Dokkatoo is very flexible, and can generate documentation in multiple formats.
 For examples of the sites Dokkatoo can generate, check out the [Showcase](/showcase).
 
+:::tip
+
+If you're unsure about which format to choose, I recommend using the HTML plugin.
+It has the best support and the most features, and you can always add another format later!
+
+For more detailed information [see the Dokka documentation](https://github.com/Kotlin/dokka#output-formats).
+
+:::
 
 <Tabs>
   <TabItem value="html" label="HTML">
@@ -118,14 +126,6 @@ For examples of the sites Dokkatoo can generate, check out the [Showcase](/showc
   </TabItem>
 </Tabs>
 
-:::tip
-
-If you're unsure about which format to choose, I recommend using the HTML plugin.
-It has the best support and the most features, and you can always add another format later!
-
-For more detailed information [see the Dokka documentation](https://github.com/Kotlin/dokka#output-formats).
-
-:::
 
 ### Apply Dokkatoo to your project
 
@@ -200,25 +200,3 @@ e.g. `:my-subproject:dokkatooGenerate`.
 If the root project is aggregating, prefix the task with a single `:`.
 
 :::
-
-
-### Migrating from Dokka too Dokkatoo
-
-Migrating from the official Dokka Gradle Plugin to Dokkatoo is easy: apply both plugins.
-
-Just make sure to update the Dokkatoo output directory!
-
-<!-- @formatter:off -->
-```kotlin title="build.gradle.kts"
-plugins {
-  id("org.jetbrains.dokka") version "$dokkaVersion"
-  id("dev.adamko.dokkatoo") version "$dokkatooVersion"
-}
-
-dokkatoo {
-  // update the output directory, so it doesn't clash with the Dokka plugin!
-  // highlight-next-line
-  dokkatooPublicationDirectory.set(layout.buildDirectory.dir("dokkatoo"))
-}
-```
-<!-- @formatter:on -->
