@@ -73,12 +73,22 @@
   height: 30px;
 }
 
-.svgIconFavouriteXs,
 .svgIconFavourite {
   color: var(--site-color-svg-icon-favourite);
 }
 
-.svgIconFavouriteXs {
+.svgIconAndroid {
+  color: #00ff00;
+  margin-left: 0.5ex;
+  padding: 0.15ex;
+}
+
+.svgIconKotlin {
+  margin-left: 0.5ex;
+  padding: 0.15ex;
+}
+
+.svgIconXs {
   margin-left: 0.625rem;
   font-size: 1rem;
 }

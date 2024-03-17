@@ -3,12 +3,12 @@ import clsx from "clsx";
 import Link from "@docusaurus/Link";
 import Translate from "@docusaurus/Translate";
 // import Image from "@theme/IdealImage";
-import FavouriteIcon from "@site/src/components/svgIcons/FavouriteIcon";
 import {type Tag, TagList, Tags, type TagType, type User,} from "@site/src/data/users";
 import {sortBy} from "@site/src/utils/jsUtils";
 import Heading from "@theme/Heading";
 import Tooltip from "../ShowcaseTooltip";
 import styles from "./styles.module.css";
+import {FavouriteIcon} from "@site/src/components/svgIcons";
 
 const TagComp = React.forwardRef<HTMLLIElement, Tag>(
     ({label, color, description}, ref) => (
@@ -46,27 +46,7 @@ function ShowcaseCardTag({tags}: { tags: TagType[] }) {
   );
 }
 
-function getCardImage(user: User): React.JSX.Element {
-  if (user.preview) {
-
-    // const lastIndex = user.preview.lastIndexOf(".svg");
-
-    // if (user.preview.endsWith(".svg")) {
-    //   return <svg ref={user.preview} alt={user.title}/>
-    // } else {
-    // }
-    if (typeof user.preview == "string") {
-      return <img src={user.preview} alt={user.title}/>
-    } else {
-      return user.preview
-    }
-  } else {
-    return <React.Fragment/>
-  }
-}
-
 function ShowcaseCard({user}: { user: User }) {
-  const image = getCardImage(user);
   let websiteLink: React.JSX.Element = <div> {user.title} </div>
   if (user.website) {
     websiteLink = <Link href={user.website} className={styles.showcaseCardLink}>
@@ -77,16 +57,17 @@ function ShowcaseCard({user}: { user: User }) {
   return (
       <li key={user.title} className="card shadow--md">
         <div className={clsx("card__image", styles.showcaseCardImage)}>
-          {image}
+          {user.preview}
         </div>
         <div className="card__body">
           <div className={clsx(styles.showcaseCardHeader)}>
             <Heading as="h4" className={styles.showcaseCardTitle}>
               {websiteLink}
             </Heading>
-            {user.tags.includes("favourite") && (
+            {
+                user.tags.includes("favourite") &&
                 <FavouriteIcon svgClass={styles.svgIconFavourite} size="small"/>
-            )}
+            }
             {user.source && (
                 <Link
                     href={user.source}

@@ -1,6 +1,7 @@
 import {sortBy} from "@site/src/utils/jsUtils";
 import React from "react";
 import JarFileIcon from "@site/static/img/icons/jar-file.svg";
+import ThemedImage from "@theme/ThemedImage";
 
 export type TagType =
     | "favourite"
@@ -23,7 +24,13 @@ const Users: User[] = [
   {
     title: "androidx-ktx-extras",
     description: "Extra KTX modules for AndroidX.",
-    preview: require("./showcase/androidx-ktx-extras-dark.png").default,
+    preview: <ThemedImage
+        alt={`androidx website screenshot`}
+        sources={{
+          light: require("./showcase/androidx-ktx-extras-light.png").default,
+          dark: require("./showcase/androidx-ktx-extras-dark.png").default,
+        }}
+    />,
     website: "https://edricchan03.github.io/androidx-ktx-extras/",
     source: "https://github.com/EdricChan03/androidx-ktx-extras/blob/browser-ktx%400.1.0/build.gradle.kts",
     tags: ["html", "android", "javadocJar"],
@@ -31,7 +38,13 @@ const Users: User[] = [
   {
     title: "Apollo Kotlin",
     description: "A strongly-typed, caching GraphQL client for Java and Kotlin multiplatform.",
-    preview: require("./showcase/apollo-graphql-dark.png").default,
+    preview: <ThemedImage
+        alt={`Apollo website screenshot`}
+        sources={{
+          light: require("./showcase/apollo-graphql-light.png").default,
+          dark: require("./showcase/apollo-graphql-dark.png").default,
+        }}
+    />,
     website: "https://www.apollographql.com/docs/kotlin/kdoc/",
     source: "https://github.com/apollographql/apollo-kotlin/blob/v4.0.0-beta.5/build-logic/src/main/kotlin/Publishing.kt",
     tags: ["favourite", "kotlinMultiplatform", "html", "design", "large", "versioning"],
@@ -39,7 +52,13 @@ const Users: User[] = [
   {
     title: "Dokkatoo",
     description: "Generates documentation for Kotlin Gradle projects.",
-    preview: require("./showcase/dokkatoo-dark.png").default,
+    preview: <ThemedImage
+        alt={`Dokkatoo website screenshot`}
+        sources={{
+          light: require("./showcase/dokkatoo-light.png").default,
+          dark: require("./showcase/dokkatoo-dark.png").default,
+        }}
+    />,
     website: "https://adamko-dev.github.io/dokkatoo/",
     source: "https://github.com/adamko-dev/dokkatoo/blob/v2.2.0/modules/dokkatoo-plugin/build.gradle.kts#L217-L235",
     tags: ["html", "kotlinJvm"],
@@ -47,7 +66,13 @@ const Users: User[] = [
   {
     title: "Gradle",
     description: "Adaptable, fast automation for all.",
-    preview: require("./showcase/gradle-dark.png").default,
+    preview: <ThemedImage
+        alt={`Gradle website screenshot`}
+        sources={{
+          light: require("./showcase/gradle-light.png").default,
+          dark: require("./showcase/gradle-dark.png").default,
+        }}
+    />,
     website: "https://docs.gradle.org/current/kotlin-dsl/",
     source: "https://github.com/gradle/gradle/tree/v8.6.0/build-logic/documentation",
     tags: ["favourite", "java", "kotlinJvm", "large", "html"],
@@ -63,7 +88,13 @@ const Users: User[] = [
   {
     title: "GW2ChatLinks",
     description: "A Kotlin Multiplatform library for parsing and generating Guild Wars 2 chat links.",
-    preview: require("./showcase/GW2ChatLinks-dark.png").default,
+    preview: <ThemedImage
+        alt={`$GW2ChatLinks website screenshot`}
+        sources={{
+          light: require("./showcase/GW2ChatLinks-light.png").default,
+          dark: require("./showcase/GW2ChatLinks-dark.png").default,
+        }}
+    />,
     website: "https://gw2toolbelt.github.io/GW2ChatLinks/latest/api/",
     source: "https://github.com/GW2ToolBelt/GW2ChatLinks/blob/4dcce081987f731aa816d0562e486a705680bc07/build.gradle.kts#L156-L183",
     tags: ["kotlinMultiplatform", "html", "javadocJar"],
@@ -79,7 +110,13 @@ const Users: User[] = [
   {
     title: "KobanKat",
     description: "RevenueCat SDK for Kotlin Multiplatform.",
-    preview: require("./showcase/KobanKat-dark.png").default,
+    preview: <ThemedImage
+        alt={`KobanKat website screenshot`}
+        sources={{
+          light: require("./showcase/KobanKat-light.png").default,
+          dark: require("./showcase/KobanKat-dark.png").default,
+        }}
+    />,
     website: "https://kobankat.shortway.io/",
     source: "https://github.com/diffplug/selfie/tree/jvm/2.0.1/jvm/gradle/dokka",
     tags: ["kotlinMultiplatform", "html"],
@@ -95,7 +132,13 @@ const Users: User[] = [
   {
     title: "Kotka Streams",
     description: "Kotka Streams - the Kotlin DSL for Kafka Streams.",
-    preview: require("./showcase/kotka-streams-dark.png").default,
+    preview: <ThemedImage
+        alt={`Kotka website screenshot`}
+        sources={{
+          light: require("./showcase/kotka-streams-light.png").default,
+          dark: require("./showcase/kotka-streams-dark.png").default,
+        }}
+    />,
     website: "https://adamko-dev.github.io/kotka-streams/",
     source: "https://github.com/adamko-dev/kotka-streams/blob/v23.03.13/buildSrc/src/main/kotlin/buildsrc/convention/dokkatoo.gradle.kts",
     tags: ["kotlinJvm", "html"],
@@ -103,7 +146,13 @@ const Users: User[] = [
   {
     title: "KS3",
     description: "KotlinX Serialization Standard Serializers (KS3).",
-    preview: require("./showcase/ks3-dark.png").default,
+    preview: <ThemedImage
+        alt={`KS3 website screenshot`}
+        sources={{
+          light: require("./showcase/ks3-light.png").default,
+          dark: require("./showcase/ks3-dark.png").default,
+        }}
+    />,
     website: "https://www.ks3.io/",
     source: "https://github.com/Kantis/ks3/blob/v0.6.0/build.gradle.kts",
     tags: ["kotlinMultiplatform", "html", "javadoc", "javadocJar"],
@@ -111,7 +160,13 @@ const Users: User[] = [
   {
     title: "ModuleCheck",
     description: "Fast dependency graph validation for Gradle.",
-    preview: require("./showcase/ModuleCheck-dark.png").default,
+    preview: <ThemedImage
+        alt={`$ModuleCheck website screenshot`}
+        sources={{
+          light: require("./showcase/ModuleCheck-light.png").default,
+          dark: require("./showcase/ModuleCheck-dark.png").default,
+        }}
+    />,
     website: "https://rickbusarow.github.io/ModuleCheck/api/index.html",
     source: "https://github.com/rickbusarow/ModuleCheck/blob/ff891da3b08cf1bd375e6617c36baa6e98e2e0fe/build-logic/conventions/src/main/kotlin/modulecheck/builds/DokkatooConventionPlugin.kt#L53",
     tags: ["kotlinJvm", "html", "large"],
@@ -119,7 +174,13 @@ const Users: User[] = [
   {
     title: "OSS Review Toolkit (ORT)",
     description: "A suite of tools to automate software compliance checks.",
-    preview: require("./showcase/oss-review-toolkit-dark.png").default,
+    preview: <ThemedImage
+        alt={`OSS website screenshot`}
+        sources={{
+          light: require("./showcase/oss-review-toolkit-light.png").default,
+          dark: require("./showcase/oss-review-toolkit-dark.png").default,
+        }}
+    />,
     // docs are published per-module (not aggregated)
     website: "https://javadoc.io/doc/org.ossreviewtoolkit/cli/latest/",
     source: "https://github.com/oss-review-toolkit/ort/blob/18.0.0/buildSrc/src/main/kotlin/ort-kotlin-conventions.gradle.kts#L186-L193",
@@ -128,7 +189,13 @@ const Users: User[] = [
   {
     title: "Pedestal",
     description: "Progress and failure tracking, architectures for aggressive caching.",
-    preview: require("./showcase/Pedestal-dark.png").default,
+    preview: <ThemedImage
+        alt={`Pedestal website screenshot`}
+        sources={{
+          light: require("./showcase/Pedestal-light.png").default,
+          dark: require("./showcase/Pedestal-dark.png").default,
+        }}
+    />,
     website: "https://opensavvy.gitlab.io/prepared/api-docs/suite/index.html",
     source: "https://gitlab.com/opensavvy/pedestal",
     tags: ["kotlinMultiplatform", "html"],
@@ -136,7 +203,13 @@ const Users: User[] = [
   {
     title: "Prepared",
     description: "Magicless testing framework for Kotlin Multiplatform.",
-    preview: require("./showcase/Prepared-dark.png").default,
+    preview: <ThemedImage
+        alt={`Prepared website screenshot`}
+        sources={{
+          light: require("./showcase/Prepared-light.png").default,
+          dark: require("./showcase/Prepared-dark.png").default,
+        }}
+    />,
     website: "https://opensavvy.gitlab.io/prepared/api-docs/suite/index.html",
     source: "https://gitlab.com/opensavvy/prepared",
     tags: ["favourite", "kotlinMultiplatform", "html"],
@@ -144,7 +217,13 @@ const Users: User[] = [
   {
     title: "Selfie",
     description: "Snapshot testing for Java, Kotlin, and the JVM.",
-    preview: require("./showcase/selfie-dark.png").default,
+    preview: <ThemedImage
+        alt={`Selfie website screenshot`}
+        sources={{
+          light: require("./showcase/selfie-light.png").default,
+          dark: require("./showcase/selfie-dark.png").default,
+        }}
+    />,
     website: "https://kdoc.selfie.dev/",
     source: "https://github.com/diffplug/selfie/tree/jvm/2.0.1/jvm/gradle/dokka",
     tags: ["favourite", "kotlinJvm", "html", "design"],
@@ -169,7 +248,7 @@ const Users: User[] = [
 export type User = {
   title: string;
   description: string;
-  preview: string | React.JSX.Element;
+  preview: React.JSX.Element,
   website: string | null;
   source: string | null;
   tags: TagType[];

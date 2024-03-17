@@ -7,7 +7,6 @@ import {usePluralForm} from "@docusaurus/theme-common";
 
 import Link from "@docusaurus/Link";
 import Layout from "@theme/Layout";
-import FavouriteIcon from "@site/src/components/svgIcons/FavouriteIcon";
 import {sortedUsers, TagList, Tags, type TagType, type User,} from "@site/src/data/users";
 import Heading from "@theme/Heading";
 import ShowcaseTagSelect, {readSearchTags,} from "./_components/ShowcaseTagSelect";
@@ -15,9 +14,10 @@ import ShowcaseCard from "./_components/ShowcaseCard";
 import ShowcaseTooltip from "./_components/ShowcaseTooltip";
 
 import styles from "./styles.module.css";
+import {AndroidIcon, FavouriteIcon, KotlinIcon} from "@site/src/components/svgIcons";
 
 const TITLE = "Dokkatoo Showcase";
-const DESCRIPTION = "List of projects using Dokkatoo to build documentation references";
+const DESCRIPTION = "List of projects using Dokkatoo to build documentation";
 
 type UserState = {
   scrollTopPosition: number;
@@ -126,7 +126,12 @@ function ShowcaseFilters() {
             const id = `showcase_checkbox_id_${tag}`;
             let icon: ReactElement<ComponentProps<"svg">>
             if (tag === "favourite") {
-              icon = <FavouriteIcon svgClass={styles.svgIconFavouriteXs}/>
+              icon = <FavouriteIcon svgClass={clsx(styles.svgIconFavourite, styles.svgIconXs)}/>
+            } else if (tag === "android") {
+              icon = <AndroidIcon svgClass={clsx(styles.svgIconAndroid)} size="small"/>
+            } else if (tag === "kotlinMultiplatform" || tag === "kotlinJvm") {
+              icon = <KotlinIcon svgClass={clsx(styles.svgIconKotlin)} size="small"
+                                 style={{fill: color}}/>
             } else {
               icon = <span
                   style={{
@@ -135,6 +140,7 @@ function ShowcaseFilters() {
                     height: 10,
                     borderRadius: "50%",
                     marginLeft: 8,
+                    boxShadow: "0 0 0 0.5px var(--ifm-color-primary-contrast-foreground)",
                   }}
               />
             }
