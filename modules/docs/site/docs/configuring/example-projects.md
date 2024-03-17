@@ -54,6 +54,8 @@ No Dokkatoo example yet - contributions welcome!
 
 ### Multimodule Example Project
 
+This example demonstrates Dokka's configuration and output for a simple Kotlin Multiplatform project.
+
 [https://github.com/adamko-dev/dokkatoo/tree/main/examples/multiplatform-example/dokkatoo](https://github.com/adamko-dev/dokkatoo/tree/main/examples/multiplatform-example/dokkatoo)
 
 ### Versioning Example Project
