@@ -22,12 +22,10 @@ Let's say you have a basic Gradle project (without any subprojects).
 .
 └── my-cool-project/
     ├── src/
-    │   ├── main/
-    │   │   └── kotlin/
-    │   │       └── (sources)
-    │   └── test/
-    │       └── kotlin/
-    │           └── (sources)
+    │   ├── main/kotlin/
+    │   │   └── (sources)
+    │   └── test/kotlin/
+    │       └── (sources)
     ├── build.gradle.kts
     └── settings.gradle.kts
 ```
