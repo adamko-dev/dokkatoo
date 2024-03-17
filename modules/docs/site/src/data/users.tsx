@@ -396,7 +396,7 @@ export const Tags: { [type in TagType]: Tag } = {
   },
   jekyll: {
     label: "Jekyll",
-    description: "Generates a site in a Jekyll format.",
+    description: "Generates a site in a Jekyll Flavoured Markdown format.",
     color: "#98fb98",
   },
   gfm: {

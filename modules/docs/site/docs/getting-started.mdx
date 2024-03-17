@@ -6,72 +6,133 @@ sidebar_position: 1
 slug: /
 ---
 
-
-
-
-
+import Link from "@docusaurus/Link";
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
+import Admonition from '@theme/Admonition';
 
 So, you have a Kotlin or Java project that uses Gradle and you want to generate some pretty
 API reference documentation. You've come to the right place.
 
+### Find the latest version of Dokkatoo
 
-Find the latest version of Dokkatoo on the Gradle Plugin Portal.
+Find the latest version of Dokkatoo:
 
-
-https://plugins.gradle.org/search?term=Dokkatoo
-
-
-[//]  # (TODO flesh out plugin selection more)
-[//]  # (TODO add accordions)
-
-#### Any formats
-
-The standard plugin provides options for generating any of the below formats.
-
-```kotlin title="build.gradle.kts"
-plugins {
-  id("dev.adamko.dokkatoo") version "$dokkatooVersion"
-}
-```
-
-#### HTML
+* [Gradle Plugin Portal](https://plugins.gradle.org/search?term=Dokkatoo)
+* [Dokkatoo GitHub Releases](https://github.com/adamko-dev/dokkatoo/releases)
+* [Maven Central](https://search.maven.org/search?q=g:dev.adamko.dokkatoo)
 
 
-```kotlin title="build.gradle.kts"
-plugins {
-  id("dev.adamko.dokkatoo-gfm") version "$dokkatooVersion"
-}
-```
+### Choose a format
 
+Dokkatoo is very flexible, and can generate documentation in multiple formats.
+For examples of the sites Dokkatoo can generate, check out the [Showcase](/showcase).
 
-#### GFM
-
-```kotlin title="build.gradle.kts"
-plugins {
-  id("dev.adamko.dokkatoo-gfm") version "$dokkatooVersion"
-}
-```
-
-#### Jekyll
-
-```kotlin title="build.gradle.kts"
-plugins {
-  id("dev.adamko.dokkatoo-jekyll") version "$dokkatooVersion"
-}
-```
-
-#### Javadoc
-
-```kotlin title="build.gradle.kts"
-plugins {
-  id("dev.adamko.dokkatoo-javadoc") version "$dokkatooVersion"
-}
-```
 
 <Tabs>
-  <TabItem value="single" label="I have Gradle Project with a single project">
+  <TabItem value="html" label="HTML">
+    The HTML plugin provides tasks that can generate any of the other formats.
+
+    <!--@formatter:off-->
+    ```kotlin title="build.gradle.kts"
+    plugins {
+      id("dev.adamko.dokkatoo-html") version "$dokkatooVersion"
+    }
+    ```
+    <!--@formatter:on-->
+  </TabItem>
+  <TabItem value="javadoc" label="Javadoc">
+    The Javadoc plugin adds a Javadoc output format that simulates the appearance of Java's Javadoc
+    HTML.
+
+    <!--@formatter:off-->
+    ```kotlin title="build.gradle.kts"
+    plugins {
+      id("dev.adamko.dokkatoo-javadoc") version "$dokkatooVersion"
+    }
+    ```
+    <!--@formatter:on-->
+
+    <Admonition type="warning">
+      The Javadoc format is in its early stages, so you may experience issues and encounter bugs.
+      See <Link
+        to="https://github.com/Kotlin/dokka/tree/master/dokka-subprojects/plugin-javadoc">Dokka</Link>
+      for the latest information.
+    </Admonition>
+  </TabItem>
+  <TabItem value="jekyll" label="Jekyll">
+    The Jekyll plugin can generate documentation in Jekyll Flavoured Markdown format.
+    It supports both multi-module and multiplatform projects.
+
+    <!--@formatter:off-->
+    ```kotlin title="build.gradle.kts"
+    plugins {
+      id("dev.adamko.dokkatoo-jekyll") version "$dokkatooVersion"
+    }
+    ```
+    <!--@formatter:on-->
+
+    <Admonition type="warning">
+      The Jekyll format is in its early stages, so you may experience issues and encounter bugs.
+      See
+      <Link
+          to="https://github.com/Kotlin/dokka/tree/master/dokka-subprojects/plugin-jekyll">Dokka</Link>
+      for the latest information.
+    </Admonition>
+
+  </TabItem>
+  <TabItem value="gfm" label="GFM">
+    The GFM plugin adds the ability to generate documentation in GitHub Flavoured Markdown format.
+    It supports both multi-module and multiplatform projects.
+
+    <!--@formatter:off-->
+    ```kotlin title="build.gradle.kts"
+    plugins {
+      id("dev.adamko.dokkatoo-gfm") version "$dokkatooVersion"
+    }
+    ```
+    <!--@formatter:on-->
+
+    <Admonition type="warning">
+      The GFM format is in its early stages, so you may experience issues and encounter bugs.
+      See
+      <Link
+          to="https://github.com/Kotlin/dokka/tree/master/dokka-subprojects/plugin-gfm">Dokka</Link>
+      for the latest information.
+    </Admonition>
+  </TabItem>
+  <TabItem value="all" label="All formats">
+    The regular plugin provides tasks that can generate any of the other formats.
+
+    This option is the most flexible, but if you have decided you only want one format, then select
+    it.
+
+    <!--@formatter:off-->
+    ```kotlin title="build.gradle.kts"
+    plugins {
+    id("dev.adamko.dokkatoo") version "$dokkatooVersion"
+  }
+    ```
+    <!--@formatter:on-->
+
+  </TabItem>
+</Tabs>
+
+:::tip
+
+If you're unsure about which format to choose, I recommend using the HTML plugin.
+It has the best support and the most features, and you can always add another format later!
+
+For more detailed information [see the Dokka documentation](https://github.com/Kotlin/dokka#output-formats).
+
+:::
+
+### Apply Dokkatoo to your project
+
+Now let's see how to apply Dokkatoo to a Gradle project.
+
+<Tabs>
+  <TabItem value="single" label="I have a single project">
 
     Apply the appropriate plugin for any formats you'd like to generate.
 
@@ -80,28 +141,10 @@ plugins {
     <!-- @formatter:off -->
     ```kotlin title="build.gradle.kts"
     plugins {
-      // only generate HTML and Javadoc
-      id("dev.adamko.dokkatoo-html") version "$dokkatooVersion"
-      id("dev.adamko.dokkatoo-javadoc") version "$dokkatooVersion"
-      //id("dev.adamko.dokkatoo-gfm") version "$dokkatooVersion"
-      //id("dev.adamko.dokkatoo-jekyll") version "$dokkatooVersion"
-    }
-    ```
-    <!-- @formatter:on -->
-
-    Or all formats:
-
-    <!-- @formatter:off -->
-    ```kotlin title="build.gradle.kts"
-    plugins {
-      // generate all formats - HTML, Jekyll, Javadoc, and GFM (GitHub Flavoured Markdown)
       id("dev.adamko.dokkatoo") version "$dokkatooVersion"
     }
     ```
     <!-- @formatter:on -->
-
-    [Read more about the available formats in the Dokka
-    docs](https://github.com/Kotlin/dokka#output-formats).
 
     Run the generation task
 
@@ -123,7 +166,7 @@ plugins {
     <!-- @formatter:off -->
     ```kotlin title="build.gradle.kts"
     plugins {
-      id("dev.adamko.dokkatoo-html") version "$dokkatooVersion"
+      id("dev.adamko.dokkatoo") version "$dokkatooVersion"
     }
 
     dependencies {
@@ -131,23 +174,11 @@ plugins {
       // the subprojects must also have Dokkatoo applied
       dokkatoo(project(":subproject-hello"))
       dokkatoo(project(":subproject-world"))
-
-      // If using Dokkatoo v2.1.0+ a dependency on all-modules-page-plugin is no longer required,
-      // see https://github.com/adamko-dev/dokkatoo/issues/14
-      //dokkatooPluginHtml("org.jetbrains.dokka:all-modules-page-plugin")
-
-      // Earlier versions of Dokkatoo must manually add a dependency:
-      dokkatooPluginHtml(
-        dokkatoo.versions.jetbrainsDokka.map { dokkaVersion ->
-          "org.jetbrains.dokka:all-modules-page-plugin:$dokkaVersion"
-        }
-      )
     }
     ```
     <!-- @formatter:on -->
 
     Run the Dokkatoo generation task.
-
 
     <!-- @formatter:off -->
     ```bash
@@ -169,3 +200,25 @@ e.g. `:my-subproject:dokkatooGenerate`.
 If the root project is aggregating, prefix the task with a single `:`.
 
 :::
+
+
+### Migrating from Dokka too Dokkatoo
+
+Migrating from the official Dokka Gradle Plugin to Dokkatoo is easy: apply both plugins.
+
+Just make sure to update the Dokkatoo output directory!
+
+<!-- @formatter:off -->
+```kotlin title="build.gradle.kts"
+plugins {
+  id("org.jetbrains.dokka") version "$dokkaVersion"
+  id("dev.adamko.dokkatoo") version "$dokkatooVersion"
+}
+
+dokkatoo {
+  // update the output directory, so it doesn't clash with the Dokka plugin!
+  // highlight-next-line
+  dokkatooPublicationDirectory.set(layout.buildDirectory.dir("dokkatoo"))
+}
+```
+<!-- @formatter:on -->
