@@ -13,7 +13,7 @@ import ShowcaseCard from "./_components/ShowcaseCard";
 import ShowcaseTooltip from "./_components/ShowcaseTooltip";
 
 import styles from "./styles.module.css";
-import {AndroidIcon, FavouriteIcon, KotlinIcon} from "@site/src/components/svgIcons";
+import {AndroidIcon, HeartIcon, KotlinIcon} from "@site/src/components/svgIcons";
 
 const TITLE = "Dokkatoo Showcase";
 const DESCRIPTION = "List of projects using Dokkatoo to build documentation";
@@ -115,7 +115,7 @@ function ShowcaseFilters() {
             const id = `showcase_checkbox_id_${tag}`;
             let icon: ReactElement<ComponentProps<"svg">>
             if (tag === "favourite") {
-              icon = <FavouriteIcon svgClass={clsx(styles.svgIconFavourite, styles.svgIconXs)}/>
+              icon = <HeartIcon svgClass={clsx(styles.svgIconFavourite, styles.svgIconXs)}/>
             } else if (tag === "android") {
               icon = <AndroidIcon svgClass={clsx(styles.svgIconAndroid)} size="small"/>
             } else if (tag === "kotlinMultiplatform" || tag === "kotlinJvm") {
@@ -186,7 +186,7 @@ function ShowcaseCards() {
                     <Heading as="h2">
                       Our favourites
                     </Heading>
-                    <FavouriteIcon svgClass={styles.svgIconFavourite}/>
+                    <HeartIcon svgClass={styles.svgIconFavourite}/>
                   </div>
                   <ul className={clsx("container", "clean-list", styles.showcaseList)}>
                     {favouriteUsers.map((user) => (

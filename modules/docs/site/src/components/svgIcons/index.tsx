@@ -18,7 +18,7 @@ function SvgIcon(props: SvgIconProps): React.JSX.Element {
     children,
     color = "inherit",
     size = "medium",
-    viewBox = "0 0 24 24",
+    viewBox = "0 0 16 16",
     ...rest
   } = props;
 
@@ -34,13 +34,12 @@ function SvgIcon(props: SvgIconProps): React.JSX.Element {
   );
 }
 
-export function FavouriteIcon(
+export function HeartIcon(
     props: Omit<SvgIconProps, "children">,
 ): React.JSX.Element {
   return (
-      <SvgIcon {...props}>
-        <path
-            d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z"/>
+      <SvgIcon viewBox={"0 0 16 16"} {...props}>
+        <path fillRule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314"/>
       </SvgIcon>
   );
 }

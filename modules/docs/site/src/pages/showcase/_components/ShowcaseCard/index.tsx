@@ -6,7 +6,7 @@ import {sortBy} from "@site/src/utils/jsUtils";
 import Heading from "@theme/Heading";
 import Tooltip from "../ShowcaseTooltip";
 import styles from "./styles.module.css";
-import {FavouriteIcon} from "@site/src/components/svgIcons";
+import {HeartIcon} from "@site/src/components/svgIcons";
 
 const TagComp = React.forwardRef<HTMLLIElement, Tag>(
     ({label, color, description}, ref) => (
@@ -64,7 +64,7 @@ function ShowcaseCard({user}: { user: User }) {
             </Heading>
             {
                 user.tags.includes("favourite") &&
-                <FavouriteIcon svgClass={styles.svgIconFavourite} size="small"/>
+                <HeartIcon svgClass={styles.svgIconFavourite} size="small"/>
             }
             {user.source && (
                 <Link
