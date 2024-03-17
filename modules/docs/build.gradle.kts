@@ -118,4 +118,8 @@ tasks.screenshotter {
   website("selfie", "https://kdoc.selfie.dev/")
   website("Prepared", "https://opensavvy.gitlab.io/prepared/api-docs/suite/index.html")
   website("Pedestal", "https://opensavvy.gitlab.io/pedestal/api-docs/")
+  website(
+    "Kotlin-JS-Resources-Plugin",
+    "https://opensavvy.gitlab.io/automation/kotlin-js-resources/api-docs/"
+  )
 }

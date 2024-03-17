@@ -1,4 +1,4 @@
-rootProject.name = "library-publishing-example"
+rootProject.name = "dokka-library-publishing-example"
 
 pluginManagement {
   repositories {
