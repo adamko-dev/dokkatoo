@@ -55,3 +55,13 @@ jobs:
       gradle-task: >-
         ${{ matrix.task }} --stacktrace
       checkout-ref: ${{ inputs.checkout-ref }}
+
+
+  site-check:
+    # verify the site can be built
+    uses: ./.github/workflows/run_gradle_task.yml
+    with:
+      runs-on: ubuntu-latest
+      gradle-task: >-
+        docusaurusBuild --stacktrace
+      checkout-ref: ${{ inputs.checkout-ref }}

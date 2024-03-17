@@ -43,6 +43,7 @@ examples/**                                                           linguist-d
 examples/*/dokka                                                      linguist-vendored
 examples/versioning-multimodule-example/dokka/previousDocVersions     linguist-generated
 examples/versioning-multimodule-example/dokkatoo/previousDocVersions  linguist-generated
+modules/docs/**                                                       linguist-documentation
 modules/dokkatoo-plugin-integration-tests/projects/**dokka/           linguist-vendored
 modules/dokkatoo-plugin-integration-tests/projects/**dokkatoo/        linguist-documentation
 

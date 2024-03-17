@@ -1,0 +1,21 @@
+.heroBanner {
+  padding: 4rem 0;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(var(--ifm-color-primary-lightest), var(--ifm-color-primary-darkest));
+  box-shadow: 0 0 0.1em 0.1em var(--ifm-color-primary-darkest);
+}
+
+@media screen and (max-width: 996px) {
+  .heroBanner {
+    padding: 2rem;
+  }
+}
+
+.buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1em;
+}
