@@ -151,6 +151,20 @@ const Users: User[] = [
     tags: ["kotlinJvm", "html"],
   },
   {
+    title: "Kotlin/JS Resources Plugin",
+    description: "Expose resources transitively to downstream projects.",
+    preview: <ThemedImage
+        alt={`Kotlin/JS Resources Plugin website screenshot`}
+        sources={{
+          light: require("./showcase/Kotlin-JS-Resources-Plugin-light.png").default,
+          dark: require("./showcase/Kotlin-JS-Resources-Plugin-dark.png").default,
+        }}
+    />,
+    website: "https://opensavvy.gitlab.io/automation/kotlin-js-resources/api-docs/",
+    source: "https://gitlab.com/opensavvy/automation/kotlin-js-resources",
+    tags: ["kotlinMultiplatform", "html"],
+  },
+  {
     title: "KS3",
     description: "KotlinX Serialization Standard Serializers (KS3).",
     preview: <ThemedImage
