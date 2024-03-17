@@ -365,17 +365,17 @@ export const Tags: { [type in TagType]: Tag } = {
   },
   versioning: {
     label: "Versioning",
-    description: "Dokkatoo sites using the versioning feature of the docs plugin to manage multiple versions.",
+    description: "Dokkatoo sites using the Versioning plugin, to manage multiple versions.",
     color: "#2e8b57",
   },
   customPlugin: {
     label: "Custom Plugins",
-    description: "Dokkatoo sites using the versioning feature of the docs plugin to manage multiple versions.",
+    description: "This site uses a custom Dokka Plugin to modify the output.",
     color: "#191970",
   },
   large: {
     label: "Large",
-    description: "Very large Dokkatoo sites, including many more pages than the average!",
+    description: "Very large Dokkatoo sites, including many more classes or modules than the average!",
     color: "#8b0000",
   },
   javadocJar: {
@@ -386,22 +386,22 @@ export const Tags: { [type in TagType]: Tag } = {
 
   html: {
     label: "HTML",
-    description: "HTML output format",
+    description: "Generates a site in an HTML format.",
     color: "#ff8c00",
   },
   javadoc: {
     label: "Javadoc",
-    description: "HTML output format",
+    description: "Generates a site in a Javadoc format.",
     color: "#0000cd",
   },
   jekyll: {
     label: "Jekyll",
-    description: "HTML output format",
+    description: "Generates a site in a Jekyll format.",
     color: "#98fb98",
   },
   gfm: {
     label: "Markdown",
-    description: "GitHub Flavoured Markdown output format.",
+    description: "Generates a site in a GitHub Flavoured Markdown (GFM) format.",
     color: "#ba55d3",
   },
   /*
