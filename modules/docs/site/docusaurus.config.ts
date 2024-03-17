@@ -66,15 +66,15 @@ const config: Config = {
           href: "/dokkatoo/showcase",
         },
         {
+          label: "Releases",
+          position: "left",
+          href: "/dokkatoo/docs/releases",
+        },
+        {
           label: "API Reference",
           position: "left",
           className: "external-link",
           to: "pathname:///dokkatoo/kdoc/index.html",
-        },
-        {
-          label: "Releases",
-          position: "left",
-          href: "https://github.com/adamko-dev/dokkatoo/releases",
         },
         {
           href: "https://github.com/adamko-dev/dokkatoo",
