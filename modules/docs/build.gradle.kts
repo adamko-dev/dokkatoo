@@ -95,6 +95,10 @@ val npmUpdate by tasks.registering(NpmTask::class) {
   args("update")
 }
 
+tasks.withType<NpmTask>().configureEach {
+  environment.put("NODE_OPTIONS", "--trace-deprecation")
+}
+
 tasks.clean {
   delete(docusaurusSiteDir.dir(".docusaurus"))
   delete(docusaurusSiteDir.dir("node_modules"))
