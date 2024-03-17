@@ -1,6 +1,5 @@
 import React from "react";
 import clsx from "clsx";
-// import Link from '@docusaurus/Link';
 import styles from "./styles.module.css";
 import Heading from "@theme/Heading";
 import UndrawArtMuseum from "/static/img/feature-icons/undraw_art_museum.svg";
@@ -12,15 +11,14 @@ type FeatureItem = {
 };
 
 
-// TODO update features text to be better, less vague
 const FeatureList: FeatureItem[] = [
   {
     title: "Easy to Use",
     Svg: require("@site/static/img/feature-icons/undraw_setup_wizard.svg").default,
     description: (
         <>
-          Drop Dokkatoo into an existing Kotlin Gradle plugin, and immediately generate
-          documentation.
+          Quickly add Dokkatoo into existing Kotlin Gradle projects, and generate comprehensive
+          documentation effortlessly.
         </>
     ),
   },
@@ -29,34 +27,37 @@ const FeatureList: FeatureItem[] = [
     Svg: require("@site/static/img/feature-icons/undraw_my_universe.svg").default,
     description: (
         <>
-          Completely compatible with Gradle best practices, Dokkatoo works fast.
+          Engineered with Gradle best practices in mind, Dokkatoo operates seamlessly and
+          efficiently within your Gradle environment.
         </>
     ),
   },
   {
-    title: "Multiple output formats",
+    title: "Versatile Output",
     Svg: UndrawArtMuseum,
     description: (
         <>
-          Dokkatoo can generate HTML, Markdown, Javadoc, and Jeykll
+          Produce documentation in various formats including HTML, Markdown, Javadoc, and Jekyll.
         </>
     ),
   },
   {
-    title: "Hackable",
+    title: "Extensibility",
     Svg: require("@site/static/img/feature-icons/undraw_under_construction.svg").default,
     description: (
         <>
-          Dokkatoo is open for extension, you can drop in your own plugins.
+          Customize Dokkatoo to suit your requirements with its open architecture.
+          Add your own plugins to enhance functionality.
         </>
     ),
   },
   {
-    title: "Open source",
+    title: "Community-driven Development",
     Svg: require("@site/static/img/feature-icons/undraw_open_source.svg").default,
     description: (
         <>
-          Dokkatoo is open for extension, you can drop in your own plugins.
+          Dokkatoo is developed openly under the Apache-2.0 license, inviting collaboration and
+          ensuring transparency.
         </>
     ),
   },
