@@ -168,11 +168,6 @@ private fun initKotlinMultiplatformProject(
       |  }
       |}
       |
-      |dependencies {
-      |  // must manually add this dependency for aggregation to work
-      |  //dokkatooPluginHtml("org.jetbrains.dokka:all-modules-page-plugin:1.8.10")
-      |}
-      |
       |dokkatoo {
       |  dokkatooSourceSets.configureEach {
       |    externalDocumentationLinks {

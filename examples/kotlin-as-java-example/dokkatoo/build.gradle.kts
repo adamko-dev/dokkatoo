@@ -8,9 +8,5 @@ dependencies {
 
   // Will apply the plugin only to the `:dokkaHtml` task
   // (Dokkatoo will automatically add the version)
-  dokkatooPluginHtml("org.jetbrains.dokka:kotlin-as-java-plugin")
-
-  // Will apply the plugin only to the `:dokkaGfm` task
-  // (Dokkatoo will automatically add the version)
-  dokkatooPluginGfm("org.jetbrains.dokka:kotlin-as-java-plugin")
+  dokkatooPlugin("org.jetbrains.dokka:kotlin-as-java-plugin")
 }

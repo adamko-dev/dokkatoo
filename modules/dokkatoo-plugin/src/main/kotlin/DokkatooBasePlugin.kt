@@ -328,6 +328,9 @@ constructor(
     /** Name of the [Configuration] used to declare dependencies on other subprojects. */
     const val DOKKATOO_CONFIGURATION_NAME = "dokkatoo"
 
+    /** Name of the [Configuration] used to declare dependencies on Dokka Generator plugins. */
+    const val DOKKA_GENERATOR_PLUGINS_CONFIGURATION_NAME = "dokkatooPlugin"
+
     internal val jsonMapper = Json {
       prettyPrint = true
       @OptIn(ExperimentalSerializationApi::class)
