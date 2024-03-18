@@ -111,10 +111,6 @@ internal object LocalProjectOnlyFilter : Spec<ComponentIdentifier> {
 }
 
 
-/** Invert a boolean [Provider] */
-internal operator fun Provider<Boolean>.not(): Provider<Boolean> = map { !it }
-
-
 /** Invert the result of a [Spec] predicate */
 internal operator fun <T> Spec<T>.not(): Spec<T> = Spec<T> { !this@not.isSatisfiedBy(it) }
 

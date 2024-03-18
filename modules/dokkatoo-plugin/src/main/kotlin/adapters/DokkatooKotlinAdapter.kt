@@ -7,9 +7,9 @@ import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetIdSpec
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetIdSpec.Companion.dokkaSourceSetIdSpec
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec
 import dev.adamko.dokkatoo.dokka.parameters.KotlinPlatform
-import dev.adamko.dokkatoo.internal.DokkatooInternalApi
+import dev.adamko.dokkatoo.internal.*
+import dev.adamko.dokkatoo.internal.PluginId
 import dev.adamko.dokkatoo.internal.artifactType
-import dev.adamko.dokkatoo.internal.not
 import dev.adamko.dokkatoo.internal.warn
 import java.io.File
 import javax.inject.Inject
@@ -60,10 +60,10 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
 
     project.plugins.withType<DokkatooBasePlugin>().configureEach {
       project.pluginManager.apply {
-        withPlugin("org.jetbrains.kotlin.android") { exec(project) }
-        withPlugin("org.jetbrains.kotlin.js") { exec(project) }
-        withPlugin("org.jetbrains.kotlin.jvm") { exec(project) }
-        withPlugin("org.jetbrains.kotlin.multiplatform") { exec(project) }
+        withPlugin(PluginId.KotlinAndroid) { exec(project) }
+        withPlugin(PluginId.KotlinJs) { exec(project) }
+        withPlugin(PluginId.KotlinJvm) { exec(project) }
+        withPlugin(PluginId.KotlinMultiplatform) { exec(project) }
       }
     }
   }
