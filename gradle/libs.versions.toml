@@ -4,7 +4,7 @@ kotlin = "1.9.20" # should match Gradle's embedded Kotlin version https://docs.g
 kotlin-dokka = "1.9.20"
 kotlinx-serialization = "1.6.3"
 
-ktor = "2.3.8"
+ktor = "2.3.9"
 
 kotest = "5.8.0"
 
