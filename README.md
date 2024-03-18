@@ -5,11 +5,11 @@
 [![Slack](https://img.shields.io/badge/slack-%23dokka-white.svg?&style=for-the-badge&logo=slack)](https://slack-chats.kotlinlang.org/c/dokka)
 
 <picture>
-  <img alt="Dokkatoo Logo" src="./modules/docs/images/banner.svg" style="margin: 1em">
+  <img alt="Dokkatoo Logo" src="./modules/docs/site/static/img/banner.svg" style="margin: 1em">
 </picture>
 
 [Dokkatoo](https://github.com/adamko-dev/dokkatoo) is a Gradle plugin that generates documentation
-for your Kotlin projects.
+for your Kotlin or Java projects.
 
 Under the hood it uses [Dokka](https://github.com/Kotlin/dokka/),
 the API documentation engine for Kotlin.
@@ -23,11 +23,11 @@ then what is Dokkatoo for?
 
 Dokkatoo has a number of improvements over the existing Dokka Gradle Plugin:
 
-* Compatible with [Gradle Build Cache](https://docs.gradle.org/current/userguide/build_cache.html)
+* Compatible with [Gradle Build Cache](https://docs.gradle.org/current/userguide/build_cache.html).
 * Compatible with
-  [Gradle Configuration Cache](https://docs.gradle.org/current/userguide/configuration_cache.html)
-* Follows Gradle best practices for plugin development, for a more stable experience
-* Faster, parallel execution
+  [Gradle Configuration Cache](https://docs.gradle.org/current/userguide/configuration_cache.html).
+* Follows Gradle best practices for plugin development, for a more stable experience.
+* Faster, parallel execution.
 
 
 ### Status

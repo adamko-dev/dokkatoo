@@ -17,8 +17,8 @@ const FeatureList: FeatureItem[] = [
     Svg: require("@site/static/img/feature-icons/undraw_setup_wizard.svg").default,
     description: (
         <>
-          Quickly add Dokkatoo into existing Kotlin Gradle projects, and generate comprehensive
-          documentation effortlessly.
+          Quickly add Dokkatoo into existing Kotlin and Java Gradle projects,
+          and generate comprehensive documentation effortlessly.
         </>
     ),
   },
@@ -37,7 +37,7 @@ const FeatureList: FeatureItem[] = [
     Svg: UndrawArtMuseum,
     description: (
         <>
-          Produce documentation in various formats including HTML, Markdown, Javadoc, and Jekyll.
+          Produce documentation in various formats, including HTML, Markdown, and Javadoc.
         </>
     ),
   },

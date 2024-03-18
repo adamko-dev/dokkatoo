@@ -283,6 +283,14 @@ const Users: User[] = [
     tags: ["example", "kotlinJvm", "html", "jekyll", "gfm", "javadoc"],
   },
   {
+    title: "Java Example",
+    description: "This example demonstrates how Dokkatoo can generate documentation for a pure-Java project.",
+    preview: <ThreeDotsIcon/>,
+    website: null,
+    source: "https://github.com/adamko-dev/dokkatoo/tree/main/examples/java-example/dokkatoo",
+    tags: ["example", "java", "html", "jekyll", "gfm", "javadoc"],
+  },
+  {
     title: "Kotlin-as-Java Example",
     description: "This example demonstrates how you can apply a Dokka plugin in a simple Gradle project.",
     preview: <ThreeDotsIcon/>,
@@ -348,22 +356,22 @@ export const Tags: { [type in TagType]: Tag } = {
 
   android: {
     label: "Android",
-    description: "Sites for Android projects",
+    description: "Android applications and libraries.",
     color: "#00ff00",
   },
   java: {
     label: "Java",
-    description: "Sites for Java projects",
+    description: "These sites contain documentation generated from Java sources.",
     color: "#808000",
   },
   kotlinJvm: {
     label: "Kotlin JVM",
-    description: "Sites for Kotlin JVM projects",
+    description: "These sites contain documentation generated from Kotlin/JVM sources.",
     color: "#d2b48c",
   },
   kotlinMultiplatform: {
     label: "Kotlin Multiplatform",
-    description: "Sites for Kotlin Multiplatform projects",
+    description: "These sites contain documentation generated from Kotlin Multiplatform libraries.",
     color: "#ff0000",
   },
 
@@ -400,22 +408,22 @@ export const Tags: { [type in TagType]: Tag } = {
 
   html: {
     label: "HTML",
-    description: "Generates a site in an HTML format.",
+    description: "The generated documentation is rendered in HTML.",
     color: "#ff8c00",
   },
   javadoc: {
     label: "Javadoc",
-    description: "Generates a site in a Javadoc format.",
+    description: "The generated documentation is rendered in Javadoc.",
     color: "#0000cd",
   },
   jekyll: {
     label: "Jekyll",
-    description: "Generates a site in a Jekyll Flavoured Markdown format.",
+    description: "The generated documentation is rendered in Jekyll.",
     color: "#98fb98",
   },
   gfm: {
     label: "Markdown",
-    description: "Generates a site in a GitHub Flavoured Markdown (GFM) format.",
+    description: "The generated documentation is rendered in GitHub Flavoured Markdown (GFM).",
     color: "#ba55d3",
   },
   /*
