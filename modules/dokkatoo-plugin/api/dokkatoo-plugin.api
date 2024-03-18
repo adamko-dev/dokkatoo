@@ -1,6 +1,7 @@
 public abstract class dev/adamko/dokkatoo/DokkatooBasePlugin : org/gradle/api/Plugin {
 	public static final field Companion Ldev/adamko/dokkatoo/DokkatooBasePlugin$Companion;
 	public static final field DOKKATOO_CONFIGURATION_NAME Ljava/lang/String;
+	public static final field DOKKA_GENERATOR_PLUGINS_CONFIGURATION_NAME Ljava/lang/String;
 	public static final field EXTENSION_NAME Ljava/lang/String;
 	public static final field TASK_GROUP Ljava/lang/String;
 	public synthetic fun apply (Ljava/lang/Object;)V

@@ -6,10 +6,9 @@ In fact, all formats created by Dokka Generator are Dokka Engine Plugins.
 
 ## Adding Dokka Engine Plugins
 
-To add a Dokka Engine Plugin to Dokkatoo, add it as a dependency in the format you want to modify.
+To add a Dokka Engine Plugin to Dokkatoo, add it as a dependency to all formats, or in the format you want to modify.
 
-The
-dependency  [Gradle dependency format](https://docs.gradle.org/8.6/userguide/declaring_dependencies.html)
+Any [Gradle dependency format](https://docs.gradle.org/8.6/userguide/declaring_dependencies.html)
 is supported.
 
 ```kotlin title="build.gradle.kts"
@@ -18,26 +17,19 @@ plugins {
 }
 
 dependencies {
-  // use Maven coordinates,
-  dokkatooPluginHtml("com.glureau:html-mermaid-dokka-plugin:0.6.0")
+  // Add a plugin when generating all formats, using Maven coordinates,
+  dokkatooPlugin("com.glureau:html-mermaid-dokka-plugin:0.6.0")
 
-  // or a Version Catalog plugin
-  dokkatooPluginJekyll(libs.dokkaPlugins.somePlugin)
+  // Add a Version Catalog entry to a specific format
+  dokkatooPluginHtml(libs.dokkaPlugins.somePlugin)
 
-  // or a local file
+  // or a local JAR file
   dokkatooPluginJavadoc(files("dokka-plugins/my-custom-plugin.jar"))
 
-  // or a subproject
+  // or another subproject
   dokkatooPluginGfm(project(":local-dokka-plugin"))
 }
 ```
-
-:::tip
-
-For a shorter way of adding a Dokka Engine Plugin to _all_ Dokkatoo
-formats, [watch this issue](https://github.com/adamko-dev/dokkatoo/issues/186).
-
-:::
 
 ## Configuring Dokka Engine Plugins
 
@@ -79,7 +71,7 @@ plugins {
 }
 
 dependencies {
-  dokkatooPluginHtml("foo.example:custom-dokka-plugin:1.2.3")
+  dokkatooPlugin("foo.example:custom-dokka-plugin:1.2.3")
 }
 
 dokkatoo {
