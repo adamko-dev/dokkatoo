@@ -25,7 +25,7 @@
 
   --docusaurus-highlighted-code-line-bg: rgb(229, 224, 224);
 
-  --ifm-pre-line-height: 1.4em;
+  --ifm-pre-line-height: 1.5em;
   // make bold a little less bold (because I can't figure out how else to modify the headings)
   --ifm-font-weight-bold: 500;
 
@@ -72,6 +72,7 @@ code {
   line-height: var(--ifm-pre-line-height) !important;
   //font-size: 90% !important;
   padding: 0.5em !important;
+  font-family: var(--ifm-font-family-monospace) !important;
 }
 
 div.theme-code-block[class*="language-"] > div[class*="codeBlockTitle"] {
