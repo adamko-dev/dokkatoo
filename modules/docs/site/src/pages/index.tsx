@@ -13,10 +13,13 @@ function HomepageHeader() {
   return (
       <header className={clsx("hero hero--primary", styles.heroBanner)}>
         <div className="container">
-          <Heading as="h1" className="hero__title">
+          <Heading as="h1" className={clsx("hero__title", styles.hero__title)}>
             {siteConfig.title}
           </Heading>
-          <p className="hero__subtitle">{siteConfig.tagline}</p>
+          <p className="hero__subtitle">
+            {siteConfig.tagline}
+          </p>
+
           <div className={styles.buttons}>
             <Link className="button button--secondary button--lg" to="/docs">
               Dive into the documentation 🏊
@@ -25,13 +28,13 @@ function HomepageHeader() {
               See the showcase 🖼️
             </Link>
             <span>
-            <iframe
-                src="https://ghbtns.com/github-btn.html?user=adamko-dev&amp;repo=dokkatoo&amp;type=star&amp;count=true&amp;size=large"
-                width={160}
-                height={30}
-                title="GitHub Stars"
-            />
-          </span>
+              <iframe
+                  src="https://ghbtns.com/github-btn.html?user=adamko-dev&amp;repo=dokkatoo&amp;type=star&amp;count=true&amp;size=large"
+                  width={160}
+                  height={30}
+                  title="GitHub Stars"
+              />
+            </span>
           </div>
         </div>
       </header>
