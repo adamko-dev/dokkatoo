@@ -83,7 +83,7 @@ gradlePlugin {
   registerDokkaPlugin("DokkatooJekyllPlugin", "Jekyll")
 
   plugins.configureEach {
-    website.set("https://github.com/adamko-dev/dokkatoo/")
+    website.set("https://adamko-dev.github.io/dokkatoo/")
     vcsUrl.set("https://github.com/adamko-dev/dokkatoo.git")
     tags.addAll(
       "dokka",
@@ -91,6 +91,7 @@ gradlePlugin {
       "kotlin",
       "kdoc",
       "android",
+      "api reference",
       "documentation",
       "javadoc",
       "html",
