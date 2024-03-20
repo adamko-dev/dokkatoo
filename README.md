@@ -13,6 +13,10 @@
 plugin that generates easy-to-use reference documentation for your
 [Kotlin](https://kotlinlang.org/) (or Java!) projects.
 
+<span style="font-size:1.5rem;">
+<a href="https://adamko-dev.github.io/dokkatoo/">For the full documentation, click here.</a>
+</span>
+
 ## What can Dokkatoo do?
 
 * **Automatic documentation** - Automatically generates up-to-date docs from your code, for both
