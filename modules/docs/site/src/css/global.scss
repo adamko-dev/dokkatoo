@@ -23,6 +23,8 @@
   --site-color-checkbox-checked-bg: hsl(167deg 56% 73% / 25%);
   --site-color-feedback-background: #f0f8ff;
 
+  --ifm-link-color: #006dd7;
+
   --docusaurus-highlighted-code-line-bg: rgb(229, 224, 224);
 
   --ifm-pre-line-height: 1.5em;
@@ -43,6 +45,8 @@
   --ifm-color-primary-lighter: #6ce8ff;
   --ifm-color-primary-lightest: #9cf0ff;
   --ifm-background-color: #2b2b2b;
+
+  --ifm-link-color: var(--ifm-color-primary);
 
   --site-color-feedback-background: #2a2929;
   --site-color-favourite-background: #1d1e1e;
