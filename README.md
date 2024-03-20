@@ -13,9 +13,7 @@
 plugin that generates easy-to-use reference documentation for your
 [Kotlin](https://kotlinlang.org/) (or Java!) projects.
 
-<span style="font-size:1.5rem;">
-<a href="https://adamko-dev.github.io/dokkatoo/">For the full documentation, click here.</a>
-</span>
+## [For the full documentation, click here](https://adamko-dev.github.io/dokkatoo/)
 
 ## What can Dokkatoo do?
 
@@ -29,6 +27,8 @@ plugin that generates easy-to-use reference documentation for your
 
 Under the hood Dokkatoo uses [Dokka](https://github.com/Kotlin/dokka/),
 the API documentation engine for Kotlin.
+
+## Showcase
 
 For real-life examples of the documentation that Dokkatoo generates,
 **check out** [**the showcase**](https://adamko-dev.github.io/dokkatoo/showcase)!
