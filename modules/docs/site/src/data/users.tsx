@@ -362,23 +362,23 @@ export const Tags: { [type in TagType]: Tag } = {
   java: {
     label: "Java",
     description: "These sites contain documentation generated from Java sources.",
-    color: "#808000",
+    color: "#1f78b4",
   },
   kotlinJvm: {
     label: "Kotlin JVM",
     description: "These sites contain documentation generated from Kotlin/JVM sources.",
-    color: "#d2b48c",
+    color: "#ffbf64",
   },
   kotlinMultiplatform: {
     label: "Kotlin Multiplatform",
     description: "These sites contain documentation generated from Kotlin Multiplatform libraries.",
-    color: "#ff0000",
+    color: "#ee2222",
   },
 
   example: {
     label: "Examples",
     description: "Simple demonstration projects, for learning the basics.",
-    color: "#1e90ff",
+    color: "#ff7f00",
   },
   design: {
     label: "Design",
@@ -428,6 +428,19 @@ export const Tags: { [type in TagType]: Tag } = {
   },
   /*
   additional distinct colours:
+  #a6cee3
+
+#b2df8a
+#33a02c
+#fb9a99
+#e31a1c
+#fdbf6f
+
+
+#6a3d9a
+
+
+
     #1e90ff
     #fa8072
     #ffff54
