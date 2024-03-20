@@ -1,3 +1,11 @@
+---
+id: configuring
+title: Configuring Dokkatoo
+description: Overviews on how to configure Dokkatoo
+sidebar_position: 4
+slug: /configuring-dokkatoo/
+---
+
 # Configuring Dokkatoo
 
 Once the Dokkatoo plugin is applied to a project, it can be configuring using the `dokkatoo {}` DSL.
