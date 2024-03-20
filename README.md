@@ -35,21 +35,9 @@ For real-life examples of the documentation that Dokkatoo generates,
 
 ## Getting Started
 
-Check the
+View the
 [documentation](https://adamko-dev.github.io/dokkatoo/)
 for more detailed instructions about how to set up and use Dokkatoo.
-
-### Releases
-
-Dokkatoo is available from the
-[Gradle Plugin Portal](https://plugins.gradle.org/search?term=dokkatoo)
-and
-[Maven Central](https://search.maven.org/search?q=g:dev.adamko.dokkatoo).
-[Snapshot releases](https://adamko-dev.github.io/dokkatoo/docs/releases#snapshots)
-are also available.
-
-More details about the Dokkatoo releases is available in the documentation
-[Dokkatoo Documentation](https://adamko-dev.github.io/dokkatoo/docs/releases)
 
 ### Quick start
 
@@ -100,7 +88,19 @@ To quickly generate documentation for your project, follow these steps.
 For more detailed instructions about how to set up and use Dokkatoo, and control the output,
 [more guides are available in the docs](https://adamko-dev.github.io/dokkatoo/docs).
 
-#### Why not Dokka?
+## Releases
+
+Dokkatoo is available from the
+[Gradle Plugin Portal](https://plugins.gradle.org/search?term=dokkatoo)
+and
+[Maven Central](https://search.maven.org/search?q=g:dev.adamko.dokkatoo).
+[Snapshot releases](https://adamko-dev.github.io/dokkatoo/docs/releases#snapshots)
+are also available.
+
+More details about the Dokkatoo releases is available in the documentation
+[Dokkatoo Documentation](https://adamko-dev.github.io/dokkatoo/docs/releases)
+
+## Why not Dokka?
 
 If
 [Dokka already has a Gradle plugin](https://kotlinlang.org/docs/dokka-gradle.html),
@@ -114,7 +114,7 @@ Dokkatoo has a number of improvements over the existing Dokka Gradle Plugin:
 * Follows Gradle best practices for plugin development, for a more stable experience.
 * Faster, parallel execution.
 
-##### Migrating from Dokka Gradle Plugin
+### Migrating from Dokka Gradle Plugin
 
 Migrating from Dokka to Dokkatoo can be done in a few simple steps.
 Check the [Dokkatoo Documentation](https://adamko-dev.github.io/dokkatoo/)
