@@ -159,41 +159,41 @@ dokkaTemplateProjects {
   }
 
   register(
-    source = "integration-tests/gradle/projects/it-android-0",
+    source = "dokka-integration-tests/gradle/projects/it-android-0",
     destination = "projects/it-android-0/dokka",
   ) {
     additionalFiles.from(androidLocalPropertiesFile)
   }
   register(
-    source = "integration-tests/gradle/projects/it-basic",
+    source = "dokka-integration-tests/gradle/projects/it-basic",
     destination = "projects/it-basic/dokka",
   )
   register(
-    source = "integration-tests/gradle/projects/it-basic-groovy",
+    source = "dokka-integration-tests/gradle/projects/it-basic-groovy",
     destination = "projects/it-basic-groovy/dokka",
   )
   register(
-    source = "integration-tests/gradle/projects/it-collector-0",
+    source = "dokka-integration-tests/gradle/projects/it-collector-0",
     destination = "projects/it-collector-0/dokka",
   )
   register(
-    source = "integration-tests/gradle/projects/it-js-ir-0",
+    source = "dokka-integration-tests/gradle/projects/it-js-ir-0",
     destination = "projects/it-js-ir-0/dokka",
   )
   register(
-    source = "integration-tests/gradle/projects/it-multimodule-0",
+    source = "dokka-integration-tests/gradle/projects/it-multimodule-0",
     destination = "projects/it-multimodule-0/dokka",
   )
   register(
-    source = "integration-tests/gradle/projects/it-multimodule-1",
+    source = "dokka-integration-tests/gradle/projects/it-multimodule-1",
     destination = "projects/it-multimodule-1/dokka",
   )
   register(
-    source = "integration-tests/gradle/projects/it-multimodule-versioning-0",
+    source = "dokka-integration-tests/gradle/projects/it-multimodule-versioning-0",
     destination = "projects/it-multimodule-versioning-0/dokka",
   )
   register(
-    source = "integration-tests/gradle/projects/it-multiplatform-0",
+    source = "dokka-integration-tests/gradle/projects/it-multiplatform-0",
     destination = "projects/it-multiplatform-0/dokka",
   )
 
@@ -203,8 +203,8 @@ dokkaTemplateProjects {
 
   configureEach {
     additionalPaths.addAll(
-      "integration-tests/gradle/projects/template.root.gradle.kts",
-      "integration-tests/gradle/projects/template.settings.gradle.kts",
+      "dokka-integration-tests/gradle/projects/template.root.gradle.kts",
+      "dokka-integration-tests/gradle/projects/template.settings.gradle.kts",
     )
   }
 }
@@ -217,7 +217,7 @@ tasks.setupDokkaTemplateProjects.configure {
   doLast {
     outputs.files.asFileTree.files.forEach { file ->
       when (file.name) {
-        "build.gradle.kts"             -> {
+        "build.gradle.kts" -> {
           file.writeText(
             file.readText()
               .replace(
@@ -230,7 +230,7 @@ tasks.setupDokkaTemplateProjects.configure {
           )
         }
 
-        "settings.gradle.kts"          -> {
+        "settings.gradle.kts" -> {
           file.writeText(
             file.readText()
               .replace(
@@ -244,9 +244,26 @@ tasks.setupDokkaTemplateProjects.configure {
           file.writeText(
             file.readText()
               .replace(
-                """for-integration-tests-SNAPSHOT""",
+                """${'$'}{System.getenv("DOKKA_VERSION")}""",
                 kotlinDokkaVersion.get(),
               )
+              .replace(
+                """val dokka_it_dokka_version: String by settings""",
+                """val dokka_it_dokka_version: String = "${kotlinDokkaVersion.get()}"""",
+              )
+              .let { str ->
+                // replace mavenLocal {} and everything inside the brackets
+                val mavenLocalStart = "mavenLocal {"
+                val start = str.indexOf(mavenLocalStart)
+                var end = start + mavenLocalStart.length
+                var braces = 1
+                while (braces > 0) {
+                  val c = str.getOrNull(++end) ?: break
+                  if (c == '{') braces++
+                  if (c == '}') braces--
+                }
+                str.removeRange(start..end)
+              }
           )
         }
       }

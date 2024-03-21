@@ -2,6 +2,7 @@ package dev.adamko.dokkatoo.dependencies
 
 import dev.adamko.dokkatoo.DokkatooBasePlugin
 import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.DOKKATOO_CONFIGURATION_NAME
+import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.DOKKA_GENERATOR_PLUGINS_CONFIGURATION_NAME
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import dev.adamko.dokkatoo.internal.HasFormatName
 import org.gradle.api.artifacts.Configuration
@@ -26,7 +27,7 @@ class DependencyContainerNames(override val formatName: String) : HasFormatName(
    *
    * Will be used in user's build scripts to declare additional format-specific Dokka Plugins.
    */
-  val pluginsClasspath = "dokkatooPlugin".appendFormat()
+  val pluginsClasspath = DOKKA_GENERATOR_PLUGINS_CONFIGURATION_NAME.appendFormat()
 //  val modulesPluginsClasspath = "dokkatooModulePlugin".appendFormat()
 //  val publicationPluginsClasspath = "dokkatooPublicationPlugin".appendFormat()
 //

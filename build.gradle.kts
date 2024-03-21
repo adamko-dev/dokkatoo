@@ -1,5 +1,6 @@
 import buildsrc.utils.excludeGeneratedGradleDsl
 import buildsrc.utils.initIdeProjectLogo
+import org.gradle.language.base.plugins.LifecycleBasePlugin.VERIFICATION_GROUP
 
 plugins {
   buildsrc.conventions.base
@@ -7,7 +8,7 @@ plugins {
 }
 
 group = "dev.adamko.dokkatoo"
-version = "2.2.0-SNAPSHOT"
+version = "2.3.0-SNAPSHOT"
 
 
 idea {
@@ -23,6 +24,8 @@ idea {
         "build",
         "gradle/wrapper",
         "ANDROID_SDK",
+        "examples/versioning-multimodule-example/dokkatoo/previousDocVersions",
+        "examples/versioning-multimodule-example/dokka/previousDocVersions",
       )
       addAll(
         projectDir.walk().filter { file ->
@@ -44,4 +47,26 @@ val dokkatooVersion by tasks.registering {
   doLast {
     logger.quiet("${version.orNull}")
   }
+}
+
+
+val verifyVersionCatalogKotlinVersion by tasks.registering {
+  description = "Verify the Version Catalog Kotlin version matches Gradle's embedded Kotlin version"
+  //  https://docs.gradle.org/current/userguide/compatibility.html#kotlin
+  group = VERIFICATION_GROUP
+
+  val kotlinVersion = libs.versions.kotlin.asProvider()
+  inputs.property("kotlinVersion", kotlinVersion)
+  val embeddedKotlinVersion = embeddedKotlinVersion
+  inputs.property("embeddedKotlinVersion", embeddedKotlinVersion)
+
+  doLast {
+    require(kotlinVersion.get() == embeddedKotlinVersion) {
+      "Version Catalog Kotlin version (${kotlinVersion.get()}) did not match embeddedKotlinVersion ($embeddedKotlinVersion)"
+    }
+  }
+}
+
+tasks.check {
+  dependsOn(verifyVersionCatalogKotlinVersion)
 }

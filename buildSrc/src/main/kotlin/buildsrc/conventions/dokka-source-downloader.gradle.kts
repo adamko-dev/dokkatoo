@@ -5,6 +5,7 @@ import buildsrc.utils.consumable
 import buildsrc.utils.declarable
 import buildsrc.utils.dropDirectories
 import buildsrc.utils.resolvable
+import org.gradle.api.attributes.Category.CATEGORY_ATTRIBUTE
 import org.gradle.api.attributes.Usage.USAGE_ATTRIBUTE
 import org.gradle.kotlin.dsl.support.serviceOf
 
@@ -17,10 +18,8 @@ val dsdExt: DokkaSourceDownloaderSettings = extensions.create<DokkaSourceDownloa
 )
 
 val kotlinDokkaSource: Configuration by configurations.creating {
+  description = "Source code for https://github.com/Kotlin/dokka/"
   declarable()
-  attributes {
-    attribute(USAGE_ATTRIBUTE, objects.named("externals-dokka-src"))
-  }
 }
 
 val kotlinDokkaSourceResolvable: Configuration by configurations.creating {
@@ -28,6 +27,7 @@ val kotlinDokkaSourceResolvable: Configuration by configurations.creating {
   extendsFrom(kotlinDokkaSource)
   attributes {
     attribute(USAGE_ATTRIBUTE, objects.named("externals-dokka-src"))
+    attribute(CATEGORY_ATTRIBUTE, objects.named("externals-dokka-src"))
   }
 }
 
@@ -36,6 +36,7 @@ val kotlinDokkaSourceConsumable: Configuration by configurations.creating {
   extendsFrom(kotlinDokkaSource)
   attributes {
     attribute(USAGE_ATTRIBUTE, objects.named("externals-dokka-src"))
+    attribute(CATEGORY_ATTRIBUTE, objects.named("externals-dokka-src"))
   }
 }
 

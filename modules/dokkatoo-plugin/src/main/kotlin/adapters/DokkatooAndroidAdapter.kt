@@ -8,6 +8,7 @@ import dev.adamko.dokkatoo.DokkatooBasePlugin
 import dev.adamko.dokkatoo.DokkatooExtension
 import dev.adamko.dokkatoo.dokka.parameters.KotlinPlatform
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
+import dev.adamko.dokkatoo.internal.PluginId
 import dev.adamko.dokkatoo.internal.artifactType
 import java.io.File
 import javax.inject.Inject
@@ -32,9 +33,9 @@ abstract class DokkatooAndroidAdapter @Inject constructor(
 
     project.plugins.withType<DokkatooBasePlugin>().configureEach {
       project.pluginManager.apply {
-        withPlugin("com.android.base") { configure(project) }
-        withPlugin("com.android.application") { configure(project) }
-        withPlugin("com.android.library") { configure(project) }
+        withPlugin(PluginId.AndroidBase) { configure(project) }
+        withPlugin(PluginId.AndroidApplication) { configure(project) }
+        withPlugin(PluginId.AndroidLibrary) { configure(project) }
       }
     }
   }

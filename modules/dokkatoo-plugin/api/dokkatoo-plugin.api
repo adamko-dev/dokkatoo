@@ -1,6 +1,7 @@
 public abstract class dev/adamko/dokkatoo/DokkatooBasePlugin : org/gradle/api/Plugin {
 	public static final field Companion Ldev/adamko/dokkatoo/DokkatooBasePlugin$Companion;
 	public static final field DOKKATOO_CONFIGURATION_NAME Ljava/lang/String;
+	public static final field DOKKA_GENERATOR_PLUGINS_CONFIGURATION_NAME Ljava/lang/String;
 	public static final field EXTENSION_NAME Ljava/lang/String;
 	public static final field TASK_GROUP Ljava/lang/String;
 	public synthetic fun apply (Ljava/lang/Object;)V
@@ -329,6 +330,7 @@ public abstract class dev/adamko/dokkatoo/dokka/plugins/DokkaHtmlPluginParameter
 	public abstract fun getCustomAssets ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public abstract fun getCustomStyleSheets ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public abstract fun getFooterMessage ()Lorg/gradle/api/provider/Property;
+	public abstract fun getHomepageLink ()Lorg/gradle/api/provider/Property;
 	public abstract fun getMergeImplicitExpectActualDeclarations ()Lorg/gradle/api/provider/Property;
 	public abstract fun getSeparateInheritedMembers ()Lorg/gradle/api/provider/Property;
 	public abstract fun getTemplatesDir ()Lorg/gradle/api/file/DirectoryProperty;

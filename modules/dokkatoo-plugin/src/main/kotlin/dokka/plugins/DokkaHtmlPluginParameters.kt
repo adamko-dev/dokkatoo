@@ -97,6 +97,16 @@ constructor(
   abstract val footerMessage: Property<String>
 
   /**
+   * Creates a link to the project's homepage URL in the HTML header.
+   *
+   * The homepage icon is also overrideable: pass in custom image named `homepage.svg` to
+   * [customAssets] (square icons work best).
+   */
+  @get:Input
+  @get:Optional
+  abstract val homepageLink: Property<String>
+
+  /**
    * Path to the directory containing custom HTML templates.
    *
    * For more information, see [Templates](https://kotlinlang.org/docs/dokka-html.html#templates).
@@ -117,6 +127,7 @@ constructor(
       val customAssetsRelativePaths: List<String>,
       val customStyleSheetsRelativePaths: List<String>,
       val templatesDirRelativePath: String?,
+      val homepageLink: String?,
       val mergeImplicitExpectActualDeclarations: Boolean?,
       val separateInheritedMembers: Boolean?,
       val footerMessage: String?,
@@ -158,6 +169,7 @@ constructor(
         footerMessage = value.footerMessage.orNull,
         separateInheritedMembers = value.separateInheritedMembers.orNull,
         mergeImplicitExpectActualDeclarations = value.mergeImplicitExpectActualDeclarations.orNull,
+        homepageLink = value.homepageLink.orNull,
       )
     }
   }
@@ -191,6 +203,7 @@ constructor(
 //          ?.relativeTo(componentsDir)
 //          ?.invariantSeparatorsPath
 //      )
+//      putIfNotNull("homepageLink", homepageLink.orNull)
 //    }.toString()
 
   companion object {

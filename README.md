@@ -5,17 +5,102 @@
 [![Slack](https://img.shields.io/badge/slack-%23dokka-white.svg?&style=for-the-badge&logo=slack)](https://slack-chats.kotlinlang.org/c/dokka)
 
 <picture>
-  <img alt="Dokkatoo Logo" src="./modules/docs/images/banner.svg" style="margin: 1em">
+  <img alt="Dokkatoo Logo" src="./modules/docs/site/static/img/banner.svg" style="margin: 1em">
 </picture>
 
-[Dokkatoo](https://github.com/adamko-dev/dokkatoo) is a Gradle plugin that generates documentation
-for your Kotlin projects.
+[Dokkatoo](https://github.com/adamko-dev/dokkatoo) is a
+[Gradle](https://gradle.org/)
+plugin that generates easy-to-use reference documentation for your
+[Kotlin](https://kotlinlang.org/) (or Java!) projects.
 
-Under the hood it uses [Dokka](https://github.com/Kotlin/dokka/),
+## [For the full documentation, click here](https://adamko-dev.github.io/dokkatoo/)
+
+## What can Dokkatoo do?
+
+* **Automatic documentation** - Automatically generates up-to-date docs from your code, for both
+  Kotlin and Java projects.
+* **Format Flexibility** - Supports generating HTML, Javadoc, and Markdown output formats.
+* **Customization King** - Make your documentation truly yours. With Dokkatoo, you can customize the
+  output, including custom stylesheets and assets.
+* **Gradle's Best Friend** - Compatible with _all_ of Gradle's most powerful features!
+  Incremental compilation, multimodule builds, composite builds, Build Cache, Configuration Cache.
+
+Under the hood Dokkatoo uses [Dokka](https://github.com/Kotlin/dokka/),
 the API documentation engine for Kotlin.
 
+## Showcase
 
-###### Why Dokkatoo?
+For real-life examples of the documentation that Dokkatoo generates,
+**check out** [**the showcase**](https://adamko-dev.github.io/dokkatoo/showcase)!
+
+## Getting Started
+
+View the
+[documentation](https://adamko-dev.github.io/dokkatoo/)
+for more detailed instructions about how to set up and use Dokkatoo.
+
+### Quick start
+
+To quickly generate documentation for your project, follow these steps.
+
+> [!TIP]
+> Dokkatoo supports multiple formats, but HTML is the quickest and easiest to get started with.
+
+1. Check the [Gradle Plugin Portal](https://plugins.gradle.org/plugin/dev.adamko.dokkatoo-html)
+   to find the latest version of Dokkatoo.
+2. Add the Dokkatoo plugin to your subproject:
+
+   ```kotlin
+   // build.gradle.kts
+
+   plugins {
+     kotlin("jvm")
+     id("dev.adamko.dokkatoo-html")
+   }
+   ```
+
+3. **(Optional)** If you'd like to combine multiple subprojects, add the Dokkatoo plugin to each
+   subproject, and
+   aggregate them in a single project by declaring dependencies to the subprojects.
+
+   ```kotlin
+   // build.gradle.kts
+   plugins {
+      id("dev.adamko.dokkatoo-html")
+   }
+   
+   dependencies {
+     // Aggregate both subproject-hello and subproject-world into the current subproject.
+     // These subprojects must also have Dokkatoo applied.
+     dokkatoo(project(":subproject-hello"))
+     dokkatoo(project(":subproject-world"))
+   }
+   ```
+
+4. Run the generation task:
+
+   ```shell
+   ./gradlew :dokkatooGenerate
+   ```
+
+5. View the results in `./build/dokka/`
+
+For more detailed instructions about how to set up and use Dokkatoo, and control the output,
+[more guides are available in the docs](https://adamko-dev.github.io/dokkatoo/docs).
+
+## Releases
+
+Dokkatoo is available from the
+[Gradle Plugin Portal](https://plugins.gradle.org/search?term=dokkatoo)
+and
+[Maven Central](https://search.maven.org/search?q=g:dev.adamko.dokkatoo).
+[Snapshot releases](https://adamko-dev.github.io/dokkatoo/docs/releases#snapshots)
+are also available.
+
+More details about the Dokkatoo releases is available in the documentation
+[Dokkatoo Documentation](https://adamko-dev.github.io/dokkatoo/docs/releases)
+
+## Why not Dokka?
 
 If
 [Dokka already has a Gradle plugin](https://kotlinlang.org/docs/dokka-gradle.html),
@@ -23,219 +108,17 @@ then what is Dokkatoo for?
 
 Dokkatoo has a number of improvements over the existing Dokka Gradle Plugin:
 
-* Compatible with [Gradle Build Cache](https://docs.gradle.org/current/userguide/build_cache.html)
+* Compatible with [Gradle Build Cache](https://docs.gradle.org/current/userguide/build_cache.html).
 * Compatible with
-  [Gradle Configuration Cache](https://docs.gradle.org/current/userguide/configuration_cache.html)
-* Safe cross-project sharing and aggregation
-* Parallel execution
-
-
-### Status
-
-Dokkatoo is used in production by many projects, and can generate documentation for single-module 
-and multimodule projects.
-
-[Dokkatoo has been merged into the Dokka codebase](https://github.com/Kotlin/dokka/pull/3188),
-although as of December 2023 it has not been released. 
-Until JetBrains releases a version of Dokkatoo, continue to use this version and
-[watch this space](https://github.com/Kotlin/dokka/issues/3131).
-
-
-## Usage
-
-Dokkatoo is published on the 
-[Gradle Plugin Portal](https://plugins.gradle.org/search?term=dokkatoo)
-and
-[Maven Central](https://search.maven.org/search?q=g:dev.adamko.dokkatoo).
-[Snapshot releases](#snapshot-releases) are also available.
-
-
-### Quick start
-
-1. Apply the appropriate plugin for any formats you'd like to generate.
-
-   For example, HTML and Javadoc
-   ```kotlin
-   // build.gradle.kts
-   
-   plugins {
-     // only generate HTML and Javadoc
-     id("dev.adamko.dokkatoo-html") version "$dokkatooVersion"
-     id("dev.adamko.dokkatoo-javadoc") version "$dokkatooVersion"
-     //id("dev.adamko.dokkatoo-gfm") version "$dokkatooVersion"
-     //id("dev.adamko.dokkatoo-jekyll") version "$dokkatooVersion"
-   }
-   ```
-   Or all formats
-
-   ```kotlin
-   // build.gradle.kts
-  
-   plugins {
-     // generate all formats - HTML, Jekyll, Javadoc, and GFM (GitHub Flavoured Markdown)
-     id("dev.adamko.dokkatoo") version "$dokkatooVersion"
-   }
-   ```
-   [Read more about the available formats in the Dokka docs](https://github.com/Kotlin/dokka#output-formats).
-2. Run the generation task
-
-   ```shell
-   ./gradlew dokkatooGenerate
-   ```
-
-3. View the results in `./build/dokka/`
-
-
-#### Configuring Dokkatoo
-
-Once the Dokkatoo plugin is applied to a project, it can be configuring using the `dokkatoo {}` DSL.
-
-Here is an example - it is not exhaustive and does not cover all functionality.
-
-```kotlin
-// build.gradle.kts
-import dev.adamko.dokkatoo.dokka.plugins.DokkaHtmlPluginParameters
-
-plugins {
-  id("dev.adamko.dokkatoo-html") version "$dokkatooVersion"
-}
-
-dokkatoo {
-  moduleName.set("Basic Project")
-
-  dokkatooSourceSets.configureEach {
-    documentedVisibilities(
-      VisibilityModifier.PUBLIC,
-      VisibilityModifier.PROTECTED,
-    )
-    suppressedFiles.from(file("src/main/kotlin/it/suppressedByPath"))
-    perPackageOption {
-      matchingRegex.set("it.suppressedByPackage.*")
-      suppress.set(true)
-    }
-    perPackageOption {
-      matchingRegex.set("it.overriddenVisibility.*")
-      documentedVisibilities(
-        DokkaConfiguration.Visibility.PRIVATE
-      )
-    }
-  }
-
-  pluginsConfiguration.html {
-    customStyleSheets.from(
-      "./customResources/logo-styles.css",
-      "./customResources/custom-style-to-add.css",
-    )
-    customAssets.from(
-      "./customResources/custom-resource.svg",
-    )
-    footerMessage.set("(C) The Owner")
-  }
-
-  dokkatooPublications.configureEach {
-    suppressObviousFunctions.set(true)
-    suppressObviousFunctions.set(false)
-  }
-
-  // The default versions that Dokkatoo uses can be overridden:
-  versions {
-    jetbrainsDokka.set("1.9.10")
-  }
-}
-```
-
-
-#### Combining subprojects
-
-Dokkatoo can aggregate documentation from subprojects.
-
-To do this, apply the Dokkatoo plugin in all subprojects that should be documented.
-
-In the aggregating project, depend on the other subprojects.
-
-```kts
-// build.gradle.kts
-
-plugins {
-  id("dev.adamko.dokkatoo-html") version "$dokkatooVersion"
-}
-
-dependencies {
-  // aggregate both subproject-hello and subproject-world
-  // the subprojects must also have Dokkatoo applied
-  dokkatoo(project(":subproject-hello"))
-  dokkatoo(project(":subproject-world"))
-
-  // If using Dokkatoo v2.1.0+ a dependency on all-modules-page-plugin is no longer required,
-  // see https://github.com/adamko-dev/dokkatoo/issues/14
-  //dokkatooPluginHtml("org.jetbrains.dokka:all-modules-page-plugin") 
-
-  // Earlier versions of Dokkatoo must manually add a dependency:
-  dokkatooPluginHtml(
-     dokkatoo.versions.jetbrainsDokka.map { dokkaVersion ->
-        "org.jetbrains.dokka:all-modules-page-plugin:$dokkaVersion"
-     }
-  )
-}
-```
-
-Run the Dokkatoo generation task.
-
-```shell
-./gradlew :dokkatooGeneratePublicationHtml
-```
-
-Dokkatoo will then generate documentation into `./build/dokka/`
-
-To improve performance only run the task in the aggregating project by prefixing the task name with
-the subproject path (or `:` if aggregating in the root project).
-
+  [Gradle Configuration Cache](https://docs.gradle.org/current/userguide/configuration_cache.html).
+* Follows Gradle best practices for plugin development, for a more stable experience.
+* Faster, parallel execution.
 
 ### Migrating from Dokka Gradle Plugin
 
-Dokkatoo is not a drop-in replacement for the Dokka Gradle Plugin, and requires migration.
+Migrating from Dokka to Dokkatoo can be done in a few simple steps.
+Check the [Dokkatoo Documentation](https://adamko-dev.github.io/dokkatoo/)
+to get started.
 
-When Dokkatoo matures, a guide will be made available. For now, check the
-[example projects](./examples#readme) for comparative examples.
-
-
-###### Apply both Dokka Gradle Plugin and Dokkatoo
-
-For help in migrating from the Dokka Gradle Plugin to Dokkatoo, you can still apply both plugins -
-just make sure to update the Dokkatoo output directory!
-
-```kotlin
-// build.gradle.kts
-
-plugins {
-  id("org.jetbrains.dokka") version "$dokkaVersion"
-  id("dev.adamko.dokkatoo-html") version "$dokkatooVersion"
-}
-
-dokkatoo {
-  // update the output directory, so it doesn't clash with the Dokka plugin! 
-  dokkatooPublicationDirectory.set(layout.buildDirectory.dir("dokkatoo"))
-}
-```
-
-### Snapshot releases
-
-Snapshot versions of Dokkatoo are available on 
-[Maven Central](https://s01.oss.sonatype.org/content/repositories/snapshots/dev/adamko/dokkatoo/dokkatoo-plugin/).
-
-```kts
-// settings.gradle.kts
-
-pluginManagement {
-  repositories {
-    gradlePluginPortal()
-    mavenCentral()
-
-    // add Maven Central snapshot repository
-    maven("https://s01.oss.sonatype.org/content/repositories/snapshots/") {
-      name = "MavenCentralSnapshots"
-      mavenContent { snapshotsOnly() }
-    }
-  }
-}
-```
+If you'd like to see comparative examples of the same projects with both Dokka and Dokkatoo config,
+check the [example projects](./examples/README.md).

@@ -77,6 +77,7 @@ class FormatDependenciesManager(
     project.configurations.create(configurationNames.plugins) {
       description = "Dokka Plugins classpath for $formatName."
       declarable()
+      extendsFrom(baseDependencyManager.dokkaGeneratorPlugins)
     }
 
   private val dokkaModulePlugins:  Configuration  =

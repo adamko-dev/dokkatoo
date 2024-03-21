@@ -5,7 +5,6 @@ import dev.adamko.dokkatoo.DokkatooExtension
 import dev.adamko.dokkatoo.adapters.DokkatooAndroidAdapter
 import dev.adamko.dokkatoo.adapters.DokkatooJavaAdapter
 import dev.adamko.dokkatoo.adapters.DokkatooKotlinAdapter
-import dev.adamko.dokkatoo.dependencies.BaseDependencyManager
 import dev.adamko.dokkatoo.dependencies.DependencyContainerNames
 import dev.adamko.dokkatoo.dependencies.DokkatooAttribute.Companion.DokkatooClasspathAttribute
 import dev.adamko.dokkatoo.dependencies.DokkatooAttribute.Companion.DokkatooFormatAttribute
@@ -70,11 +69,9 @@ abstract class DokkatooFormatPlugin(
 
       val publication = dokkatooExtension.dokkatooPublications.create(formatName)
 
-      val baseDependencyManager = target.extensions.getByType<BaseDependencyManager>()
-
       val formatDependencies = FormatDependenciesManager(
         project = target,
-        baseDependencyManager = baseDependencyManager,
+        baseDependencyManager = dokkatooExtension.baseDependencyManager,
         formatName = formatName,
         objects = objects,
       )

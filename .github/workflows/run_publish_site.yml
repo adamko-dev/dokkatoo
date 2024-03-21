@@ -23,7 +23,7 @@ concurrency:
 
 jobs:
 
-  build:
+  build-site:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repo
@@ -32,7 +32,7 @@ jobs:
           ref: ${{ inputs.checkout-ref || github.ref }}
 
       - name: Validate Gradle Wrapper
-        uses: gradle/wrapper-validation-action@v1
+        uses: gradle/wrapper-validation-action@v2
 
       - name: Setup JDK
         uses: actions/setup-java@v4
@@ -40,18 +40,23 @@ jobs:
           distribution: temurin
           java-version: 11
 
-      - uses: gradle/gradle-build-action@v2
+      - name: Build site
+        uses: gradle/gradle-build-action@v3
         with:
           gradle-home-cache-cleanup: true
+          # write build cache on 'main' and 'release' branches, or tags (default is 'main' only)
+          cache-read-only: ${{ github.ref != 'refs/heads/main' && !startsWith(github.ref, 'refs/heads/release') && !startsWith(github.ref, 'refs/tags/') }}
           arguments: |
-            :modules:docs:dokkatooGenerate
+            :modules:docs:docusaurusBuild
 
-      - uses: actions/upload-pages-artifact@v3
+      - name: Upload Dokka to Pages
+        uses: actions/upload-pages-artifact@v3
         with:
-          path: ./modules/docs/build/dokka/html
+          path: ./modules/docs/site/build/
 
   deploy:
-    needs: build
+    needs:
+      - build-site
     runs-on: ubuntu-latest
     permissions:
       pages: write      # to deploy to Pages

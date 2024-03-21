@@ -2,11 +2,11 @@ import dev.adamko.dokkatoo.dokka.parameters.VisibilityModifier
 import dev.adamko.dokkatoo.dokka.plugins.DokkaHtmlPluginParameters
 
 plugins {
-  kotlin("jvm") version "1.9.10"
-  id("dev.adamko.dokkatoo") version "2.2.0-SNAPSHOT"
+  kotlin("jvm") version "1.9.22"
+  id("dev.adamko.dokkatoo") version "2.3.0-SNAPSHOT"
 }
 
-version = "1.9.10-SNAPSHOT"
+version = "1.9.20-SNAPSHOT"
 
 dependencies {
   testImplementation(kotlin("test-junit"))
@@ -37,7 +37,7 @@ dokkatoo {
     sourceLink {
       localDirectory.set(file("src/main"))
       remoteUrl(
-        "https://github.com/Kotlin/dokka/tree/master/integration-tests/gradle/projects/it-basic/src/main"
+        "https://github.com/Kotlin/dokka/tree/master/dokka-integration-tests/gradle/projects/it-basic/src/main"
       )
     }
   }

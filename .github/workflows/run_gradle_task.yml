@@ -61,7 +61,7 @@ jobs:
           ref: ${{ inputs.checkout-ref || github.ref }}
 
       - name: Validate Gradle Wrapper
-        uses: gradle/wrapper-validation-action@v1
+        uses: gradle/wrapper-validation-action@v2
 
       - name: Setup JDK 11
         uses: actions/setup-java@v4
@@ -78,10 +78,12 @@ jobs:
       - name: Setup Android SDK # required for integration tests
         uses: android-actions/setup-android@v3
 
-      - uses: gradle/gradle-build-action@v2
+      - uses: gradle/gradle-build-action@v3
         with:
           gradle-home-cache-cleanup: true
           arguments: ${{ inputs.gradle-task }}
+          # write build cache on 'main' and 'release' branches, or tags (default is 'main' only)
+          cache-read-only: ${{ github.ref != 'refs/heads/main' && !startsWith(github.ref, 'refs/heads/release') && !startsWith(github.ref, 'refs/tags/') }}
         env:
           MAVEN_SONATYPE_USERNAME: ${{ vars.MAVEN_SONATYPE_USERNAME }}
           MAVEN_SONATYPE_PASSWORD: ${{ secrets.MAVEN_SONATYPE_PASSWORD }}
@@ -97,7 +99,7 @@ jobs:
 
       - name: Upload build reports
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build-report-${{ runner.os }}${{ github.action }}
           path: |

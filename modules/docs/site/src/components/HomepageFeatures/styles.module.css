@@ -1,0 +1,29 @@
+.features {
+  display: flex;
+  align-items: center;
+  padding: 2rem 0;
+  width: 100%;
+}
+
+.col {
+  background-color: var(--ifm-footer-background-color);
+}
+
+svg.featureSvg {
+  height: 10em;
+  width: 20em;
+}
+
+svg.featureSvg [fill="#6c63ff"] {
+  fill: var(--ifm-color-primary-darkest);
+}
+
+svg.featureSvg [fill="#3f3d56"] {
+  /*fill: var(--ifm-color-primary-contrast-background);*/
+  fill: var(--ifm-color-primary-lightest);
+  filter: drop-shadow(5px 5px 5px var(--ifm-color-primary-contrast-foreground));
+}
+
+svg.featureSvg [fill="#fff"] {
+  fill: var(--ifm-color-primary-contrast-background);
+}

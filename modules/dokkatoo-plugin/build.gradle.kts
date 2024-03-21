@@ -84,7 +84,7 @@ gradlePlugin {
   registerDokkaPlugin("DokkatooJekyllPlugin", "Jekyll")
 
   plugins.configureEach {
-    website.set("https://github.com/adamko-dev/dokkatoo/")
+    website.set("https://adamko-dev.github.io/dokkatoo/")
     vcsUrl.set("https://github.com/adamko-dev/dokkatoo.git")
     tags.addAll(
       "dokka",
@@ -92,6 +92,7 @@ gradlePlugin {
       "kotlin",
       "kdoc",
       "android",
+      "api reference",
       "documentation",
       "javadoc",
       "html",
@@ -216,15 +217,26 @@ kotlin.sourceSets.main {
 }
 
 dokkatoo {
+  moduleName = "Dokkatoo Gradle Plugin"
+
   dokkatooSourceSets.configureEach {
+    includes.from("Module.md")
+
     externalDocumentationLinks.register("gradle") {
       // https://docs.gradle.org/current/javadoc/index.html
       url("https://docs.gradle.org/${gradle.gradleVersion}/javadoc/")
     }
+
     sourceLink {
       localDirectory.set(file("src/main/kotlin"))
       val relativeProjectPath = projectDir.relativeToOrNull(rootDir)?.invariantSeparatorsPath ?: ""
       remoteUrl("https://github.com/adamko-dev/dokkatoo/tree/main/$relativeProjectPath/src/main/kotlin")
+    }
+  }
+
+  pluginsConfiguration {
+    html {
+      homepageLink = "https://github.com/adamko-dev/dokkatoo/"
     }
   }
 }

@@ -128,6 +128,7 @@ class AndroidProjectIntegrationTest : FunSpec({
           │   ├── copy-successful-icon.svg
           │   ├── footer-go-to-link.svg
           │   ├── go-to-top-icon.svg
+          │   ├── homepage.svg
           │   ├── logo-icon.svg
           │   └── theme-toggle.svg
           ├── it-android-0/
