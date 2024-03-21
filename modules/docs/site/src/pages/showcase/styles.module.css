@@ -73,7 +73,7 @@
   height: 30px;
 }
 
-.svgIconFavourite {
+svg.svgIconFavourite {
   color: var(--site-color-svg-icon-favourite);
 }
 
