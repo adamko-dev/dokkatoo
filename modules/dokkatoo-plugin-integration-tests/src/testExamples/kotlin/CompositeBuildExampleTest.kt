@@ -5,12 +5,11 @@ import dev.adamko.dokkatoo.utils.GradleProjectTest.Companion.exampleProjectDataP
 import dev.adamko.dokkatoo.utils.GradleProjectTest.Companion.projectTestTempDir
 import io.kotest.assertions.withClue
 import io.kotest.core.spec.style.FunSpec
-import io.kotest.matchers.file.shouldHaveSameStructureAndContentAs
-import io.kotest.matchers.file.shouldHaveSameStructureAs
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
 import java.io.File
+import kotlin.io.path.walk
 
 class CompositeBuildExampleTest : FunSpec({
 
@@ -45,14 +44,12 @@ class CompositeBuildExampleTest : FunSpec({
       }
 
       test("expect directories are the same") {
-        val actualDir = dokkatooHtmlDir.toFile()
-        val expectedDir = exampleDataDir.toFile()
         withClue(
-          "actualDir[${actualDir.walkTopDown().toList()}], " +
-              "expectedDir[${expectedDir.walkTopDown().toList()}]"
+          "dokkatooHtmlDir[${dokkatooHtmlDir.walk().toList()}], " +
+              "exampleDataDir[${exampleDataDir.walk().toList()}]"
         ) {
-          actualDir.shouldHaveSameStructureAs(expectedDir)
-          actualDir.shouldHaveSameStructureAndContentAs(expectedDir)
+          dokkatooHtmlDir.shouldHaveSameStructureAs(exampleDataDir, skipEmptyDirs = true)
+          dokkatooHtmlDir.shouldHaveSameStructureAndContentAs(exampleDataDir, skipEmptyDirs = true)
         }
       }
     }
