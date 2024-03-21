@@ -43,6 +43,9 @@ for more detailed instructions about how to set up and use Dokkatoo.
 
 To quickly generate documentation for your project, follow these steps.
 
+> [!TIP]
+> Dokkatoo supports multiple formats, but HTML is the quickest and easiest to get started with.
+
 1. Check the [Gradle Plugin Portal](https://plugins.gradle.org/plugin/dev.adamko.dokkatoo-html)
    to find the latest version of Dokkatoo.
 2. Add the Dokkatoo plugin to your subproject:
@@ -55,9 +58,6 @@ To quickly generate documentation for your project, follow these steps.
      id("dev.adamko.dokkatoo-html")
    }
    ```
-
-   > [!TIP]
-   > Dokkatoo supports multiple formats, but HTML is the quickest and easiest to get started with.
 
 3. **(Optional)** If you'd like to combine multiple subprojects, add the Dokkatoo plugin to each
    subproject, and
