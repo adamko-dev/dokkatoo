@@ -26,6 +26,7 @@ idea {
         "ANDROID_SDK",
         "examples/versioning-multimodule-example/dokkatoo/previousDocVersions",
         "examples/versioning-multimodule-example/dokka/previousDocVersions",
+        "modules/dokkatoo-plugin-integration-tests/example-project-data",
       )
       addAll(
         projectDir.walk().filter { file ->

@@ -13,7 +13,6 @@ import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.plugins.ExtensionContainer
-import org.gradle.api.provider.Provider
 import org.gradle.api.specs.Spec
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.*
@@ -115,7 +114,7 @@ internal object LocalProjectOnlyFilter : Spec<ComponentIdentifier> {
 internal operator fun <T> Spec<T>.not(): Spec<T> = Spec<T> { !this@not.isSatisfiedBy(it) }
 
 
-internal fun Project.pathAsFilePath() = path
+internal fun Project.pathAsFilePath(): String = path
   .removePrefix(GradleProjectPath.SEPARATOR)
   .replace(GradleProjectPath.SEPARATOR, "/")
 

@@ -79,6 +79,10 @@ testing.suites {
         inputs.property("projectTestTempDir", projectTestTempDirPath)
         systemProperty("projectTestTempDir", projectTestTempDirPath)
 
+        val exampleProjectDataPath = layout.projectDirectory.dir("example-project-data")
+          .asFile.invariantSeparatorsPath
+        systemProperty("exampleProjectDataPath", exampleProjectDataPath)
+
         // depend on the test-publication configuration, but not the test-maven repo dir
         // (otherwise this task will never be up-to-date)
         dependsOn(configurations.testMavenPublicationResolvable)
