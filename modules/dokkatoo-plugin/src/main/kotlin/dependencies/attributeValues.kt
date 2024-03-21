@@ -15,10 +15,6 @@ class BaseAttributes(
   objects: ObjectFactory,
 ) {
   val dokkatooUsage: Usage = objects.named("dev.adamko.dokkatoo")
-  val dokkaPlugins: DokkatooAttribute.Classpath = objects.named("dokka-plugins")
-  val dokkaPublicationPlugins: DokkatooAttribute.Classpath =
-    objects.named("dokka-publication-plugins")
-  val dokkaGenerator: DokkatooAttribute.Classpath = objects.named("dokka-generator")
   val dokkaModuleComponents: DokkatooAttribute.Component = objects.named("dokka-module-components")
 }
 

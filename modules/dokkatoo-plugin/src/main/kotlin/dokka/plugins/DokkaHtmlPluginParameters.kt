@@ -119,14 +119,10 @@ constructor(
   @DokkatooInternalApi
   class Serializer(
     private val objects: ObjectFactory,
-    private val componentsDir: File,
   ) : KSerializer<DokkaHtmlPluginParameters> {
     @Serializable
     data class Delegate(
       val name: String,
-      val customAssetsRelativePaths: List<String>,
-      val customStyleSheetsRelativePaths: List<String>,
-      val templatesDirRelativePath: String?,
       val homepageLink: String?,
       val mergeImplicitExpectActualDeclarations: Boolean?,
       val separateInheritedMembers: Boolean?,
@@ -141,15 +137,6 @@ constructor(
     override fun deserialize(decoder: Decoder): DokkaHtmlPluginParameters {
       val delegate = serializer.deserialize(decoder)
       return objects.newInstance<DokkaHtmlPluginParameters>(delegate.name).apply {
-        customAssets.from(
-          delegate.customAssetsRelativePaths.map { componentsDir.resolve(it) }
-        )
-        customStyleSheets.from(
-          delegate.customAssetsRelativePaths.map { componentsDir.resolve(it) }
-        )
-        if (delegate.templatesDirRelativePath != null) {
-          templatesDir.set(componentsDir.resolve(delegate.templatesDirRelativePath))
-        }
         separateInheritedMembers.set(delegate.separateInheritedMembers)
         footerMessage.set(delegate.footerMessage)
       }
@@ -158,14 +145,6 @@ constructor(
     override fun serialize(encoder: Encoder, value: DokkaHtmlPluginParameters) {
       Delegate(
         name = value.name,
-        customStyleSheetsRelativePaths = value.customStyleSheets.asFileTree.files.map {
-          it.relativeTo(componentsDir).invariantSeparatorsPath
-        },
-        customAssetsRelativePaths = value.customAssets.asFileTree.files.map {
-          it.relativeTo(componentsDir).invariantSeparatorsPath
-        },
-        templatesDirRelativePath = value.templatesDir.asFile.orNull
-          ?.relativeTo(componentsDir)?.invariantSeparatorsPath,
         footerMessage = value.footerMessage.orNull,
         separateInheritedMembers = value.separateInheritedMembers.orNull,
         mergeImplicitExpectActualDeclarations = value.mergeImplicitExpectActualDeclarations.orNull,

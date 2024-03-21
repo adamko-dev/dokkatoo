@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 @DokkatooInternalApi
 data class DokkaModuleComponentsSpec(
-  val moduleParametersFileName: String = "dokka-module-parameters.json",
+  val moduleParametersFileName: String = FILE_NAME,
   val classpathDirName: String = "classpath",
   val samplesDirName: String = "samples",
   val includesDirName: String = "includes",

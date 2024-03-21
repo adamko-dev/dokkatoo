@@ -6,6 +6,7 @@ import java.io.Serializable
 import javax.inject.Inject
 import kotlinx.serialization.KSerializer
 import org.gradle.api.Named
+import org.gradle.api.Project
 import org.gradle.api.tasks.Input
 
 /**
@@ -28,13 +29,14 @@ constructor
   open val pluginFqn: String,
 ) : Serializable, Named {
 
-  abstract fun <T : DokkaPluginParametersBaseSpec> valuesSerializer(
-    componentsDir: File
-  ): KSerializer<T>
-
-//  abstract fun jsonEncode(
+//  abstract fun <T : DokkaPluginParametersBaseSpec> valuesSerializer(
 //    componentsDir: File
-//  ): String // must be implemented by subclasses
+//  ): KSerializer<T>
+
+  abstract fun jsonEncode(): String // must be implemented by subclasses
+
+  abstract fun createVariants(project: Project)
+  abstract fun resolveVariants(project: Project)
 
   @Input
   override fun getName(): String = name

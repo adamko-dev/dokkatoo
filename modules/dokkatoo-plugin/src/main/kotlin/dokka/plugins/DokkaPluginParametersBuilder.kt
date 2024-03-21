@@ -1,10 +1,15 @@
 package dev.adamko.dokkatoo.dokka.plugins
 
+import dev.adamko.dokkatoo.internal.Attribute
 import dev.adamko.dokkatoo.internal.DokkaPluginParametersContainer
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
+import dev.adamko.dokkatoo.internal.consumable
 import java.io.File
 import javax.inject.Inject
 import kotlinx.serialization.json.*
+import org.gradle.api.Project
+import org.gradle.api.attributes.Attribute
+import org.gradle.api.attributes.Category
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
@@ -54,11 +59,32 @@ constructor(
   internal val objects: ObjectFactory,
 ) : DokkaPluginParametersBaseSpec(name, pluginFqn) {
 
+  private val attribute : Attribute<String> = Attribute(pluginFqn)
+
   @get:Nested
   internal val properties = PluginConfigValue.Properties(objects.mapProperty())
 
   @Internal
   override fun jsonEncode(): String = properties.convertToJson().toString()
+
+  override fun createVariants(project: Project) {
+
+    val baseC = project.configurations.create("dokkatoo $pluginFqn") {
+      consumable()
+      attributes {
+        attribute(attribute, "x")
+      }
+    }
+
+
+
+    baseC.outgoing.variants.create("")
+
+
+  }
+
+  override fun resolveVariants(project: Project) {
+  }
 
   companion object {
     private fun PluginConfigValue.convertToJson(): JsonElement =

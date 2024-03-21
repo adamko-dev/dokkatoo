@@ -13,7 +13,6 @@ import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.plugins.ExtensionContainer
-import org.gradle.api.provider.Provider
 import org.gradle.api.specs.Spec
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.*
@@ -247,10 +246,10 @@ internal fun ObjectFactory.dokkaPluginParametersContainer(): DokkaPluginParamete
  *
  * @see Attribute.of
  */
-internal inline fun <reified T> Attribute(
+internal inline fun <reified T : Any> Attribute(
   name: String
 ): Attribute<T> =
-  Attribute.of(name, T::class.java)
+  Attribute.of(name, T::class.javaPrimitiveType ?: T::class.java)
 
 
 internal val ArtifactTypeAttribute: Attribute<String> = Attribute("artifactType")
