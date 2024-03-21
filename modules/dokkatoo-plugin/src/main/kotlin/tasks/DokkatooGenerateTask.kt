@@ -154,7 +154,7 @@ constructor(
     if (modulesWithDuplicatePaths.isNotEmpty()) {
       val modulePaths = modulesWithDuplicatePaths.entries
         .map { (path, modules) ->
-          "${modules.joinToString { "'${it.name}'" }} had modulePath '$path'"
+          "${modules.joinToString { "'${it.name}'" }} have modulePath '$path'"
         }
         .sorted()
         .joinToString("\n") { "  - $it" }
