@@ -3,8 +3,13 @@
   text-align: center;
   position: relative;
   overflow: hidden;
-  background: linear-gradient(var(--ifm-color-primary-lightest), var(--ifm-color-primary-darkest));
-  box-shadow: 0 0 0.1em 0.1em var(--ifm-color-primary-darkest);
+  background-image: linear-gradient(
+      -120deg,
+      #0095D5,
+      #3C83DC,
+      #6D74E1,
+      #806EE3
+  );
 }
 
 @media screen and (max-width: 996px) {
@@ -15,6 +20,7 @@
 
 .buttons {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   gap: 1em;

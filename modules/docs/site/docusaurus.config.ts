@@ -92,7 +92,11 @@ const config: Config = {
           items: [
             {label: "Documentation", to: "/docs"},
             {label: "Showcase", to: "/showcase"},
-            {label: "API Reference", to: "pathname:///dokkatoo/kdoc/index.html"},
+            {
+              label: "API Reference",
+              to: "pathname:///dokkatoo/kdoc/index.html",
+              className: "external-link footer__link-item"
+            },
           ],
         },
         {

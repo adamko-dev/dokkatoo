@@ -25,9 +25,6 @@
 }
 
 .external-link:hover:after  {
-  color: var(--ifm-link-color);
-  fill: var(--ifm-link-color);
-  path: var(--ifm-link-color);
   background-color: var(--ifm-link-color);
 }
 

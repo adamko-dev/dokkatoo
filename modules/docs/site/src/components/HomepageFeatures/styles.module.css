@@ -19,10 +19,10 @@ svg.featureSvg [fill="#6c63ff"] {
 }
 
 svg.featureSvg [fill="#3f3d56"] {
-  fill: var(--ifm-color-primary-contrast-background);
-  filter: drop-shadow(2px 3px 1px var(--ifm-color-white));
+  /*fill: var(--ifm-color-primary-contrast-background);*/
+  fill: var(--ifm-color-primary-lightest);
+  filter: drop-shadow(5px 5px 5px var(--ifm-color-primary-contrast-foreground));
 }
-
 
 svg.featureSvg [fill="#fff"] {
   fill: var(--ifm-color-primary-contrast-background);
