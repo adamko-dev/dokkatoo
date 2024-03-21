@@ -190,7 +190,7 @@ const Users: User[] = [
     />,
     website: "https://rickbusarow.github.io/ModuleCheck/api/index.html",
     source: "https://github.com/rickbusarow/ModuleCheck/blob/ff891da3b08cf1bd375e6617c36baa6e98e2e0fe/build-logic/conventions/src/main/kotlin/modulecheck/builds/DokkatooConventionPlugin.kt#L53",
-    tags: ["kotlinJvm", "html", "large"],
+    tags: ["kotlinJvm", "html", "large", "versioning"],
   },
   {
     title: "OSS Review Toolkit (ORT)",
