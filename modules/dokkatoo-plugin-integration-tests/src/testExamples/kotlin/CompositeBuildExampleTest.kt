@@ -3,6 +3,7 @@ package dev.adamko.dokkatoo.tests.examples
 import dev.adamko.dokkatoo.utils.*
 import dev.adamko.dokkatoo.utils.GradleProjectTest.Companion.exampleProjectDataPath
 import dev.adamko.dokkatoo.utils.GradleProjectTest.Companion.projectTestTempDir
+import io.kotest.assertions.withClue
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.file.shouldHaveSameStructureAndContentAs
 import io.kotest.matchers.file.shouldHaveSameStructureAs
@@ -25,7 +26,6 @@ class CompositeBuildExampleTest : FunSpec({
           "clean",
           ":build",
           "--stacktrace",
-          "--info",
         )
         .forwardOutput()
         .build {
@@ -45,8 +45,15 @@ class CompositeBuildExampleTest : FunSpec({
       }
 
       test("expect directories are the same") {
-        dokkatooHtmlDir.toFile().shouldHaveSameStructureAs(exampleDataDir.toFile())
-        dokkatooHtmlDir.toFile().shouldHaveSameStructureAndContentAs(exampleDataDir.toFile())
+        val actualDir = dokkatooHtmlDir.toFile()
+        val expectedDir = exampleDataDir.toFile()
+        withClue(
+          "actualDir[${actualDir.walkTopDown().toList()}], " +
+              "expectedDir[${expectedDir.walkTopDown().toList()}]"
+        ) {
+          actualDir.shouldHaveSameStructureAs(expectedDir)
+          actualDir.shouldHaveSameStructureAndContentAs(expectedDir)
+        }
       }
     }
   }
