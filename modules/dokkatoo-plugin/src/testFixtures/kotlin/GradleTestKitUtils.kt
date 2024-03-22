@@ -46,6 +46,8 @@ class GradleProjectTest(
 
     val projectTestTempDir: Path by systemProperty(Paths::get)
 
+    val exampleProjectDataPath: Path by systemProperty(Paths::get)
+
     /** Temporary directory for the functional tests */
     val funcTestTempDir: Path by lazy {
       projectTestTempDir.resolve("functional-tests")
