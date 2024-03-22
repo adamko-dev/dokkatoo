@@ -16,6 +16,7 @@ import kotlin.time.Duration.Companion.seconds
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.logging.Logging
 import org.gradle.api.provider.ListProperty
+import org.gradle.kotlin.dsl.support.useToRun
 import org.gradle.workers.WorkAction
 import org.gradle.workers.WorkParameters
 
@@ -68,7 +69,7 @@ internal abstract class ScreenshotterWorker : WorkAction<ScreenshotterWorker.Par
       newPage(
         NewPageOptions()
           .setColorScheme(colorScheme)
-      ).apply {
+      ).useToRun {
         navigate(uri.toString()).finished()
         waitForLoadState(DOMCONTENTLOADED)
         Thread.sleep(0.5.seconds.inWholeMilliseconds)

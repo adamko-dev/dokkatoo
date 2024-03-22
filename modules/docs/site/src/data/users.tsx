@@ -112,7 +112,18 @@ const Users: User[] = [
     preview: <JarFileIcon className="java-filetype"/>,
     website: null, // it appears a new version hasn't been published since Dokkatoo was added
     source: "https://github.com/GW2ToolBelt/api-generator/blob/2059cd9883a9eb9347e66679c42e471bf48e28e4/build.gradle.kts#L59-L83",
-    tags: ["html", "javadocJar"],
+    tags: ["html", "javadocJar", "kotlinJvm"],
+  },
+  {
+    title: "HiveMQ Spring Boot Starter",
+    description: "Use an automatically configured mqtt 3 or 5 client in your Spring Boot project.",
+    preview: <img
+        alt={`HiveMQ Spring Boot Starter website screenshot`}
+        src={require("./showcase/mqtt-starter.png").default}
+    />,
+    website: "https://javadoc.io/doc/de.smartsquare/mqtt-starter/latest/index.html",
+    source: "https://github.com/SmartsquareGmbH/mqtt-starter/blob/f0125bd179c64949dc0730539d24bca15263b855/build.gradle.kts#L75-L88",
+    tags: ["html", "javadocJar", "kotlinJvm"],
   },
   {
     title: "KobanKat",

@@ -16,11 +16,14 @@ val createJavadocJarReadme by tasks.registering(Sync::class) {
   from(
     resources.text.fromString(
       """
-      This Javadoc JAR is intentionally empty.
-      
-      For documentation, see the sources JAR or https://github.com/adamko-dev/dokkatoo/
-      
-    """.trimIndent()
+        |This Javadoc JAR is intentionally empty.
+        |
+        |For documentation, see:
+        |* https://adamko-dev.github.io/dokkatoo/
+        |* https://github.com/adamko-dev/dokkatoo/
+        |* Or the sources JAR. 
+        |
+      """.trimMargin()
     )
   ) {
     rename { "readme.txt" }
