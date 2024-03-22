@@ -267,6 +267,14 @@ const Users: User[] = [
 
   //region examples
   {
+    title: "Composite Build Example",
+    description: "This example demonstrates how Dokkatoo can create an aggregated publication a Composite Build project.",
+    preview: <ThreeDotsIcon/>,
+    website: null,
+    source: "https://github.com/adamko-dev/dokkatoo/tree/main/examples/composite-build-example/dokkatoo",
+    tags: ["example", "kotlinJvm", "html"],
+  },
+  {
     title: "Custom Format Example",
     description: "This example demonstrates how to override `.css` styles and add custom images as assets, allowing you to change the logo used in the header.",
     preview: <ThreeDotsIcon/>,
