@@ -123,8 +123,3 @@ tasks.screenshotter {
     "https://opensavvy.gitlab.io/automation/kotlin-js-resources/api-docs/"
   )
 }
-
-
-dokkatoo {
-  modulePath
-}
