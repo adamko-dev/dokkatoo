@@ -122,4 +122,5 @@ tasks.screenshotter {
     "Kotlin-JS-Resources-Plugin",
     "https://opensavvy.gitlab.io/automation/kotlin-js-resources/api-docs/"
   )
+  website("mqtt-starter", "https://javadoc.io/doc/de.smartsquare/mqtt-starter/latest/index.html")
 }
