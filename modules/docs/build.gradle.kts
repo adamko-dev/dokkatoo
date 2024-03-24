@@ -123,4 +123,5 @@ tasks.screenshotter {
     "https://opensavvy.gitlab.io/automation/kotlin-js-resources/api-docs/"
   )
   website("mqtt-starter", "https://javadoc.io/doc/de.smartsquare/mqtt-starter/latest/index.html")
+  website("snakeyaml-engine-kmp", "https://krzema12.github.io/snakeyaml-engine-kmp/")
 }
