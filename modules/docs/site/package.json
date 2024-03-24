@@ -37,6 +37,10 @@
     "@docusaurus/types": "3.1.1",
     "@tsconfig/docusaurus": "2.0.2"
   },
+  "// override fast-url-parser": "prevent warning about deprecated punycode",
+  "overrides": {
+    "fast-url-parser": "npm:@kamilkisiela/fast-url-parser@1.1.4"
+  },
   "browserslist": {
     "production": [
       ">0.5%",
