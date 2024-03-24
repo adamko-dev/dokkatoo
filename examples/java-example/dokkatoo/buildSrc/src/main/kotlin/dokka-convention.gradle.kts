@@ -20,5 +20,5 @@ dependencies {
   dokkatooPluginHtml("org.jetbrains.dokka:kotlin-as-java-plugin")
   dokkatooPluginJavadoc("org.jetbrains.dokka:kotlin-as-java-plugin")
   dokkatooPluginJekyll("org.jetbrains.dokka:kotlin-as-java-plugin")
-  dokkatooPluginMarkdown("org.jetbrains.dokka:kotlin-as-java-plugin")
+  dokkatooPluginGfm("org.jetbrains.dokka:kotlin-as-java-plugin")
 }
