@@ -260,6 +260,20 @@ const Users: User[] = [
     source: "https://github.com/diffplug/selfie/tree/jvm/2.0.1/jvm/gradle/dokka",
     tags: ["favourite", "kotlinJvm", "html", "design"],
   },
+  {
+    title: "SnakeYAML Engine KMP",
+    description: "SnakeYAML Engine KMP is a YAML 1.2 processor for Kotlin Multiplatform.",
+    preview: <ThemedImage
+        alt={`SnakeYAML Engine KMP website screenshot`}
+        sources={{
+          light: require("./showcase/snakeyaml-engine-kmp-light.png").default,
+          dark: require("./showcase/snakeyaml-engine-kmp-dark.png").default,
+        }}
+    />,
+    website: "https://krzema12.github.io/snakeyaml-engine-kmp/",
+    source: "https://github.com/krzema12/snakeyaml-engine-kmp/blob/93035811240d755fedfc846191751e1b54b16e6c/build.gradle.kts",
+    tags: ["kotlinMultiplatform", "html"],
+  },
 
   // looks like a convention plugin, not an actual project
   // {
