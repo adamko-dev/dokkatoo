@@ -77,9 +77,19 @@ constructor(
     val indexHtmlFile = generatePublicationTask
       .flatMap { it.outputDirectory.file("index.html") }
 
-    val indexHtmlPath = indexHtmlFile.map { indexHtml ->
+    // assume that user.dir is IntelliJ's current project directory
+    val userDir = providers.systemProperty("user.dir")
+      .map(::File)
+
+    val indexHtmlPath = providers.zip(userDir, indexHtmlFile) { baseDir, indexHtml ->
+      // IntelliJ built-in webserver needs the path to start with the project dir.
+      // E.g. If the project is in /user/rachel/my-project/
+      //      the link should start with http://localhost:63342/my-project/<path-to-index.html>
+      // So, relativize the path to index.html to include the project dir name.
+      // (Keep composite builds in mind when changing ths property, as the project rootDir might
+      // not be the current IJ project dir.)
       indexHtml.asFile
-        .relativeTo(project.rootDir.parentFile)
+        .relativeTo(baseDir.parentFile)
         .invariantSeparatorsPath
     }
 
