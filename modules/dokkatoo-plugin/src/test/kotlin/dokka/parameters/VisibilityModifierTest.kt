@@ -11,7 +11,7 @@ class VisibilityModifierTest : FunSpec({
 
   test("DokkaConfiguration.Visibility should have equivalent VisibilityModifier") {
     DokkaConfiguration.Visibility.values().shouldForAll { dokkaVisibility ->
-      VisibilityModifier.entries.map { it.dokkaType }.shouldForOne { it shouldBe dokkaVisibility }
+      VisibilityModifier.values.map { it.dokkaType }.shouldForOne { it shouldBe dokkaVisibility }
     }
   }
 })
