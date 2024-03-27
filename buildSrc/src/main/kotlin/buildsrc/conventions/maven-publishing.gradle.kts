@@ -17,7 +17,7 @@ publishing {
     pom {
       name.convention("Dokkatoo")
       description.convention("Dokkatoo is a Gradle plugin that generates documentation for your Kotlin projects")
-      url.convention("https://github.com/adamko-dev/dokkatoo")
+      url.convention("https://adamko-dev.github.io/dokkatoo/")
 
       scm {
         connection.convention("scm:git:https://github.com/adamko-dev/dokkatoo")

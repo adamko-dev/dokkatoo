@@ -27,7 +27,8 @@ enum class VisibilityModifier {
   ;
 
   companion object {
-    internal val entries: Set<VisibilityModifier> = values().toSet()
+    // replace with `entries` when Kotlin lang level is 1.9
+    internal val values: Set<VisibilityModifier> = values().toSet()
 
     // Not defined as a property to try and minimize the dependency on Dokka Core types
     internal val VisibilityModifier.dokkaType: DokkaConfiguration.Visibility
