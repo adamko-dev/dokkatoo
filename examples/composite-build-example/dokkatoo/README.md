@@ -3,7 +3,7 @@
 This project demonstrates how to use Dokkatoo to aggregate modules across a
 [composite build projects](https://docs.gradle.org/current/userguide/composite_builds.html).
 
-> [!WARN]
+> [!WARNING]
 > HTML is the only format that correctly supports multimodule aggregation.
 > This is a limitation of Dokka.
 
@@ -21,18 +21,25 @@ There are 4 included builds.
 
 To run locally, follow these steps.
 
-1. In the root Dokkatoo project directory, run `./gradlew assemble`.
+1. In the root Dokkatoo project directory, run `./gradlew assemble publishToTestMavenRepo`.
 2. Either open the example project in an IDE, or `cd` into it.
 3. In the example project, run `gradle build`.
 
 The docs will be generated into [`./docs/build/dokka/`](./docs/build/dokka/).
 
+## Distinct module paths
+
 > [!IMPORTANT]
 > When Dokkatoo aggregates modules, each module **must** have a distinct `modulePath`.
-> By default, this path is set to be the project path. With composite builds these
-> paths may not be distinct, causing Dokkatoo to overwrite modules.
 >
 > When using composite builds, project paths may clash, so make sure to set a distinct `modulePath`.
->
-> This can be achieved in a convention plugin.
-> [build-logic/src/main/kotlin/dokka-convention.gradle.kts](./build-logic/src/main/kotlin/dokka-convention.gradle.kts). 
+
+The module path determines where each Dokka Module will be located within an aggregated
+Dokka Publication.
+
+By default, the module path is set to be the project path, which are distinct for a single
+Gradle build. With composite builds the project paths may not be distinct, causing Dokkatoo
+to overwrite modules.
+
+This can be achieved in a convention plugin.
+[build-logic/src/main/kotlin/dokka-convention.gradle.kts](./build-logic/src/main/kotlin/dokka-convention.gradle.kts). 

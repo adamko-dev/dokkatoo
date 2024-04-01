@@ -10,7 +10,7 @@ The Dokka examples are synced automatically from the Dokka source code.
 
 ### Run locally
 
-To run locally the examples locally you must first run `./gradlew assemble`
+To run locally the examples locally you must first run `./gradlew assemble publishToTestMavenRepo`
 in the root Dokkatoo repository project directory.
 
 ### Tests
