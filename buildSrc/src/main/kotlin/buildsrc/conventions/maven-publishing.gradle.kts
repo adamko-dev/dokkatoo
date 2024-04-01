@@ -151,6 +151,20 @@ tasks.withType<AbstractPublishToMaven>().configureEach {
 //endregion
 
 
+//region Maven Central can't handle parallel uploads, so limit parallel uploads with a service.
+abstract class MavenPublishLimiter : BuildService<BuildServiceParameters.None>
+
+val mavenPublishLimiter =
+  gradle.sharedServices.registerIfAbsent("mavenPublishLimiter", MavenPublishLimiter::class) {
+    maxParallelUsages = 1
+  }
+
+tasks.withType<PublishToMavenRepository>().configureEach {
+  usesService(mavenPublishLimiter)
+}
+//endregion
+
+
 //region IJ workarounds
 // manually define the Kotlin DSL accessors because IntelliJ _still_ doesn't load them properly
 fun Project.publishing(configure: PublishingExtension.() -> Unit): Unit =
