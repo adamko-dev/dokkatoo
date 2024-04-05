@@ -16,25 +16,34 @@ interface DokkatooAttribute {
 
   /** HTML, Markdown, etc. */
   @DokkatooInternalApi
-  interface Format : Named
+  @JvmInline
+  value class Format(private val named: String) : Named {
+    override fun getName(): String = named
+  }
 
   /** Generated output, or subproject classpath, or included files, etc */
   @DokkatooInternalApi
-  interface ModuleComponent : Named
+  @JvmInline
+  value class ModuleComponent(private val named: String) : Named {
+    override fun getName(): String = named
+  }
 
   /** A classpath, e.g. for Dokka Plugins or the Dokka Generator. */
   @DokkatooInternalApi
-  interface Classpath : Named
+  @JvmInline
+  value class Classpath(private val named: String) : Named {
+    override fun getName(): String = named
+  }
 
   @DokkatooInternalApi
   companion object {
-    val DokkatooFormatAttribute: Attribute<Format> =
+    val DokkatooFormatAttribute: Attribute<String> =
       Attribute("dev.adamko.dokkatoo.format")
 
-    val DokkatooModuleComponentAttribute: Attribute<ModuleComponent> =
+    val DokkatooModuleComponentAttribute: Attribute<String> =
       Attribute("dev.adamko.dokkatoo.module-component")
 
-    val DokkatooClasspathAttribute: Attribute<Classpath> =
+    val DokkatooClasspathAttribute: Attribute<String> =
       Attribute("dev.adamko.dokkatoo.classpath")
   }
 }
