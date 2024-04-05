@@ -33,8 +33,8 @@ class ModuleComponentDependencies(
       extendsFrom(declaredDependencies)
       attributes {
         attribute(USAGE_ATTRIBUTE, baseAttributes.dokkatooUsage)
-        attribute(DokkatooFormatAttribute, formatAttributes.format)
-        attribute(DokkatooModuleComponentAttribute, component)
+        attribute(DokkatooFormatAttribute, formatAttributes.format.name)
+        attribute(DokkatooModuleComponentAttribute, component.name)
       }
     }
 
@@ -46,8 +46,8 @@ class ModuleComponentDependencies(
       extendsFrom(declaredDependencies)
       attributes {
         attribute(USAGE_ATTRIBUTE, baseAttributes.dokkatooUsage)
-        attribute(DokkatooFormatAttribute, formatAttributes.format)
-        attribute(DokkatooModuleComponentAttribute, component)
+        attribute(DokkatooFormatAttribute, formatAttributes.format.name)
+        attribute(DokkatooModuleComponentAttribute, component.name)
       }
     }
 
@@ -83,8 +83,8 @@ class ModuleComponentDependencies(
         withVariantReselection()
         attributes {
           attribute(USAGE_ATTRIBUTE, usage)
-          attribute(DokkatooFormatAttribute, formatAttributes.format)
-          attribute(DokkatooModuleComponentAttribute, component)
+          attribute(DokkatooFormatAttribute, formatAttributes.format.name)
+          attribute(DokkatooModuleComponentAttribute, component.name)
         }
         lenient(true)
       }
@@ -98,23 +98,23 @@ class ModuleComponentDependencies(
           .filter { artifact ->
             val variantAttributes = artifact.variant.attributes
             when {
-              artifact.variant.attributes[USAGE_ATTRIBUTE]?.name != baseAttributes.dokkatooUsage.name -> {
-                logger.info("[${incomingName}] ignoring artifact $artifact - USAGE_ATTRIBUTE != ${baseAttributes.dokkatooUsage} | attributes:${variantAttributes.toMap()}")
+              variantAttributes[USAGE_ATTRIBUTE]?.name != baseAttributes.dokkatooUsage.name -> {
+                logger.info("[${incomingName}] ignoring artifact $artifact - USAGE_ATTRIBUTE != ${baseAttributes.dokkatooUsage} | attributes:${variantAttributes.toDebugString()}")
                 false
               }
 
-              variantAttributes[DokkatooFormatAttribute]?.name != formatAttributes.format.name        -> {
-                logger.info("[${incomingName}] ignoring artifact $artifact - DokkatooFormatAttribute != ${formatAttributes.format} | attributes:${variantAttributes.toMap()}")
+              variantAttributes[DokkatooFormatAttribute] != formatAttributes.format.name    -> {
+                logger.info("[${incomingName}] ignoring artifact $artifact - DokkatooFormatAttribute != ${formatAttributes.format} | attributes:${variantAttributes.toDebugString()}")
                 false
               }
 
-              variantAttributes[DokkatooModuleComponentAttribute]?.name != component.name             -> {
-                logger.info("[${incomingName}] ignoring artifact $artifact - DokkatooModuleComponentAttribute != $component | attributes:${variantAttributes.toMap()}")
+              variantAttributes[DokkatooModuleComponentAttribute] != component.name         -> {
+                logger.info("[${incomingName}] ignoring artifact $artifact - DokkatooModuleComponentAttribute != $component | attributes:${variantAttributes.toDebugString()}")
                 false
               }
 
-              else                                                                                    -> {
-                logger.info("[${incomingName}] found valid artifact $artifact | attributes:${variantAttributes.toMap()}")
+              else                                                                          -> {
+                logger.info("[${incomingName}] found valid artifact $artifact | attributes:${variantAttributes.toDebugString()}")
                 true
               }
             }

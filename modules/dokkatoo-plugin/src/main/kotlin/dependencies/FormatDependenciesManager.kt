@@ -48,7 +48,6 @@ class FormatDependenciesManager(
   internal val formatAttributes: FormatAttributes =
     FormatAttributes(
       formatName = formatName,
-      objects = objects,
     )
 
   init {
@@ -94,8 +93,8 @@ class FormatDependenciesManager(
       isTransitive = false
       attributes {
         jvmJar()
-        attribute(DokkatooFormatAttribute, formatAttributes.format)
-        attribute(DokkatooClasspathAttribute, baseAttributes.dokkaPlugins)
+        attribute(DokkatooFormatAttribute, formatAttributes.format.name)
+        attribute(DokkatooClasspathAttribute, baseAttributes.dokkaPlugins.name)
       }
     }
   //endregion
@@ -117,8 +116,8 @@ class FormatDependenciesManager(
       extendsFrom(dokkaPublicationPluginClasspath.get())
       attributes {
         jvmJar()
-        attribute(DokkatooFormatAttribute, formatAttributes.format)
-        attribute(DokkatooClasspathAttribute, baseAttributes.dokkaPublicationPlugins)
+        attribute(DokkatooFormatAttribute, formatAttributes.format.name)
+        attribute(DokkatooClasspathAttribute, baseAttributes.dokkaPublicationPlugins.name)
       }
     }
 
@@ -137,8 +136,8 @@ class FormatDependenciesManager(
       extendsFrom(dokkaPublicationPluginClasspathApiOnly.get())
       attributes {
         jvmJar()
-        attribute(DokkatooFormatAttribute, formatAttributes.format)
-        attribute(DokkatooClasspathAttribute, baseAttributes.dokkaPublicationPlugins)
+        attribute(DokkatooFormatAttribute, formatAttributes.format.name)
+        attribute(DokkatooClasspathAttribute, baseAttributes.dokkaPublicationPlugins.name)
       }
     }
   }
@@ -186,8 +185,8 @@ class FormatDependenciesManager(
 
       attributes {
         jvmJar()
-        attribute(DokkatooFormatAttribute, formatAttributes.format)
-        attribute(DokkatooClasspathAttribute, baseAttributes.dokkaGenerator)
+        attribute(DokkatooFormatAttribute, formatAttributes.format.name)
+        attribute(DokkatooClasspathAttribute, baseAttributes.dokkaGenerator.name)
       }
     }
   //endregion

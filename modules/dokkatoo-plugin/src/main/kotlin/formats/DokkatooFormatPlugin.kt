@@ -165,13 +165,13 @@ abstract class DokkatooFormatPlugin(
       dokkatooExtension.versions.jetbrainsDokka.map { version -> create("org.jetbrains.dokka:$module:$version") }
 
     private fun AttributeContainer.dokkaPluginsClasspath() {
-      attribute(DokkatooFormatAttribute, formatDependencies.formatAttributes.format)
-      attribute(DokkatooClasspathAttribute, formatDependencies.baseAttributes.dokkaPlugins)
+      attribute(DokkatooFormatAttribute, formatDependencies.formatAttributes.format.name)
+      attribute(DokkatooClasspathAttribute, formatDependencies.baseAttributes.dokkaPlugins.name)
     }
 
     private fun AttributeContainer.dokkaGeneratorClasspath() {
-      attribute(DokkatooFormatAttribute, formatDependencies.formatAttributes.format)
-      attribute(DokkatooClasspathAttribute, formatDependencies.baseAttributes.dokkaGenerator)
+      attribute(DokkatooFormatAttribute, formatDependencies.formatAttributes.format.name)
+      attribute(DokkatooClasspathAttribute, formatDependencies.baseAttributes.dokkaGenerator.name)
     }
 
     /** Add a dependency to the Dokka plugins classpath */
