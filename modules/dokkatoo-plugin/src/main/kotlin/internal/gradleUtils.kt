@@ -237,14 +237,31 @@ internal fun ObjectFactory.dokkaPluginParametersContainer(): DokkaPluginParamete
 
 
 /**
- * Creates a new attribute of the given name with the given type.
+ * Creates a new [Attribute] of the given name with the given type [T].
  *
  * @see Attribute.of
  */
+@Deprecated(
+  "Typed attributes are broken - use String attributes instead. https://github.com/adamko-dev/dokkatoo/issues/214",
+  ReplaceWith("dev.adamko.dokkatoo.internal.Attribute(name)"),
+)
+@JvmName("TypedAttribute")
 internal inline fun <reified T> Attribute(
   name: String
 ): Attribute<T> =
   Attribute.of(name, T::class.java)
+
+
+/**
+ * Creates a new [Attribute] of the given name with a type of [String].
+ *
+ * @see Attribute.of
+ */
+@JvmName("StringAttribute")
+internal fun Attribute(
+  name: String
+): Attribute<String> =
+  Attribute.of(name, String::class.java)
 
 
 internal val ArtifactTypeAttribute: Attribute<String> = Attribute("artifactType")
@@ -262,14 +279,59 @@ internal fun AttributeContainer.toMap(): Map<Attribute<*>, Any?> =
   keySet().associateWith { getAttribute(it) }
 
 
+internal fun AttributeContainer.toDebugString(): String =
+  toMap().entries.joinToString { (k, v) -> "$k[name:${k.name}, type:${k.type}, type.hc:${k.type.hashCode()}]=$v" }
+
+
 /**
  * Get an [Attribute] from an [AttributeContainer].
  *
  * (Nicer Kotlin accessor function).
  */
-internal operator fun <T : Any> AttributeContainer.get(key: Attribute<T>): T? =
-  getAttribute(key)
+internal operator fun <T : Any> AttributeContainer.get(key: Attribute<T>): T? {
+  // first, try the official way
+  val value = getAttribute(key)
+  if (value != null) {
+    return value
+  }
 
+  // Failed to get attribute using official method, which might have been caused by a Gradle bug
+  // https://github.com/gradle/gradle/issues/28695
+  // Attempting to check...
 
-internal infix fun <T> Attribute<T>?.eq(other: Attribute<T>) =
-  this?.name == other.name
+  // Quickly check that any attribute has the same name.
+  // (There's no point in checking further if no names match.)
+  if (keySet().none { it.name == key.name }) {
+    return null
+  }
+
+  val actualKey = keySet()
+    .firstOrNull { candidate -> candidate.matchesTypeOf(key) }
+    ?: return null
+
+  error(
+    """
+      Gradle failed to fetch attribute from AttributeContainer, even though the attribute is present.
+      Please report this error to Gradle https://github.com/gradle/gradle/issues/28695
+        Requested attribute: $key ${key.type} ${key.type.hashCode()}
+        Actual attribute: $actualKey ${actualKey.type} ${actualKey.type.hashCode()}
+        All attributes: ${toDebugString()}
+        Gradle Version: $CurrentGradleVersion
+    """.trimIndent()
+  )
+}
+
+/** Leniently check if [Attribute.type]s are equal, avoiding [Class.hashCode] classloader issues. */
+private fun Attribute<*>.matchesTypeOf(other: Attribute<*>): Boolean {
+  val thisTypeId = this.typeId() ?: false
+  val otherTypeId = other.typeId() ?: false
+  return thisTypeId == otherTypeId
+}
+
+/**
+ * An ID for [Attribute.type] that is stable across different classloaders.
+ *
+ * Workaround for https://github.com/gradle/gradle/issues/28695.
+ */
+private fun Attribute<*>.typeId(): String? =
+  type.toString().ifBlank { null }

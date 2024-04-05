@@ -15,10 +15,15 @@ class BaseAttributes(
   objects: ObjectFactory,
 ) {
   val dokkatooUsage: Usage = objects.named("dev.adamko.dokkatoo")
-  val dokkaPlugins: DokkatooAttribute.Classpath = objects.named("dokka-plugins")
+
+  val dokkaPlugins: DokkatooAttribute.Classpath =
+    DokkatooAttribute.Classpath("dokka-plugins")
+
   val dokkaPublicationPlugins: DokkatooAttribute.Classpath =
-    objects.named("dokka-publication-plugins")
-  val dokkaGenerator: DokkatooAttribute.Classpath = objects.named("dokka-generator")
+    DokkatooAttribute.Classpath("dokka-publication-plugins")
+
+  val dokkaGenerator: DokkatooAttribute.Classpath =
+    DokkatooAttribute.Classpath("dokka-generator")
 }
 
 
@@ -26,10 +31,10 @@ class BaseAttributes(
 @DokkatooInternalApi
 class FormatAttributes(
   formatName: String,
-  objects: ObjectFactory,
 ) {
-  val format: DokkatooAttribute.Format = objects.named(formatName)
+  val format: DokkatooAttribute.Format =
+    DokkatooAttribute.Format(formatName)
 
   val moduleOutputDirectories: DokkatooAttribute.ModuleComponent =
-    objects.named("ModuleOutputDirectories")
+    DokkatooAttribute.ModuleComponent("ModuleOutputDirectories")
 }
