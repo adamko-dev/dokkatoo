@@ -321,7 +321,7 @@ internal operator fun <T : Any> AttributeContainer.get(key: Attribute<T>): T? {
   )
 }
 
-/** Leniently check if [Attribute.type]s are equal, avoiding [Class.hashCode] classloader issues. */
+/** Leniently check if [Attribute.type]s are equal, avoiding [Class.hashCode] classloader differences. */
 private fun Attribute<*>.matchesTypeOf(other: Attribute<*>): Boolean {
   val thisTypeId = this.typeId() ?: false
   val otherTypeId = other.typeId() ?: false
