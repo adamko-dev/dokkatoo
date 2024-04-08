@@ -17,7 +17,7 @@ publishing {
     pom {
       name.convention("Dokkatoo")
       description.convention("Dokkatoo is a Gradle plugin that generates documentation for your Kotlin projects")
-      url.convention("https://github.com/adamko-dev/dokkatoo")
+      url.convention("https://adamko-dev.github.io/dokkatoo/")
 
       scm {
         connection.convention("scm:git:https://github.com/adamko-dev/dokkatoo")
@@ -147,6 +147,20 @@ tasks.withType<AbstractPublishToMaven>().configureEach {
       logger.info("[task: ${path}] ${publicationGAV.get()}")
     }
   }
+}
+//endregion
+
+
+//region Maven Central can't handle parallel uploads, so limit parallel uploads with a service.
+abstract class MavenPublishLimiter : BuildService<BuildServiceParameters.None>
+
+val mavenPublishLimiter =
+  gradle.sharedServices.registerIfAbsent("mavenPublishLimiter", MavenPublishLimiter::class) {
+    maxParallelUsages = 1
+  }
+
+tasks.withType<PublishToMavenRepository>().configureEach {
+  usesService(mavenPublishLimiter)
 }
 //endregion
 

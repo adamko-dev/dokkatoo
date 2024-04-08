@@ -42,8 +42,6 @@ jobs:
       gradle-task: >-
         publishAllPublicationsToSonatypeReleaseRepository
         --stacktrace
-        --no-configuration-cache
-        --no-parallel
       checkout-ref: ${{ inputs.checkout-ref }}
 
 
@@ -60,8 +58,6 @@ jobs:
       gradle-task: >-
         publishAllPublicationsToJetBrainsSpaceRepository
         --stacktrace
-        --no-configuration-cache
-        --no-parallel
       checkout-ref: ${{ inputs.checkout-ref }}
 
 
@@ -78,6 +74,4 @@ jobs:
       gradle-task: >-
         publishAllPublicationsToAdamkoDevRepository
         --stacktrace
-        --no-configuration-cache
-        --no-parallel
       checkout-ref: ${{ inputs.checkout-ref }}
