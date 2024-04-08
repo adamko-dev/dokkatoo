@@ -3,13 +3,21 @@
   text-align: center;
   position: relative;
   overflow: hidden;
-  background-image: linear-gradient(
-      -120deg,
-      #0095D5,
-      #3C83DC,
-      #6D74E1,
-      #806EE3
-  );
+  background: linear-gradient(-113deg, #0095D5, #3C83DC, #6D74E1, #806EE3);
+  animation: gradient 17s linear infinite;
+  background-size: 400% 400%;
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
 }
 
 @media screen and (max-width: 996px) {
