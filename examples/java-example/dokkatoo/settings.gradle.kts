@@ -1,4 +1,4 @@
-rootProject.name = "dokkatoo-multimodule-example"
+rootProject.name = "dokkatoo-java-example"
 
 pluginManagement {
   repositories {
@@ -43,4 +43,5 @@ dependencyResolutionManagement {
 }
 
 include(":my-java-application")
+include(":my-java-features")
 include(":my-java-library")

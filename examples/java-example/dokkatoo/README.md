@@ -3,6 +3,13 @@
 This project demonstrates how Dokkatoo can be applied to a pure Java project
 to generate documentation.
 
+This project has multiple modules.
+
+* [my-java-application](./my-java-application) is a Java Application
+* [my-java-application](./my-java-features) is a Java Library, demonstrating
+  [feature variants](https://docs.gradle.org/current/userguide/feature_variants.html).
+* [my-java-application](./my-java-library) is a Java Library
+
 ### Demonstration
 
 To generate HTML documentation, run
@@ -10,6 +17,8 @@ To generate HTML documentation, run
 ```shell
 gradle :dokkatooGeneratePublicationHtml
 ```
+
+The HTML documentation will be generated into [build/dokka/html](./build/dokka/html/).
 
 ### Implementation details
 
