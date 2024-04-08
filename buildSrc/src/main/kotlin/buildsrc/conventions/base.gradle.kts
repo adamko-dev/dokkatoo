@@ -45,6 +45,8 @@ tasks.withType<AbstractCopyTask>().configureEach {
   includeEmptyDirs = false
 }
 
+
+//region Gradle test report dark mode
 val updateTestReportCss by tasks.registering {
   description = "Hack so the Gradle test reports have dark mode"
   // the CSS is based on https://github.com/gradle/gradle/pull/12177
@@ -153,3 +155,4 @@ tasks.matching { it.name == "validatePlugins" }.configureEach {
   // Task ':validatePlugins' uses this output of task ':updateTestReportCss' without declaring an explicit or implicit dependency.
   mustRunAfter(updateTestReportCss)
 }
+//endregion
