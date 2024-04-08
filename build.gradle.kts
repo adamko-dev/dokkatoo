@@ -1,4 +1,4 @@
-import buildsrc.utils.excludeGeneratedGradleDsl
+import buildsrc.utils.excludeProjectConfigurationDirs
 import buildsrc.utils.initIdeProjectLogo
 import org.gradle.language.base.plugins.LifecycleBasePlugin.VERIFICATION_GROUP
 
@@ -10,46 +10,20 @@ plugins {
 group = "dev.adamko.dokkatoo"
 version = "2.4.0-SNAPSHOT"
 
+excludeProjectConfigurationDirs(idea)
 
-idea {
-  module {
-    excludeGeneratedGradleDsl(layout)
-
-    excludeDirs.apply {
-      // exclude .gradle, IDE dirs from nested projects (e.g. example & template projects)
-      // so IntelliJ project-wide search isn't cluttered with irrelevant files
-      val excludedDirs = setOf(
-        ".idea",
-        ".gradle",
-        "build",
-        "gradle/wrapper",
-        "ANDROID_SDK",
-        "examples/versioning-multimodule-example/dokkatoo/previousDocVersions",
-        "examples/versioning-multimodule-example/dokka/previousDocVersions",
-        "modules/dokkatoo-plugin-integration-tests/example-project-data",
-      )
-      addAll(
-        projectDir.walk().filter { file ->
-          excludedDirs.any {
-            file.invariantSeparatorsPath.endsWith("/$it")
-          }
-        }
-      )
-    }
-  }
+tasks.prepareKotlinBuildScriptModel {
+  initIdeProjectLogo("documentation/media/kayray-logo.svg")
 }
-
-initIdeProjectLogo("modules/docs/images/logo-icon.svg")
 
 val dokkatooVersion by tasks.registering {
   description = "prints the Dokkatoo project version (used during release to verify the version)"
   group = "help"
-  val version = providers.provider { project.version }
+  val version = providers.provider { project.version.toString() }
   doLast {
     logger.quiet("${version.orNull}")
   }
 }
-
 
 val verifyVersionCatalogKotlinVersion by tasks.registering {
   description = "Verify the Version Catalog Kotlin version matches Gradle's embedded Kotlin version"
