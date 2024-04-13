@@ -116,7 +116,7 @@ tasks.screenshotter {
   website("ks3", "https://www.ks3.io/")
   website("oss-review-toolkit", "https://javadoc.io/doc/org.ossreviewtoolkit/cli/latest/")
   website("selfie", "https://kdoc.selfie.dev/")
-  website("Prepared", "https://opensavvy.gitlab.io/prepared/api-docs/suite/index.html")
+  website("Prepared", "https://opensavvy.gitlab.io/groundwork/prepared/api-docs/suite/index.html")
   website("Pedestal", "https://opensavvy.gitlab.io/pedestal/api-docs/")
   website(
     "Kotlin-JS-Resources-Plugin",
