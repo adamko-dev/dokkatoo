@@ -242,8 +242,8 @@ const Users: User[] = [
           dark: require("./showcase/Prepared-dark.png").default,
         }}
     />,
-    website: "https://opensavvy.gitlab.io/prepared/api-docs/suite/index.html",
-    source: "https://gitlab.com/opensavvy/prepared",
+    website: "https://opensavvy.gitlab.io/groundwork/prepared/api-docs/suite/index.html",
+    source: "https://gitlab.com/opensavvy/groundwork/prepared",
     tags: ["favourite", "kotlinMultiplatform", "html"],
   },
   {
