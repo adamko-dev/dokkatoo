@@ -117,7 +117,7 @@ tasks.screenshotter {
   website("oss-review-toolkit", "https://javadoc.io/doc/org.ossreviewtoolkit/cli/latest/")
   website("selfie", "https://kdoc.selfie.dev/")
   website("Prepared", "https://opensavvy.gitlab.io/groundwork/prepared/api-docs/suite/index.html")
-  website("Pedestal", "https://opensavvy.gitlab.io/pedestal/api-docs/")
+  website("Pedestal", "https://opensavvy.gitlab.io/groundwork/pedestal/api-docs/")
   website(
     "Kotlin-JS-Resources-Plugin",
     "https://opensavvy.gitlab.io/automation/kotlin-js-resources/api-docs/"
