@@ -228,8 +228,8 @@ const Users: User[] = [
           dark: require("./showcase/Pedestal-dark.png").default,
         }}
     />,
-    website: "https://opensavvy.gitlab.io/prepared/api-docs/suite/index.html",
-    source: "https://gitlab.com/opensavvy/pedestal",
+    website: "https://opensavvy.gitlab.io/groundwork/pedestal/api-docs/",
+    source: "https://gitlab.com/opensavvy/groundwork/pedestal",
     tags: ["kotlinMultiplatform", "html"],
   },
   {
