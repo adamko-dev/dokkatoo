@@ -1,6 +1,6 @@
 plugins {
   kotlin("multiplatform") version "1.9.22"
-  id("dev.adamko.dokkatoo") version "2.4.0-SNAPSHOT"
+  id("dev.adamko.dokkatoo") version "2.3.1"
 }
 
 group = "org.dokka.example"
