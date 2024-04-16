@@ -1,8 +1,6 @@
 name: Gradle Dependency Graph
 run-name: "Gradle Dependency Graph"
 
-# Reusable Workflow for running a Gradle task
-
 on:
   workflow_dispatch:
     inputs:
@@ -19,8 +17,7 @@ on:
 
 
 concurrency:
-  # note: the Workflow inputs are also included in the concurrency group
-  group: "Gradle Dependency Graph: ${{ github.workflow }} ${{ join(inputs.*) }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}"
+  group: "Gradle Dependency Graph: ${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}"
   cancel-in-progress: true
 
 
@@ -31,12 +28,9 @@ permissions:
 jobs:
 
   run-task:
-    runs-on: ${{ inputs.runs-on }}
-    name: "./gradlew ${{ inputs.gradle-task}} @ ${{ inputs.runs-on }}"
+    runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
-
-      ### Gradle task ###
 
       - name: Checkout the repo
         uses: actions/checkout@v4
