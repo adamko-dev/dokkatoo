@@ -72,8 +72,6 @@ object Release : CliktCommand() {
     // Tag the release
     createAndPushTag(releaseVersion)
 
-    publishPlugins()
-
     // Bump the version to the next snapshot
     updateVersionCreatePR(nextVersion)
 
@@ -158,12 +156,6 @@ object Release : CliktCommand() {
     echo("Pushing tag $tagName...")
     Git.push(tagName)
     echo("Tag $tagName pushed")
-  }
-
-  private fun publishPlugins() {
-    echo("Publishing plugins to Gradle Plugin Portal...")
-    Gradle.publishPlugins()
-    echo("Published plugins")
   }
 
   private val buildGradleKts: File by lazy {
@@ -362,11 +354,6 @@ private object Gradle : CliTool() {
   fun check(): String {
     stopDaemons()
     return runCommand("$gradlew check --no-daemon")
-  }
-
-  fun publishPlugins(): String {
-    stopDaemons()
-    return runCommand("$gradlew publishPlugins --no-daemon --no-configuration-cache")
   }
 }
 

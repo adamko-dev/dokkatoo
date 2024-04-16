@@ -42,6 +42,23 @@ jobs:
     with:
       checkout-ref: ${{ inputs.checkout-ref }}
 
+  publish-gradle-plugin:
+    # only publish when manually triggered, or it's for a release
+    # (Gradle Plugin Portal doesn't allow snapshot versions)
+    if: inputs.checkout-ref || (github.event_name == 'release' && github.event.action == 'created')
+    uses: ./.github/workflows/run_gradle_task.yml
+    secrets: inherit
+    permissions:
+      contents: read
+      packages: write
+      checks: write
+    with:
+      runs-on: macos-latest
+      gradle-task: >-
+        publishPlugins
+        --stacktrace
+      checkout-ref: ${{ inputs.checkout-ref }}
+
   publish-site:
     needs: tests
     # only publish when manually triggered, or it's for a release
