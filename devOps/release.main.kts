@@ -204,11 +204,18 @@ object Release : CliktCommand() {
 
 private abstract class CliTool {
 
-  protected fun runCommand(
+  private val maxAttempts = 10
+
+  protected tailrec fun runCommand(
     cmd: String,
     dir: File? = Git.rootDir,
     logOutput: Boolean = true,
+    attempts: Int = 0,
   ): String {
+    if (attempts >= maxAttempts) {
+      error("command '$cmd' failed $attempts times (limit $maxAttempts)")
+    }
+
     val args = parseSpaceSeparatedArgs(cmd)
 
     val process = ProcessBuilder(args).apply {
@@ -229,11 +236,13 @@ private abstract class CliTool {
 
     val exitCode = process.exitValue()
 
-    if (exitCode != 0) {
-      error("command '$cmd' failed:\n${processOutput}")
+    if (exitCode == 0) {
+      return processOutput
     }
 
-    return processOutput
+    print("command '$cmd' failed:\n${processOutput}")
+    print("retrying...")
+    return runCommand(cmd, dir, logOutput, attempts + 1)
   }
 
   private data class ProcessResult(
