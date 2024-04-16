@@ -86,7 +86,8 @@ jobs:
           cache-read-only: ${{ github.ref != 'refs/heads/main' && !startsWith(github.ref, 'refs/heads/release') && !startsWith(github.ref, 'refs/tags/') }}
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
-      - run: ./gradlew ${{ inputs.gradle-task }}
+      - run: >-
+         ./gradlew ${{ inputs.gradle-task }}
         env:
           MAVEN_SONATYPE_USERNAME: ${{ vars.MAVEN_SONATYPE_USERNAME }}
           MAVEN_SONATYPE_PASSWORD: ${{ secrets.MAVEN_SONATYPE_PASSWORD }}
