@@ -1,0 +1,50 @@
+name: Gradle Dependency Graph
+run-name: "Gradle Dependency Graph"
+
+# Reusable Workflow for running a Gradle task
+
+on:
+  workflow_dispatch:
+    inputs:
+      checkout-ref:
+        description: "The branch, tag or SHA to checkout. See actions/checkout 'ref'."
+        required: false
+        type: string
+  workflow_call:
+    inputs:
+      checkout-ref:
+        description: "The branch, tag or SHA to checkout. See actions/checkout 'ref'."
+        required: false
+        type: string
+
+
+concurrency:
+  # note: the Workflow inputs are also included in the concurrency group
+  group: "Gradle Dependency Graph: ${{ github.workflow }} ${{ join(inputs.*) }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}"
+  cancel-in-progress: true
+
+
+permissions:
+  contents: write # required to submit dependency graph
+
+
+jobs:
+
+  run-task:
+    runs-on: ${{ inputs.runs-on }}
+    name: "./gradlew ${{ inputs.gradle-task}} @ ${{ inputs.runs-on }}"
+    timeout-minutes: 60
+    steps:
+
+      ### Gradle task ###
+
+      - name: Checkout the repo
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.checkout-ref || github.ref }}
+
+      - name: Validate Gradle Wrapper
+        uses: gradle/actions/wrapper-validation@v3
+
+      - name: Update GitHub Gradle dependency graph
+        uses: gradle/actions/dependency-submission@v3
