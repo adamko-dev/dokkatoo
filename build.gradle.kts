@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "dev.adamko.dokkatoo"
-version = "2.3.1"
+version = "2.4.0-SNAPSHOT"
 
 excludeProjectConfigurationDirs(idea)
 
