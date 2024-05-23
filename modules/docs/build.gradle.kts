@@ -124,4 +124,5 @@ tasks.screenshotter {
   )
   website("mqtt-starter", "https://javadoc.io/doc/de.smartsquare/mqtt-starter/latest/index.html")
   website("snakeyaml-engine-kmp", "https://krzema12.github.io/snakeyaml-engine-kmp/")
+  website("spring-boot", "https://docs.spring.io/spring-boot/api/kotlin/index.html")
 }
