@@ -1,7 +1,6 @@
 plugins {
-  `java-library`
+  `java-library-convention`
   `dokka-convention`
-  id("my-java-conventions")
 }
 
 dokkatoo {
