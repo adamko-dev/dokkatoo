@@ -1,5 +1,5 @@
 plugins {
-  `java`
+  `java-application-convention`
   `dokka-convention`
 }
 
@@ -11,4 +11,8 @@ dokkatoo {
   dokkatooSourceSets.configureEach {
     includes.from("Module.md")
   }
+}
+
+application {
+  mainClass = "demo.MyJavaApplication"
 }

@@ -1,5 +1,5 @@
 plugins {
-  `java-library`
+  id("java-library-convention")
 }
 
 val mongodbSourceSet = sourceSets.create("mongodbSupport") {

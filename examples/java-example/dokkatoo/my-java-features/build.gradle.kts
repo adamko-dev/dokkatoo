@@ -1,5 +1,5 @@
 plugins {
-  `my-java-mongodb-convention`
+  `java-mongodb-library-convention`
   `dokka-convention`
 }
 
