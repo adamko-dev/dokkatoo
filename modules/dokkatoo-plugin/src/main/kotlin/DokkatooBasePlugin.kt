@@ -168,7 +168,7 @@ constructor(
         }
       )
       documentedVisibilities.convention(setOf(VisibilityModifier.PUBLIC))
-      jdkVersion.convention(8)
+      jdkVersion.convention(11)
 
       enableKotlinStdLibDocumentationLink.convention(true)
       enableJdkDocumentationLink.convention(true)
