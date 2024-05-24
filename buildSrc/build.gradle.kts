@@ -19,8 +19,6 @@ dependencies {
   compileOnly("com.microsoft.playwright:playwright:1.42.0")
 }
 
-java {
-  toolchain {
-    languageVersion.set(JavaLanguageVersion.of(11))
-  }
+kotlin {
+  jvmToolchain(11)
 }
