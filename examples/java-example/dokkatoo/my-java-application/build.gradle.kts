@@ -1,5 +1,6 @@
 plugins {
-  `java`
+  java
+  id("my-java-conventions")
   `dokka-convention`
 }
 
