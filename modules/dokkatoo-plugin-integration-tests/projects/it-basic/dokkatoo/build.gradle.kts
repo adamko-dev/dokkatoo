@@ -13,7 +13,8 @@ dependencies {
 }
 
 kotlin {
-  jvmToolchain(8)
+  // must build with JDK11, since GitHub MacOS runners no longer support JDK8
+  jvmToolchain(11)
 }
 
 dokkatoo {
@@ -60,5 +61,10 @@ dokkatoo {
 tasks.withType<dev.adamko.dokkatoo.tasks.DokkatooGenerateTask>().configureEach {
   generator.dokkaSourceSets.configureEach {
     sourceSetScope.set(":dokkaHtml")
+
+    // Dokka it-basic project outputs JDK8 links, but we must build this project
+    // with JDK11 (because GitHub MacOS runners no longer support JDK8).
+    // To make the Dokkatoo output match the Dokka output, manually set JDK8.
+    jdkVersion.set(8)
   }
 }
