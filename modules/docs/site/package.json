@@ -15,10 +15,10 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@docusaurus/core": "3.2.1",
-    "@docusaurus/preset-classic": "3.2.1",
-    "@docusaurus/utils": "3.2.1",
-    "@docusaurus/utils-common": "3.2.1",
+    "@docusaurus/core": "3.3.2",
+    "@docusaurus/preset-classic": "3.3.2",
+    "@docusaurus/utils": "3.3.2",
+    "@docusaurus/utils-common": "3.3.2",
     "@mdx-js/react": "3.0.1",
     "@popperjs/core": "2.11.8",
     "@types/react-dom": "18.2.25",
@@ -33,8 +33,8 @@
     "typescript": "5.4.5"
   },
   "devDependencies": {
-    "@docusaurus/module-type-aliases": "3.2.1",
-    "@docusaurus/types": "3.2.1",
+    "@docusaurus/module-type-aliases": "3.3.2",
+    "@docusaurus/types": "3.3.2",
     "@tsconfig/docusaurus": "2.0.3"
   },
   "// override fast-url-parser": "prevent warning about deprecated punycode",
