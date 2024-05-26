@@ -1,5 +1,6 @@
 import {Config} from "@docusaurus/types";
 import type * as Preset from "@docusaurus/preset-classic";
+import defaultSSRTemplate from "@docusaurus/core/lib/templates/ssr.html.template";
 
 const config: Config = {
   title: "Dokkatoo",
@@ -33,14 +34,14 @@ const config: Config = {
     ],
   ],
 
-  scripts: [
-    {
-      // Cloudflare Web Analytics
-      src: "https://static.cloudflareinsights.com/beacon.min.js",
-      async: false,
-      "data-cf-beacon": "{'token': '60b3e3c8134343cc8cb3b0fa0bae9a28'}",
-    },
-  ],
+  // Cloudflare Web Analytics
+  // Have to manually inject the script, because Docusaurus escapes quotes :(
+  // https://github.com/facebook/docusaurus/issues/10172
+  ssrTemplate: defaultSSRTemplate
+  .replace(
+      "</head>",
+      "<script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{\"token\": \"60b3e3c8134343cc8cb3b0fa0bae9a28\"}'></script>\n</head>"
+  ),
 
   clientModules: [
     require.resolve("./src/css/global.scss"),
