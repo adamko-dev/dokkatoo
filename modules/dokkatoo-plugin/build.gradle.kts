@@ -222,14 +222,3 @@ dokkatoo {
     includes.from("Module.md")
   }
 }
-
-  pluginsConfiguration {
-    html {
-      homepageLink = "https://github.com/adamko-dev/dokkatoo/"
-    }
-  }
-}
-
-dokkaSourceDownload {
-  dokkaVersion.set(libs.versions.kotlin.dokka)
-}
