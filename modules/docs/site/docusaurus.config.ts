@@ -38,7 +38,7 @@ const config: Config = {
       // Cloudflare Web Analytics
       src: "https://static.cloudflareinsights.com/beacon.min.js",
       async: false,
-      "data-cf-beacon": `{"token": "60b3e3c8134343cc8cb3b0fa0bae9a28"}`,
+      "data-cf-beacon": "{'token': '60b3e3c8134343cc8cb3b0fa0bae9a28'}",
     },
   ],
 
