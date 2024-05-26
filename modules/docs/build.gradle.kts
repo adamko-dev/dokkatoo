@@ -4,7 +4,7 @@ import org.gradle.api.tasks.PathSensitivity.RELATIVE
 
 plugins {
   buildsrc.conventions.base
-  dev.adamko.`dokkatoo-html`
+  buildsrc.conventions.dokkatoo
   com.github.`node-gradle`.node
   buildsrc.screenshotter.plugin
 }
@@ -38,8 +38,6 @@ dokkatoo {
           "static/img/homepage.svg",
         )
       )
-      homepageLink = "https://github.com/adamko-dev/dokkatoo/"
-      footerMessage = "Copyright © 2023"
     }
   }
 }
