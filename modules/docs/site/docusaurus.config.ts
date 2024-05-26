@@ -33,7 +33,14 @@ const config: Config = {
     ],
   ],
 
-  // scripts: [],
+  scripts: [
+    {
+      // Cloudflare Web Analytics
+      src: "https://static.cloudflareinsights.com/beacon.min.js",
+      async: false,
+      "data-cf-beacon": `{"token": "60b3e3c8134343cc8cb3b0fa0bae9a28"}`,
+    },
+  ],
 
   clientModules: [
     require.resolve("./src/css/global.scss"),
