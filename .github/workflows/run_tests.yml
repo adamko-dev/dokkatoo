@@ -47,7 +47,6 @@ jobs:
               --no-configuration-cache
               --no-daemon
               --max-workers=1
-              -Dorg.gradle.workers.max=1
       fail-fast: false
     uses: ./.github/workflows/run_gradle_task.yml
     with:

@@ -4,7 +4,7 @@ import org.gradle.api.tasks.PathSensitivity.RELATIVE
 
 plugins {
   buildsrc.conventions.base
-  dev.adamko.`dokkatoo-html`
+  buildsrc.conventions.dokkatoo
   com.github.`node-gradle`.node
   buildsrc.screenshotter.plugin
 }
@@ -38,8 +38,6 @@ dokkatoo {
           "static/img/homepage.svg",
         )
       )
-      homepageLink = "https://github.com/adamko-dev/dokkatoo/"
-      footerMessage = "Copyright © 2023"
     }
   }
 }
@@ -116,12 +114,13 @@ tasks.screenshotter {
   website("ks3", "https://www.ks3.io/")
   website("oss-review-toolkit", "https://javadoc.io/doc/org.ossreviewtoolkit/cli/latest/")
   website("selfie", "https://kdoc.selfie.dev/")
-  website("Prepared", "https://opensavvy.gitlab.io/prepared/api-docs/suite/index.html")
-  website("Pedestal", "https://opensavvy.gitlab.io/pedestal/api-docs/")
+  website("Prepared", "https://opensavvy.gitlab.io/groundwork/prepared/api-docs/suite/index.html")
+  website("Pedestal", "https://opensavvy.gitlab.io/groundwork/pedestal/api-docs/")
   website(
     "Kotlin-JS-Resources-Plugin",
     "https://opensavvy.gitlab.io/automation/kotlin-js-resources/api-docs/"
   )
   website("mqtt-starter", "https://javadoc.io/doc/de.smartsquare/mqtt-starter/latest/index.html")
   website("snakeyaml-engine-kmp", "https://krzema12.github.io/snakeyaml-engine-kmp/")
+  website("spring-boot", "https://docs.spring.io/spring-boot/api/kotlin/index.html")
 }

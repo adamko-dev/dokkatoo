@@ -35,5 +35,8 @@ dokkatoo {
 //region DON'T COPY - this is only needed for internal Dokkatoo integration tests
 dokkatoo {
   sourceSetScopeDefault.set(":dokkaHtml")
+  dokkatooSourceSets.matching { it.name != "customSourceSet" }.configureEach {
+    jdkVersion.set(8)
+  }
 }
 //endregion

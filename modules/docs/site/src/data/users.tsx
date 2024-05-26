@@ -228,8 +228,8 @@ const Users: User[] = [
           dark: require("./showcase/Pedestal-dark.png").default,
         }}
     />,
-    website: "https://opensavvy.gitlab.io/prepared/api-docs/suite/index.html",
-    source: "https://gitlab.com/opensavvy/pedestal",
+    website: "https://opensavvy.gitlab.io/groundwork/pedestal/api-docs/",
+    source: "https://gitlab.com/opensavvy/groundwork/pedestal",
     tags: ["kotlinMultiplatform", "html"],
   },
   {
@@ -242,8 +242,8 @@ const Users: User[] = [
           dark: require("./showcase/Prepared-dark.png").default,
         }}
     />,
-    website: "https://opensavvy.gitlab.io/prepared/api-docs/suite/index.html",
-    source: "https://gitlab.com/opensavvy/prepared",
+    website: "https://opensavvy.gitlab.io/groundwork/prepared/api-docs/suite/index.html",
+    source: "https://gitlab.com/opensavvy/groundwork/prepared",
     tags: ["favourite", "kotlinMultiplatform", "html"],
   },
   {
@@ -259,6 +259,20 @@ const Users: User[] = [
     website: "https://kdoc.selfie.dev/",
     source: "https://github.com/diffplug/selfie/tree/jvm/2.0.1/jvm/gradle/dokka",
     tags: ["favourite", "kotlinJvm", "html", "design"],
+  },
+  {
+    title: "Spring Boot",
+    description: "Spring Boot makes it easy to create stand-alone, production-grade Spring based Applications that you can \"just run\"..",
+    preview: <ThemedImage
+        alt={`Spring Boot website screenshot`}
+        sources={{
+          light: require("./showcase/spring-boot-light.png").default,
+          dark: require("./showcase/spring-boot-dark.png").default,
+        }}
+    />,
+    website: "https://docs.spring.io/spring-boot/api/kotlin/index.html",
+    source: "https://github.com/spring-projects/spring-boot/blob/v3.3.0/buildSrc/src/main/java/org/springframework/boot/build/KotlinConventions.java#L69-L90",
+    tags: ["kotlinJvm", "html"],
   },
   {
     title: "SnakeYAML Engine KMP",

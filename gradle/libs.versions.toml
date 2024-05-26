@@ -4,11 +4,11 @@ kotlin = "1.9.22" # should match Gradle's embedded Kotlin version https://docs.g
 kotlin-dokka = "1.9.20"
 kotlinx-serialization = "1.6.3"
 
-ktor = "2.3.9"
+ktor = "2.3.11"
 
-kotest = "5.8.1"
+kotest = "5.9.0"
 
-gradlePlugin-android = "8.3.1"
+gradlePlugin-android = "8.4.0"
 gradlePlugin-dokkatoo = "latest.integration"
 gradlePlugin-gradlePublishPlugin = "1.2.1"
 gradlePlugin-bcvMu = "0.1.0"

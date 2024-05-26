@@ -32,7 +32,7 @@ jobs:
           ref: ${{ inputs.checkout-ref || github.ref }}
 
       - name: Validate Gradle Wrapper
-        uses: gradle/wrapper-validation-action@v2
+        uses: gradle/actions/wrapper-validation@v3
 
       - name: Setup JDK
         uses: actions/setup-java@v4
@@ -40,16 +40,18 @@ jobs:
           distribution: temurin
           java-version: 11
 
-      - name: Build site
-        uses: gradle/gradle-build-action@v3
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
         with:
           gradle-home-cache-cleanup: true
           # write build cache on 'main' and 'release' branches, or tags (default is 'main' only)
           cache-read-only: ${{ github.ref != 'refs/heads/main' && !startsWith(github.ref, 'refs/heads/release') && !startsWith(github.ref, 'refs/tags/') }}
-          arguments: |
-            :modules:docs:docusaurusBuild
+          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
-      - name: Upload Dokka to Pages
+      - name: Build site
+        run: ./gradlew :modules:docs:docusaurusBuild
+
+      - name: Upload site to Pages
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./modules/docs/site/build/
