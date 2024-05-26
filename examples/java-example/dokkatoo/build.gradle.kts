@@ -1,4 +1,5 @@
 plugins {
+  base
   `dokka-convention`
 }
 

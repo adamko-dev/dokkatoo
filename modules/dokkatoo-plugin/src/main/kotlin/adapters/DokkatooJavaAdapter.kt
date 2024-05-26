@@ -63,7 +63,7 @@ abstract class DokkatooJavaAdapter @Inject constructor(
       .languageVersion
 
     dokkatoo.dokkatooSourceSets.configureEach {
-      jdkVersion.set(toolchainLanguageVersion.map { it.asInt() }.orElse(8))
+      jdkVersion.set(toolchainLanguageVersion.map { it.asInt() }.orElse(11))
     }
   }
 

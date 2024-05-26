@@ -16,11 +16,9 @@ dependencies {
     because("parse Dokka's libs.version.toml, so Dokkatoo can use the same versions")
   }
 
-  compileOnly("com.microsoft.playwright:playwright:1.42.0")
+  compileOnly("com.microsoft.playwright:playwright:1.43.0")
 }
 
-java {
-  toolchain {
-    languageVersion.set(JavaLanguageVersion.of(11))
-  }
+kotlin {
+  jvmToolchain(11)
 }

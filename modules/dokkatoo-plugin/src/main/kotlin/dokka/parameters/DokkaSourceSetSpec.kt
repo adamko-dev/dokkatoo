@@ -333,7 +333,7 @@ constructor(
    * and this property is set to `8`, Dokka will generate an external documentation link
    * to [JDK 8 Javadocs](https://docs.oracle.com/javase/8/docs/api/java/util/UUID.html) for it.
    *
-   * Default is JDK 8.
+   * Default is JDK 11.
    */
   @get:Input
   abstract val jdkVersion: Property<Int>
