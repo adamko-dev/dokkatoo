@@ -212,6 +212,7 @@ public abstract class dev/adamko/dokkatoo/dokka/plugins/DokkaHtmlPluginParameter
 	public static final field DOKKA_HTML_PLUGIN_FQN Ljava/lang/String;
 	public abstract fun getCustomAssets ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public abstract fun getCustomStyleSheets ()Lorg/gradle/api/file/ConfigurableFileCollection;
+	public abstract fun getEnableAutomaticAggregation ()Lorg/gradle/api/provider/Property;
 	public abstract fun getFooterMessage ()Lorg/gradle/api/provider/Property;
 	public abstract fun getHomepageLink ()Lorg/gradle/api/provider/Property;
 	public abstract fun getMergeImplicitExpectActualDeclarations ()Lorg/gradle/api/provider/Property;
