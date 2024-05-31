@@ -152,7 +152,7 @@ abstract class DokkatooFormatPlugin(
     val dokkatooExtension: DokkatooExtension,
     val dokkatooTasks: DokkatooFormatTasks,
     val formatDependencies: FormatDependenciesManager,
-    formatName: String,
+    val formatName: String,
   ) {
     private val dependencyContainerNames: DependencyContainerNames =
       DependencyContainerNames(formatName)
