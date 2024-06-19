@@ -36,7 +36,7 @@ import org.gradle.kotlin.dsl.*
 @DokkatooInternalApi
 class FormatDependenciesManager(
   private val formatName: String,
-  private val baseDependencyManager: BaseDependencyManager,
+  internal val baseDependencyManager: BaseDependencyManager,
   private val project: Project,
   private val objects: ObjectFactory,
 ) {
