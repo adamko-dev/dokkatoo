@@ -34,6 +34,7 @@ private fun initProject(
   config: GradleProjectTest.() -> Unit = {},
 ): GradleProjectTest {
   return gradleKtsProjectTest("attribute-hack-test") {
+    val versions = versions
 
     settingsGradleKts += """
       |
@@ -45,7 +46,7 @@ private fun initProject(
     dir("subproject-with-dokkatoo") {
       buildGradleKts = """
           |plugins {
-          |  kotlin("multiplatform") version embeddedKotlinVersion
+          |  kotlin("multiplatform") version "${versions.kgp}"
           |  id("dev.adamko.dokkatoo-html") version "$DOKKATOO_VERSION"
           |}
           |

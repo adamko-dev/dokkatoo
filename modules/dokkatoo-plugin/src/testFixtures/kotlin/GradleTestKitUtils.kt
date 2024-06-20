@@ -8,8 +8,10 @@ import kotlin.io.path.readText
 import kotlin.properties.PropertyDelegateProvider
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
+import org.gradle.api.SupportsKotlinAssignmentOverloading
 import org.gradle.testkit.runner.GradleRunner
 import org.intellij.lang.annotations.Language
+import io.github.z4kn4fein.semver.Version as VersionK
 
 
 // utils for testing using Gradle TestKit
@@ -35,7 +37,7 @@ class GradleProjectTest(
   val runner: GradleRunner
     get() = GradleRunner.create()
       .withProjectDir(projectDir.toFile())
-      .withGradleVersion(versions.gradle)
+      .withGradleVersion(versions.gradle.toString())
       .withJvmArguments(
         "-XX:MaxMetaspaceSize=512m",
         "-XX:+AlwaysPreTouch", // https://github.com/gradle/gradle/issues/3093#issuecomment-387259298
@@ -65,15 +67,36 @@ class GradleProjectTest(
 
 
 data class Versions(
-  var kgp: String = "2.0.0",
-  var agp: String = "7.4.0",
-  var gradle: String = "8.8",
+  val kgp: Version = v("2.0.0"),
+  val agp: Version = v("7.4.0"),
+  val gradle: Version =
+//  v("6.9.4"),
+//    v("7.6.4"),
+    v("8.4"),
 ) {
   operator fun invoke(configure: Versions.() -> Unit) {
     apply(configure)
   }
 }
 
+
+@SupportsKotlinAssignmentOverloading
+class Version(var version: VersionK) : Comparable<Version> {
+  constructor(version: String) : this(VersionK.parse(version, strict = false))
+
+  override fun compareTo(other: Version): Int =
+    this.version.compareTo(other.version)
+
+  operator fun compareTo(other: String): Int = compareTo(v(other))
+
+  fun assign(version: String) {
+    this.version = VersionK.parse(version, strict = false)
+  }
+
+  override fun toString(): String = version.toString()
+}
+
+fun v(version: String) = Version(version)
 
 ///**
 // * Load a project from the [GradleProjectTest.dokkaSrcIntegrationTestProjectsDir]

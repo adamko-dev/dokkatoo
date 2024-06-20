@@ -41,16 +41,19 @@ dependencies {
   testFixturesImplementation(gradleTestKit())
 
   testFixturesCompileOnly(libs.kotlin.dokkaCore)
+
   testFixturesImplementation(platform(libs.kotlinxSerialization.bom))
   testFixturesImplementation(libs.kotlinxSerialization.json)
 
-  testFixturesCompileOnly(libs.kotlin.dokkaCore)
+  testFixturesImplementation("io.github.z4kn4fein:semver:2.0.0")
 
   testFixturesApi(platform(libs.kotest.bom))
   testFixturesApi(libs.kotest.junit5Runner)
   testFixturesApi(libs.kotest.assertionsCore)
   testFixturesApi(libs.kotest.assertionsJson)
   testFixturesApi(libs.kotest.datatest)
+  testFixturesApi(libs.kotest.datatest)
+
 
   // don't define test dependencies here, instead define them in the testing.suites {} configuration below
 }
