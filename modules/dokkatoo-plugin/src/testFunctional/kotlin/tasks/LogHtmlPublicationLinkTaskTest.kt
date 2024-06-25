@@ -100,7 +100,7 @@ private fun initDokkatooProject(
   return gradleKtsProjectTest("log-html-publication-link-task") {
     buildGradleKts = """
       |plugins {
-      |  kotlin("jvm") version "1.8.22"
+      |  kotlin("jvm") version "${versions.kgp}"
       |  id("dev.adamko.dokkatoo") version "${DokkatooConstants.DOKKATOO_VERSION}"
       |}
       |

@@ -40,7 +40,11 @@ class HtmlAggregationWarningTest : FunSpec({
   context("when all-modules-page-plugin is present") {
     val project = initMultiModuleProject("with-all-pages-plugin")
 
-    project.runner
+    project
+      .versions {
+        gradle = gradle.coerceAtLeast("8.0")
+      }
+      .runner
       .addArguments(
         "clean",
         ":dokkatooGenerate",

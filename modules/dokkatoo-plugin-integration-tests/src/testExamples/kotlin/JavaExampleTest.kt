@@ -3,11 +3,11 @@ package dev.adamko.dokkatoo.tests.examples
 import dev.adamko.dokkatoo.utils.*
 import dev.adamko.dokkatoo.utils.GradleProjectTest.Companion.exampleProjectDataPath
 import dev.adamko.dokkatoo.utils.GradleProjectTest.Companion.projectTestTempDir
+import io.kotest.assertions.asClue
 import io.kotest.assertions.withClue
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
-import io.kotest.matchers.string.shouldNotContain
 import java.io.File
 import kotlin.io.path.walk
 
@@ -57,7 +57,7 @@ class JavaExampleTest : FunSpec({
 
 
   context("Gradle caching") {
-    test("expect Dokkatoo is compatible with Gradle Build Cache") {
+    test("expect Dokkatoo is compatible with Build Cache") {
       dokkatooProject.runner
         .addArguments(
           "clean",
@@ -83,13 +83,16 @@ class JavaExampleTest : FunSpec({
             "> Task :my-java-library:dokkatooGenerateModuleHtml UP-TO-DATE",
             "> Task :dokkatooGeneratePublicationHtml UP-TO-DATE",
             "BUILD SUCCESSFUL",
-            // expect "1 executed" because :checkKotlinGradlePluginConfigurationErrors always runs (fixed KGP in 2.0?)
-            "18 actionable tasks: 1 executed, 17 up-to-date",
           )
+          output shouldContain when {
+            // expect "1 executed" because :checkKotlinGradlePluginConfigurationErrors always runs
+            dokkatooProject.versions.gradle < "8.0" -> "20 actionable tasks: 20 up-to-date"
+            else                                   -> "18 actionable tasks: 18 up-to-date"
+          }
         }
     }
 
-    context("expect Dokkatoo is compatible with Gradle Configuration Cache") {
+    context("expect Dokkatoo is compatible with Configuration Cache") {
       dokkatooProject
         .findFiles {
           val isCCDir = it.invariantSeparatorsPath.endsWith(".gradle/configuration-cache")
@@ -111,8 +114,10 @@ class JavaExampleTest : FunSpec({
       test("first build should store the configuration cache") {
         configCacheRunner.build {
           output shouldContain "BUILD SUCCESSFUL"
-          output shouldContain "Configuration cache entry stored"
-          output shouldNotContain "problems were found storing the configuration cache"
+          configurationCacheReport().asClue { report ->
+            report.cacheAction shouldBe "storing"
+            report.totalProblemCount shouldBe 0
+          }
         }
       }
 

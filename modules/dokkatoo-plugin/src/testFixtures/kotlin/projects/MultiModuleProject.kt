@@ -16,7 +16,9 @@ fun TestScope.initMultiModuleProject(
     .substringAfter("dev.adamko.dokkatoo.") // drop the package name
     .replaceNonAlphaNumeric()
 
+
   return gradleKtsProjectTest("$baseDirName/multi-module-hello-goodbye/$testName") {
+    val versions = versions
 
     settingsGradleKts += """
       |
@@ -29,7 +31,7 @@ fun TestScope.initMultiModuleProject(
       |plugins {
       |  // Kotlin plugin shouldn't be necessary here, but without it Dokka errors
       |  // with ClassNotFound KotlinPluginExtension... very weird
-      |  kotlin("jvm") version embeddedKotlinVersion apply false
+      |  kotlin("jvm") version "${versions.kgp}" apply false
       |  id("dev.adamko.dokkatoo") version "${DokkatooConstants.DOKKATOO_VERSION}"
       |}
       |
@@ -43,7 +45,7 @@ fun TestScope.initMultiModuleProject(
     dir("subproject-hello") {
       buildGradleKts = """
           |plugins {
-          |  kotlin("jvm") version embeddedKotlinVersion
+          |  kotlin("jvm") version "${versions.kgp}"
           |  id("dev.adamko.dokkatoo") version "${DokkatooConstants.DOKKATOO_VERSION}"
           |}
           |
@@ -70,7 +72,7 @@ fun TestScope.initMultiModuleProject(
 
       buildGradleKts = """
           |plugins {
-          |  kotlin("jvm") version embeddedKotlinVersion
+          |  kotlin("jvm") version "${versions.kgp}"
           |  id("dev.adamko.dokkatoo") version "${DokkatooConstants.DOKKATOO_VERSION}"
           |}
           |

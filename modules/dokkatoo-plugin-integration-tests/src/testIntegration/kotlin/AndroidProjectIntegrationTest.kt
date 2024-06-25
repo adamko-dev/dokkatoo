@@ -1,6 +1,7 @@
 package dev.adamko.dokkatoo.tests.integration
 
 import dev.adamko.dokkatoo.utils.*
+import io.kotest.assertions.asClue
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.file.shouldBeAFile
 import io.kotest.matchers.file.shouldHaveSameStructureAndContentAs
@@ -185,7 +186,7 @@ class AndroidProjectIntegrationTest : FunSpec({
         }
     }
 
-    context("expect Dokkatoo is compatible with Gradle Configuration Cache") {
+    context("expect Dokkatoo is compatible with Configuration Cache") {
       dokkatooProject.file(".gradle/configuration-cache").toFile().deleteRecursively()
       dokkatooProject.file("build/reports/configuration-cache").toFile().deleteRecursively()
 
@@ -203,8 +204,11 @@ class AndroidProjectIntegrationTest : FunSpec({
       test("first build should store the configuration cache") {
         configCacheRunner.build {
           output shouldContain "BUILD SUCCESSFUL"
-          output shouldContain "Configuration cache entry stored"
-          output shouldNotContain "problems were found storing the configuration cache"
+
+          configurationCacheReport().asClue { report ->
+            report.cacheAction shouldBe "storing"
+            report.totalProblemCount shouldBe 0
+          }
         }
       }
 
@@ -224,11 +228,11 @@ private fun initDokkaProject(
   return GradleProjectTest(destinationDir.toPath()).apply {
     copyIntegrationTestProject("it-android-0/dokka")
 
-    gradleProperties = gradleProperties
-      .replace(
-        "dokka_it_android_gradle_plugin_version=4.2.2",
-        "dokka_it_android_gradle_plugin_version=8.0.2",
-      )
+//    gradleProperties = gradleProperties
+//      .replace(
+//        "dokka_it_android_gradle_plugin_version=4.2.2",
+//        "dokka_it_android_gradle_plugin_version=8.0.2",
+//      )
 
     file("src/main/AndroidManifest.xml").deleteIfExists()
 

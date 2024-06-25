@@ -3,6 +3,7 @@ package dev.adamko.dokkatoo.tests.examples
 import dev.adamko.dokkatoo.internal.DokkatooConstants.DOKKA_VERSION
 import dev.adamko.dokkatoo.utils.*
 import dev.adamko.dokkatoo.utils.GradleProjectTest.Companion.projectTestTempDir
+import io.kotest.assertions.asClue
 import io.kotest.assertions.withClue
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.file.shouldBeAFile
@@ -82,7 +83,7 @@ class GradleExampleTest : FunSpec({
 
 
   context("Gradle caching") {
-    test("expect Dokkatoo is compatible with Gradle Build Cache") {
+    test("expect Dokkatoo is compatible with Build Cache") {
       dokkatooProject.runner
         .addArguments(
           "clean",
@@ -123,7 +124,7 @@ class GradleExampleTest : FunSpec({
         }
     }
 
-    context("expect Dokkatoo is compatible with Gradle Configuration Cache") {
+    context("expect Dokkatoo is compatible with Configuration Cache") {
       dokkatooProject.file(".gradle/configuration-cache").toFile().deleteRecursively()
       dokkatooProject.file("build/reports/configuration-cache").toFile().deleteRecursively()
 
@@ -141,8 +142,11 @@ class GradleExampleTest : FunSpec({
       test("first build should store the configuration cache") {
         configCacheRunner.build {
           output shouldContain "BUILD SUCCESSFUL"
-          output shouldContain "Configuration cache entry stored"
-          output shouldNotContain "problems were found storing the configuration cache"
+
+          configurationCacheReport().asClue { report ->
+            report.cacheAction shouldBe "storing"
+            report.totalProblemCount shouldBe 0
+          }
         }
       }
 
@@ -150,6 +154,10 @@ class GradleExampleTest : FunSpec({
         configCacheRunner.build {
           output shouldContain "BUILD SUCCESSFUL"
           output shouldContain "Configuration cache entry reused"
+//          configurationCacheReport().asClue { report ->
+//            report.cacheAction shouldBe "reused"
+//            report.totalProblemCount shouldBe 0
+//          }
         }
       }
     }

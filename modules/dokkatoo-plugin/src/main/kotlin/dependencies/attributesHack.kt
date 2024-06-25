@@ -6,8 +6,8 @@ import org.gradle.api.attributes.Bundling.BUNDLING_ATTRIBUTE
 import org.gradle.api.attributes.Category.CATEGORY_ATTRIBUTE
 import org.gradle.api.attributes.LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE
 import org.gradle.api.attributes.Usage.USAGE_ATTRIBUTE
-import org.gradle.api.attributes.java.TargetJvmEnvironment
-import org.gradle.api.attributes.java.TargetJvmEnvironment.TARGET_JVM_ENVIRONMENT_ATTRIBUTE
+//import org.gradle.api.attributes.java.TargetJvmEnvironment
+//import org.gradle.api.attributes.java.TargetJvmEnvironment.TARGET_JVM_ENVIRONMENT_ATTRIBUTE
 import org.gradle.kotlin.dsl.*
 
 /**
@@ -43,7 +43,7 @@ internal const val AttributeHackPrefix = "Dokkatoo~"
 internal class UsageHackRule : AttributeHackCompatibilityRule<Usage>()
 internal class CategoryHackRule : AttributeHackCompatibilityRule<Category>()
 internal class BundlingHackRule : AttributeHackCompatibilityRule<Bundling>()
-internal class TargetJvmEnvironmentHackRule : AttributeHackCompatibilityRule<TargetJvmEnvironment>()
+//internal class TargetJvmEnvironmentHackRule : AttributeHackCompatibilityRule<TargetJvmEnvironment>()
 internal class LibraryElementsHackRule : AttributeHackCompatibilityRule<LibraryElements>()
 
 /**
@@ -60,9 +60,9 @@ internal fun DependencyHandlerScope.applyAttributeHacks() {
     attribute(BUNDLING_ATTRIBUTE) {
       compatibilityRules.add(BundlingHackRule::class)
     }
-    attribute(TARGET_JVM_ENVIRONMENT_ATTRIBUTE) {
-      compatibilityRules.add(TargetJvmEnvironmentHackRule::class)
-    }
+//    attribute(TARGET_JVM_ENVIRONMENT_ATTRIBUTE) {
+//      compatibilityRules.add(TargetJvmEnvironmentHackRule::class)
+//    }
     attribute(LIBRARY_ELEMENTS_ATTRIBUTE) {
       compatibilityRules.add(LibraryElementsHackRule::class)
     }

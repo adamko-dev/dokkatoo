@@ -1,7 +1,9 @@
 package dev.adamko.dokkatoo.tasks
 
+import dev.adamko.dokkatoo.internal.CurrentGradleVersion
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import dev.adamko.dokkatoo.internal.appendPath
+import dev.adamko.dokkatoo.internal.compareTo
 import dev.adamko.dokkatoo.tasks.LogHtmlPublicationLinkTask.Companion.ENABLE_TASK_PROPERTY_NAME
 import java.net.URI
 import java.net.http.HttpClient
@@ -91,7 +93,9 @@ constructor(
       .orElse(true)
 
     super.onlyIf("task is enabled via property") {
-      logHtmlPublicationLinkTaskEnabled.get()
+      CurrentGradleVersion >= "8.0" // avoid CC error 'GradleProperties has not been loaded yet'
+          &&
+          logHtmlPublicationLinkTaskEnabled.get()
     }
 
     super.onlyIf("${::serverUri.name} is present") {

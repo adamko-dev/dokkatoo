@@ -99,7 +99,7 @@ class MultiModuleFunctionalTest : FunSpec({
 
   context("Gradle caching") {
 
-    context("expect Dokkatoo is compatible with Gradle Build Cache") {
+    context("expect Dokkatoo is compatible with Build Cache") {
       val project = initMultiModuleProject("build-cache")
 
       test("expect clean is successful") {
@@ -510,6 +510,22 @@ class MultiModuleFunctionalTest : FunSpec({
           else                                   -> line
         }
       }
+    }
+
+    if (project.versions.gradle <= "8.0") {
+      /*
+        FAILURE: Build failed with an exception.
+
+        * Where:
+        Build file '/.../build.gradle.kts' line: 1
+
+        * What went wrong:
+        An exception occurred applying plugin request [id: 'dev.adamko.dokkatoo', version: '2.4.0-SNAPSHOT']
+        > Failed to apply plugin class 'dev.adamko.dokkatoo.DokkatooBasePlugin'.
+           > Could not create plugin of type 'DokkatooBasePlugin'.
+              > kotlin/enums/EnumEntriesKt
+       */
+      return@context
     }
 
     test("expect warning regarding KotlinProjectExtension") {

@@ -4,7 +4,9 @@ import dev.adamko.dokkatoo.dokka.plugins.DokkaHtmlPluginParameters
 import dev.adamko.dokkatoo.dokka.plugins.DokkaHtmlPluginParameters.Companion.DOKKA_HTML_PARAMETERS_NAME
 import dev.adamko.dokkatoo.dokka.plugins.DokkaVersioningPluginParameters
 import dev.adamko.dokkatoo.dokka.plugins.DokkaVersioningPluginParameters.Companion.DOKKA_VERSIONING_PLUGIN_PARAMETERS_NAME
+import dev.adamko.dokkatoo.internal.CurrentGradleVersion
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
+import dev.adamko.dokkatoo.internal.compareTo
 import dev.adamko.dokkatoo.internal.uppercaseFirstChar
 import dev.adamko.dokkatoo.tasks.DokkatooGeneratePublicationTask
 import dev.adamko.dokkatoo.tasks.LogHtmlPublicationLinkTask
@@ -120,10 +122,13 @@ constructor(
   ) : Action<Task> {
 
     private val checkEnabled: Boolean
-      get() = providers
-        .gradleProperty(HTML_MODULE_AGGREGATION_CHECK_ENABLED)
-        .map(String::toBoolean)
-        .getOrElse(true)
+      get() =
+        CurrentGradleVersion >= "8.0" // avoid CC error 'GradleProperties has not been loaded yet'
+            &&
+            providers
+              .gradleProperty(HTML_MODULE_AGGREGATION_CHECK_ENABLED)
+              .map(String::toBoolean)
+              .getOrElse(true)
 
     override fun execute(task: Task) {
       if (!checkEnabled) {

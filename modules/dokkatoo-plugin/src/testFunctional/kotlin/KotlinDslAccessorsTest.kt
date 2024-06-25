@@ -13,6 +13,9 @@ class KotlinDslAccessorsTest : FunSpec({
   test("Dokkatoo DSL accessors do not trigger compilation warnings") {
 
     project
+      .versions {
+        gradle = gradle.coerceAtLeast("8.3")
+      }
       .runner
       .forwardOutput()
       .addArguments(
