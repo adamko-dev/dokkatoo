@@ -45,19 +45,27 @@ private fun Path.updateKgpVersion(version: Version) {
         """implementation\("org\.jetbrains\.kotlin:kotlin-gradle-plugin:[^"]+"\)""".toRegex(),
         """implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:$version")""",
       )
-      .replace("""kotlin\("(?<type>[^"]+)"\) version "?[^"]+"?""".toRegex()) { mr ->
+      .replace("""kotlin\("(?<type>[^"\s]+)"\) version "?[^"\s]+"?""".toRegex()) { mr ->
         val type = mr.groups["type"]!!.value
         """kotlin("$type") version "$version""""
       }
+      .replace(
+        """dokka_it_kotlin_version=.+""".toRegex(),
+        """dokka_it_kotlin_version=$version""",
+      )
   )
 }
 
 private fun Path.updateAgpVersion(version: Version) {
   writeText(
     readText()
-      .replace("""id\("com.android(?<type>[^"]*)"\) version "[^"]+"""".toRegex()) { mr ->
+      .replace("""id\("com.android(?<type>[^"\s]*)"\) version "?[^"\s]+"?""".toRegex()) { mr ->
         val type = mr.groups["type"]!!.value
         """id("com.android$type") version "$version""""
       }
+      .replace(
+        """dokka_it_android_gradle_plugin_version=.+""".toRegex(),
+        """dokka_it_android_gradle_plugin_version=$version""",
+      )
   )
 }

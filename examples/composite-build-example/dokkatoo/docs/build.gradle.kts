@@ -8,5 +8,5 @@ dependencies {
 }
 
 dokkatoo {
-  moduleName = "Dokkatoo Composite Builds Example"
+  moduleName.set("Dokkatoo Composite Builds Example")
 }

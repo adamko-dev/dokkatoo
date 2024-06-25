@@ -14,5 +14,5 @@ dokkatoo {
 }
 
 application {
-  mainClass = "demo.MyJavaApplication"
+  mainClass.set("demo.MyJavaApplication")
 }

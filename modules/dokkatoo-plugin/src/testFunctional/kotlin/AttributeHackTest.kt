@@ -66,8 +66,8 @@ private fun initProject(
         |import org.gradle.api.attributes.LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE
         |import org.gradle.api.attributes.Usage.JAVA_RUNTIME
         |import org.gradle.api.attributes.Usage.USAGE_ATTRIBUTE
-        |import org.gradle.api.attributes.java.TargetJvmEnvironment.STANDARD_JVM
-        |import org.gradle.api.attributes.java.TargetJvmEnvironment.TARGET_JVM_ENVIRONMENT_ATTRIBUTE
+        |//import org.gradle.api.attributes.java.TargetJvmEnvironment.STANDARD_JVM
+        |//import org.gradle.api.attributes.java.TargetJvmEnvironment.TARGET_JVM_ENVIRONMENT_ATTRIBUTE
         |
         |plugins {
         |  `java-library`
@@ -76,13 +76,13 @@ private fun initProject(
         |val jarFiles: Configuration by configurations.creating {
         |  isCanBeResolved = false
         |  isCanBeConsumed = false
-        |  isCanBeDeclared = true
+        |  ${"isCanBeDeclared = true".takeIf { versions.gradle >= "8.0" } ?: ""}
         |}
         |
         |val jarFilesResolver: Configuration by configurations.creating {
         |  isCanBeResolved = true
         |  isCanBeConsumed = false
-        |  isCanBeDeclared = false
+        |  ${"isCanBeDeclared = true".takeIf { versions.gradle >= "8.0" } ?: ""}
         |  extendsFrom(jarFiles)
         |  attributes {
         |    //attribute(USAGE_ATTRIBUTE, objects.named(JAVA_RUNTIME))

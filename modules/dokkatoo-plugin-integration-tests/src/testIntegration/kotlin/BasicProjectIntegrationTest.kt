@@ -2,6 +2,7 @@ package dev.adamko.dokkatoo.tests.integration
 
 import dev.adamko.dokkatoo.utils.*
 import dev.adamko.dokkatoo.utils.GradleProjectTest.Companion.projectTestTempDir
+import io.kotest.assertions.asClue
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.file.shouldBeAFile
 import io.kotest.matchers.file.shouldHaveSameStructureAndContentAs
@@ -95,7 +96,7 @@ class BasicProjectIntegrationTest : FunSpec({
         }
     }
 
-    context("expect Dokkatoo is compatible with Gradle Configuration Cache") {
+    context("expect Dokkatoo is compatible with Configuration Cache") {
       dokkatooProject.file(".gradle/configuration-cache").toFile().deleteRecursively()
       dokkatooProject.file("build/reports/configuration-cache").toFile().deleteRecursively()
 
@@ -113,8 +114,11 @@ class BasicProjectIntegrationTest : FunSpec({
       test("first build should store the configuration cache") {
         configCacheRunner.build {
           output shouldContain "BUILD SUCCESSFUL"
-          output shouldContain "Configuration cache entry stored"
-          output shouldNotContain "problems were found storing the configuration cache"
+
+          configurationCacheReport().asClue { report ->
+            report.cacheAction shouldBe "storing"
+            report.totalProblemCount shouldBe 0
+          }
         }
       }
 

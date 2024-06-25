@@ -9,12 +9,12 @@ dokkatoo {
   }
 
   dokkatooSourceSets.javaMain {
-    displayName = "Java"
+    displayName.set("Java")
   }
 
   // non-main source sets are suppressed by default
   dokkatooSourceSets.javaMongodbSupport {
-    suppress = false
-    displayName = "MongoDB"
+    suppress.set(false)
+    displayName.set("MongoDB")
   }
 }

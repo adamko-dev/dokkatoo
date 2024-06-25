@@ -9,5 +9,5 @@ plugins {
 dokkatoo {
   // Important! Ensure that each project has a distinct module path.
   // See the example README for more information.
-  modulePath = rootProject.name + project.path.replace(":", "/")
+  modulePath.set(rootProject.name + project.path.replace(":", "/"))
 }

@@ -19,7 +19,7 @@ class DokkatooPluginFunctionalTest : FunSpec({
   }
 
   testProject.versions {
-    gradle = "8.6" // Gradle is bugged in newer versions https://github.com/gradle/gradle/issues/28733
+    gradle = v("8.6") // Gradle is bugged in newer versions https://github.com/gradle/gradle/issues/28733
   }
 
   test("expect Dokka Plugin creates Dokka tasks") {
