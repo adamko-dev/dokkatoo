@@ -1,6 +1,5 @@
 package dev.adamko.dokkatoo.formats
 
-import dev.adamko.dokkatoo.DokkatooExtension
 import dev.adamko.dokkatoo.dependencies.FormatDependenciesManager
 import dev.adamko.dokkatoo.dokka.DokkaPublication
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
@@ -19,7 +18,6 @@ import org.gradle.kotlin.dsl.*
 class DokkatooFormatTasks(
   project: Project,
   private val publication: DokkaPublication,
-  private val dokkatooExtension: DokkatooExtension,
   private val formatDependencies: FormatDependenciesManager,
 
   private val providers: ProviderFactory,
@@ -57,7 +55,7 @@ class DokkatooFormatTasks(
     ).configuring {
       description = "Executes the Dokka Generator, generating the $formatName publication"
 
-      outputDirectory.convention(dokkatooExtension.dokkatooPublicationDirectory.dir(formatName))
+      outputDirectory.convention(publication.outputDirectory)
 
       applyFormatSpecificConfiguration()
     }
@@ -69,7 +67,7 @@ class DokkatooFormatTasks(
     ).configuring {
       description = "Executes the Dokka Generator, generating a $formatName module"
 
-      outputDirectory.convention(dokkatooExtension.dokkatooModuleDirectory.dir(formatName))
+      outputDirectory.convention(publication.moduleOutputDirectory)
 
       applyFormatSpecificConfiguration()
     }

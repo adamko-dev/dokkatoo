@@ -136,13 +136,19 @@ constructor(
     dokkatooExtension.dokkatooPublications.all {
       enabled.convention(true)
       cacheRoot.convention(dokkatooExtension.dokkatooCacheDirectory)
+      @Suppress("DEPRECATION")
       delayTemplateSubstitution.convention(false)
       failOnWarning.convention(false)
       finalizeCoroutines.convention(false)
       moduleName.convention(dokkatooExtension.moduleName)
       moduleVersion.convention(dokkatooExtension.moduleVersion)
       offlineMode.convention(false)
-      outputDir.convention(dokkatooExtension.dokkatooPublicationDirectory)
+      outputDirectory.convention(
+        @Suppress("DEPRECATION")
+        outputDir
+          .orElse(dokkatooExtension.dokkatooPublicationDirectory.dir(formatName))
+      )
+      moduleOutputDirectory.convention(dokkatooExtension.dokkatooModuleDirectory.dir(formatName))
       suppressInheritedMembers.convention(false)
       suppressObviousFunctions.convention(true)
     }

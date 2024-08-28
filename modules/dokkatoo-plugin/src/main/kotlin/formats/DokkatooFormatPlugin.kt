@@ -79,7 +79,6 @@ abstract class DokkatooFormatPlugin(
       val dokkatooTasks = DokkatooFormatTasks(
         project = target,
         publication = publication,
-        dokkatooExtension = dokkatooExtension,
         formatDependencies = formatDependencies,
         providers = providers,
       )
