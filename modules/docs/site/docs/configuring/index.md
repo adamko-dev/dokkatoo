@@ -53,7 +53,7 @@ dokkatoo {
 
   dokkatooPublications.configureEach {
     suppressObviousFunctions.set(true)
-    suppressObviousFunctions.set(false)
+    suppressInheritedMembers.set(false)
   }
 
   // The default versions that Dokkatoo uses can be overridden:
