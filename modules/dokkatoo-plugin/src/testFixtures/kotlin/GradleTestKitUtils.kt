@@ -78,19 +78,24 @@ class GradleProjectTest(
  * Builder for testing a Gradle project that uses Kotlin script DSL and creates default
  * `settings.gradle.kts` and `gradle.properties` files.
  *
- * @param[testProjectName] the path of the project directory, relative to [baseDir
+ * @param[projectLocation] the path of the project directory, relative to [baseDir]
  */
 fun gradleKtsProjectTest(
-  testProjectName: String,
+  projectLocation: String,
+  rootProjectName: String? = null,
   baseDir: Path = GradleProjectTest.funcTestTempDir,
   build: GradleProjectTest.() -> Unit,
 ): GradleProjectTest {
+
+  val rootProjectNameValue: String = rootProjectName
+    ?: projectLocation.removeSuffix("/").substringAfterLast('/')
+
   return gradleProjectTest(
-    testProjectName = testProjectName,
+    testProjectName = projectLocation,
     baseDir = baseDir,
   ) {
     settingsGradleKts = """
-      |rootProject.name = "test"
+      |rootProject.name = "$rootProjectNameValue"
       |
       |${settingsRepositories()}
       |
@@ -116,7 +121,7 @@ fun gradleGroovyProjectTest(
     baseDir = baseDir,
   ) {
     settingsGradle = """
-      |rootProject.name = "test"
+      |rootProject.name = "$testProjectName"
       |
       |${settingsRepositories()}
       |

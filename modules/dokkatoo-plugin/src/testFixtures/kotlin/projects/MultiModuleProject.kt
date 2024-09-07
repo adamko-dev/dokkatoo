@@ -7,6 +7,7 @@ import io.kotest.core.test.TestScope
 
 fun TestScope.initMultiModuleProject(
   testName: String,
+  rootProjectName: String? = null,
   config: GradleProjectTest.() -> Unit = {},
 ): GradleProjectTest {
 
@@ -16,7 +17,10 @@ fun TestScope.initMultiModuleProject(
     .substringAfter("dev.adamko.dokkatoo.") // drop the package name
     .replaceNonAlphaNumeric()
 
-  return gradleKtsProjectTest("$baseDirName/multi-module-hello-goodbye/$testName") {
+  return gradleKtsProjectTest(
+    projectLocation = "$baseDirName/multi-module-hello-goodbye/$testName",
+    rootProjectName
+  ) {
 
     settingsGradleKts += """
       |

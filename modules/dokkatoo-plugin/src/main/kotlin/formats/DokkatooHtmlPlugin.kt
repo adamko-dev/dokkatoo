@@ -62,6 +62,13 @@ constructor(
   }
 
   private fun DokkatooFormatPluginContext.configureHtmlUrlLogging() {
+    project.tasks.withType<LogHtmlPublicationLinkTask>().configureEach {
+      // default port of IntelliJ built-in server is defined in the docs
+      // https://www.jetbrains.com/help/idea/settings-debugger.html#24aabda8
+      serverUri.convention("http://localhost:63342")
+      rootProjectName.convention(project.rootProject.name)
+    }
+
     val logHtmlUrlTask = registerLogHtmlUrlTask()
 
     dokkatooTasks.generatePublication.configure {
@@ -79,16 +86,13 @@ constructor(
 
     val indexHtmlPath = indexHtmlFile.map { indexHtml ->
       indexHtml.asFile
-        .relativeTo(project.rootDir.parentFile)
+        .relativeTo(project.rootDir)
         .invariantSeparatorsPath
     }
 
     return project.tasks.register<LogHtmlPublicationLinkTask>(
       "logLink" + generatePublicationTask.name.uppercaseFirstChar()
     ) {
-      // default port of IntelliJ built-in server is defined in the docs
-      // https://www.jetbrains.com/help/idea/settings-debugger.html#24aabda8
-      serverUri.convention("http://localhost:63342")
       this.indexHtmlPath.convention(indexHtmlPath)
     }
   }
@@ -156,7 +160,7 @@ constructor(
         logger.warn(/* language=text */ """
             |[${task.path}] org.jetbrains.dokka:all-modules-page-plugin is missing.
             |
-            |Publication '$moduleName' in has $modulesCount modules, but
+            |Dokka Publication '$moduleName' has $modulesCount Dokka modules, but
             |the Dokka Generator plugins classpath does not contain 
             |   org.jetbrains.dokka:all-modules-page-plugin
             |which is required for aggregating Dokka HTML modules.
