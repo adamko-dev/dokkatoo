@@ -15,8 +15,8 @@ import org.gradle.api.provider.ValueSource
 import org.gradle.api.provider.ValueSourceParameters
 import org.gradle.api.tasks.Console
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.UntrackedTask
 import org.gradle.kotlin.dsl.*
-import org.gradle.work.DisableCachingByDefault
 import org.slf4j.LoggerFactory
 
 /**
@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory
  * † For some reason, the only doc page for the built-in server I could find is for PhpStorm,
  * but the built-in server is also available in IntelliJ IDEA.
  */
-@DisableCachingByDefault(because = "logging-only task")
+@UntrackedTask(because = "logging-only task")
 abstract class LogHtmlPublicationLinkTask
 @Inject
 @DokkatooInternalApi
@@ -44,18 +44,36 @@ constructor(
   providers: ProviderFactory
 ) : DokkatooTask() {
 
+  /**
+   * A localhost server, for serving Dokka HTML.
+   *
+   * A server is required because Dokka HTML uses JavaScript.
+   */
   @get:Console
   abstract val serverUri: Property<String>
 
   /**
-   * Path to the `index.html` of the publication. Will be appended to [serverUri].
+   * When using the IntelliJ built-in server the relative paths of files must be prepended
+   * with the IDEA project name.
    *
-   * The IntelliJ built-in server requires a relative path originating from the _parent_ directory
+   * If this is a regular Gradle project, then it's the name of the root Gradle project.
+   *
+   * This property is optional.
+   * If present the value will be appended to [serverUri], before [indexHtmlPath].
+   */
+  @get:Console
+  abstract val rootProjectName: Property<String>
+
+  /**
+   * Path to the `index.html` of the publication, relative to the root directory.
+   * Will be appended to [serverUri].
+   *
+   * The IntelliJ built-in server requires a relative path originating from the root directory
    * of the IntelliJ project.
    *
    * For example,
    *
-   * * given an IntelliJ project path of
+   * * given an IntelliJ project named `MyProject` located in a directory:
    *    ```
    *    /Users/rachel/projects/my-project/
    *    ```
@@ -63,13 +81,13 @@ constructor(
    *    ```
    *    /Users/rachel/projects/my-project/docs/build/dokka/html/index.html
    *    ````
-   * * then IntelliJ requires [indexHtmlPath] is
+   * * then [indexHtmlPath] must be
    *    ```
-   *    my-project/docs/build/dokka/html/index.html
+   *    docs/build/dokka/html/index.html
    *    ```
    * * so that (assuming [serverUri] is `http://localhost:63342`) the logged URL is
    *    ```
-   *    http://localhost:63342/my-project/docs/build/dokka/html/index.html
+   *    http://localhost:63342/MyProject/docs/build/dokka/html/index.html
    *    ```
    */
   @get:Console
@@ -107,14 +125,18 @@ constructor(
   fun exec() {
     val serverUri = serverUri.get()
     val indexHtmlPath = indexHtmlPath.get()
+    val rootProjectName = rootProjectName.orNull?.ifBlank { null }
 
     logger.info(
-      "LogHtmlPublicationLinkTask received variables " +
-          "serverUri:$serverUri, " +
-          "indexHtmlPath:$indexHtmlPath"
+      "LogHtmlPublicationLinkTask received variables "
+          + "serverUri:$serverUri, "
+          + "indexHtmlPath:$indexHtmlPath, "
+          + "rootProjectName:$rootProjectName"
     )
 
-    val link = URI(serverUri).appendPath(indexHtmlPath)
+    val link = URI(serverUri)
+      .let { if (rootProjectName != null) it.appendPath(rootProjectName) else it }
+      .appendPath(indexHtmlPath)
 
     logger.lifecycle("Generated Dokka HTML publication: $link")
   }

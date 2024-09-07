@@ -62,6 +62,13 @@ constructor(
   }
 
   private fun DokkatooFormatPluginContext.configureHtmlUrlLogging() {
+    project.tasks.withType<LogHtmlPublicationLinkTask>().configureEach {
+      // default port of IntelliJ built-in server is defined in the docs
+      // https://www.jetbrains.com/help/idea/settings-debugger.html#24aabda8
+      serverUri.convention("http://localhost:63342")
+      rootProjectName.convention(project.rootProject.name)
+    }
+
     val logHtmlUrlTask = registerLogHtmlUrlTask()
 
     dokkatooTasks.generatePublication.configure {
@@ -79,16 +86,13 @@ constructor(
 
     val indexHtmlPath = indexHtmlFile.map { indexHtml ->
       indexHtml.asFile
-        .relativeTo(project.rootDir.parentFile)
+        .relativeTo(project.rootDir)
         .invariantSeparatorsPath
     }
 
     return project.tasks.register<LogHtmlPublicationLinkTask>(
       "logLink" + generatePublicationTask.name.uppercaseFirstChar()
     ) {
-      // default port of IntelliJ built-in server is defined in the docs
-      // https://www.jetbrains.com/help/idea/settings-debugger.html#24aabda8
-      serverUri.convention("http://localhost:63342")
       this.indexHtmlPath.convention(indexHtmlPath)
     }
   }

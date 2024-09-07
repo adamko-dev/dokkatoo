@@ -412,6 +412,7 @@ public abstract class dev/adamko/dokkatoo/tasks/LogHtmlPublicationLinkTask : dev
 	public static final field ENABLE_TASK_PROPERTY_NAME Ljava/lang/String;
 	public final fun exec ()V
 	public abstract fun getIndexHtmlPath ()Lorg/gradle/api/provider/Property;
+	public abstract fun getRootProjectName ()Lorg/gradle/api/provider/Property;
 	public abstract fun getServerUri ()Lorg/gradle/api/provider/Property;
 }
 
