@@ -24,6 +24,10 @@ class GradleProjectTest(
     baseDir: Path = funcTestTempDir,
   ) : this(projectDir = baseDir.resolve(testProjectName))
 
+  val versions = Versions()
+  fun versions(configure: Versions.() -> Unit): GradleProjectTest =
+    apply { versions.configure() }
+
   /** Args that will be added to every [runner] */
   val defaultRunnerArgs: MutableList<String> = mutableListOf(
     // disable the logging task so the tests work consistently on local machines and CI/CD
@@ -33,6 +37,7 @@ class GradleProjectTest(
   val runner: GradleRunner
     get() = GradleRunner.create()
       .withProjectDir(projectDir.toFile())
+      .withGradleVersion(versions.gradle.toString().substringBeforeLast(".0"))
       .withJvmArguments(
         "-XX:MaxMetaspaceSize=512m",
         "-XX:+AlwaysPreTouch", // https://github.com/gradle/gradle/issues/3093#issuecomment-387259298
@@ -57,6 +62,22 @@ class GradleProjectTest(
     val integrationTestProjectsDir: Path by systemProperty(Paths::get)
     /** Dokka Source directory that contains example Gradle projects */
     val exampleProjectsDir: Path by systemProperty(Paths::get)
+  }
+}
+
+
+data class Versions(
+  var kgp: Version =
+//    v("2.0.0"),
+    v("1.9.24"),
+  var agp: Version = v("7.4.0"),
+  var gradle: Version =
+//  v("6.9.4"),
+//    v("7.6.4"),
+    v("8.4"),
+) {
+  operator fun invoke(configure: Versions.() -> Unit) {
+    apply(configure)
   }
 }
 

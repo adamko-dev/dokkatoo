@@ -13,7 +13,7 @@ class DuplicateModulePathWarningTest : FunSpec({
       buildGradleKts += """
         |
         |dokkatoo {
-        |  modulePath = "dupe"
+        |  modulePath.set("dupe")
         |}
         |
       """.trimMargin()
@@ -23,7 +23,7 @@ class DuplicateModulePathWarningTest : FunSpec({
       buildGradleKts += """
         |
         |dokkatoo {
-        |  modulePath = "dupe"
+        |  modulePath.set("dupe")
         |}
         |
       """.trimMargin()
