@@ -80,7 +80,7 @@ class DokkatooPluginFunctionalTest : FunSpec({
             |Provides Dokkatoo $format ModuleOutputDirectories files for consumption by other subprojects.
             |
             |Capabilities
-            |    - :test:unspecified (default capability)
+            |    - :DokkatooPluginFunctionalTest:unspecified (default capability)
             |Attributes
             |    - dev.adamko.dokkatoo.format           = $format
             |    - dev.adamko.dokkatoo.module-component = ModuleOutputDirectories

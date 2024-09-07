@@ -160,7 +160,7 @@ constructor(
         logger.warn(/* language=text */ """
             |[${task.path}] org.jetbrains.dokka:all-modules-page-plugin is missing.
             |
-            |Publication '$moduleName' in has $modulesCount modules, but
+            |Dokka Publication '$moduleName' has $modulesCount Dokka modules, but
             |the Dokka Generator plugins classpath does not contain 
             |   org.jetbrains.dokka:all-modules-page-plugin
             |which is required for aggregating Dokka HTML modules.
