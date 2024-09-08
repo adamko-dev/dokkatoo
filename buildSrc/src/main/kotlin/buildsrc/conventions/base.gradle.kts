@@ -34,7 +34,6 @@ tasks.withType<AbstractTestTask>().configureEach {
       TestLogEvent.PASSED,
       TestLogEvent.FAILED,
       TestLogEvent.SKIPPED,
-      TestLogEvent.STARTED,
       TestLogEvent.STANDARD_ERROR,
       TestLogEvent.STANDARD_OUT,
     )

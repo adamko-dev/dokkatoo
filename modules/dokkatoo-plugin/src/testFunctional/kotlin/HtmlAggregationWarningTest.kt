@@ -28,7 +28,6 @@ class HtmlAggregationWarningTest : FunSpec({
         "--stacktrace",
         "--info",
       )
-      .forwardOutput()
       .build {
         test("expect warning message is logged") {
           output shouldContain expectedWarning
@@ -47,7 +46,6 @@ class HtmlAggregationWarningTest : FunSpec({
         "--stacktrace",
         "--info",
       )
-      .forwardOutput()
       .build {
         test("expect warning message is not logged") {
           output shouldNotContain expectedWarning

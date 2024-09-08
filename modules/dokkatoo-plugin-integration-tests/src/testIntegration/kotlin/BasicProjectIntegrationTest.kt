@@ -2,6 +2,7 @@ package dev.adamko.dokkatoo.tests.integration
 
 import dev.adamko.dokkatoo.utils.*
 import dev.adamko.dokkatoo.utils.GradleProjectTest.Companion.projectTestTempDir
+import io.kotest.assertions.withClue
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.file.shouldBeAFile
 import io.kotest.matchers.file.shouldHaveSameStructureAndContentAs
@@ -30,7 +31,6 @@ class BasicProjectIntegrationTest : FunSpec({
         "dokkaHtml",
         "--stacktrace",
       )
-      .forwardOutput()
       .build {
         context("with Dokka") {
           test("expect project builds successfully") {
@@ -45,7 +45,6 @@ class BasicProjectIntegrationTest : FunSpec({
         "dokkatooGeneratePublicationHtml",
         "--stacktrace",
       )
-      .forwardOutput()
       .build {
         context("with Dokkatoo") {
           test("expect project builds successfully") {
@@ -73,11 +72,11 @@ class BasicProjectIntegrationTest : FunSpec({
 
       val expectedFileTree = dokkaHtmlDir.toTreeString()
       val actualFileTree = dokkatooHtmlDir.toTreeString()
-      println((actualFileTree to expectedFileTree).sideBySide())
-      expectedFileTree shouldBe actualFileTree
-
-      dokkatooHtmlDir.toFile().shouldHaveSameStructureAs(dokkaHtmlDir.toFile())
-      dokkatooHtmlDir.toFile().shouldHaveSameStructureAndContentAs(dokkaHtmlDir.toFile())
+      withClue((actualFileTree to expectedFileTree).sideBySide()) {
+        expectedFileTree shouldBe actualFileTree
+        dokkatooHtmlDir.toFile().shouldHaveSameStructureAs(dokkaHtmlDir.toFile())
+        dokkatooHtmlDir.toFile().shouldHaveSameStructureAndContentAs(dokkaHtmlDir.toFile())
+      }
     }
 
     test("Dokkatoo tasks should be cacheable") {
@@ -87,7 +86,6 @@ class BasicProjectIntegrationTest : FunSpec({
           "--stacktrace",
           "--build-cache",
         )
-        .forwardOutput()
         .build {
           output shouldContainAll listOf(
             "Task :dokkatooGeneratePublicationHtml UP-TO-DATE",
@@ -108,7 +106,6 @@ class BasicProjectIntegrationTest : FunSpec({
             "--no-build-cache",
             "--configuration-cache",
           )
-          .forwardOutput()
 
       test("first build should store the configuration cache") {
         configCacheRunner.build {

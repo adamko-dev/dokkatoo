@@ -1,5 +1,6 @@
 package dev.adamko.dokkatoo.utils
 
+import io.kotest.assertions.withClue
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.BuildTask
 import org.gradle.testkit.runner.GradleRunner
@@ -17,12 +18,20 @@ fun GradleRunner.withEnvironment(build: MutableMap<String, String?>.() -> Unit):
 
 inline fun GradleRunner.build(
   handleResult: BuildResult.() -> Unit
-): Unit = build().let(handleResult)
+): Unit = build().let {
+  withClue({ it.output.prependIndent() }) {
+    handleResult(it)
+  }
+}
 
 
 inline fun GradleRunner.buildAndFail(
   handleResult: BuildResult.() -> Unit
-): Unit = buildAndFail().let(handleResult)
+): Unit = buildAndFail().let {
+  withClue({ it.output.prependIndent() }) {
+    handleResult(it)
+  }
+}
 
 
 fun GradleRunner.withJvmArguments(

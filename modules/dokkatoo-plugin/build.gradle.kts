@@ -142,6 +142,13 @@ testing.suites {
             // depend on the test-publication task, but not the test-maven repo
             // (otherwise this task will never be up-to-date)
             dependsOn(tasks.publishToTestMavenRepo)
+
+            systemProperty(
+              "kotest.framework.config.fqn",
+              "dev.adamko.dokkatoo.utils.KotestProjectConfig",
+            )
+            // FIXME remove autoscan when Kotest >= 6.0
+            systemProperty("kotest.framework.classpath.scanning.autoscan.disable", "true")
           }
         }
       }

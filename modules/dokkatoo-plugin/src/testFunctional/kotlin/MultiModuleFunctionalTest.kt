@@ -34,7 +34,6 @@ class MultiModuleFunctionalTest : FunSpec({
         ":dokkatooGenerate",
         "--stacktrace",
       )
-      .forwardOutput()
       .build {
         test("expect build is successful") {
           output shouldContain "BUILD SUCCESSFUL"
@@ -115,7 +114,6 @@ class MultiModuleFunctionalTest : FunSpec({
           "--stacktrace",
           "--build-cache",
         )
-        .forwardOutput()
         .build {
           test("expect build is successful") {
             output shouldContain "BUILD SUCCESSFUL"
@@ -141,7 +139,6 @@ class MultiModuleFunctionalTest : FunSpec({
             "--stacktrace",
             "--build-cache",
           )
-          .forwardOutput()
           .build {
             test("expect build is successful") {
               output shouldContainAll listOf(
@@ -224,7 +221,6 @@ class MultiModuleFunctionalTest : FunSpec({
             "clean",
             "--build-cache",
           )
-          .forwardOutput()
           .build {
             test("clean tasks should run successfully") {
               shouldHaveTasksWithAnyOutcome(
@@ -243,7 +239,6 @@ class MultiModuleFunctionalTest : FunSpec({
             "--build-cache",
             "-D" + "org.gradle.caching.debug=true"
           )
-          .forwardOutput()
           .build {
             test("should execute all generation tasks") {
               shouldHaveTasksWithOutcome(expectedGenerationTasks.map { it to SUCCESS })
@@ -257,7 +252,6 @@ class MultiModuleFunctionalTest : FunSpec({
             "clean",
             "--build-cache",
           )
-          .forwardOutput()
           .build {
             test("clean tasks should run successfully") {
               shouldHaveTasksWithAnyOutcome(
@@ -275,7 +269,6 @@ class MultiModuleFunctionalTest : FunSpec({
             "--build-cache",
             "-D" + "org.gradle.caching.debug=true"
           )
-          .forwardOutput()
           .build {
             test("should load all generation tasks from cache") {
               shouldHaveTasksWithOutcome(expectedGenerationTasks.map { it to FROM_CACHE })
@@ -302,7 +295,6 @@ class MultiModuleFunctionalTest : FunSpec({
           "--no-build-cache",
           "--configuration-cache",
         )
-        .forwardOutput()
         .build {
           test("expect build is successful") {
             output shouldContain "BUILD SUCCESSFUL"
@@ -341,7 +333,6 @@ class MultiModuleFunctionalTest : FunSpec({
             "--stacktrace",
             "--build-cache",
           )
-          .forwardOutput()
           .build {
             output shouldContain "BUILD SUCCESSFUL"
           }
@@ -372,7 +363,6 @@ class MultiModuleFunctionalTest : FunSpec({
               "--stacktrace",
               "--build-cache",
             )
-            .forwardOutput()
             .build {
 
               test("expect HelloAgain HTML file exists") {
@@ -422,7 +412,6 @@ class MultiModuleFunctionalTest : FunSpec({
                 "--info",
                 "--build-cache",
               )
-              .forwardOutput()
               .build {
 
                 test("expect HelloAgain HTML file is now deleted") {
@@ -455,7 +444,6 @@ class MultiModuleFunctionalTest : FunSpec({
           "--no-build-cache",
           "--quiet",
         )
-        .forwardOutput()
         .build {
           output.shouldBeEmpty()
         }
@@ -471,7 +459,6 @@ class MultiModuleFunctionalTest : FunSpec({
           "--no-parallel",
           // no logging option => lifecycle log level
         )
-        .forwardOutput()
         .build {
 
           // projects are only configured the first time TestKit runs, and annoyingly there's no
@@ -527,7 +514,6 @@ class MultiModuleFunctionalTest : FunSpec({
     test("expect warning regarding KotlinProjectExtension") {
       project.runner
         .addArguments("clean")
-        .forwardOutput()
         .build {
           // the root project doesn't have the KGP applied, so KotlinProjectExtension shouldn't be applied
           output shouldNotContain "DokkatooKotlinAdapter failed to get KotlinProjectExtension in :\n"
@@ -603,7 +589,6 @@ class MultiModuleFunctionalTest : FunSpec({
           ":dokkatooGeneratePublicationHtml",
           "--stacktrace",
         )
-        .forwardOutput()
         .build {
 
           test("expect project builds successfully") {

@@ -20,7 +20,6 @@ class GradlePluginProjectIntegrationTest : FunSpec({
         "dokkatooGeneratePublicationHtml",
         "--stacktrace",
       )
-      .forwardOutput()
       .build {
 
         test("expect project builds successfully") {

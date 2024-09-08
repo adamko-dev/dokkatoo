@@ -34,7 +34,6 @@ class GradleExampleTest : FunSpec({
           "--stacktrace",
           "--info",
         )
-        .forwardOutput()
         .build {
           output shouldContain "BUILD SUCCESSFUL"
           output shouldContain "Generation completed successfully"
@@ -49,7 +48,6 @@ class GradleExampleTest : FunSpec({
           "--stacktrace",
           "--info",
         )
-        .forwardOutput()
         .build {
           output shouldContain "BUILD SUCCESSFUL"
 
@@ -69,8 +67,9 @@ class GradleExampleTest : FunSpec({
       test("expect file trees are the same") {
         val expectedFileTree = dokkaHtmlDir.toTreeString()
         val actualFileTree = dokkatooHtmlDir.toTreeString()
-        println((actualFileTree to expectedFileTree).sideBySide())
-        expectedFileTree shouldBe actualFileTree
+        withClue((actualFileTree to expectedFileTree).sideBySide()) {
+          expectedFileTree shouldBe actualFileTree
+        }
       }
 
       test("expect directories are the same") {
@@ -90,7 +89,6 @@ class GradleExampleTest : FunSpec({
           "--stacktrace",
           "--info",
         )
-        .forwardOutput()
         .build {
           output shouldContain "BUILD SUCCESSFUL"
 
@@ -110,7 +108,6 @@ class GradleExampleTest : FunSpec({
           "--info",
           "--build-cache",
         )
-        .forwardOutput()
         .build {
           output shouldContainAll listOf(
             "> Task :dokkatooGeneratePublicationHtml UP-TO-DATE",
@@ -136,7 +133,6 @@ class GradleExampleTest : FunSpec({
             "--no-build-cache",
             "--configuration-cache",
           )
-          .forwardOutput()
 
       test("first build should store the configuration cache") {
         configCacheRunner.build {

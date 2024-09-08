@@ -32,7 +32,6 @@ class CustomFormatExampleTest : FunSpec({
           "--stacktrace",
           "--info",
         )
-        .forwardOutput()
         .build {
           output shouldContain "BUILD SUCCESSFUL"
           output shouldContain "Generation completed successfully"
@@ -47,7 +46,6 @@ class CustomFormatExampleTest : FunSpec({
           "--stacktrace",
           "--info",
         )
-        .forwardOutput()
         .build {
           output shouldContain "BUILD SUCCESSFUL"
 
@@ -67,9 +65,10 @@ class CustomFormatExampleTest : FunSpec({
       test("expect file trees are the same") {
         val expectedFileTree = dokkaHtmlDir.toTreeString()
         val actualFileTree = dokkatooHtmlDir.toTreeString()
-        println((actualFileTree to expectedFileTree).sideBySide())
-        // drop the first line from each, since the directory name is different
-        expectedFileTree.substringAfter("\n") shouldBe actualFileTree.substringAfter("\n")
+        withClue((actualFileTree to expectedFileTree).sideBySide()) {
+          // drop the first line from each, since the directory name is different
+          expectedFileTree.substringAfter("\n") shouldBe actualFileTree.substringAfter("\n")
+        }
       }
 
       test("expect directories are the same") {
@@ -89,7 +88,6 @@ class CustomFormatExampleTest : FunSpec({
           "--stacktrace",
           "--info",
         )
-        .forwardOutput()
         .build {
           output shouldContain "BUILD SUCCESSFUL"
 
@@ -108,7 +106,6 @@ class CustomFormatExampleTest : FunSpec({
           "--build-cache",
           "--info",
         )
-        .forwardOutput()
         .build {
           output shouldContainAll listOf(
             "> Task :dokkatooGeneratePublicationHtml UP-TO-DATE",
@@ -134,7 +131,6 @@ class CustomFormatExampleTest : FunSpec({
             "--no-build-cache",
             "--configuration-cache",
           )
-          .forwardOutput()
 
       test("first build should store the configuration cache") {
         configCacheRunner.build {

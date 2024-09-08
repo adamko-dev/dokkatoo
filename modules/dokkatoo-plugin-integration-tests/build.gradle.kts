@@ -101,6 +101,13 @@ testing.suites {
           // workaround for lazy-properties not working https://github.com/gradle/gradle/issues/12247
           systemProperty("exampleProjectsDir", dokkatooExamplesDir.get())
         }
+
+        systemProperty(
+          "kotest.framework.config.fqn",
+          "dev.adamko.dokkatoo.utils.KotestProjectConfig",
+        )
+        // FIXME remove autoscan when Kotest >= 6.0
+        systemProperty("kotest.framework.classpath.scanning.autoscan.disable", "true")
       }
     }
   }
@@ -129,21 +136,6 @@ tasks.withType<Test>().configureEach {
   )
 
   mustRunAfter(tasks.withType<AbstractPublishToMaven>())
-
-  testLogging {
-    events = setOf(
-      TestLogEvent.STARTED,
-      TestLogEvent.PASSED,
-      TestLogEvent.SKIPPED,
-      TestLogEvent.FAILED,
-      TestLogEvent.STANDARD_OUT,
-      TestLogEvent.STANDARD_ERROR,
-    )
-    showStandardStreams = true
-    showExceptions = true
-    showCauses = true
-    showStackTraces = true
-  }
 }
 //endregion
 

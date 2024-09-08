@@ -33,7 +33,6 @@ class LogHtmlPublicationLinkTaskTest : FunSpec({
             "--info",
             validServerUriParam,
           )
-          .forwardOutput()
           .build {
             test("expect project builds successfully") {
               output shouldContain "BUILD SUCCESSFUL"
@@ -62,7 +61,6 @@ class LogHtmlPublicationLinkTaskTest : FunSpec({
               "--info",
               validServerUriParam,
             )
-            .forwardOutput()
             .build {
               test("expect project builds successfully") {
                 output shouldContain "BUILD SUCCESSFUL"
