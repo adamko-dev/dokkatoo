@@ -17,7 +17,6 @@ class AttributeHackTest : FunSpec({
         "--stacktrace",
         "--no-configuration-cache",
       )
-      .forwardOutput()
       .build {
         test("resolving JARs from a Dokkatoo-enabled project should not contain Dokka plugin JARs") {
           output.shouldNotContainAnyOf(

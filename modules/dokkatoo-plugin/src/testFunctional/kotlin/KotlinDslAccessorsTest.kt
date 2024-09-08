@@ -14,7 +14,6 @@ class KotlinDslAccessorsTest : FunSpec({
 
     project
       .runner
-      .forwardOutput()
       .addArguments(
         ":clean",
         ":compileKotlin",

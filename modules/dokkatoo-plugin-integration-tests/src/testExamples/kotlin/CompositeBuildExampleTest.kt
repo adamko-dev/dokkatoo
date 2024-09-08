@@ -26,7 +26,6 @@ class CompositeBuildExampleTest : FunSpec({
           ":build",
           "--stacktrace",
         )
-        .forwardOutput()
         .build {
           output shouldContain "BUILD SUCCESSFUL"
         }
@@ -39,8 +38,9 @@ class CompositeBuildExampleTest : FunSpec({
       test("expect file trees are the same") {
         val expectedFileTree = exampleDataDir.toTreeString()
         val actualFileTree = dokkatooHtmlDir.toTreeString()
-        println((actualFileTree to expectedFileTree).sideBySide())
-        expectedFileTree shouldBe actualFileTree
+        withClue((actualFileTree to expectedFileTree).sideBySide()) {
+          expectedFileTree shouldBe actualFileTree
+        }
       }
 
       test("expect directories are the same") {
@@ -64,7 +64,6 @@ class CompositeBuildExampleTest : FunSpec({
           ":build",
           "--stacktrace",
         )
-        .forwardOutput()
         .build {
           output shouldContain "BUILD SUCCESSFUL"
         }
@@ -75,7 +74,6 @@ class CompositeBuildExampleTest : FunSpec({
           "--stacktrace",
           "--build-cache",
         )
-        .forwardOutput()
         .build {
           output shouldContainAll listOf(
             "> Task :module-kakapo:dokkatooGenerateModuleHtml UP-TO-DATE",
@@ -105,7 +103,6 @@ class CompositeBuildExampleTest : FunSpec({
             "--no-build-cache",
             "--configuration-cache",
           )
-          .forwardOutput()
 
       test("first build should store the configuration cache") {
         configCacheRunner.build {

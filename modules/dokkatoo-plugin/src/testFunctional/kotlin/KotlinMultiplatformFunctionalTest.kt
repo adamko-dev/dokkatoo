@@ -24,7 +24,6 @@ class KotlinMultiplatformFunctionalTest : FunSpec({
         ":dokkatooGeneratePublicationHtml",
         "--stacktrace",
       )
-      .forwardOutput()
       .build {
         test("expect build is successful") {
           output shouldContain "BUILD SUCCESSFUL"

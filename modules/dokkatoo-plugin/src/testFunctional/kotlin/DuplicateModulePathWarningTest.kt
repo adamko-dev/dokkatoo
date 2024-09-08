@@ -37,7 +37,6 @@ class DuplicateModulePathWarningTest : FunSpec({
           "--stacktrace",
           "--warn",
         )
-        .forwardOutput()
         .build {
           test("expect duplicate module path warning") {
             output.shouldContainAll(

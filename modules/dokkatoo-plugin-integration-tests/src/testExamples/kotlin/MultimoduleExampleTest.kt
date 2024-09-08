@@ -3,6 +3,7 @@ package dev.adamko.dokkatoo.tests.examples
 import dev.adamko.dokkatoo.internal.DokkatooConstants.DOKKA_VERSION
 import dev.adamko.dokkatoo.utils.*
 import dev.adamko.dokkatoo.utils.GradleProjectTest.Companion.projectTestTempDir
+import io.kotest.assertions.withClue
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.inspectors.shouldForAll
 import io.kotest.matchers.collections.shouldHaveSize
@@ -34,7 +35,6 @@ class MultimoduleExampleTest : FunSpec({
           "--stacktrace",
           "--info",
         )
-        .forwardOutput()
         .build {
           output shouldContain "BUILD SUCCESSFUL"
           output shouldContain "Generation completed successfully"
@@ -49,7 +49,6 @@ class MultimoduleExampleTest : FunSpec({
           "--stacktrace",
           "--info",
         )
-        .forwardOutput()
         .build {
           test("expect build is successful") {
             output shouldContain "BUILD SUCCESSFUL"
@@ -77,8 +76,9 @@ class MultimoduleExampleTest : FunSpec({
       test("expect file trees are the same") {
         val expectedFileTree = dokkaHtmlDir.toTreeString()
         val actualFileTree = dokkatooHtmlDir.toTreeString()
-        println((actualFileTree to expectedFileTree).sideBySide())
-        expectedFileTree shouldBe actualFileTree
+        withClue((actualFileTree to expectedFileTree).sideBySide()) {
+          expectedFileTree shouldBe actualFileTree
+        }
       }
 
       test("expect directories are the same") {
@@ -98,7 +98,6 @@ class MultimoduleExampleTest : FunSpec({
           ":parentProject:dokkatooGeneratePublicationHtml",
           "--stacktrace",
         )
-        .forwardOutput()
         .build {
           test("expect first build is successful") {
             output shouldContain "BUILD SUCCESSFUL"
@@ -124,7 +123,6 @@ class MultimoduleExampleTest : FunSpec({
           "--info",
           "--build-cache",
         )
-        .forwardOutput()
         .build {
           test("expect second build is successful") {
             output shouldContain "BUILD SUCCESSFUL"
@@ -160,7 +158,6 @@ class MultimoduleExampleTest : FunSpec({
             "--no-build-cache",
             "--configuration-cache",
           )
-          .forwardOutput()
 
       test("first build should store the configuration cache") {
         configCacheRunner.build {
