@@ -1,6 +1,6 @@
 plugins {
   kotlin("jvm") version "1.9.23"
-  id("dev.adamko.dokkatoo") version "2.4.0"
+  id("dev.adamko.dokkatoo") version "2.5.0-SNAPSHOT"
   `maven-publish`
 }
 
