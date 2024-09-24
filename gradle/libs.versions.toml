@@ -10,7 +10,7 @@ kotest = "5.9.1"
 
 gradlePlugin-android = "8.6.0"
 gradlePlugin-dokkatoo = "latest.integration"
-gradlePlugin-gradlePublishPlugin = "1.2.2"
+gradlePlugin-gradlePublishPlugin = "1.3.0"
 gradlePlugin-bcvMu = "0.1.0"
 gradlePlugin-node = "7.0.2"
 
