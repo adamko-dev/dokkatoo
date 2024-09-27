@@ -9,7 +9,7 @@ import org.gradle.api.attributes.Usage.USAGE_ATTRIBUTE
 val screenshotterClasspath: Configuration by configurations.creating {
   declarable()
   withDependencies {
-    add(project.dependencies.create("com.microsoft.playwright:playwright:1.46.0"))
+    add(project.dependencies.create("com.microsoft.playwright:playwright:1.47.0"))
   }
 }
 
