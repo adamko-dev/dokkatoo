@@ -29,6 +29,14 @@ constructor(
 ) {
 
   /**
+   * Experimental.
+   *
+   * Automatically aggregate Dokka HTML from other projects.
+   */
+  @get:Input
+  abstract val enableAutomaticAggregation: Property<Boolean>
+
+  /**
    * List of paths for image assets to be bundled with documentation.
    * The image assets can have any file extension.
    *
