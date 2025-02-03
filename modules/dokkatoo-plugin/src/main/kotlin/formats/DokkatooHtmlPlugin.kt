@@ -1,5 +1,6 @@
 package dev.adamko.dokkatoo.formats
 
+import dev.adamko.dokkatoo.dependencies.ProjectDependencyDescriptor
 import dev.adamko.dokkatoo.dokka.plugins.DokkaHtmlPluginParameters
 import dev.adamko.dokkatoo.dokka.plugins.DokkaHtmlPluginParameters.Companion.DOKKA_HTML_PARAMETERS_NAME
 import dev.adamko.dokkatoo.dokka.plugins.DokkaVersioningPluginParameters
@@ -11,6 +12,7 @@ import dev.adamko.dokkatoo.tasks.LogHtmlPublicationLinkTask
 import java.io.File
 import javax.inject.Inject
 import org.gradle.api.Action
+import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.Task
 import org.gradle.api.file.ArchiveOperations
 import org.gradle.api.logging.Logging
@@ -30,20 +32,24 @@ constructor(
     HtmlModuleAggregationCheck(archives, providers)
 
   override fun DokkatooFormatPluginContext.configure() {
-    registerDokkaBasePluginConfiguration()
+    val htmlParams = registerDokkaBasePluginConfiguration()
     registerDokkaVersioningPlugin()
     configureHtmlUrlLogging()
     configureModuleAggregation()
+    configureAutomaticAggregation(htmlParams)
   }
 
-  private fun DokkatooFormatPluginContext.registerDokkaBasePluginConfiguration() {
+  private fun DokkatooFormatPluginContext.registerDokkaBasePluginConfiguration(): NamedDomainObjectProvider<DokkaHtmlPluginParameters> {
     with(dokkatooExtension.pluginsConfiguration) {
       registerBinding(DokkaHtmlPluginParameters::class, DokkaHtmlPluginParameters::class)
-      register<DokkaHtmlPluginParameters>(DOKKA_HTML_PARAMETERS_NAME)
+
       withType<DokkaHtmlPluginParameters>().configureEach {
+        enableAutomaticAggregation.convention(false)
         separateInheritedMembers.convention(false)
         mergeImplicitExpectActualDeclarations.convention(false)
       }
+
+      return register<DokkaHtmlPluginParameters>(DOKKA_HTML_PARAMETERS_NAME)
     }
   }
 
@@ -112,6 +118,29 @@ constructor(
         project.dependencies.create("org.jetbrains.dokka:all-modules-page-plugin:$v")
       })
     }
+  }
+
+  private fun DokkatooFormatPluginContext.configureAutomaticAggregation(htmlParams: NamedDomainObjectProvider<DokkaHtmlPluginParameters>) {
+
+    val projectDescriptors = objects.listProperty<ProjectDependencyDescriptor>()
+      .apply {
+        addAll(
+          dokkatooExtension.buildService.projects
+            .matching { formatName in it.dokkaFormats.get() }
+        )
+      }
+
+    formatDependencies.baseDependencyManager.declaredDependencies.dependencies.addAllLater(
+      projectDescriptors.map { descriptors ->
+        if (!htmlParams.get().enableAutomaticAggregation.get()) {
+          emptyList()
+        } else {
+          descriptors.map { desc ->
+            project.dependencies.project(desc.projectPath)
+          }
+        }
+      }
+    )
   }
 
   /**

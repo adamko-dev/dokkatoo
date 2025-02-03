@@ -8,7 +8,9 @@ import dev.adamko.dokkatoo.dependencies.DokkatooAttribute.Companion.DokkatooModu
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec
 import dev.adamko.dokkatoo.dokka.parameters.KotlinPlatform
 import dev.adamko.dokkatoo.dokka.parameters.VisibilityModifier
+import dev.adamko.dokkatoo.formats.DokkatooFormatPlugin
 import dev.adamko.dokkatoo.internal.*
+import dev.adamko.dokkatoo.services.DokkatooBuildService
 import dev.adamko.dokkatoo.tasks.DokkatooGenerateModuleTask
 import dev.adamko.dokkatoo.tasks.DokkatooGenerateTask
 import dev.adamko.dokkatoo.tasks.DokkatooTask
@@ -49,7 +51,9 @@ constructor(
     // apply the lifecycle-base plugin so the clean task is available
     target.pluginManager.apply(LifecycleBasePlugin::class)
 
-    val dokkatooExtension = createExtension(target)
+    val dokkatooBuildService = createDokkatooBuildService(target)
+
+    val dokkatooExtension = createExtension(target, dokkatooBuildService)
 
     configureDependencyAttributes(target)
 
@@ -58,7 +62,10 @@ constructor(
     initDokkatooTasks(target, dokkatooExtension)
   }
 
-  private fun createExtension(project: Project): DokkatooExtension {
+  private fun createExtension(
+    project: Project,
+    dokkatooBuildService: DokkatooBuildService,
+  ): DokkatooExtension {
 
     val baseDependencyManager = BaseDependencyManager(
       project = project,
@@ -68,6 +75,7 @@ constructor(
     val dokkatooExtension = project.extensions.create<DokkatooExtension>(
       EXTENSION_NAME,
       baseDependencyManager,
+      dokkatooBuildService,
     ).apply {
       moduleName.convention(providers.provider { project.name })
       moduleVersion.convention(providers.provider { project.version.toString() })
@@ -301,6 +309,22 @@ constructor(
     target.tasks.withType<DokkatooGenerateModuleTask>().configureEach {
       modulePath.convention(dokkatooExtension.modulePath)
     }
+  }
+
+
+  private fun createDokkatooBuildService(project: Project): DokkatooBuildService {
+    val dokkatooBuildService = project.gradle.sharedServices.registerIfAbsent(
+      DokkatooBuildService.DBS_NAME,
+      DokkatooBuildService::class
+    ) {}.get()
+
+    val projectDesc = dokkatooBuildService.projects.create(project.path)
+
+    project.plugins.withType<DokkatooFormatPlugin>().configureEach format@{
+      projectDesc.dokkaFormats.add(formatName)
+    }
+
+    return dokkatooBuildService
   }
 
 
