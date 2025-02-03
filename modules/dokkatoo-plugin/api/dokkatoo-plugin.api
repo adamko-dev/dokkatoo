@@ -146,6 +146,8 @@ public final class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceSetIdSpec$Com
 }
 
 public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceSetSpec : dev/adamko/dokkatoo/dokka/parameters/HasConfigurableVisibilityModifiers, java/io/Serializable, org/gradle/api/Named, org/gradle/api/plugins/ExtensionAware {
+	public final fun externalDocumentationLink (Ljava/net/URI;Lorg/gradle/api/Action;)Ldev/adamko/dokkatoo/dokka/parameters/DokkaExternalDocumentationLinkSpec;
+	public static synthetic fun externalDocumentationLink$default (Ldev/adamko/dokkatoo/dokka/parameters/DokkaSourceSetSpec;Ljava/net/URI;Lorg/gradle/api/Action;ILjava/lang/Object;)Ldev/adamko/dokkatoo/dokka/parameters/DokkaExternalDocumentationLinkSpec;
 	public abstract fun getAnalysisPlatform ()Lorg/gradle/api/provider/Property;
 	public abstract fun getApiVersion ()Lorg/gradle/api/provider/Property;
 	public abstract fun getClasspath ()Lorg/gradle/api/file/ConfigurableFileCollection;

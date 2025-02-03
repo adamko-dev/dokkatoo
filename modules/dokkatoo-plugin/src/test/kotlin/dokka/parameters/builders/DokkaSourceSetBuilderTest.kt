@@ -3,10 +3,7 @@ package dev.adamko.dokkatoo.dokka.parameters.builders
 import dev.adamko.dokkatoo.DokkatooExtension
 import dev.adamko.dokkatoo.DokkatooPlugin
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec
-import dev.adamko.dokkatoo.utils.all_
-import dev.adamko.dokkatoo.utils.create_
-import dev.adamko.dokkatoo.utils.shouldContainAll
-import dev.adamko.dokkatoo.utils.sourceLink_
+import dev.adamko.dokkatoo.utils.*
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.engine.spec.tempdir
@@ -73,6 +70,17 @@ class DokkaSourceSetBuilderTest : FunSpec({
           link.packageListUrl shouldNotBeEqual linkSpec.packageListUrl.get().toURL()
         }
       }
+    }
+
+    test("expect externalDocumentationLink() util function adds link") {
+      val sourceSetSpec = project.createDokkaSourceSetSpec("test4")
+      val linkSpec =
+        sourceSetSpec.externalDocumentationLink_(URI("https://github.com/adamko-dev/dokkatoo/")) {
+          enabled.set(false)
+        }
+      linkSpec.name shouldBe "https://github.com/adamko-dev/dokkatoo/"
+      linkSpec.url.get() shouldBe URI("https://github.com/adamko-dev/dokkatoo/")
+      linkSpec.enabled.get() shouldBe false
     }
   }
 
