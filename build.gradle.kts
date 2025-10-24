@@ -5,6 +5,8 @@ import org.gradle.language.base.plugins.LifecycleBasePlugin.VERIFICATION_GROUP
 plugins {
   buildsrc.conventions.base
   idea
+  id("com.gradleup.nmcp.aggregation")
+  buildsrc.conventions.`maven-publishing-settings`
 }
 
 group = "dev.adamko.dokkatoo"
@@ -44,4 +46,30 @@ val verifyVersionCatalogKotlinVersion by tasks.registering {
 
 tasks.check {
   dependsOn(verifyVersionCatalogKotlinVersion)
+}
+
+nmcpAggregation {
+  centralPortal {
+    username = mavenPublishing.mavenCentralUsername
+    password = mavenPublishing.mavenCentralPassword
+
+    // publish manually from the portal
+    publishingType = "USER_MANAGED"
+  }
+}
+
+dependencies {
+  nmcpAggregation(projects.modules.dokkatooPlugin)
+}
+
+tasks.register("nmcpPublish") {
+  dependsOn(
+    mavenPublishing.isReleaseVersion.map { isRelease ->
+      if (isRelease) {
+        "publishAggregationToCentralPortal"
+      } else {
+        "publishAggregationToCentralPortalSnapshots"
+      }
+    }
+  )
 }
