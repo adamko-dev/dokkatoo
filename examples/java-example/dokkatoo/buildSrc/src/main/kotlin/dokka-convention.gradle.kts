@@ -14,6 +14,11 @@ dokkatoo {
       localDirectory.set(rootDir)
     }
   }
+  pluginsConfiguration.html {
+    // By default footerMessage uses the current year.
+    // Here we fix the year to 2024 for test stability.
+    footerMessage.set("© 2024 Copyright")
+  }
 }
 
 dependencies {
