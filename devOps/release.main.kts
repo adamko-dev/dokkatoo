@@ -3,7 +3,7 @@
 @file:DependsOn("me.alllex.parsus:parsus-jvm:0.6.1")
 @file:DependsOn("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.7.3")
 
-import Release_main.SemVer.Companion.SemVer
+import SemVer.Companion.SemVer
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.terminal
 import com.github.ajalt.clikt.parameters.options.flag
