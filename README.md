@@ -1,7 +1,7 @@
 [![GitHub license](https://img.shields.io/github/license/adamko-dev/dokkatoo?style=for-the-badge)](https://github.com/adamko-dev/dokkatoo/blob/main/LICENSE)
 [![Gradle Plugin Portal](https://img.shields.io/gradle-plugin-portal/v/dev.adamko.dokkatoo?style=for-the-badge&logo=gradle)](https://plugins.gradle.org/search?term=dokkatoo)
 [![Maven Central](https://img.shields.io/maven-central/v/dev.adamko.dokkatoo/dokkatoo-plugin?style=for-the-badge&logo=apache-maven&color=6545e7&link=https%3A%2F%2Fsearch.maven.org%2Fsearch%3Fq%3Dg%3Adev.adamko.dokkatoo)](https://search.maven.org/search?q=g:dev.adamko.dokkatoo)
-[![Maven Central Snapshots](https://img.shields.io/maven-metadata/v?label=MAVEN%20SNAPSHOT&metadataUrl=https%3A%2F%2Fs01.oss.sonatype.org%2Fcontent%2Frepositories%2Fsnapshots%2Fdev%2Fadamko%2Fdokkatoo%2Fdokkatoo-plugin%2Fmaven-metadata.xml&style=for-the-badge&logo=apache-maven)](https://s01.oss.sonatype.org/content/repositories/snapshots/dev/adamko/dokkatoo/dokkatoo-plugin/)
+[![Maven Central Snapshots](https://img.shields.io/nexus/s/dev.adamko.dokkatoo/dokkatoo-plugin?label=MAVEN%20SNAPSHOT&server=https%3A%2F%2Fs01.oss.sonatype.org&style=for-the-badge&logo=apache-maven)](https://s01.oss.sonatype.org/content/repositories/snapshots/dev/adamko/dokkatoo/dokkatoo-plugin/)
 [![Slack](https://img.shields.io/badge/slack-%23dokka-white.svg?&style=for-the-badge&logo=slack)](https://slack-chats.kotlinlang.org/c/dokka)
 
 <picture>
