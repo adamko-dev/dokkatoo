@@ -13,7 +13,7 @@ gradlePlugin-dokkatoo = "latest.integration"
 gradlePlugin-gradlePublishPlugin = "1.3.0"
 gradlePlugin-bcvMu = "0.1.0"
 gradlePlugin-node = "7.1.0"
-
+gradlePlugin-nmcp = "1.2.0"
 
 [libraries]
 
@@ -55,5 +55,6 @@ gradlePlugin-bcvMu = { module = "dev.adamko.kotlin.binary_compatibility_validato
 gradlePlugin-gradlePublishPlugin = { module = "com.gradle.publish:plugin-publish-plugin", version.ref = "gradlePlugin-gradlePublishPlugin" }
 gradlePlugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 gradlePlugin-kotlin-klibCommonizerApi = { module = "org.jetbrains.kotlin:kotlin-klib-commonizer-api", version.ref = "kotlin" }
+gradlePlugin-nmcp = { module = "com.gradleup.nmcp:nmcp", version.ref = "gradlePlugin-nmcp" }
 
 [plugins]

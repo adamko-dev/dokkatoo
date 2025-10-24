@@ -1,14 +1,13 @@
 package buildsrc.conventions
 
-import buildsrc.settings.MavenPublishingSettings
+import buildsrc.settings.MavenPublishingSettings.Companion.mavenPublishing
 
 plugins {
   `maven-publish`
   signing
+  id("com.gradleup.nmcp")
+  id("buildsrc.conventions.maven-publishing-settings")
 }
-
-val mavenPublishing =
-  extensions.create<MavenPublishingSettings>(MavenPublishingSettings.EXTENSION_NAME, project)
 
 
 //region POM convention
@@ -57,17 +56,6 @@ publishing {
 //region Maven Central publishing/signing
 publishing {
   repositories {
-    val mavenCentralUsername = mavenPublishing.mavenCentralUsername.orNull
-    val mavenCentralPassword = mavenPublishing.mavenCentralPassword.orNull
-    if (!mavenCentralUsername.isNullOrBlank() && !mavenCentralPassword.isNullOrBlank()) {
-      maven(mavenPublishing.sonatypeReleaseUrl) {
-        name = "SonatypeRelease"
-        credentials {
-          username = mavenCentralUsername
-          password = mavenCentralPassword
-        }
-      }
-    }
 
     val jbSpaceUsername = mavenPublishing.jbSpaceUsername.orNull
     val jbSpacePassword = mavenPublishing.jbSpacePassword.orNull

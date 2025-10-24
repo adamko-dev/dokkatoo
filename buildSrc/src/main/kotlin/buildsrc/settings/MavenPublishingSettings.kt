@@ -9,25 +9,16 @@ import org.gradle.kotlin.dsl.*
 
 
 /**
- * Settings for the [buildsrc.conventions.Maven_publish_test_gradle] convention plugin.
+ * Settings for the [buildsrc.conventions.MavenPublishTestPlugin] convention plugin.
  */
 abstract class MavenPublishingSettings @Inject constructor(
   private val project: Project,
   private val providers: ProviderFactory,
 ) {
 
-  private val isReleaseVersion: Provider<Boolean> =
+  val isReleaseVersion: Provider<Boolean> =
     providers.provider { !project.version.toString().endsWith("-SNAPSHOT") }
 
-
-  val sonatypeReleaseUrl: Provider<String> =
-    isReleaseVersion.map { isRelease ->
-      if (isRelease) {
-        "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-      } else {
-        "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-      }
-    }
   val mavenCentralUsername: Provider<String> =
     d2Prop("mavenCentralUsername")
       .orElse(providers.environmentVariable("MAVEN_SONATYPE_USERNAME"))
