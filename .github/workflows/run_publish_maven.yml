@@ -45,22 +45,6 @@ jobs:
       checkout-ref: ${{ inputs.checkout-ref }}
 
 
-  jetbrains-space:
-    if: github.ref == 'refs/heads/main'
-    permissions:
-      contents: read
-      packages: write
-      checks: write
-    uses: ./.github/workflows/run_gradle_task.yml
-    secrets: inherit
-    with:
-      runs-on: macos-latest
-      gradle-task: >-
-        publishAllPublicationsToJetBrainsSpaceRepository
-        --stacktrace
-      checkout-ref: ${{ inputs.checkout-ref }}
-
-
   adamko-dev:
     if: github.ref == 'refs/heads/main'
     permissions:
