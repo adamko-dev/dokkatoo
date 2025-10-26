@@ -8,7 +8,7 @@ ktor = "2.3.13"
 
 kotest = "5.9.1"
 
-gradlePlugin-android = "8.7.3"
+gradlePlugin-android = "8.13.0"
 gradlePlugin-dokkatoo = "latest.integration"
 gradlePlugin-gradlePublishPlugin = "1.3.1"
 gradlePlugin-bcvMu = "0.1.0"
