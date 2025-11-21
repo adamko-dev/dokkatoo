@@ -17,7 +17,7 @@ dependencies {
     because("parse Dokka's libs.version.toml, so Dokkatoo can use the same versions")
   }
 
-  compileOnly("com.microsoft.playwright:playwright:1.55.0")
+  compileOnly("com.microsoft.playwright:playwright:1.56.0")
 }
 
 kotlin {
