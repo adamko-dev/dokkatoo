@@ -35,7 +35,7 @@
   "devDependencies": {
     "@docusaurus/module-type-aliases": "3.5.2",
     "@docusaurus/types": "3.5.2",
-    "@tsconfig/docusaurus": "2.0.4"
+    "@tsconfig/docusaurus": "2.0.5"
   },
   "// override fast-url-parser": "prevent warning about deprecated punycode",
   "overrides": {
