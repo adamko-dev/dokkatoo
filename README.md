@@ -8,6 +8,103 @@
   <img alt="Dokkatoo Logo" src="./modules/docs/site/static/img/banner.svg" style="margin: 1em">
 </picture>
 
+---
+
+## Status Update
+
+Dokkatoo has been merged into the main Dokka project!
+In October 2025 [Dokka v2.1.0](https://github.com/Kotlin/dokka/releases/tag/v2.1.0) was released,
+which means the official Dokka Gradle plugin has all the same features as Dokkatoo,
+as well as improved performance, stability, and support.
+
+* Compatible with [Gradle Build Cache](https://docs.gradle.org/current/userguide/build_cache.html).
+* Compatible with
+  [Gradle Configuration Cache](https://docs.gradle.org/current/userguide/configuration_cache.html).
+* Follows Gradle best practices for plugin development, for a more stable experience.
+* Faster, parallel execution.
+* K2 Analysis is enabled by default.
+* Support
+  for [Context parameters](https://kotlinlang.org/docs/whatsnew22.html#preview-of-context-parameters)
+  and [Nested typealiases](https://kotlinlang.org/docs/whatsnew22.html#support-for-nested-type-aliases).
+
+The Dokkatoo Gradle plugin is now obsolete. It will no longer be maintained.
+It will be deprecated in a future release.
+
+### Migration from Dokkatoo to Dokka Gradle plugin
+
+Please migrate from Dokkatoo to Dokka to ensure you receive the latest features, bug fixes, and
+support.
+
+- Use the new plugin ID:
+    - Replace `id("dev.adamko.dokkatoo")` with `id("org.jetbrains.dokka")`.
+    - Replace `id("dev.adamko.dokkatoo-html")` with `id("org.jetbrains.dokka")`.
+    - Replace `id("dev.adamko.dokkatoo-javadoc")` with `id("org.jetbrains.dokka-javadoc")`.
+
+  _Note: The experimental Jekyll and GitHub Markdown formats are not available in Dokka 2.1.0._\
+  _See [The future of Dokkatoo](#the-future-of-dokkatoo) below._
+- Update any import statements. The packages are different, so the classes must be re-imported.
+  For example:
+    - `dev.adamko.dokkatoo.DokkatooExtension` is now `org.jetbrains.dokka.gradle.DokkaExtension`.
+    - `dev.adamko.dokkatoo.dokka.parameters.VisibilityModifier` is now
+      `org.jetbrains.dokka.gradle.engine.parameters.VisibilityModifier`.
+- Replace `dokkatoo {}` with `dokka {}` in Gradle build scripts.
+- Update any dependencies:
+    - Replace `dokkatoo(project(":some-subproject"))` with `dokka(project(":some-subproject"))`.
+    - Replace `dokkatooPlugin(...)` with `dokkaPlugin(...)`.
+- Update any task names from `dokkatoo` to `dokka`.
+
+The official DGPv1 to DGPv2 docs might be helpful too:
+https://kotl.in/dokka-gradle-migration
+
+Migration might be a bit more complicated than that, so if anything is unclear please reach out in
+[Kotlinlang Slack](https://kotl.in/slack) `#dokka`
+or [create an issue](https://kotl.in/dokka-issues).
+
+### The future of Dokkatoo
+
+If Dokkatoo is obsolete, what is the purpose of this repository?
+
+I think we can still use Dokkatoo as a force for good. Dokka has always been very pluggable,
+and there is a scattering of useful plugins.
+I want to make Dokkatoo a hub for community-maintained plugins for Dokka.
+
+Since the Dokka team do not have the capacity to maintain the Jekyll and GitHub Markdown plugins,
+instead we can migrate them into Dokkatoo, where they can be maintained in this repo,
+and the community can contribute to them.
+
+If you are interested in contributing a Dokka plugin, or maintaining an existing one,
+please reach out in
+[Kotlinlang Slack](https://kotl.in/slack) `#dokka`
+or [create an issue](https://github.com/adamko-dev/dokkatoo/issues/new).
+
+### Thanks
+
+Lastly, I want to thank everyone who made Dokkatoo such a success.
+I'm sure Dokkatoo was just another library for most people, but for me, it represents a milestone
+of my life.
+I started Dokkatoo as a hobby (or, more accurately,
+a [yak-shaving](https://softwareengineering.stackexchange.com/q/388092/400690))
+project. My efforts were noticed and encouraged, and JetBrains hired me to merge Dokkatoo into
+Dokka.
+
+To everyone in the Dokka, Kotlin Build Tools, and Kotlin teams: thanks for the help, support, and
+code reviews.
+And I especially want to thank all the users who gave feedback, reported bugs, requested features,
+opened pull requests, or even just those who quietly used Dokkatoo.
+I always appreciated your support.
+
+When I look back on Dokkatoo, two things stand out. The first is the high point, which was
+when [Gradle decided to use Dokkatoo to generate Gradle docs](https://github.com/gradle/gradle/pull/24302) -
+I had written a plugin good enough for Gradle itself! The second is just how confusing the name was
+in meetings. I laughed every time someone said "Dokkatoo" and someone else thought they said
+"Dokka 2" - exactly what I wanted!
+
+---
+
+<details>
+
+<summary>Click here to view the rest of the readme</summary>
+
 [Dokkatoo](https://github.com/adamko-dev/dokkatoo) is a
 [Gradle](https://gradle.org/)
 plugin that generates easy-to-use reference documentation for your
@@ -100,25 +197,4 @@ are also available.
 More details about the Dokkatoo releases is available in the documentation
 [Dokkatoo Documentation](https://adamko-dev.github.io/dokkatoo/docs/releases)
 
-## Why not Dokka?
-
-If
-[Dokka already has a Gradle plugin](https://kotlinlang.org/docs/dokka-gradle.html),
-then what is Dokkatoo for?
-
-Dokkatoo has a number of improvements over the existing Dokka Gradle Plugin:
-
-* Compatible with [Gradle Build Cache](https://docs.gradle.org/current/userguide/build_cache.html).
-* Compatible with
-  [Gradle Configuration Cache](https://docs.gradle.org/current/userguide/configuration_cache.html).
-* Follows Gradle best practices for plugin development, for a more stable experience.
-* Faster, parallel execution.
-
-### Migrating from Dokka Gradle Plugin
-
-Migrating from Dokka to Dokkatoo can be done in a few simple steps.
-Check the [Dokkatoo Documentation](https://adamko-dev.github.io/dokkatoo/)
-to get started.
-
-If you'd like to see comparative examples of the same projects with both Dokka and Dokkatoo config,
-check the [example projects](./examples/README.md).
+</details>

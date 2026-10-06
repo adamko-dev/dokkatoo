@@ -43,6 +43,9 @@ dokkatoo {
 }
 
 node {
+  download = true
+  version = "24.21.0"
+  distBaseUrl = null
   nodeProjectDir = docusaurusSiteDir
 }
 

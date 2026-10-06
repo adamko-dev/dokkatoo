@@ -20,6 +20,19 @@ function HomepageHeader() {
             {siteConfig.tagline}
           </p>
 
+          <aside className={clsx("alert alert--warning", styles.deprecationNotice)} aria-label="Deprecation notice">
+            <p>
+              The Dokkatoo Gradle plugin has been merged into <Link to="https://github.com/Kotlin/dokka">Dokka</Link>.
+              The official Dokka Gradle Plugin (v2.1.0+) has all the same features as Dokkatoo,
+              and the Dokkatoo Gradle plugin will no longer be maintained.
+            </p>
+            <Link
+                className="button button--primary button--lg"
+                to="https://github.com/adamko-dev/dokkatoo#migration-from-dokkatoo-to-dokka-gradle-plugin">
+              Migrate to Dokka →
+            </Link>
+          </aside>
+
           <div className={styles.buttons}>
             <Link className="button button--secondary button--lg" to="/docs">
               Dive into the documentation 🏊

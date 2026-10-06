@@ -4,6 +4,7 @@ import dev.adamko.dokkatoo.dokka.plugins.DokkaHtmlPluginParameters
 import dev.adamko.dokkatoo.dokka.plugins.DokkaHtmlPluginParameters.Companion.DOKKA_HTML_PARAMETERS_NAME
 import dev.adamko.dokkatoo.dokka.plugins.DokkaVersioningPluginParameters
 import dev.adamko.dokkatoo.dokka.plugins.DokkaVersioningPluginParameters.Companion.DOKKA_VERSIONING_PLUGIN_PARAMETERS_NAME
+import dev.adamko.dokkatoo.internal.DOKKATOO_GRADLE_PLUGIN_DEPRECATION_MESSAGE
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import dev.adamko.dokkatoo.internal.uppercaseFirstChar
 import dev.adamko.dokkatoo.tasks.DokkatooGeneratePublicationTask
@@ -18,6 +19,8 @@ import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.*
 
+@Deprecated(DOKKATOO_GRADLE_PLUGIN_DEPRECATION_MESSAGE)
+@Suppress("DEPRECATION")
 abstract class DokkatooHtmlPlugin
 @DokkatooInternalApi
 @Inject
@@ -184,6 +187,7 @@ constructor(
 
   @DokkatooInternalApi
   companion object {
+    @Suppress("DEPRECATION")
     private val logger = Logging.getLogger(DokkatooHtmlPlugin::class.java)
 
     private const val ALL_MODULES_PAGE_PLUGIN_FQN =

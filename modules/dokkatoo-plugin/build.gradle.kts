@@ -134,11 +134,11 @@ testing.suites {
     useJUnitJupiter()
 
     dependencies {
-      implementation(project.dependencies.gradleTestKit())
+      implementation(gradleTestKit())
 
-      implementation(project.dependencies.testFixtures(project()))
+      implementation(testFixtures(project()))
 
-      implementation(project.dependencies.platform(libs.kotlinxSerialization.bom))
+      implementation(platform(libs.kotlinxSerialization.bom))
       implementation(libs.kotlinxSerialization.json)
     }
 
@@ -186,7 +186,7 @@ testing.suites {
     }
 
     dependencies {
-      implementation(project.dependencies.platform(libs.ktor.bom))
+      implementation(platform(libs.ktor.bom))
       implementation(libs.ktorServer.core)
       implementation(libs.ktorServer.cio)
     }

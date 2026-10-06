@@ -9,6 +9,7 @@ import dev.adamko.dokkatoo.dependencies.DependencyContainerNames
 import dev.adamko.dokkatoo.dependencies.DokkatooAttribute.Companion.DokkatooClasspathAttribute
 import dev.adamko.dokkatoo.dependencies.DokkatooAttribute.Companion.DokkatooFormatAttribute
 import dev.adamko.dokkatoo.dependencies.FormatDependenciesManager
+import dev.adamko.dokkatoo.internal.DOKKATOO_GRADLE_PLUGIN_DEPRECATION_MESSAGE
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import javax.inject.Inject
 import org.gradle.api.Action
@@ -36,6 +37,7 @@ import org.gradle.kotlin.dsl.*
  *
  * Anyone can use this class as a basis for a generating a Dokka Publication in a custom format.
  */
+@Deprecated(DOKKATOO_GRADLE_PLUGIN_DEPRECATION_MESSAGE)
 abstract class DokkatooFormatPlugin(
   val formatName: String,
 ) : Plugin<Project> {
@@ -54,6 +56,7 @@ abstract class DokkatooFormatPlugin(
   protected abstract val layout: ProjectLayout
 
 
+  @Suppress("DEPRECATION")
   override fun apply(target: Project) {
 
     // apply DokkatooBasePlugin
@@ -148,6 +151,7 @@ abstract class DokkatooFormatPlugin(
   @DokkatooInternalApi
   class DokkatooFormatPluginContext(
     val project: Project,
+    @Suppress("DEPRECATION")
     val dokkatooExtension: DokkatooExtension,
     val dokkatooTasks: DokkatooFormatTasks,
     val formatDependencies: FormatDependenciesManager,
@@ -227,6 +231,7 @@ abstract class DokkatooFormatPlugin(
   }
 
   companion object {
+    @Suppress("DEPRECATION")
     private val logger = Logging.getLogger(DokkatooFormatPlugin::class.java)
   }
 }

@@ -36,6 +36,7 @@ import org.gradle.language.base.plugins.LifecycleBasePlugin
  * The base plugin for Dokkatoo. Sets up Dokkatoo and configures default values, but does not
  * add any specific config (specifically, it does not create Dokka Publications).
  */
+@Deprecated(DOKKATOO_GRADLE_PLUGIN_DEPRECATION_MESSAGE)
 abstract class DokkatooBasePlugin
 @DokkatooInternalApi
 @Inject
@@ -58,6 +59,7 @@ constructor(
     initDokkatooTasks(target, dokkatooExtension)
   }
 
+@Suppress("DEPRECATION")
   private fun createExtension(project: Project): DokkatooExtension {
 
     val baseDependencyManager = BaseDependencyManager(
@@ -130,6 +132,7 @@ constructor(
 
 
   /** Set defaults in all [DokkatooExtension.dokkatooPublications]s */
+@Suppress("DEPRECATION")
   private fun configureDokkaPublicationsDefaults(
     dokkatooExtension: DokkatooExtension,
   ) {
@@ -247,6 +250,7 @@ constructor(
   }
 
 
+@Suppress("DEPRECATION")
   private fun initDokkatooTasks(
     target: Project,
     dokkatooExtension: DokkatooExtension,

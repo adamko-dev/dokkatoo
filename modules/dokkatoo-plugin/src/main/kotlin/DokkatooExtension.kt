@@ -21,6 +21,7 @@ import org.gradle.workers.WorkerExecutor
 /**
  * Configure the behaviour of the [DokkatooBasePlugin].
  */
+@Deprecated(DOKKATOO_GRADLE_PLUGIN_DEPRECATION_MESSAGE)
 abstract class DokkatooExtension
 @DokkatooInternalApi
 constructor(

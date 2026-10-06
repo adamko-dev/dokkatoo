@@ -28,6 +28,7 @@ abstract class DokkatooAndroidAdapter @Inject constructor(
   private val objects: ObjectFactory,
 ) : Plugin<Project> {
 
+  @Suppress("DEPRECATION")
   override fun apply(project: Project) {
     logger.info("applied DokkatooAndroidAdapter to ${project.path}")
 
@@ -40,6 +41,7 @@ abstract class DokkatooAndroidAdapter @Inject constructor(
     }
   }
 
+  @Suppress("DEPRECATION")
   protected fun configure(project: Project) {
     val dokkatooExtension = project.extensions.getByType<DokkatooExtension>()
 

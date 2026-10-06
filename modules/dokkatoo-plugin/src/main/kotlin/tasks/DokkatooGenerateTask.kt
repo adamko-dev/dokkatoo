@@ -3,6 +3,7 @@ package dev.adamko.dokkatoo.tasks
 import dev.adamko.dokkatoo.DokkatooBasePlugin.Companion.jsonMapper
 import dev.adamko.dokkatoo.dokka.parameters.DokkaGeneratorParametersSpec
 import dev.adamko.dokkatoo.dokka.parameters.builders.DokkaParametersBuilder
+import dev.adamko.dokkatoo.internal.DOKKATOO_GRADLE_PLUGIN_DEPRECATION_MESSAGE
 import dev.adamko.dokkatoo.internal.DokkaPluginParametersContainer
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import dev.adamko.dokkatoo.workers.ClassLoaderIsolation
@@ -31,6 +32,8 @@ import org.jetbrains.dokka.toPrettyJsonString
  * The Dokka Plugins added to the generator classpath determine the type of documentation generated.
  */
 @CacheableTask
+@Deprecated(DOKKATOO_GRADLE_PLUGIN_DEPRECATION_MESSAGE)
+@Suppress("DEPRECATION")
 abstract class DokkatooGenerateTask
 @DokkatooInternalApi
 @Inject
