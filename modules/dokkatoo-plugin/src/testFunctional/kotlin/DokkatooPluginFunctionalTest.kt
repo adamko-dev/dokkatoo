@@ -102,7 +102,13 @@ class DokkatooPluginFunctionalTest : FunSpec({
     testProject.runner
       .addArguments("resolvableConfigurations", "-q")
       .build {
-        output.invariantNewlines().asClue { allConfigurations ->
+        output.invariantNewlines()
+          .lines()
+          // Gradle 9 reports this warning for resolvable configurations, even though they're not
+          // consumable, so the warning doesn't apply.
+          .filterNot { it.trimStart().startsWith("Consumable configurations with identical capabilities") }
+          .joinToString("\n")
+          .asClue { allConfigurations ->
 
           val dokkatooConfigurations = allConfigurations.lines()
             .filter { it.contains("dokka", ignoreCase = true) }

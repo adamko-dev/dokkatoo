@@ -81,8 +81,7 @@ class JavaExampleTest : FunSpec({
             "> Task :my-java-library:dokkatooGenerateModuleHtml UP-TO-DATE",
             "> Task :dokkatooGeneratePublicationHtml UP-TO-DATE",
             "BUILD SUCCESSFUL",
-            // expect "1 executed" because :checkKotlinGradlePluginConfigurationErrors always runs (fixed KGP in 2.0?)
-            "18 actionable tasks: 1 executed, 17 up-to-date",
+            "17 actionable tasks: 17 up-to-date",
           )
         }
     }
@@ -128,6 +127,7 @@ private fun initDokkatooProject(
   destinationDir: File,
 ): GradleProjectTest {
   return GradleProjectTest(destinationDir.toPath()).apply {
+    gradleVersion = INTEGRATION_TEST_GRADLE_VERSION
     copyExampleProject("java-example/dokkatoo")
   }
 }

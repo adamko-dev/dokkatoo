@@ -2,15 +2,11 @@ package dev.adamko.dokkatoo.adapters
 
 import dev.adamko.dokkatoo.DokkatooBasePlugin
 import dev.adamko.dokkatoo.DokkatooExtension
-import dev.adamko.dokkatoo.adapters.DokkatooKotlinAdapter.Companion.currentKotlinToolingVersion
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetIdSpec
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetIdSpec.Companion.dokkaSourceSetIdSpec
 import dev.adamko.dokkatoo.dokka.parameters.DokkaSourceSetSpec
 import dev.adamko.dokkatoo.dokka.parameters.KotlinPlatform
 import dev.adamko.dokkatoo.internal.*
-import dev.adamko.dokkatoo.internal.PluginId
-import dev.adamko.dokkatoo.internal.artifactType
-import dev.adamko.dokkatoo.internal.warn
 import java.io.File
 import javax.inject.Inject
 import kotlin.reflect.jvm.jvmName
@@ -201,14 +197,18 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
           else                    -> throw e
         }
       }
-
-    /** Get the version of the Kotlin Gradle Plugin currently used to compile the project */
-    // Must be lazy, else tests fail (because the KGP plugin isn't accessible)
-    internal val currentKotlinToolingVersion: KotlinToolingVersion by lazy {
-      val kgpVersion = getKotlinPluginVersion(logger)
-      KotlinToolingVersion(kgpVersion)
-    }
   }
+}
+
+
+/** Get the version of the Kotlin Gradle Plugin currently used to compile the project */
+// Must be lazy, else tests fail (because the KGP plugin isn't accessible).
+// Must not be defined inside DokkatooKotlinAdapter, because Kotlin compiles the `lazy {}`
+// lambda into a method of the enclosing class, and Gradle fails to decorate the plugin class
+// when KGP isn't on the classpath.
+private val currentKotlinToolingVersion: KotlinToolingVersion by lazy {
+  val kgpVersion = getKotlinPluginVersion(Logging.getLogger(DokkatooKotlinAdapter::class.java))
+  KotlinToolingVersion(kgpVersion)
 }
 
 
@@ -378,6 +378,7 @@ private class KotlinCompilationDetailsBuilder(
         is KotlinMetadataCompilation<*> -> true
 
         is KotlinJvmAndroidCompilation  -> {
+          val androidVariant = @Suppress("DEPRECATION") androidVariant ?: return false
           // Use string-based comparison, not the actual classes, because AGP has deprecated and
           // moved the Library/Application classes to a different package.
           // Using strings is more widely compatible.

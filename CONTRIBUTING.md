@@ -31,10 +31,10 @@ Here are some additional helpful commands:
     ./gradlew publishToTestMavenRepo
     ```
 * Update the
-  [Binary Compatibility Validator](https://github.com/Kotlin/binary-compatibility-validator)
+  [Kotlin Gradle Plugin ABI validation](https://kotlinlang.org/docs/gradle-binary-compatibility-validation.html)
   API dump:
     ```shell
-    ./gradlew apiDump
+    ./gradlew updateKotlinAbi
     ```
 
 ## Adding New Features

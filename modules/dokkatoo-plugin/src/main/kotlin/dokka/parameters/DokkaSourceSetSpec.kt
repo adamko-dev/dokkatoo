@@ -313,7 +313,7 @@ constructor(
    */
   @get:Input
   @get:Optional
-  abstract val languageVersion: Property<String?>
+  abstract val languageVersion: Property<String>
 
   /**
    * [Kotlin API version](https://kotlinlang.org/docs/compatibility-modes.html)
@@ -324,7 +324,7 @@ constructor(
    */
   @get:Input
   @get:Optional
-  abstract val apiVersion: Property<String?>
+  abstract val apiVersion: Property<String>
 
   /**
    * JDK version to use when generating external documentation links for Java types.

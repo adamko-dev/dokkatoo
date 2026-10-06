@@ -3,7 +3,6 @@
 import buildsrc.tasks.SetupDokkaProjects
 import buildsrc.utils.buildDir_
 import buildsrc.utils.skipTestFixturesPublications
-import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
   kotlin("jvm")
@@ -59,12 +58,12 @@ testing.suites {
     useJUnitJupiter()
 
     dependencies {
-      implementation(project.dependencies.gradleTestKit())
-      implementation(project.dependencies.testFixtures(project()))
+      implementation(gradleTestKit())
+      implementation(testFixtures(project()))
 
       compileOnly(libs.kotlin.dokkaCore)
 
-      implementation(project.dependencies.platform(libs.kotlinxSerialization.bom))
+      implementation(platform(libs.kotlinxSerialization.bom))
       implementation(libs.kotlinxSerialization.json)
     }
 
@@ -213,7 +212,7 @@ tasks.setupDokkaTemplateProjects.configure {
   doLast {
     outputs.files.asFileTree.files.forEach { file ->
       when (file.name) {
-        "build.gradle.kts" -> {
+        "build.gradle.kts"             -> {
           file.writeText(
             file.readText()
               .replace(

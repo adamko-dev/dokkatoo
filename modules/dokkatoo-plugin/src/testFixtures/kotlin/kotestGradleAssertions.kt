@@ -21,7 +21,7 @@ infix fun <T : Any> NamedDomainObjectCollection<out T>?.shouldNotContainDomainOb
   return this
 }
 
-private fun <T> containDomainObject(name: String): Matcher<NamedDomainObjectCollection<T>?> =
+private fun <T: Any> containDomainObject(name: String): Matcher<NamedDomainObjectCollection<T>?> =
   neverNullMatcher { value ->
     MatcherResult(
       name in value.names,

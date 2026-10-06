@@ -80,8 +80,7 @@ class CompositeBuildExampleTest : FunSpec({
             "> Task :module-kea:dokkatooGenerateModuleHtml UP-TO-DATE",
             "> Task :docs:dokkatooGeneratePublicationHtml UP-TO-DATE",
             "BUILD SUCCESSFUL",
-            // expect "1 executed" because :checkKotlinGradlePluginConfigurationErrors always runs (fixed KGP in 2.0?)
-            "14 actionable tasks: 1 executed, 13 up-to-date",
+            "13 actionable tasks: 13 up-to-date",
           )
         }
     }
@@ -127,6 +126,7 @@ private fun initDokkatooProject(
   destinationDir: File,
 ): GradleProjectTest {
   return GradleProjectTest(destinationDir.toPath()).apply {
+    gradleVersion = INTEGRATION_TEST_GRADLE_VERSION
     copyExampleProject("composite-build-example/dokkatoo")
   }
 }

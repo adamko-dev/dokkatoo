@@ -33,7 +33,7 @@ fun TestScope.initMultiModuleProject(
       |plugins {
       |  // Kotlin plugin shouldn't be necessary here, but without it Dokka errors
       |  // with ClassNotFound KotlinPluginExtension... very weird
-      |  kotlin("jvm") version embeddedKotlinVersion apply false
+      |  kotlin("jvm") version "$TESTED_KOTLIN_VERSION" apply false
       |  id("dev.adamko.dokkatoo") version "${DokkatooConstants.DOKKATOO_VERSION}"
       |}
       |
@@ -47,7 +47,7 @@ fun TestScope.initMultiModuleProject(
     dir("subproject-hello") {
       buildGradleKts = """
           |plugins {
-          |  kotlin("jvm") version embeddedKotlinVersion
+          |  kotlin("jvm") version "$TESTED_KOTLIN_VERSION"
           |  id("dev.adamko.dokkatoo") version "${DokkatooConstants.DOKKATOO_VERSION}"
           |}
           |
@@ -74,7 +74,7 @@ fun TestScope.initMultiModuleProject(
 
       buildGradleKts = """
           |plugins {
-          |  kotlin("jvm") version embeddedKotlinVersion
+          |  kotlin("jvm") version "$TESTED_KOTLIN_VERSION"
           |  id("dev.adamko.dokkatoo") version "${DokkatooConstants.DOKKATOO_VERSION}"
           |}
           |
