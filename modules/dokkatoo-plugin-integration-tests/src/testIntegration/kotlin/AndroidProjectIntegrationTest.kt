@@ -220,6 +220,7 @@ private fun initDokkaProject(
   destinationDir: File,
 ): GradleProjectTest {
   return GradleProjectTest(destinationDir.toPath()).apply {
+    gradleVersion = INTEGRATION_TEST_GRADLE_VERSION
     copyIntegrationTestProject("it-android-0/dokka")
 
     gradleProperties = gradleProperties
@@ -249,6 +250,7 @@ private fun initDokkatooProject(
   destinationDir: File,
 ): GradleProjectTest {
   return GradleProjectTest(destinationDir.toPath()).apply {
+    gradleVersion = INTEGRATION_TEST_GRADLE_VERSION
     copyIntegrationTestProject("it-android-0/dokkatoo")
   }
 }

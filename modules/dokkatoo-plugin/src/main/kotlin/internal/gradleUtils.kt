@@ -31,13 +31,10 @@ import org.gradle.util.GradleVersion
  * isCanBeDeclared = true
  * ```
  */
-internal fun Configuration.declarable(
-  visible: Boolean = false,
-) {
+internal fun Configuration.declarable() {
   isCanBeResolved = false
   isCanBeConsumed = false
   canBeDeclared(true)
-  isVisible = visible
 }
 
 
@@ -50,13 +47,10 @@ internal fun Configuration.declarable(
  * isCanBeDeclared = false
  * ```
  */
-internal fun Configuration.consumable(
-  visible: Boolean = false,
-) {
+internal fun Configuration.consumable() {
   isCanBeResolved = false
   isCanBeConsumed = true
   canBeDeclared(false)
-  isVisible = visible
 }
 
 
@@ -69,13 +63,10 @@ internal fun Configuration.consumable(
  * isCanBeDeclared = false
  * ```
  */
-internal fun Configuration.resolvable(
-  visible: Boolean = false,
-) {
+internal fun Configuration.resolvable() {
   isCanBeResolved = true
   isCanBeConsumed = false
   canBeDeclared(false)
-  isVisible = visible
 }
 
 
@@ -129,7 +120,7 @@ internal fun <T : Task> TaskProvider<T>.configuring(
 ): TaskProvider<T> = apply { configure(block) }
 
 
-internal fun <T> NamedDomainObjectContainer<T>.maybeCreate(
+internal fun <T : Any> NamedDomainObjectContainer<T>.maybeCreate(
   name: String,
   configure: T.() -> Unit,
 ): T = maybeCreate(name).apply(configure)
@@ -246,7 +237,7 @@ internal fun ObjectFactory.dokkaPluginParametersContainer(): DokkaPluginParamete
   ReplaceWith("dev.adamko.dokkatoo.internal.Attribute(name)"),
 )
 @JvmName("TypedAttribute")
-internal inline fun <reified T> Attribute(
+internal inline fun <reified T : Any> Attribute(
   name: String
 ): Attribute<T> =
   Attribute.of(name, T::class.java)

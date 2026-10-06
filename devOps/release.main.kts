@@ -237,11 +237,6 @@ private abstract class CliTool {
     return runCommand(cmd, dir, logOutput, attempts + 1)
   }
 
-  private data class ProcessResult(
-    val exitCode: Int,
-    val output: String,
-  )
-
   companion object {
     private fun parseSpaceSeparatedArgs(argsString: String): List<String> {
       val parsedArgs = mutableListOf<String>()

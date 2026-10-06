@@ -3,12 +3,13 @@
 import buildsrc.tasks.GenerateDokkatooConstants
 import buildsrc.utils.buildDir_
 import buildsrc.utils.skipTestFixturesPublications
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
+import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
   buildsrc.conventions.`kotlin-gradle-plugin`
   kotlin("plugin.serialization")
-
-  dev.adamko.kotlin.`binary-compatibility-validator`
 
   buildsrc.conventions.dokkatoo
   buildsrc.conventions.`maven-publishing`
@@ -103,11 +104,28 @@ gradlePlugin {
 }
 
 kotlin {
+  @OptIn(ExperimentalAbiValidation::class)
+  abiValidation {
+    filters {
+      exclude {
+        annotatedWith.add("dev.adamko.dokkatoo.internal.DokkatooInternalApi")
+      }
+    }
+  }
   sourceSets.configureEach {
     languageSettings {
       optIn("dev.adamko.dokkatoo.internal.DokkatooInternalApi")
       optIn("kotlin.io.path.ExperimentalPathApi")
     }
+  }
+}
+
+tasks.withType<KotlinCompile>().configureEach {
+  compilerOptions {
+    // Gradle 9's kotlin-dsl plugin sets these to 2.2, which older Kotlin compilers can't read
+    // (e.g. when Dokkatoo is a dependency of buildSrc in a project using Gradle 8).
+    languageVersion = KotlinVersion.KOTLIN_2_0
+    apiVersion = KotlinVersion.KOTLIN_2_0
   }
 }
 
@@ -130,27 +148,22 @@ testing.suites {
         inputs.property("projectTestTempDir", projectTestTempDirPath)
         systemProperty("projectTestTempDir", projectTestTempDirPath)
 
-        when (testType.get()) {
-          TestSuiteType.FUNCTIONAL_TEST,
-          TestSuiteType.INTEGRATION_TEST -> {
-            dependsOn(tasks.matching { it.name == "publishAllPublicationsToTestRepository" })
+        dependsOn(tasks.matching { it.name == "publishAllPublicationsToTestRepository" })
 
-            systemProperties(
-              "testMavenRepoDir" to file(mavenPublishTest.testMavenRepo).canonicalPath,
-            )
+        systemProperties(
+          "testMavenRepoDir" to file(mavenPublishTest.testMavenRepo).canonicalPath,
+        )
 
-            // depend on the test-publication task, but not the test-maven repo
-            // (otherwise this task will never be up-to-date)
-            dependsOn(tasks.publishToTestMavenRepo)
+        // depend on the test-publication task, but not the test-maven repo
+        // (otherwise this task will never be up-to-date)
+        dependsOn(tasks.publishToTestMavenRepo)
 
-            systemProperty(
-              "kotest.framework.config.fqn",
-              "dev.adamko.dokkatoo.utils.KotestProjectConfig",
-            )
-            // FIXME remove autoscan when Kotest >= 6.0
-            systemProperty("kotest.framework.classpath.scanning.autoscan.disable", "true")
-          }
-        }
+        systemProperty(
+          "kotest.framework.config.fqn",
+          "dev.adamko.dokkatoo.utils.KotestProjectConfig",
+        )
+        // FIXME remove autoscan when Kotest >= 6.0
+        systemProperty("kotest.framework.classpath.scanning.autoscan.disable", "true")
       }
     }
   }
@@ -165,7 +178,6 @@ testing.suites {
   /** Functional tests suite */
   val testFunctional by registering(JvmTestSuite::class) {
     description = "Tests that use Gradle TestKit to test functionality"
-    testType.set(TestSuiteType.FUNCTIONAL_TEST)
 
     targets.all {
       testTask.configure {
@@ -199,10 +211,6 @@ val aggregateTestReports by tasks.registering(TestReport::class) {
   doLast {
     logger.lifecycle("Aggregated test report: file://${destinationDirectory.asFile.get()}/index.html")
   }
-}
-
-binaryCompatibilityValidator {
-  ignoredMarkers.add("dev.adamko.dokkatoo.internal.DokkatooInternalApi")
 }
 
 val dokkatooVersion = provider { project.version.toString() }

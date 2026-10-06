@@ -24,6 +24,12 @@ class GradleProjectTest(
     baseDir: Path = funcTestTempDir,
   ) : this(projectDir = baseDir.resolve(testProjectName))
 
+  /**
+   * Gradle version used to run the test project.
+   * If `null`, the Gradle version of the current build is used.
+   */
+  var gradleVersion: String? = null
+
   /** Args that will be added to every [runner] */
   val defaultRunnerArgs: MutableList<String> = mutableListOf(
     // disable the logging task so the tests work consistently on local machines and CI/CD
@@ -38,6 +44,7 @@ class GradleProjectTest(
         "-XX:+AlwaysPreTouch", // https://github.com/gradle/gradle/issues/3093#issuecomment-387259298
       )
       .addArguments(*defaultRunnerArgs.toTypedArray())
+      .apply { gradleVersion?.let(::withGradleVersion) }
 
   companion object {
 

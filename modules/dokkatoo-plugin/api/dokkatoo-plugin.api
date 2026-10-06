@@ -13,11 +13,6 @@ public final class dev/adamko/dokkatoo/DokkatooBasePlugin$Companion {
 	public final fun getTaskNames ()Ldev/adamko/dokkatoo/tasks/TaskNames;
 }
 
-public final class dev/adamko/dokkatoo/DokkatooBasePlugin$inlined$sam$i$org_gradle_api_Action$0 : org/gradle/api/Action {
-	public fun <init> (Lkotlin/jvm/functions/Function1;)V
-	public final synthetic fun execute (Ljava/lang/Object;)V
-}
-
 public abstract class dev/adamko/dokkatoo/DokkatooExtension : java/io/Serializable, org/gradle/api/plugins/ExtensionAware {
 	public final fun ClassLoaderIsolation (Lkotlin/jvm/functions/Function1;)Ldev/adamko/dokkatoo/workers/ClassLoaderIsolation;
 	public static synthetic fun ClassLoaderIsolation$default (Ldev/adamko/dokkatoo/DokkatooExtension;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ldev/adamko/dokkatoo/workers/ClassLoaderIsolation;
@@ -101,13 +96,13 @@ public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaGeneratorParamet
 	public abstract fun getSuppressObviousFunctions ()Lorg/gradle/api/provider/Property;
 }
 
-public final class dev/adamko/dokkatoo/dokka/parameters/DokkaModuleDescriptionKxs$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class dev/adamko/dokkatoo/dokka/parameters/DokkaModuleDescriptionKxs$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Ldev/adamko/dokkatoo/dokka/parameters/DokkaModuleDescriptionKxs$$serializer;
-	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
-	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ldev/adamko/dokkatoo/dokka/parameters/DokkaModuleDescriptionKxs;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ldev/adamko/dokkatoo/dokka/parameters/DokkaModuleDescriptionKxs;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
-	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
-	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Ldev/adamko/dokkatoo/dokka/parameters/DokkaModuleDescriptionKxs;)V
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Ldev/adamko/dokkatoo/dokka/parameters/DokkaModuleDescriptionKxs;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
@@ -117,6 +112,7 @@ public final class dev/adamko/dokkatoo/dokka/parameters/DokkaModuleDescriptionKx
 }
 
 public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaPackageOptionsSpec : dev/adamko/dokkatoo/dokka/parameters/HasConfigurableVisibilityModifiers, java/io/Serializable {
+	public fun documentedVisibilities ([Ldev/adamko/dokkatoo/dokka/parameters/VisibilityModifier;)V
 	public abstract fun getDocumentedVisibilities ()Lorg/gradle/api/provider/SetProperty;
 	public abstract fun getMatchingRegex ()Lorg/gradle/api/provider/Property;
 	public abstract fun getReportUndocumented ()Lorg/gradle/api/provider/Property;
@@ -146,6 +142,7 @@ public final class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceSetIdSpec$Com
 }
 
 public abstract class dev/adamko/dokkatoo/dokka/parameters/DokkaSourceSetSpec : dev/adamko/dokkatoo/dokka/parameters/HasConfigurableVisibilityModifiers, java/io/Serializable, org/gradle/api/Named, org/gradle/api/plugins/ExtensionAware {
+	public fun documentedVisibilities ([Ldev/adamko/dokkatoo/dokka/parameters/VisibilityModifier;)V
 	public abstract fun getAnalysisPlatform ()Lorg/gradle/api/provider/Property;
 	public abstract fun getApiVersion ()Lorg/gradle/api/provider/Property;
 	public abstract fun getClasspath ()Lorg/gradle/api/file/ConfigurableFileCollection;
@@ -184,6 +181,7 @@ public final class dev/adamko/dokkatoo/dokka/parameters/KotlinPlatform : java/la
 	public static final field JVM Ldev/adamko/dokkatoo/dokka/parameters/KotlinPlatform;
 	public static final field Native Ldev/adamko/dokkatoo/dokka/parameters/KotlinPlatform;
 	public static final field WASM Ldev/adamko/dokkatoo/dokka/parameters/KotlinPlatform;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
 	public static fun valueOf (Ljava/lang/String;)Ldev/adamko/dokkatoo/dokka/parameters/KotlinPlatform;
 	public static fun values ()[Ldev/adamko/dokkatoo/dokka/parameters/KotlinPlatform;
 }
@@ -200,6 +198,7 @@ public final class dev/adamko/dokkatoo/dokka/parameters/VisibilityModifier : jav
 	public static final field PRIVATE Ldev/adamko/dokkatoo/dokka/parameters/VisibilityModifier;
 	public static final field PROTECTED Ldev/adamko/dokkatoo/dokka/parameters/VisibilityModifier;
 	public static final field PUBLIC Ldev/adamko/dokkatoo/dokka/parameters/VisibilityModifier;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
 	public static fun valueOf (Ljava/lang/String;)Ldev/adamko/dokkatoo/dokka/parameters/VisibilityModifier;
 	public static fun values ()[Ldev/adamko/dokkatoo/dokka/parameters/VisibilityModifier;
 }
@@ -336,23 +335,12 @@ public abstract class dev/adamko/dokkatoo/formats/DokkatooFormatPlugin : org/gra
 public final class dev/adamko/dokkatoo/formats/DokkatooFormatPlugin$Companion {
 }
 
-public final class dev/adamko/dokkatoo/formats/DokkatooFormatTasks$inlined$sam$i$org_gradle_api_Action$0 : org/gradle/api/Action {
-	public fun <init> (Lkotlin/jvm/functions/Function1;)V
-	public final synthetic fun execute (Ljava/lang/Object;)V
-}
-
 public abstract class dev/adamko/dokkatoo/formats/DokkatooGfmPlugin : dev/adamko/dokkatoo/formats/DokkatooFormatPlugin {
 	public fun configure (Ldev/adamko/dokkatoo/formats/DokkatooFormatPlugin$DokkatooFormatPluginContext;)V
 }
 
 public abstract class dev/adamko/dokkatoo/formats/DokkatooHtmlPlugin : dev/adamko/dokkatoo/formats/DokkatooFormatPlugin {
-	public static final field Companion Ldev/adamko/dokkatoo/formats/DokkatooHtmlPlugin$Companion;
 	public fun configure (Ldev/adamko/dokkatoo/formats/DokkatooFormatPlugin$DokkatooFormatPluginContext;)V
-}
-
-public final class dev/adamko/dokkatoo/formats/DokkatooHtmlPlugin$inlined$sam$i$org_gradle_api_Action$0 : org/gradle/api/Action {
-	public fun <init> (Lkotlin/jvm/functions/Function1;)V
-	public final synthetic fun execute (Ljava/lang/Object;)V
 }
 
 public abstract class dev/adamko/dokkatoo/formats/DokkatooJavadocPlugin : dev/adamko/dokkatoo/formats/DokkatooFormatPlugin {
@@ -391,6 +379,7 @@ public abstract class dev/adamko/dokkatoo/tasks/DokkatooGenerateTask : dev/adamk
 public final class dev/adamko/dokkatoo/tasks/DokkatooGenerateTask$GenerationType : java/lang/Enum {
 	public static final field MODULE Ldev/adamko/dokkatoo/tasks/DokkatooGenerateTask$GenerationType;
 	public static final field PUBLICATION Ldev/adamko/dokkatoo/tasks/DokkatooGenerateTask$GenerationType;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
 	public static fun valueOf (Ljava/lang/String;)Ldev/adamko/dokkatoo/tasks/DokkatooGenerateTask$GenerationType;
 	public static fun values ()[Ldev/adamko/dokkatoo/tasks/DokkatooGenerateTask$GenerationType;
 }

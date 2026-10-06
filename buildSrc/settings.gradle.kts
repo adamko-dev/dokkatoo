@@ -4,7 +4,15 @@ pluginManagement {
   repositories {
     mavenCentral()
     gradlePluginPortal()
+    maven("https://central.sonatype.com/repository/maven-snapshots/") {
+      name = "MavenCentralSnapshots"
+      mavenContent { snapshotsOnly() }
+    }
   }
+}
+
+plugins {
+  id("dev.adamko.gradle-kotlin-accessors") version "main-SNAPSHOT"
 }
 
 @Suppress("UnstableApiUsage")
@@ -26,7 +34,7 @@ dependencyResolutionManagement {
       mavenContent { snapshotsOnly() }
     }
 
-    maven("https://s01.oss.sonatype.org/content/repositories/snapshots/") {
+    maven("https://central.sonatype.com/repository/maven-snapshots/") {
       name = "MavenCentralSnapshots"
       mavenContent { snapshotsOnly() }
     }

@@ -6,7 +6,6 @@ plugins {
 
 dependencies {
   implementation("org.gradle.kotlin:gradle-kotlin-dsl-plugins:$expectedKotlinDslPluginsVersion")
-  implementation(libs.gradlePlugin.bcvMu)
   implementation(libs.gradlePlugin.dokkatoo)
   implementation(libs.gradlePlugin.gradlePublishPlugin)
   implementation(libs.gradlePlugin.node)
@@ -18,6 +17,8 @@ dependencies {
   }
 
   compileOnly("com.microsoft.playwright:playwright:1.56.0")
+
+  implementation(gradleKotlinAccessorsLibs.accessors)
 }
 
 kotlin {

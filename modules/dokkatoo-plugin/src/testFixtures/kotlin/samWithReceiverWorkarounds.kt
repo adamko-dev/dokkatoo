@@ -50,19 +50,19 @@ fun Project.subprojects_(configure: Project.() -> Unit) =
 fun Project.allprojects_(configure: Project.() -> Unit) =
   allprojects(configure)
 
-fun <T> DomainObjectCollection<T>.configureEach_(configure: T.() -> Unit) =
+fun <T: Any> DomainObjectCollection<T>.configureEach_(configure: T.() -> Unit) =
   configureEach(configure)
 
-fun <T> DomainObjectCollection<T>.all_(configure: T.() -> Unit) =
+fun <T: Any> DomainObjectCollection<T>.all_(configure: T.() -> Unit) =
   all(configure)
 
 fun Configuration.withDependencies_(action: DependencySet.() -> Unit): Configuration =
   withDependencies(action)
 
-fun <T> NamedDomainObjectContainer<T>.create_(name: String, configure: T.() -> Unit = {}): T =
+fun <T: Any> NamedDomainObjectContainer<T>.create_(name: String, configure: T.() -> Unit = {}): T =
   create(name, configure)
 
-fun <T> NamedDomainObjectContainer<T>.register_(
+fun <T: Any> NamedDomainObjectContainer<T>.register_(
   name: String,
   configure: T.() -> Unit
 ): NamedDomainObjectProvider<T> =
