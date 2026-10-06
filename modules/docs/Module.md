@@ -1,5 +1,9 @@
 # Dokkatoo Gradle Plugin
 
+> **The Dokkatoo Gradle plugin is deprecated.**
+> It has been merged into [Dokka](https://github.com/Kotlin/dokka).
+> Please [migrate to the Dokka Gradle Plugin](https://github.com/adamko-dev/dokkatoo#migration-from-dokkatoo-to-dokka-gradle-plugin).
+
 [Dokkatoo](https://github.com/adamko-dev/dokkatoo) is a Gradle plugin that generates documentation
 for your Kotlin projects.
 

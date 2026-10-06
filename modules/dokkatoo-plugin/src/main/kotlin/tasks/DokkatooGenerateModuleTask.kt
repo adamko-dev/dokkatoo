@@ -2,6 +2,7 @@ package dev.adamko.dokkatoo.tasks
 
 import dev.adamko.dokkatoo.DokkatooBasePlugin
 import dev.adamko.dokkatoo.dokka.parameters.DokkaModuleDescriptionKxs
+import dev.adamko.dokkatoo.internal.DOKKATOO_GRADLE_PLUGIN_DEPRECATION_MESSAGE
 import dev.adamko.dokkatoo.internal.DokkaPluginParametersContainer
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import java.io.File
@@ -23,6 +24,8 @@ import org.gradle.workers.WorkerExecutor
  * by [DokkatooGeneratePublicationTask].
  */
 @CacheableTask
+@Deprecated(DOKKATOO_GRADLE_PLUGIN_DEPRECATION_MESSAGE)
+@Suppress("DEPRECATION")
 abstract class DokkatooGenerateModuleTask
 @DokkatooInternalApi
 @Inject
@@ -82,6 +85,7 @@ constructor(
       modulePath = modulePath,
     )
 
+    @Suppress("DEPRECATION")
     val encodedModuleDesc =
       DokkatooBasePlugin.jsonMapper.encodeToString(
         DokkaModuleDescriptionKxs.serializer(),

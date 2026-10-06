@@ -1,5 +1,6 @@
 package dev.adamko.dokkatoo.tasks
 
+import dev.adamko.dokkatoo.internal.DOKKATOO_GRADLE_PLUGIN_DEPRECATION_MESSAGE
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import dev.adamko.dokkatoo.internal.appendPath
 import dev.adamko.dokkatoo.tasks.LogHtmlPublicationLinkTask.Companion.ENABLE_TASK_PROPERTY_NAME
@@ -37,6 +38,8 @@ import org.slf4j.LoggerFactory
  * but the built-in server is also available in IntelliJ IDEA.
  */
 @UntrackedTask(because = "logging-only task")
+@Deprecated(DOKKATOO_GRADLE_PLUGIN_DEPRECATION_MESSAGE)
+@Suppress("DEPRECATION")
 abstract class LogHtmlPublicationLinkTask
 @Inject
 @DokkatooInternalApi

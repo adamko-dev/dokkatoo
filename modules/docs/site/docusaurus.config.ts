@@ -48,6 +48,13 @@ const config: Config = {
   ],
 
   themeConfig: {
+    announcementBar: {
+      id: "dokkatoo-deprecated",
+      content: 'The Dokkatoo Gradle plugin is deprecated: it has been merged into <a href="https://github.com/Kotlin/dokka">Dokka</a>. Please <a href="https://github.com/adamko-dev/dokkatoo#migration-from-dokkatoo-to-dokka-gradle-plugin">migrate to the Dokka Gradle Plugin</a>.',
+      backgroundColor: "var(--ifm-color-warning-contrast-background)",
+      textColor: "var(--ifm-color-warning-contrast-foreground)",
+      isCloseable: false,
+    },
     colorMode: {
       defaultMode: "dark",
       disableSwitch: false,

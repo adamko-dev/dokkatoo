@@ -33,3 +33,14 @@
   justify-content: center;
   gap: 1em;
 }
+
+.deprecationNotice {
+  max-width: 40rem;
+  margin: 0 auto 2rem;
+  text-align: center;
+}
+
+/*!* Infima underlines all links in an alert, including buttons *!*/
+/*.deprecationNotice :global(.button) {*/
+/*  text-decoration: none;*/
+/*}*/

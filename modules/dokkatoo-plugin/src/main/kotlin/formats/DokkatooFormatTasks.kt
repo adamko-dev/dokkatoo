@@ -26,6 +26,7 @@ class DokkatooFormatTasks(
 
   private val taskNames = TaskNames(formatName)
 
+  @Suppress("DEPRECATION")
   private fun DokkatooGenerateTask.applyFormatSpecificConfiguration() {
     runtimeClasspath.from(
       formatDependencies.dokkaGeneratorClasspathResolver
@@ -48,6 +49,7 @@ class DokkatooFormatTasks(
     }
   }
 
+  @Suppress("DEPRECATION")
   val generatePublication: TaskProvider<DokkatooGeneratePublicationTask> =
     project.tasks.register<DokkatooGeneratePublicationTask>(
       taskNames.generatePublication,
@@ -60,6 +62,7 @@ class DokkatooFormatTasks(
       applyFormatSpecificConfiguration()
     }
 
+  @Suppress("DEPRECATION")
   val generateModule: TaskProvider<DokkatooGenerateModuleTask> =
     project.tasks.register<DokkatooGenerateModuleTask>(
       taskNames.generateModule,

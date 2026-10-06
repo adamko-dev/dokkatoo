@@ -54,7 +54,7 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
   override fun apply(project: Project) {
     logger.info("Applying $dkaName to ${project.path}")
 
-    project.plugins.withType<DokkatooBasePlugin>().configureEach {
+    project.plugins.withType<@Suppress("DEPRECATION") DokkatooBasePlugin>().configureEach {
       project.pluginManager.apply {
         withPlugin(PluginId.KotlinAndroid) { exec(project) }
         withPlugin(PluginId.KotlinJs) { exec(project) }
@@ -88,7 +88,8 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
     }
     logger.info("Configuring $dkaName in Gradle Kotlin Project ${project.path}")
 
-    val dokkatooExtension = project.extensions.getByType<DokkatooExtension>()
+    val dokkatooExtension =
+      project.extensions.getByType<@Suppress("DEPRECATION") DokkatooExtension>()
 
     // first fetch the relevant properties of all KotlinCompilations
     val compilationDetailsBuilder = KotlinCompilationDetailsBuilder(
@@ -124,7 +125,7 @@ abstract class DokkatooKotlinAdapter @Inject constructor(
 
   /** Register a [DokkaSourceSetSpec] for each element in [sourceSetDetails] */
   private fun registerDokkatooSourceSets(
-    dokkatooExtension: DokkatooExtension,
+    dokkatooExtension: @Suppress("DEPRECATION") DokkatooExtension,
     sourceSetDetails: NamedDomainObjectContainer<KotlinSourceSetDetails>,
   ) {
     // proactively use 'all' so source sets will be available in users' build files if they use `named("...")`
@@ -358,7 +359,7 @@ private class KotlinCompilationDetailsBuilder(
         )
       }
     } else {
-      return providers.provider { objects.fileCollection() }
+      providers.provider { objects.fileCollection() }
     }
   }
 

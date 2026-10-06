@@ -92,6 +92,7 @@ internal class DokkaParametersBuilder(
           error("missing module-descriptor.json in consolidated Dokka module $moduleDir")
         }
 
+        @Suppress("DEPRECATION")
         val moduleDescriptor: DokkaModuleDescriptionKxs =
           DokkatooBasePlugin.jsonMapper.decodeFromString(
             DokkaModuleDescriptionKxs.serializer(),

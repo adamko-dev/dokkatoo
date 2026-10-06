@@ -1,5 +1,6 @@
 package dev.adamko.dokkatoo.tasks
 
+import dev.adamko.dokkatoo.internal.DOKKATOO_GRADLE_PLUGIN_DEPRECATION_MESSAGE
 import dev.adamko.dokkatoo.internal.DokkaPluginParametersContainer
 import dev.adamko.dokkatoo.internal.DokkatooInternalApi
 import javax.inject.Inject
@@ -18,6 +19,8 @@ import org.gradle.workers.WorkerExecutor
  * [DokkatooGenerateModuleTask].
  */
 @CacheableTask
+@Deprecated(DOKKATOO_GRADLE_PLUGIN_DEPRECATION_MESSAGE)
+@Suppress("DEPRECATION")
 abstract class DokkatooGeneratePublicationTask
 @DokkatooInternalApi
 @Inject

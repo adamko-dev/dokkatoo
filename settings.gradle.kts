@@ -31,6 +31,13 @@ dependencyResolutionManagement {
       }
       metadataSources { artifact() }
     }
+
+    ivy("https://nodejs.org/dist/") {
+      name = "Node.js"
+      patternLayout { artifact("v[revision]/[artifact](-v[revision]-[classifier]).[ext]") }
+      metadataSources { artifact() }
+      content { includeModule("org.nodejs", "node") }
+    }
   }
 }
 

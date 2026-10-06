@@ -27,7 +27,7 @@ import org.gradle.api.tasks.UntrackedTask
       "This task now does nothing and should not be used."
 )
 @UntrackedTask(because = "DokkatooPrepareModuleDescriptorTask has been deprecated and should no longer be used - see KDoc")
-@Suppress("unused")
+@Suppress("unused", "DEPRECATION")
 abstract class DokkatooPrepareModuleDescriptorTask
 @DokkatooInternalApi
 @Inject

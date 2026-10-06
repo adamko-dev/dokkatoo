@@ -35,6 +35,7 @@ abstract class DokkatooJavaAdapter @Inject constructor(
 
   private val logger = Logging.getLogger(this::class.java)
 
+  @Suppress("DEPRECATION")
   override fun apply(project: Project) {
     logger.info("applied DokkatooJavaAdapter to ${project.path}")
 
@@ -53,6 +54,7 @@ abstract class DokkatooJavaAdapter @Inject constructor(
   }
 
   /** fetch the  toolchain, and use the language version as Dokka's jdkVersion */
+  @Suppress("DEPRECATION")
   private fun detectJavaToolchainVersion(
     dokkatoo: DokkatooExtension,
     java: JavaPluginExtension,
@@ -67,6 +69,7 @@ abstract class DokkatooJavaAdapter @Inject constructor(
     }
   }
 
+  @Suppress("DEPRECATION")
   private fun registerDokkatooSourceSets(
     dokkatoo: DokkatooExtension,
     sourceSets: SourceSetContainer,
